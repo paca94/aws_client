@@ -13,26 +13,30 @@ class RegionConfigData {
   @JsonKey(name: "dualstackFipsRules", fromJson: mapDualstackFipsRulesFromJson)
   final Map<String, dynamic> dualstackFipsRules;
 
-  RegionConfigData(this.rules, this.patterns, this.fipsRules, this.dualstackRules, this.dualstackFipsRules);
+  RegionConfigData(this.rules, this.patterns, this.fipsRules,
+      this.dualstackRules, this.dualstackFipsRules);
 
   static RegionConfigData fromJson(Map<String, dynamic> json) =>
       _$RegionConfigDataFromJson(json);
 
   static mapFipsRulesFromJson(Map<String, dynamic> json) {
     return (json as Map<String, dynamic>).map(
-      (k, e) => MapEntry(k, e is String ? e : RegionConfig.fromJson(e as Map<String, dynamic>)),
+      (k, e) => MapEntry(k,
+          e is String ? e : RegionConfig.fromJson(e as Map<String, dynamic>)),
     );
   }
 
   static mapDualstackRulesFromJson(Map<String, dynamic> json) {
     return (json as Map<String, dynamic>).map(
-      (k, e) => MapEntry(k, e is String ? e : RegionConfig.fromJson(e as Map<String, dynamic>)),
+      (k, e) => MapEntry(k,
+          e is String ? e : RegionConfig.fromJson(e as Map<String, dynamic>)),
     );
   }
 
   static mapDualstackFipsRulesFromJson(Map<String, dynamic> json) {
     return (json as Map<String, dynamic>).map(
-      (k, e) => MapEntry(k, e is String ? e : RegionConfig.fromJson(e as Map<String, dynamic>)),
+      (k, e) => MapEntry(k,
+          e is String ? e : RegionConfig.fromJson(e as Map<String, dynamic>)),
     );
   }
 }

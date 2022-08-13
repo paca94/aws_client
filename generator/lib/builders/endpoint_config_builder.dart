@@ -25,7 +25,7 @@ final rules = <String, RegionConfig>{
 
   for (var pattern in regionConfigData.patterns.entries) {
     String patternKey = pattern.key;
-    if (patternKey.contains(".")){
+    if (patternKey.contains(".")) {
       patternKey = pattern.key.replaceAll(".", "_");
     }
     code.writeln('');
