@@ -68,6 +68,94 @@ final rules = <String, RegionConfig>{
     signatureVersion: 'v2',
   ),
 };
+final fipsRules = <String, RegionConfig>{
+  '*/*': _fipsStandard,
+  'us-gov-*/*': _fipsStandard,
+  'us-iso-*/*': RegionConfig(
+    endpoint: '{service}-fips.{region}.c2s.ic.gov',
+  ),
+  'us-iso-*/dms': _usIso,
+  'us-isob-*/*': RegionConfig(
+    endpoint: '{service}-fips.{region}.sc2s.sgov.gov',
+  ),
+  'us-isob-*/dms': _usIsob,
+  'cn-*/*': RegionConfig(
+    endpoint: '{service}-fips.{region}.amazonaws.com.cn',
+  ),
+  '*/api.ecr': _fipsApiEcr,
+  '*/api.sagemaker': _fipsApiSagemaker,
+  '*/batch': _fipsDotPrefix,
+  '*/eks': _fipsDotPrefix,
+  '*/models.lex': _fipsModelsLex,
+  '*/runtime.lex': _fipsRuntimeLex,
+  '*/runtime.sagemaker': RegionConfig(
+    endpoint: 'runtime-fips.sagemaker.{region}.amazonaws.com',
+  ),
+  '*/iam': _fipsWithoutRegion,
+  '*/route53': _fipsWithoutRegion,
+  '*/transcribe': _fipsDotPrefix,
+  '*/waf': _fipsWithoutRegion,
+  'us-gov-*/transcribe': _fipsDotPrefix,
+  'us-gov-*/api.ecr': _fipsApiEcr,
+  'us-gov-*/api.sagemaker': _fipsApiSagemaker,
+  'us-gov-*/models.lex': _fipsModelsLex,
+  'us-gov-*/runtime.lex': _fipsRuntimeLex,
+  'us-gov-*/acm-pca': _fipsWithServiceOnly,
+  'us-gov-*/batch': _fipsWithServiceOnly,
+  'us-gov-*/config': _fipsWithServiceOnly,
+  'us-gov-*/eks': _fipsWithServiceOnly,
+  'us-gov-*/elasticmapreduce': _fipsWithServiceOnly,
+  'us-gov-*/identitystore': _fipsWithServiceOnly,
+  'us-gov-*/dynamodb': _fipsWithServiceOnly,
+  'us-gov-*/elasticloadbalancing': _fipsWithServiceOnly,
+  'us-gov-*/guardduty': _fipsWithServiceOnly,
+  'us-gov-*/monitoring': _fipsWithServiceOnly,
+  'us-gov-*/resource-groups': _fipsWithServiceOnly,
+  'us-gov-*/runtime.sagemaker': _fipsWithServiceOnly,
+  'us-gov-*/servicecatalog-appregistry': _fipsWithServiceOnly,
+  'us-gov-*/servicequotas': _fipsWithServiceOnly,
+  'us-gov-*/ssm': _fipsWithServiceOnly,
+  'us-gov-*/sts': _fipsWithServiceOnly,
+  'us-gov-*/support': _fipsWithServiceOnly,
+  'us-gov-west-1/states': _fipsWithServiceOnly,
+  'us-iso-east-1/elasticfilesystem': RegionConfig(
+    endpoint: 'elasticfilesystem-fips.{region}.c2s.ic.gov',
+  ),
+  'us-gov-west-1/organizations': _fipsWithServiceOnly,
+  'us-gov-west-1/route53': RegionConfig(
+    endpoint: 'route53.us-gov.amazonaws.com',
+  ),
+};
+final dualstackRules = <String, RegionConfig>{
+  '*/*': RegionConfig(
+    endpoint: '{service}.{region}.api.aws',
+  ),
+  'cn-*/*': RegionConfig(
+    endpoint: '{service}.{region}.api.amazonwebservices.com.cn',
+  ),
+  '*/s3': _dualstackLegacy,
+  'cn-*/s3': _dualstackLegacyCn,
+  '*/s3-control': _dualstackLegacy,
+  'cn-*/s3-control': _dualstackLegacyCn,
+  'ap-south-1/ec2': _dualstackLegacyEc2,
+  'eu-west-1/ec2': _dualstackLegacyEc2,
+  'sa-east-1/ec2': _dualstackLegacyEc2,
+  'us-east-1/ec2': _dualstackLegacyEc2,
+  'us-east-2/ec2': _dualstackLegacyEc2,
+  'us-west-2/ec2': _dualstackLegacyEc2,
+};
+final dualstackFipsRules = <String, RegionConfig>{
+  '*/*': RegionConfig(
+    endpoint: '{service}-fips.{region}.api.aws',
+  ),
+  'cn-*/*': RegionConfig(
+    endpoint: '{service}-fips.{region}.api.amazonwebservices.com.cn',
+  ),
+  '*/s3': _dualstackFipsLegacy,
+  'cn-*/s3': _dualstackFipsLegacyCn,
+  '*/s3-control': _dualstackFipsLegacy,
+  'cn-*/s3-control': _dualstackFipsLegacyCn,
+};
 
 final _globalSSL = RegionConfig(
   endpoint: 'https://{service}.amazonaws.com',
