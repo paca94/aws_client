@@ -26,7 +26,9 @@ final rules = <String, RegionConfig>{
   for (var pattern in regionConfigData.patterns.entries) {
     String patternKey = pattern.key;
     if (patternKey.contains(".")) {
-      patternKey = pattern.key.replaceAll(".", "_");
+      patternKey = pattern.key.split(".").reduce((value, element) {
+        return value + "${element[0].toUpperCase()}${element.substring(1)}";
+      });
     }
     code.writeln('');
     code.writeln(

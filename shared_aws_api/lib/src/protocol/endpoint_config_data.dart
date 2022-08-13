@@ -106,19 +106,19 @@ final _fipsWithoutRegion = RegionConfig(
   endpoint: '{service}-fips.amazonaws.com',
 );
 
-final _fips_api_ecr = RegionConfig(
+final _fipsApiEcr = RegionConfig(
   endpoint: 'ecr-fips.{region}.amazonaws.com',
 );
 
-final _fips_api_sagemaker = RegionConfig(
+final _fipsApiSagemaker = RegionConfig(
   endpoint: 'api-fips.sagemaker.{region}.amazonaws.com',
 );
 
-final _fips_models_lex = RegionConfig(
+final _fipsModelsLex = RegionConfig(
   endpoint: 'models-fips.lex.{region}.amazonaws.com',
 );
 
-final _fips_runtime_lex = RegionConfig(
+final _fipsRuntimeLex = RegionConfig(
   endpoint: 'runtime-fips.lex.{region}.amazonaws.com',
 );
 
