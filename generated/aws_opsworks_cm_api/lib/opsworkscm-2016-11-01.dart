@@ -438,7 +438,7 @@ class OpsWorksCM {
   /// Parameter [engineVersion] :
   /// The major release version of the engine that you want to use. For a Chef
   /// server, the valid value for EngineVersion is currently <code>2</code>. For
-  /// a Puppet server, the valid value is <code>2017</code>.
+  /// a Puppet server, valid values are <code>2019</code> or <code>2017</code>.
   ///
   /// Parameter [keyPair] :
   /// The Amazon EC2 key pair to set for the instance. This parameter is
@@ -1366,7 +1366,7 @@ class OpsWorksCM {
   /// Parameter [keyPair] :
   /// The name of the key pair to set on the new EC2 instance. This can be
   /// helpful if the administrator no longer has the SSH key.
-  Future<void> restoreServer({
+  Future<RestoreServerResponse> restoreServer({
     required String backupId,
     required String serverName,
     String? instanceType,
@@ -1404,7 +1404,7 @@ class OpsWorksCM {
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'OpsWorksCM_V2016_11_01.RestoreServer'
     };
-    await _protocol.send(
+    final jsonResponse = await _protocol.send(
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
@@ -1417,6 +1417,8 @@ class OpsWorksCM {
         if (keyPair != null) 'KeyPair': keyPair,
       },
     );
+
+    return RestoreServerResponse.fromJson(jsonResponse.body);
   }
 
   /// Manually starts server maintenance. This command can be useful if an
@@ -2167,11 +2169,24 @@ class DescribeServersResponse {
   /// 1 must have had at least one successful maintenance run after November 1,
   /// 2019.
   ///
-  /// <i>For Puppet Server:</i>
-  /// <code>DescribeServersResponse$Servers$EngineAttributes</code> contains
-  /// PUPPET_API_CA_CERT. This is the PEM-encoded CA certificate that is used by
-  /// the Puppet API over TCP port number 8140. The CA certificate is also used to
-  /// sign node certificates.
+  /// <i>For Puppet servers:</i>
+  /// <code>DescribeServersResponse$Servers$EngineAttributes</code> contains the
+  /// following two responses:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>PUPPET_API_CA_CERT</code>, the PEM-encoded CA certificate that is used
+  /// by the Puppet API over TCP port number 8140. The CA certificate is also used
+  /// to sign node certificates.
+  /// </li>
+  /// <li>
+  /// <code>PUPPET_API_CRL</code>, a certificate revocation list. The certificate
+  /// revocation list is for internal maintenance purposes only. For more
+  /// information about the Puppet certificate revocation list, see <a
+  /// href="https://puppet.com/docs/puppet/5.5/man/certificate_revocation_list.html">Man
+  /// Page: puppet certificate_revocation_list</a> in the Puppet documentation.
+  /// </li>
+  /// </ul>
   final List<Server>? servers;
 
   DescribeServersResponse({
@@ -2357,9 +2372,17 @@ extension on String {
 }
 
 class RestoreServerResponse {
-  RestoreServerResponse();
-  factory RestoreServerResponse.fromJson(Map<String, dynamic> _) {
-    return RestoreServerResponse();
+  final Server? server;
+
+  RestoreServerResponse({
+    this.server,
+  });
+  factory RestoreServerResponse.fromJson(Map<String, dynamic> json) {
+    return RestoreServerResponse(
+      server: json['Server'] != null
+          ? Server.fromJson(json['Server'] as Map<String, dynamic>)
+          : null,
+    );
   }
 }
 
@@ -2439,8 +2462,8 @@ class Server {
   final String? engineModel;
 
   /// The engine version of the server. For a Chef server, the valid value for
-  /// EngineVersion is currently <code>2</code>. For a Puppet server, the valid
-  /// value is <code>2017</code>.
+  /// EngineVersion is currently <code>2</code>. For a Puppet server, specify
+  /// either <code>2019</code> or <code>2017</code>.
   final String? engineVersion;
 
   /// The instance profile ARN of the server.

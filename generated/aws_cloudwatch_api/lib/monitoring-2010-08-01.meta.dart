@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_single_quotes
 const Map<String, Map<String, dynamic>> shapesJson = {
+  "AccountId": {"type": "string", "flattened": false},
   "ActionPrefix": {"type": "string", "flattened": false},
   "ActionsEnabled": {"type": "boolean", "flattened": false},
+  "ActionsSuppressedBy": {"type": "string", "flattened": false},
+  "ActionsSuppressedReason": {"type": "string", "flattened": false},
   "AlarmArn": {"type": "string", "flattened": false},
   "AlarmDescription": {"type": "string", "flattened": false},
   "AlarmHistoryItem": {
@@ -47,7 +50,15 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "shape": "AnomalyDetectorConfiguration",
         "flattened": false
       },
-      "StateValue": {"shape": "AnomalyDetectorStateValue", "flattened": false}
+      "StateValue": {"shape": "AnomalyDetectorStateValue", "flattened": false},
+      "SingleMetricAnomalyDetector": {
+        "shape": "SingleMetricAnomalyDetector",
+        "flattened": false
+      },
+      "MetricMathAnomalyDetector": {
+        "shape": "MetricMathAnomalyDetector",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -73,6 +84,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
   "AnomalyDetectorMetricStat": {"type": "string", "flattened": false},
   "AnomalyDetectorMetricTimezone": {"type": "string", "flattened": false},
   "AnomalyDetectorStateValue": {"type": "string", "flattened": false},
+  "AnomalyDetectorType": {"type": "string", "flattened": false},
+  "AnomalyDetectorTypes": {
+    "type": "list",
+    "member": {"shape": "AnomalyDetectorType"},
+    "flattened": false
+  },
   "AnomalyDetectors": {
     "type": "list",
     "member": {"shape": "AnomalyDetector"},
@@ -102,7 +119,25 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "StateReason": {"shape": "StateReason", "flattened": false},
       "StateReasonData": {"shape": "StateReasonData", "flattened": false},
       "StateUpdatedTimestamp": {"shape": "Timestamp", "flattened": false},
-      "StateValue": {"shape": "StateValue", "flattened": false}
+      "StateValue": {"shape": "StateValue", "flattened": false},
+      "StateTransitionedTimestamp": {"shape": "Timestamp", "flattened": false},
+      "ActionsSuppressedBy": {
+        "shape": "ActionsSuppressedBy",
+        "flattened": false
+      },
+      "ActionsSuppressedReason": {
+        "shape": "ActionsSuppressedReason",
+        "flattened": false
+      },
+      "ActionsSuppressor": {"shape": "AlarmArn", "flattened": false},
+      "ActionsSuppressorWaitPeriod": {
+        "shape": "SuppressorPeriod",
+        "flattened": false
+      },
+      "ActionsSuppressorExtensionPeriod": {
+        "shape": "SuppressorPeriod",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -199,7 +234,15 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Namespace": {"shape": "Namespace", "flattened": false},
       "MetricName": {"shape": "MetricName", "flattened": false},
       "Dimensions": {"shape": "Dimensions", "flattened": false},
-      "Stat": {"shape": "AnomalyDetectorMetricStat", "flattened": false}
+      "Stat": {"shape": "AnomalyDetectorMetricStat", "flattened": false},
+      "SingleMetricAnomalyDetector": {
+        "shape": "SingleMetricAnomalyDetector",
+        "flattened": false
+      },
+      "MetricMathAnomalyDetector": {
+        "shape": "MetricMathAnomalyDetector",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -232,6 +275,18 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "Failures": {"shape": "BatchFailures", "flattened": false}
     },
+    "flattened": false
+  },
+  "DeleteMetricStreamInput": {
+    "type": "structure",
+    "members": {
+      "Name": {"shape": "MetricStreamName", "flattened": false}
+    },
+    "flattened": false
+  },
+  "DeleteMetricStreamOutput": {
+    "type": "structure",
+    "members": {},
     "flattened": false
   },
   "DescribeAlarmHistoryInput": {
@@ -307,7 +362,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "MaxResults": {"shape": "MaxReturnedResultsCount", "flattened": false},
       "Namespace": {"shape": "Namespace", "flattened": false},
       "MetricName": {"shape": "MetricName", "flattened": false},
-      "Dimensions": {"shape": "Dimensions", "flattened": false}
+      "Dimensions": {"shape": "Dimensions", "flattened": false},
+      "AnomalyDetectorTypes": {
+        "shape": "AnomalyDetectorTypes",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -487,10 +546,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "MaxDatapoints": {
         "shape": "GetMetricDataMaxDatapoints",
         "flattened": false
-      }
+      },
+      "LabelOptions": {"shape": "LabelOptions", "flattened": false}
     },
     "flattened": false
   },
+  "GetMetricDataLabelTimezone": {"type": "string", "flattened": false},
   "GetMetricDataMaxDatapoints": {"type": "integer", "flattened": false},
   "GetMetricDataOutput": {
     "type": "structure",
@@ -521,6 +582,33 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "Label": {"shape": "MetricLabel", "flattened": false},
       "Datapoints": {"shape": "Datapoints", "flattened": false}
+    },
+    "flattened": false
+  },
+  "GetMetricStreamInput": {
+    "type": "structure",
+    "members": {
+      "Name": {"shape": "MetricStreamName", "flattened": false}
+    },
+    "flattened": false
+  },
+  "GetMetricStreamOutput": {
+    "type": "structure",
+    "members": {
+      "Arn": {"shape": "AmazonResourceName", "flattened": false},
+      "Name": {"shape": "MetricStreamName", "flattened": false},
+      "IncludeFilters": {"shape": "MetricStreamFilters", "flattened": false},
+      "ExcludeFilters": {"shape": "MetricStreamFilters", "flattened": false},
+      "FirehoseArn": {"shape": "AmazonResourceName", "flattened": false},
+      "RoleArn": {"shape": "AmazonResourceName", "flattened": false},
+      "State": {"shape": "MetricStreamState", "flattened": false},
+      "CreationDate": {"shape": "Timestamp", "flattened": false},
+      "LastUpdateDate": {"shape": "Timestamp", "flattened": false},
+      "OutputFormat": {"shape": "MetricStreamOutputFormat", "flattened": false},
+      "StatisticsConfigurations": {
+        "shape": "MetricStreamStatisticsConfigurations",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -651,6 +739,13 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "InsightRule"},
     "flattened": false
   },
+  "LabelOptions": {
+    "type": "structure",
+    "members": {
+      "Timezone": {"shape": "GetMetricDataLabelTimezone", "flattened": false}
+    },
+    "flattened": false
+  },
   "LastModified": {"type": "timestamp", "flattened": false},
   "ListDashboardsInput": {
     "type": "structure",
@@ -668,6 +763,23 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "DashboardEntries": {"shape": "DashboardEntries", "flattened": false},
       "NextToken": {"shape": "NextToken", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ListMetricStreamsInput": {
+    "type": "structure",
+    "members": {
+      "NextToken": {"shape": "NextToken", "flattened": false},
+      "MaxResults": {"shape": "ListMetricStreamsMaxResults", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ListMetricStreamsMaxResults": {"type": "integer", "flattened": false},
+  "ListMetricStreamsOutput": {
+    "type": "structure",
+    "members": {
+      "NextToken": {"shape": "NextToken", "flattened": false},
+      "Entries": {"shape": "MetricStreamEntries", "flattened": false}
     },
     "flattened": false
   },
@@ -788,7 +900,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Expression": {"shape": "MetricExpression", "flattened": false},
       "Label": {"shape": "MetricLabel", "flattened": false},
       "ReturnData": {"shape": "ReturnData", "flattened": false},
-      "Period": {"shape": "Period", "flattened": false}
+      "Period": {"shape": "Period", "flattened": false},
+      "AccountId": {"shape": "AccountId", "flattened": false}
     },
     "flattened": false
   },
@@ -832,6 +945,13 @@ const Map<String, Map<String, dynamic>> shapesJson = {
   "MetricExpression": {"type": "string", "flattened": false},
   "MetricId": {"type": "string", "flattened": false},
   "MetricLabel": {"type": "string", "flattened": false},
+  "MetricMathAnomalyDetector": {
+    "type": "structure",
+    "members": {
+      "MetricDataQueries": {"shape": "MetricDataQueries", "flattened": false}
+    },
+    "flattened": false
+  },
   "MetricName": {"type": "string", "flattened": false},
   "MetricStat": {
     "type": "structure",
@@ -840,6 +960,82 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Period": {"shape": "Period", "flattened": false},
       "Stat": {"shape": "Stat", "flattened": false},
       "Unit": {"shape": "StandardUnit", "flattened": false}
+    },
+    "flattened": false
+  },
+  "MetricStreamEntries": {
+    "type": "list",
+    "member": {"shape": "MetricStreamEntry"},
+    "flattened": false
+  },
+  "MetricStreamEntry": {
+    "type": "structure",
+    "members": {
+      "Arn": {"shape": "AmazonResourceName", "flattened": false},
+      "CreationDate": {"shape": "Timestamp", "flattened": false},
+      "LastUpdateDate": {"shape": "Timestamp", "flattened": false},
+      "Name": {"shape": "MetricStreamName", "flattened": false},
+      "FirehoseArn": {"shape": "AmazonResourceName", "flattened": false},
+      "State": {"shape": "MetricStreamState", "flattened": false},
+      "OutputFormat": {"shape": "MetricStreamOutputFormat", "flattened": false}
+    },
+    "flattened": false
+  },
+  "MetricStreamFilter": {
+    "type": "structure",
+    "members": {
+      "Namespace": {"shape": "Namespace", "flattened": false}
+    },
+    "flattened": false
+  },
+  "MetricStreamFilters": {
+    "type": "list",
+    "member": {"shape": "MetricStreamFilter"},
+    "flattened": false
+  },
+  "MetricStreamName": {"type": "string", "flattened": false},
+  "MetricStreamNames": {
+    "type": "list",
+    "member": {"shape": "MetricStreamName"},
+    "flattened": false
+  },
+  "MetricStreamOutputFormat": {"type": "string", "flattened": false},
+  "MetricStreamState": {"type": "string", "flattened": false},
+  "MetricStreamStatistic": {"type": "string", "flattened": false},
+  "MetricStreamStatisticsAdditionalStatistics": {
+    "type": "list",
+    "member": {"shape": "MetricStreamStatistic"},
+    "flattened": false
+  },
+  "MetricStreamStatisticsConfiguration": {
+    "type": "structure",
+    "members": {
+      "IncludeMetrics": {
+        "shape": "MetricStreamStatisticsIncludeMetrics",
+        "flattened": false
+      },
+      "AdditionalStatistics": {
+        "shape": "MetricStreamStatisticsAdditionalStatistics",
+        "flattened": false
+      }
+    },
+    "flattened": false
+  },
+  "MetricStreamStatisticsConfigurations": {
+    "type": "list",
+    "member": {"shape": "MetricStreamStatisticsConfiguration"},
+    "flattened": false
+  },
+  "MetricStreamStatisticsIncludeMetrics": {
+    "type": "list",
+    "member": {"shape": "MetricStreamStatisticsMetric"},
+    "flattened": false
+  },
+  "MetricStreamStatisticsMetric": {
+    "type": "structure",
+    "members": {
+      "Namespace": {"shape": "Namespace", "flattened": false},
+      "MetricName": {"shape": "MetricName", "flattened": false}
     },
     "flattened": false
   },
@@ -874,6 +1070,14 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Configuration": {
         "shape": "AnomalyDetectorConfiguration",
         "flattened": false
+      },
+      "SingleMetricAnomalyDetector": {
+        "shape": "SingleMetricAnomalyDetector",
+        "flattened": false
+      },
+      "MetricMathAnomalyDetector": {
+        "shape": "MetricMathAnomalyDetector",
+        "flattened": false
       }
     },
     "flattened": false
@@ -893,7 +1097,16 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "AlarmRule": {"shape": "AlarmRule", "flattened": false},
       "InsufficientDataActions": {"shape": "ResourceList", "flattened": false},
       "OKActions": {"shape": "ResourceList", "flattened": false},
-      "Tags": {"shape": "TagList", "flattened": false}
+      "Tags": {"shape": "TagList", "flattened": false},
+      "ActionsSuppressor": {"shape": "AlarmArn", "flattened": false},
+      "ActionsSuppressorWaitPeriod": {
+        "shape": "SuppressorPeriod",
+        "flattened": false
+      },
+      "ActionsSuppressorExtensionPeriod": {
+        "shape": "SuppressorPeriod",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -969,6 +1182,30 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "PutMetricStreamInput": {
+    "type": "structure",
+    "members": {
+      "Name": {"shape": "MetricStreamName", "flattened": false},
+      "IncludeFilters": {"shape": "MetricStreamFilters", "flattened": false},
+      "ExcludeFilters": {"shape": "MetricStreamFilters", "flattened": false},
+      "FirehoseArn": {"shape": "AmazonResourceName", "flattened": false},
+      "RoleArn": {"shape": "AmazonResourceName", "flattened": false},
+      "OutputFormat": {"shape": "MetricStreamOutputFormat", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false},
+      "StatisticsConfigurations": {
+        "shape": "MetricStreamStatisticsConfigurations",
+        "flattened": false
+      }
+    },
+    "flattened": false
+  },
+  "PutMetricStreamOutput": {
+    "type": "structure",
+    "members": {
+      "Arn": {"shape": "AmazonResourceName", "flattened": false}
+    },
+    "flattened": false
+  },
   "Range": {
     "type": "structure",
     "members": {
@@ -996,8 +1233,30 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "SingleMetricAnomalyDetector": {
+    "type": "structure",
+    "members": {
+      "Namespace": {"shape": "Namespace", "flattened": false},
+      "MetricName": {"shape": "MetricName", "flattened": false},
+      "Dimensions": {"shape": "Dimensions", "flattened": false},
+      "Stat": {"shape": "AnomalyDetectorMetricStat", "flattened": false}
+    },
+    "flattened": false
+  },
   "Size": {"type": "long", "flattened": false},
   "StandardUnit": {"type": "string", "flattened": false},
+  "StartMetricStreamsInput": {
+    "type": "structure",
+    "members": {
+      "Names": {"shape": "MetricStreamNames", "flattened": false}
+    },
+    "flattened": false
+  },
+  "StartMetricStreamsOutput": {
+    "type": "structure",
+    "members": {},
+    "flattened": false
+  },
   "Stat": {"type": "string", "flattened": false},
   "StateReason": {"type": "string", "flattened": false},
   "StateReasonData": {"type": "string", "flattened": false},
@@ -1019,7 +1278,20 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "flattened": false
   },
   "StatusCode": {"type": "string", "flattened": false},
+  "StopMetricStreamsInput": {
+    "type": "structure",
+    "members": {
+      "Names": {"shape": "MetricStreamNames", "flattened": false}
+    },
+    "flattened": false
+  },
+  "StopMetricStreamsOutput": {
+    "type": "structure",
+    "members": {},
+    "flattened": false
+  },
   "StorageResolution": {"type": "integer", "flattened": false},
+  "SuppressorPeriod": {"type": "integer", "flattened": false},
   "Tag": {
     "type": "structure",
     "members": {

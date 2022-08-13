@@ -18,8 +18,8 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS License Manager makes it easier to manage licenses from software vendors
-/// across multiple AWS accounts and on-premises servers.
+/// License Manager makes it easier to manage licenses from software vendors
+/// across multiple Amazon Web Services accounts and on-premises servers.
 class LicenseManager {
   final _s.JsonProtocol _protocol;
   LicenseManager({
@@ -93,6 +93,7 @@ class LicenseManager {
   /// in use.
   ///
   /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
   /// May throw [ResourceNotFoundException].
   /// May throw [ConflictException].
   /// May throw [AuthorizationException].
@@ -131,6 +132,7 @@ class LicenseManager {
   /// Checks out the specified license for offline use.
   ///
   /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
   /// May throw [ResourceNotFoundException].
   /// May throw [NoEntitlementsAllowedException].
   /// May throw [EntitlementNotAllowedException].
@@ -176,7 +178,7 @@ class LicenseManager {
       'clientToken',
       clientToken,
       0,
-      64,
+      2048,
       isRequired: true,
     );
     ArgumentError.checkNotNull(
@@ -216,6 +218,7 @@ class LicenseManager {
   /// Checks out the specified license.
   ///
   /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
   /// May throw [ResourceNotFoundException].
   /// May throw [NoEntitlementsAllowedException].
   /// May throw [UnsupportedDigitalSignatureMethodException].
@@ -261,7 +264,7 @@ class LicenseManager {
       'clientToken',
       clientToken,
       0,
-      64,
+      2048,
       isRequired: true,
     );
     ArgumentError.checkNotNull(entitlements, 'entitlements');
@@ -292,7 +295,7 @@ class LicenseManager {
   }
 
   /// Creates a grant for the specified license. A grant shares the use of
-  /// license entitlements with specific AWS accounts.
+  /// license entitlements with specific Amazon Web Services accounts.
   ///
   /// May throw [ValidationException].
   /// May throw [InvalidParameterValueException].
@@ -330,6 +333,13 @@ class LicenseManager {
   }) async {
     ArgumentError.checkNotNull(allowedOperations, 'allowedOperations');
     ArgumentError.checkNotNull(clientToken, 'clientToken');
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      0,
+      2048,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(grantName, 'grantName');
     ArgumentError.checkNotNull(homeRegion, 'homeRegion');
     ArgumentError.checkNotNull(licenseArn, 'licenseArn');
@@ -392,6 +402,9 @@ class LicenseManager {
   ///
   /// Parameter [status] :
   /// Grant status.
+  ///
+  /// Parameter [statusReason] :
+  /// Grant status reason.
   Future<CreateGrantVersionResponse> createGrantVersion({
     required String clientToken,
     required String grantArn,
@@ -399,8 +412,16 @@ class LicenseManager {
     String? grantName,
     String? sourceVersion,
     GrantStatus? status,
+    String? statusReason,
   }) async {
     ArgumentError.checkNotNull(clientToken, 'clientToken');
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      0,
+      2048,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(grantArn, 'grantArn');
     _s.validateStringLength(
       'grantArn',
@@ -408,6 +429,12 @@ class LicenseManager {
       0,
       2048,
       isRequired: true,
+    );
+    _s.validateStringLength(
+      'statusReason',
+      statusReason,
+      0,
+      400,
     );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -428,6 +455,7 @@ class LicenseManager {
         if (grantName != null) 'GrantName': grantName,
         if (sourceVersion != null) 'SourceVersion': sourceVersion,
         if (status != null) 'Status': status.toValue(),
+        if (statusReason != null) 'StatusReason': statusReason,
       },
     );
 
@@ -495,6 +523,13 @@ class LicenseManager {
   }) async {
     ArgumentError.checkNotNull(beneficiary, 'beneficiary');
     ArgumentError.checkNotNull(clientToken, 'clientToken');
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      0,
+      2048,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(
         consumptionConfiguration, 'consumptionConfiguration');
     ArgumentError.checkNotNull(entitlements, 'entitlements');
@@ -649,6 +684,168 @@ class LicenseManager {
     return CreateLicenseConfigurationResponse.fromJson(jsonResponse.body);
   }
 
+  /// Creates a new license conversion task.
+  ///
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ValidationException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [AccessDeniedException].
+  /// May throw [RateLimitExceededException].
+  ///
+  /// Parameter [destinationLicenseContext] :
+  /// Information that identifies the license type you are converting to. For
+  /// the structure of the destination license, see <a
+  /// href="https://docs.aws.amazon.com/license-manager/latest/userguide/conversion-procedures.html#conversion-cli">Convert
+  /// a license type using the AWS CLI</a> in the <i>License Manager User
+  /// Guide</i>.
+  ///
+  /// Parameter [resourceArn] :
+  /// Amazon Resource Name (ARN) of the resource you are converting the license
+  /// type for.
+  ///
+  /// Parameter [sourceLicenseContext] :
+  /// Information that identifies the license type you are converting from. For
+  /// the structure of the source license, see <a
+  /// href="https://docs.aws.amazon.com/license-manager/latest/userguide/conversion-procedures.html#conversion-cli">Convert
+  /// a license type using the AWS CLI</a> in the <i>License Manager User
+  /// Guide</i>.
+  Future<CreateLicenseConversionTaskForResourceResponse>
+      createLicenseConversionTaskForResource({
+    required LicenseConversionContext destinationLicenseContext,
+    required String resourceArn,
+    required LicenseConversionContext sourceLicenseContext,
+  }) async {
+    ArgumentError.checkNotNull(
+        destinationLicenseContext, 'destinationLicenseContext');
+    ArgumentError.checkNotNull(resourceArn, 'resourceArn');
+    _s.validateStringLength(
+      'resourceArn',
+      resourceArn,
+      0,
+      2048,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(sourceLicenseContext, 'sourceLicenseContext');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.CreateLicenseConversionTaskForResource'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'DestinationLicenseContext': destinationLicenseContext,
+        'ResourceArn': resourceArn,
+        'SourceLicenseContext': sourceLicenseContext,
+      },
+    );
+
+    return CreateLicenseConversionTaskForResourceResponse.fromJson(
+        jsonResponse.body);
+  }
+
+  /// Creates a report generator.
+  ///
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ResourceLimitExceededException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [RateLimitExceededException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [clientToken] :
+  /// Unique, case-sensitive identifier that you provide to ensure the
+  /// idempotency of the request.
+  ///
+  /// Parameter [reportContext] :
+  /// Defines the type of license configuration the report generator tracks.
+  ///
+  /// Parameter [reportFrequency] :
+  /// Frequency by which reports are generated. Reports can be generated daily,
+  /// monthly, or weekly.
+  ///
+  /// Parameter [reportGeneratorName] :
+  /// Name of the report generator.
+  ///
+  /// Parameter [type] :
+  /// Type of reports to generate. The following report types an be generated:
+  ///
+  /// <ul>
+  /// <li>
+  /// License configuration report - Reports the number and details of consumed
+  /// licenses for a license configuration.
+  /// </li>
+  /// <li>
+  /// Resource report - Reports the tracked licenses and resource consumption
+  /// for a license configuration.
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [description] :
+  /// Description of the report generator.
+  ///
+  /// Parameter [tags] :
+  /// Tags to add to the report generator.
+  Future<CreateLicenseManagerReportGeneratorResponse>
+      createLicenseManagerReportGenerator({
+    required String clientToken,
+    required ReportContext reportContext,
+    required ReportFrequency reportFrequency,
+    required String reportGeneratorName,
+    required List<ReportType> type,
+    String? description,
+    List<Tag>? tags,
+  }) async {
+    ArgumentError.checkNotNull(clientToken, 'clientToken');
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      1,
+      36,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(reportContext, 'reportContext');
+    ArgumentError.checkNotNull(reportFrequency, 'reportFrequency');
+    ArgumentError.checkNotNull(reportGeneratorName, 'reportGeneratorName');
+    _s.validateStringLength(
+      'reportGeneratorName',
+      reportGeneratorName,
+      1,
+      100,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(type, 'type');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.CreateLicenseManagerReportGenerator'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ClientToken': clientToken,
+        'ReportContext': reportContext,
+        'ReportFrequency': reportFrequency,
+        'ReportGeneratorName': reportGeneratorName,
+        'Type': type.map((e) => e.toValue()).toList(),
+        if (description != null) 'Description': description,
+        if (tags != null) 'Tags': tags,
+      },
+    );
+
+    return CreateLicenseManagerReportGeneratorResponse.fromJson(
+        jsonResponse.body);
+  }
+
   /// Creates a new version of the specified license.
   ///
   /// May throw [ValidationException].
@@ -714,6 +911,13 @@ class LicenseManager {
     String? sourceVersion,
   }) async {
     ArgumentError.checkNotNull(clientToken, 'clientToken');
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      0,
+      2048,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(
         consumptionConfiguration, 'consumptionConfiguration');
     ArgumentError.checkNotNull(entitlements, 'entitlements');
@@ -805,7 +1009,7 @@ class LicenseManager {
       'clientToken',
       clientToken,
       0,
-      60,
+      2048,
       isRequired: true,
     );
     ArgumentError.checkNotNull(licenseArn, 'licenseArn');
@@ -853,9 +1057,13 @@ class LicenseManager {
   ///
   /// Parameter [version] :
   /// Current version of the grant.
+  ///
+  /// Parameter [statusReason] :
+  /// The Status reason for the delete request.
   Future<DeleteGrantResponse> deleteGrant({
     required String grantArn,
     required String version,
+    String? statusReason,
   }) async {
     ArgumentError.checkNotNull(grantArn, 'grantArn');
     _s.validateStringLength(
@@ -866,6 +1074,12 @@ class LicenseManager {
       isRequired: true,
     );
     ArgumentError.checkNotNull(version, 'version');
+    _s.validateStringLength(
+      'statusReason',
+      statusReason,
+      0,
+      400,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AWSLicenseManager.DeleteGrant'
@@ -879,6 +1093,7 @@ class LicenseManager {
       payload: {
         'GrantArn': grantArn,
         'Version': version,
+        if (statusReason != null) 'StatusReason': statusReason,
       },
     );
 
@@ -962,6 +1177,44 @@ class LicenseManager {
       headers: headers,
       payload: {
         'LicenseConfigurationArn': licenseConfigurationArn,
+      },
+    );
+  }
+
+  /// Deletes the specified report generator.
+  ///
+  /// This action deletes the report generator, which stops it from generating
+  /// future reports. The action cannot be reversed. It has no effect on the
+  /// previous reports from this generator.
+  ///
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ResourceLimitExceededException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [RateLimitExceededException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [licenseManagerReportGeneratorArn] :
+  /// Amazon Resource Name (ARN) of the report generator to be deleted.
+  Future<void> deleteLicenseManagerReportGenerator({
+    required String licenseManagerReportGeneratorArn,
+  }) async {
+    ArgumentError.checkNotNull(
+        licenseManagerReportGeneratorArn, 'licenseManagerReportGeneratorArn');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.DeleteLicenseManagerReportGenerator'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'LicenseManagerReportGeneratorArn': licenseManagerReportGeneratorArn,
       },
     );
   }
@@ -1209,6 +1462,83 @@ class LicenseManager {
     return GetLicenseConfigurationResponse.fromJson(jsonResponse.body);
   }
 
+  /// Gets information about the specified license type conversion task.
+  ///
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [AccessDeniedException].
+  /// May throw [RateLimitExceededException].
+  ///
+  /// Parameter [licenseConversionTaskId] :
+  /// ID of the license type conversion task to retrieve information on.
+  Future<GetLicenseConversionTaskResponse> getLicenseConversionTask({
+    required String licenseConversionTaskId,
+  }) async {
+    ArgumentError.checkNotNull(
+        licenseConversionTaskId, 'licenseConversionTaskId');
+    _s.validateStringLength(
+      'licenseConversionTaskId',
+      licenseConversionTaskId,
+      0,
+      50,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.GetLicenseConversionTask'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'LicenseConversionTaskId': licenseConversionTaskId,
+      },
+    );
+
+    return GetLicenseConversionTaskResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Gets information about the specified report generator.
+  ///
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ResourceLimitExceededException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [RateLimitExceededException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [licenseManagerReportGeneratorArn] :
+  /// Amazon Resource Name (ARN) of the report generator.
+  Future<GetLicenseManagerReportGeneratorResponse>
+      getLicenseManagerReportGenerator({
+    required String licenseManagerReportGeneratorArn,
+  }) async {
+    ArgumentError.checkNotNull(
+        licenseManagerReportGeneratorArn, 'licenseManagerReportGeneratorArn');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.GetLicenseManagerReportGenerator'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'LicenseManagerReportGeneratorArn': licenseManagerReportGeneratorArn,
+      },
+    );
+
+    return GetLicenseManagerReportGeneratorResponse.fromJson(jsonResponse.body);
+  }
+
   /// Gets detailed information about the usage of the specified license.
   ///
   /// May throw [ValidationException].
@@ -1337,16 +1667,19 @@ class LicenseManager {
   ///
   /// <ul>
   /// <li>
-  /// <code>LicenseARN</code>
+  /// <code>LicenseArn</code>
   /// </li>
   /// <li>
-  /// <code>Status</code>
+  /// <code>GrantStatus</code>
   /// </li>
   /// <li>
-  /// <code>PrincipalARN</code>
+  /// <code>GranteePrincipalARN</code>
   /// </li>
   /// <li>
-  /// <code>ParentARN</code>
+  /// <code>ProductSKU</code>
+  /// </li>
+  /// <li>
+  /// <code>LicenseIssuerName</code>
   /// </li>
   /// </ul>
   ///
@@ -1452,7 +1785,7 @@ class LicenseManager {
   ///
   /// <ul>
   /// <li>
-  /// <code>licenseCountingType</code> - The dimension on which licenses are
+  /// <code>licenseCountingType</code> - The dimension for which licenses are
   /// counted. Possible values are <code>vCPU</code> | <code>Instance</code> |
   /// <code>Core</code> | <code>Socket</code>. Logical operators are
   /// <code>EQUALS</code> | <code>NOT_EQUALS</code>.
@@ -1503,6 +1836,106 @@ class LicenseManager {
     );
 
     return ListLicenseConfigurationsResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Lists the license type conversion tasks for your account.
+  ///
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [AccessDeniedException].
+  /// May throw [RateLimitExceededException].
+  ///
+  /// Parameter [filters] :
+  /// Filters to scope the results. Valid filters are <code>ResourceArns</code>
+  /// and <code>Status</code>.
+  ///
+  /// Parameter [maxResults] :
+  /// Maximum number of results to return in a single call.
+  ///
+  /// Parameter [nextToken] :
+  /// Token for the next set of results.
+  Future<ListLicenseConversionTasksResponse> listLicenseConversionTasks({
+    List<Filter>? filters,
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.ListLicenseConversionTasks'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (filters != null) 'Filters': filters,
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListLicenseConversionTasksResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Lists the report generators for your account.
+  ///
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ResourceLimitExceededException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [RateLimitExceededException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [filters] :
+  /// Filters to scope the results. The following filters are supported:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>LicenseConfigurationArn</code>
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [maxResults] :
+  /// Maximum number of results to return in a single call.
+  ///
+  /// Parameter [nextToken] :
+  /// Token for the next set of results.
+  Future<ListLicenseManagerReportGeneratorsResponse>
+      listLicenseManagerReportGenerators({
+    List<Filter>? filters,
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      100,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.ListLicenseManagerReportGenerators'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (filters != null) 'Filters': filters,
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListLicenseManagerReportGeneratorsResponse.fromJson(
+        jsonResponse.body);
   }
 
   /// Describes the license configurations for the specified resource.
@@ -1625,7 +2058,7 @@ class LicenseManager {
   /// <code>ProductSKU</code>
   /// </li>
   /// <li>
-  /// <code>KeyFingerprint</code>
+  /// <code>Fingerprint</code>
   /// </li>
   /// <li>
   /// <code>Status</code>
@@ -1688,10 +2121,19 @@ class LicenseManager {
   ///
   /// <ul>
   /// <li>
-  /// <code>LicenseARN</code>
+  /// <code>ProductSKU</code>
   /// </li>
   /// <li>
-  /// <code>Status</code>
+  /// <code>LicenseIssuerName</code>
+  /// </li>
+  /// <li>
+  /// <code>LicenseArn</code>
+  /// </li>
+  /// <li>
+  /// <code>GrantStatus</code>
+  /// </li>
+  /// <li>
+  /// <code>GranterAccountId</code>
   /// </li>
   /// </ul>
   ///
@@ -1757,10 +2199,13 @@ class LicenseManager {
   /// <code>Status</code>
   /// </li>
   /// <li>
-  /// <code>KeyFingerprint</code>
+  /// <code>Fingerprint</code>
   /// </li>
   /// <li>
-  /// <code>Issuer</code>
+  /// <code>IssuerName</code>
+  /// </li>
+  /// <li>
+  /// <code>Beneficiary</code>
   /// </li>
   /// </ul>
   ///
@@ -1821,8 +2266,8 @@ class LicenseManager {
   ///
   /// <ul>
   /// <li>
-  /// <code>account_id</code> - The ID of the AWS account that owns the
-  /// resource. Logical operators are <code>EQUALS</code> |
+  /// <code>account_id</code> - The ID of the Amazon Web Services account that
+  /// owns the resource. Logical operators are <code>EQUALS</code> |
   /// <code>NOT_EQUALS</code>.
   /// </li>
   /// <li>
@@ -1926,7 +2371,7 @@ class LicenseManager {
   ///
   /// <ul>
   /// <li>
-  /// <code>licenseArns</code>
+  /// <code>LicenseArns</code>
   /// </li>
   /// </ul>
   ///
@@ -2233,11 +2678,109 @@ class LicenseManager {
     );
   }
 
-  /// Adds or removes the specified license configurations for the specified AWS
-  /// resource.
+  /// Updates a report generator.
+  ///
+  /// After you make changes to a report generator, it starts generating new
+  /// reports within 60 minutes of being updated.
+  ///
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [RateLimitExceededException].
+  /// May throw [ServerInternalException].
+  /// May throw [AuthorizationException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ResourceLimitExceededException].
+  ///
+  /// Parameter [clientToken] :
+  /// Unique, case-sensitive identifier that you provide to ensure the
+  /// idempotency of the request.
+  ///
+  /// Parameter [licenseManagerReportGeneratorArn] :
+  /// Amazon Resource Name (ARN) of the report generator to update.
+  ///
+  /// Parameter [reportContext] :
+  /// The report context.
+  ///
+  /// Parameter [reportFrequency] :
+  /// Frequency by which reports are generated.
+  ///
+  /// Parameter [reportGeneratorName] :
+  /// Name of the report generator.
+  ///
+  /// Parameter [type] :
+  /// Type of reports to generate. The following report types are supported:
+  ///
+  /// <ul>
+  /// <li>
+  /// License configuration report - Reports the number and details of consumed
+  /// licenses for a license configuration.
+  /// </li>
+  /// <li>
+  /// Resource report - Reports the tracked licenses and resource consumption
+  /// for a license configuration.
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [description] :
+  /// Description of the report generator.
+  Future<void> updateLicenseManagerReportGenerator({
+    required String clientToken,
+    required String licenseManagerReportGeneratorArn,
+    required ReportContext reportContext,
+    required ReportFrequency reportFrequency,
+    required String reportGeneratorName,
+    required List<ReportType> type,
+    String? description,
+  }) async {
+    ArgumentError.checkNotNull(clientToken, 'clientToken');
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      1,
+      36,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(
+        licenseManagerReportGeneratorArn, 'licenseManagerReportGeneratorArn');
+    ArgumentError.checkNotNull(reportContext, 'reportContext');
+    ArgumentError.checkNotNull(reportFrequency, 'reportFrequency');
+    ArgumentError.checkNotNull(reportGeneratorName, 'reportGeneratorName');
+    _s.validateStringLength(
+      'reportGeneratorName',
+      reportGeneratorName,
+      1,
+      100,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(type, 'type');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSLicenseManager.UpdateLicenseManagerReportGenerator'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ClientToken': clientToken,
+        'LicenseManagerReportGeneratorArn': licenseManagerReportGeneratorArn,
+        'ReportContext': reportContext,
+        'ReportFrequency': reportFrequency,
+        'ReportGeneratorName': reportGeneratorName,
+        'Type': type.map((e) => e.toValue()).toList(),
+        if (description != null) 'Description': description,
+      },
+    );
+  }
+
+  /// Adds or removes the specified license configurations for the specified
+  /// Amazon Web Services resource.
   ///
   /// You can update the license specifications of AMIs, instances, and hosts.
-  /// You cannot update the license specifications for launch templates and AWS
+  /// You cannot update the license specifications for launch templates and
   /// CloudFormation templates, as they send license configurations to the
   /// operation that creates the resource.
   ///
@@ -2250,7 +2793,7 @@ class LicenseManager {
   /// May throw [RateLimitExceededException].
   ///
   /// Parameter [resourceArn] :
-  /// Amazon Resource Name (ARN) of the AWS resource.
+  /// Amazon Resource Name (ARN) of the Amazon Web Services resource.
   ///
   /// Parameter [addLicenseSpecifications] :
   /// ARNs of the license configurations to add.
@@ -2295,7 +2838,7 @@ class LicenseManager {
   /// Activates cross-account discovery.
   ///
   /// Parameter [organizationConfiguration] :
-  /// Enables integration with AWS Organizations for cross-account discovery.
+  /// Enables integration with Organizations for cross-account discovery.
   ///
   /// Parameter [s3BucketArn] :
   /// Amazon Resource Name (ARN) of the Amazon S3 bucket where the License
@@ -2528,6 +3071,9 @@ class CheckoutLicenseResponse {
   /// Date and time at which the license checkout is issued.
   final String? issuedAt;
 
+  /// Amazon Resource Name (ARN) of the checkout license.
+  final String? licenseArn;
+
   /// License consumption token.
   final String? licenseConsumptionToken;
 
@@ -2542,6 +3088,7 @@ class CheckoutLicenseResponse {
     this.entitlementsAllowed,
     this.expiration,
     this.issuedAt,
+    this.licenseArn,
     this.licenseConsumptionToken,
     this.nodeId,
     this.signedToken,
@@ -2555,6 +3102,7 @@ class CheckoutLicenseResponse {
           .toList(),
       expiration: json['Expiration'] as String?,
       issuedAt: json['IssuedAt'] as String?,
+      licenseArn: json['LicenseArn'] as String?,
       licenseConsumptionToken: json['LicenseConsumptionToken'] as String?,
       nodeId: json['NodeId'] as String?,
       signedToken: json['SignedToken'] as String?,
@@ -2564,6 +3112,7 @@ class CheckoutLicenseResponse {
 
 enum CheckoutType {
   provisional,
+  perpetual,
 }
 
 extension on CheckoutType {
@@ -2571,6 +3120,8 @@ extension on CheckoutType {
     switch (this) {
       case CheckoutType.provisional:
         return 'PROVISIONAL';
+      case CheckoutType.perpetual:
+        return 'PERPETUAL';
     }
   }
 }
@@ -2580,6 +3131,8 @@ extension on String {
     switch (this) {
       case 'PROVISIONAL':
         return CheckoutType.provisional;
+      case 'PERPETUAL':
+        return CheckoutType.perpetual;
     }
     throw Exception('$this is not known in enum CheckoutType');
   }
@@ -2708,6 +3261,37 @@ class CreateLicenseConfigurationResponse {
       Map<String, dynamic> json) {
     return CreateLicenseConfigurationResponse(
       licenseConfigurationArn: json['LicenseConfigurationArn'] as String?,
+    );
+  }
+}
+
+class CreateLicenseConversionTaskForResourceResponse {
+  /// The ID of the created license type conversion task.
+  final String? licenseConversionTaskId;
+
+  CreateLicenseConversionTaskForResourceResponse({
+    this.licenseConversionTaskId,
+  });
+  factory CreateLicenseConversionTaskForResourceResponse.fromJson(
+      Map<String, dynamic> json) {
+    return CreateLicenseConversionTaskForResourceResponse(
+      licenseConversionTaskId: json['LicenseConversionTaskId'] as String?,
+    );
+  }
+}
+
+class CreateLicenseManagerReportGeneratorResponse {
+  /// The Amazon Resource Name (ARN) of the new report generator.
+  final String? licenseManagerReportGeneratorArn;
+
+  CreateLicenseManagerReportGeneratorResponse({
+    this.licenseManagerReportGeneratorArn,
+  });
+  factory CreateLicenseManagerReportGeneratorResponse.fromJson(
+      Map<String, dynamic> json) {
+    return CreateLicenseManagerReportGeneratorResponse(
+      licenseManagerReportGeneratorArn:
+          json['LicenseManagerReportGeneratorArn'] as String?,
     );
   }
 }
@@ -2844,8 +3428,16 @@ class DeleteLicenseConfigurationResponse {
   }
 }
 
+class DeleteLicenseManagerReportGeneratorResponse {
+  DeleteLicenseManagerReportGeneratorResponse();
+  factory DeleteLicenseManagerReportGeneratorResponse.fromJson(
+      Map<String, dynamic> _) {
+    return DeleteLicenseManagerReportGeneratorResponse();
+  }
+}
+
 class DeleteLicenseResponse {
-  /// Date on which the license is deleted.
+  /// Date when the license is deleted.
   final String? deletionDate;
 
   /// License status.
@@ -3423,7 +4015,7 @@ class GetLicenseConfigurationResponse {
   /// Sets the number of available licenses as a hard limit.
   final bool? licenseCountHardLimit;
 
-  /// Dimension on which the licenses are counted.
+  /// Dimension for which the licenses are counted.
   final LicenseCountingType? licenseCountingType;
 
   /// License rules.
@@ -3511,6 +4103,86 @@ class GetLicenseConfigurationResponse {
   }
 }
 
+class GetLicenseConversionTaskResponse {
+  /// Information about the license type converted to.
+  final LicenseConversionContext? destinationLicenseContext;
+
+  /// Time at which the license type conversion task was completed.
+  final DateTime? endTime;
+
+  /// ID of the license type conversion task.
+  final String? licenseConversionTaskId;
+
+  /// Amount of time to complete the license type conversion.
+  final DateTime? licenseConversionTime;
+
+  /// Amazon Resource Names (ARN) of the resources the license conversion task is
+  /// associated with.
+  final String? resourceArn;
+
+  /// Information about the license type converted from.
+  final LicenseConversionContext? sourceLicenseContext;
+
+  /// Time at which the license type conversion task was started .
+  final DateTime? startTime;
+
+  /// Status of the license type conversion task.
+  final LicenseConversionTaskStatus? status;
+
+  /// The status message for the conversion task.
+  final String? statusMessage;
+
+  GetLicenseConversionTaskResponse({
+    this.destinationLicenseContext,
+    this.endTime,
+    this.licenseConversionTaskId,
+    this.licenseConversionTime,
+    this.resourceArn,
+    this.sourceLicenseContext,
+    this.startTime,
+    this.status,
+    this.statusMessage,
+  });
+  factory GetLicenseConversionTaskResponse.fromJson(Map<String, dynamic> json) {
+    return GetLicenseConversionTaskResponse(
+      destinationLicenseContext: json['DestinationLicenseContext'] != null
+          ? LicenseConversionContext.fromJson(
+              json['DestinationLicenseContext'] as Map<String, dynamic>)
+          : null,
+      endTime: timeStampFromJson(json['EndTime']),
+      licenseConversionTaskId: json['LicenseConversionTaskId'] as String?,
+      licenseConversionTime: timeStampFromJson(json['LicenseConversionTime']),
+      resourceArn: json['ResourceArn'] as String?,
+      sourceLicenseContext: json['SourceLicenseContext'] != null
+          ? LicenseConversionContext.fromJson(
+              json['SourceLicenseContext'] as Map<String, dynamic>)
+          : null,
+      startTime: timeStampFromJson(json['StartTime']),
+      status: (json['Status'] as String?)?.toLicenseConversionTaskStatus(),
+      statusMessage: json['StatusMessage'] as String?,
+    );
+  }
+}
+
+class GetLicenseManagerReportGeneratorResponse {
+  /// A report generator that creates periodic reports about your license
+  /// configurations.
+  final ReportGenerator? reportGenerator;
+
+  GetLicenseManagerReportGeneratorResponse({
+    this.reportGenerator,
+  });
+  factory GetLicenseManagerReportGeneratorResponse.fromJson(
+      Map<String, dynamic> json) {
+    return GetLicenseManagerReportGeneratorResponse(
+      reportGenerator: json['ReportGenerator'] != null
+          ? ReportGenerator.fromJson(
+              json['ReportGenerator'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 class GetLicenseResponse {
   /// License details.
   final License? license;
@@ -3547,11 +4219,11 @@ class GetServiceSettingsResponse {
   /// Indicates whether cross-account discovery is enabled.
   final bool? enableCrossAccountsDiscovery;
 
-  /// Amazon Resource Name (ARN) of the AWS resource share. The License Manager
-  /// master account will provide member accounts with access to this share.
+  /// Amazon Resource Name (ARN) of the resource share. The License Manager
+  /// management account provides member accounts with access to this share.
   final String? licenseManagerResourceShareArn;
 
-  /// Indicates whether AWS Organizations is integrated with License Manager for
+  /// Indicates whether Organizations is integrated with License Manager for
   /// cross-account discovery.
   final OrganizationConfiguration? organizationConfiguration;
 
@@ -3657,6 +4329,7 @@ enum GrantStatus {
   deleted,
   pendingDelete,
   disabled,
+  workflowCompleted,
 }
 
 extension on GrantStatus {
@@ -3678,6 +4351,8 @@ extension on GrantStatus {
         return 'PENDING_DELETE';
       case GrantStatus.disabled:
         return 'DISABLED';
+      case GrantStatus.workflowCompleted:
+        return 'WORKFLOW_COMPLETED';
     }
   }
 }
@@ -3701,6 +4376,8 @@ extension on String {
         return GrantStatus.pendingDelete;
       case 'DISABLED':
         return GrantStatus.disabled;
+      case 'WORKFLOW_COMPLETED':
+        return GrantStatus.workflowCompleted;
     }
     throw Exception('$this is not known in enum GrantStatus');
   }
@@ -3879,7 +4556,7 @@ class Issuer {
   /// Issuer name.
   final String name;
 
-  /// Asymmetric CMK from AWS Key Management Service. The CMK must have a key
+  /// Asymmetric KMS key from Key Management Service. The KMS key must have a key
   /// usage of sign and verify, and support the RSASSA-PSS SHA-256 signing
   /// algorithm.
   final String? signKey;
@@ -3906,7 +4583,7 @@ class IssuerDetails {
   /// Issuer name.
   final String? name;
 
-  /// Asymmetric CMK from AWS Key Management Service. The CMK must have a key
+  /// Asymmetric KMS key from Key Management Service. The KMS key must have a key
   /// usage of sign and verify, and support the RSASSA-PSS SHA-256 signing
   /// algorithm.
   final String? signKey;
@@ -3925,7 +4602,7 @@ class IssuerDetails {
   }
 }
 
-/// Software license that is managed in AWS License Manager.
+/// Software license that is managed in License Manager.
 class License {
   /// License beneficiary.
   final String? beneficiary;
@@ -4144,7 +4821,8 @@ class LicenseConfigurationAssociation {
   /// Amazon Resource Name (ARN) of the resource.
   final String? resourceArn;
 
-  /// ID of the AWS account that owns the resource consuming licenses.
+  /// ID of the Amazon Web Services account that owns the resource consuming
+  /// licenses.
   final String? resourceOwnerId;
 
   /// Type of server resource.
@@ -4238,6 +4916,127 @@ class LicenseConfigurationUsage {
   }
 }
 
+/// Information about a license type conversion task.
+class LicenseConversionContext {
+  /// The Usage operation value that corresponds to the license type you are
+  /// converting your resource from. For more information about which platforms
+  /// correspond to which usage operation values see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/billing-info-fields.html#billing-info">Sample
+  /// data: usage operation by platform </a>
+  final String? usageOperation;
+
+  LicenseConversionContext({
+    this.usageOperation,
+  });
+  factory LicenseConversionContext.fromJson(Map<String, dynamic> json) {
+    return LicenseConversionContext(
+      usageOperation: json['UsageOperation'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final usageOperation = this.usageOperation;
+    return {
+      if (usageOperation != null) 'UsageOperation': usageOperation,
+    };
+  }
+}
+
+/// Information about a license type conversion task.
+class LicenseConversionTask {
+  /// Information about the license type this conversion task converted to.
+  final LicenseConversionContext? destinationLicenseContext;
+
+  /// The time the conversion task was completed.
+  final DateTime? endTime;
+
+  /// The ID of the license type conversion task.
+  final String? licenseConversionTaskId;
+
+  /// The time the usage operation value of the resource was changed.
+  final DateTime? licenseConversionTime;
+
+  /// The Amazon Resource Name (ARN) of the resource associated with the license
+  /// type conversion task.
+  final String? resourceArn;
+
+  /// Information about the license type this conversion task converted from.
+  final LicenseConversionContext? sourceLicenseContext;
+
+  /// The time the conversion task was started at.
+  final DateTime? startTime;
+
+  /// The status of the conversion task.
+  final LicenseConversionTaskStatus? status;
+
+  /// The status message for the conversion task.
+  final String? statusMessage;
+
+  LicenseConversionTask({
+    this.destinationLicenseContext,
+    this.endTime,
+    this.licenseConversionTaskId,
+    this.licenseConversionTime,
+    this.resourceArn,
+    this.sourceLicenseContext,
+    this.startTime,
+    this.status,
+    this.statusMessage,
+  });
+  factory LicenseConversionTask.fromJson(Map<String, dynamic> json) {
+    return LicenseConversionTask(
+      destinationLicenseContext: json['DestinationLicenseContext'] != null
+          ? LicenseConversionContext.fromJson(
+              json['DestinationLicenseContext'] as Map<String, dynamic>)
+          : null,
+      endTime: timeStampFromJson(json['EndTime']),
+      licenseConversionTaskId: json['LicenseConversionTaskId'] as String?,
+      licenseConversionTime: timeStampFromJson(json['LicenseConversionTime']),
+      resourceArn: json['ResourceArn'] as String?,
+      sourceLicenseContext: json['SourceLicenseContext'] != null
+          ? LicenseConversionContext.fromJson(
+              json['SourceLicenseContext'] as Map<String, dynamic>)
+          : null,
+      startTime: timeStampFromJson(json['StartTime']),
+      status: (json['Status'] as String?)?.toLicenseConversionTaskStatus(),
+      statusMessage: json['StatusMessage'] as String?,
+    );
+  }
+}
+
+enum LicenseConversionTaskStatus {
+  inProgress,
+  succeeded,
+  failed,
+}
+
+extension on LicenseConversionTaskStatus {
+  String toValue() {
+    switch (this) {
+      case LicenseConversionTaskStatus.inProgress:
+        return 'IN_PROGRESS';
+      case LicenseConversionTaskStatus.succeeded:
+        return 'SUCCEEDED';
+      case LicenseConversionTaskStatus.failed:
+        return 'FAILED';
+    }
+  }
+}
+
+extension on String {
+  LicenseConversionTaskStatus toLicenseConversionTaskStatus() {
+    switch (this) {
+      case 'IN_PROGRESS':
+        return LicenseConversionTaskStatus.inProgress;
+      case 'SUCCEEDED':
+        return LicenseConversionTaskStatus.succeeded;
+      case 'FAILED':
+        return LicenseConversionTaskStatus.failed;
+    }
+    throw Exception('$this is not known in enum LicenseConversionTaskStatus');
+  }
+}
+
 enum LicenseCountingType {
   vcpu,
   instance,
@@ -4324,7 +5123,7 @@ class LicenseOperationFailure {
   /// Amazon Resource Name (ARN) of the resource.
   final String? resourceArn;
 
-  /// ID of the AWS account that owns the resource.
+  /// ID of the Amazon Web Services account that owns the resource.
   final String? resourceOwnerId;
 
   /// Resource type.
@@ -4549,6 +5348,53 @@ class ListLicenseConfigurationsResponse {
           .map((e) => LicenseConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class ListLicenseConversionTasksResponse {
+  /// Information about the license configuration tasks for your account.
+  final List<LicenseConversionTask>? licenseConversionTasks;
+
+  /// Token for the next set of results.
+  final String? nextToken;
+
+  ListLicenseConversionTasksResponse({
+    this.licenseConversionTasks,
+    this.nextToken,
+  });
+  factory ListLicenseConversionTasksResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ListLicenseConversionTasksResponse(
+      licenseConversionTasks: (json['LicenseConversionTasks'] as List?)
+          ?.whereNotNull()
+          .map((e) => LicenseConversionTask.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class ListLicenseManagerReportGeneratorsResponse {
+  /// Token for the next set of results.
+  final String? nextToken;
+
+  /// A report generator that creates periodic reports about your license
+  /// configurations.
+  final List<ReportGenerator>? reportGenerators;
+
+  ListLicenseManagerReportGeneratorsResponse({
+    this.nextToken,
+    this.reportGenerators,
+  });
+  factory ListLicenseManagerReportGeneratorsResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ListLicenseManagerReportGeneratorsResponse(
+      nextToken: json['NextToken'] as String?,
+      reportGenerators: (json['ReportGenerators'] as List?)
+          ?.whereNotNull()
+          .map((e) => ReportGenerator.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -4799,9 +5645,9 @@ class Metadata {
   }
 }
 
-/// Configuration information for AWS Organizations.
+/// Configuration information for Organizations.
 class OrganizationConfiguration {
-  /// Enables AWS Organization integration.
+  /// Enables Organizations integration.
   final bool enableIntegration;
 
   OrganizationConfiguration({
@@ -4823,10 +5669,18 @@ class OrganizationConfiguration {
 
 /// Describes product information for a license configuration.
 class ProductInformation {
-  /// Product information filters.
+  /// A Product information filter consists of a
+  /// <code>ProductInformationFilterComparator</code> which is a logical operator,
+  /// a <code>ProductInformationFilterName</code> which specifies the type of
+  /// filter being declared, and a <code>ProductInformationFilterValue</code> that
+  /// specifies the value to filter on.
   ///
-  /// The following filters and logical operators are supported when the resource
-  /// type is <code>SSM_MANAGED</code>:
+  /// Accepted values for <code>ProductInformationFilterName</code> are listed
+  /// here along with descriptions and valid options for
+  /// <code>ProductInformationFilterComparator</code>.
+  ///
+  /// The following filters and are supported when the resource type is
+  /// <code>SSM_MANAGED</code>:
   ///
   /// <ul>
   /// <li>
@@ -4848,6 +5702,19 @@ class ProductInformation {
   /// <li>
   /// <code>Platform Type</code> - The platform type. Logical operator is
   /// <code>EQUALS</code>.
+  /// </li>
+  /// <li>
+  /// <code>Tag:key</code> - The key of a tag attached to an Amazon Web Services
+  /// resource you wish to exclude from automated discovery. Logical operator is
+  /// <code>NOT_EQUALS</code>. The key for your tag must be appended to
+  /// <code>Tag:</code> following the example: <code>Tag:name-of-your-key</code>.
+  /// <code>ProductInformationFilterValue</code> is optional if you are not using
+  /// values for the key.
+  /// </li>
+  /// <li>
+  /// <code>AccountId</code> - The 12-digit ID of an Amazon Web Services account
+  /// you wish to exclude from automated discovery. Logical operator is
+  /// <code>NOT_EQUALS</code>.
   /// </li>
   /// <li>
   /// <code>License Included</code> - The type of license included. Logical
@@ -4915,12 +5782,12 @@ class ProductInformationFilter {
   final String productInformationFilterName;
 
   /// Filter value.
-  final List<String> productInformationFilterValue;
+  final List<String>? productInformationFilterValue;
 
   ProductInformationFilter({
     required this.productInformationFilterComparator,
     required this.productInformationFilterName,
-    required this.productInformationFilterValue,
+    this.productInformationFilterValue,
   });
   factory ProductInformationFilter.fromJson(Map<String, dynamic> json) {
     return ProductInformationFilter(
@@ -4929,8 +5796,8 @@ class ProductInformationFilter {
       productInformationFilterName:
           json['ProductInformationFilterName'] as String,
       productInformationFilterValue:
-          (json['ProductInformationFilterValue'] as List)
-              .whereNotNull()
+          (json['ProductInformationFilterValue'] as List?)
+              ?.whereNotNull()
               .map((e) => e as String)
               .toList(),
     );
@@ -4944,7 +5811,8 @@ class ProductInformationFilter {
     return {
       'ProductInformationFilterComparator': productInformationFilterComparator,
       'ProductInformationFilterName': productInformationFilterName,
-      'ProductInformationFilterValue': productInformationFilterValue,
+      if (productInformationFilterValue != null)
+        'ProductInformationFilterValue': productInformationFilterValue,
     };
   }
 }
@@ -4979,9 +5847,13 @@ class ReceivedMetadata {
   /// Received status.
   final ReceivedStatus? receivedStatus;
 
+  /// Received status reason.
+  final String? receivedStatusReason;
+
   ReceivedMetadata({
     this.allowedOperations,
     this.receivedStatus,
+    this.receivedStatusReason,
   });
   factory ReceivedMetadata.fromJson(Map<String, dynamic> json) {
     return ReceivedMetadata(
@@ -4990,6 +5862,7 @@ class ReceivedMetadata {
           .map((e) => (e as String).toAllowedOperation())
           .toList(),
       receivedStatus: (json['ReceivedStatus'] as String?)?.toReceivedStatus(),
+      receivedStatusReason: json['ReceivedStatusReason'] as String?,
     );
   }
 }
@@ -5002,6 +5875,7 @@ enum ReceivedStatus {
   failedWorkflow,
   deleted,
   disabled,
+  workflowCompleted,
 }
 
 extension on ReceivedStatus {
@@ -5021,6 +5895,8 @@ extension on ReceivedStatus {
         return 'DELETED';
       case ReceivedStatus.disabled:
         return 'DISABLED';
+      case ReceivedStatus.workflowCompleted:
+        return 'WORKFLOW_COMPLETED';
     }
   }
 }
@@ -5042,6 +5918,8 @@ extension on String {
         return ReceivedStatus.deleted;
       case 'DISABLED':
         return ReceivedStatus.disabled;
+      case 'WORKFLOW_COMPLETED':
+        return ReceivedStatus.workflowCompleted;
     }
     throw Exception('$this is not known in enum ReceivedStatus');
   }
@@ -5101,6 +5979,214 @@ extension on String {
         return RenewType.monthly;
     }
     throw Exception('$this is not known in enum RenewType');
+  }
+}
+
+/// Details of the license configuration that this generator reports on.
+class ReportContext {
+  /// Amazon Resource Name (ARN) of the license configuration that this generator
+  /// reports on.
+  final List<String> licenseConfigurationArns;
+
+  ReportContext({
+    required this.licenseConfigurationArns,
+  });
+  factory ReportContext.fromJson(Map<String, dynamic> json) {
+    return ReportContext(
+      licenseConfigurationArns: (json['licenseConfigurationArns'] as List)
+          .whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final licenseConfigurationArns = this.licenseConfigurationArns;
+    return {
+      'licenseConfigurationArns': licenseConfigurationArns,
+    };
+  }
+}
+
+/// Details about how frequently reports are generated.
+class ReportFrequency {
+  /// Time period between each report. The period can be daily, weekly, or
+  /// monthly.
+  final ReportFrequencyType? period;
+
+  /// Number of times within the frequency period that a report is generated. The
+  /// only supported value is <code>1</code>.
+  final int? value;
+
+  ReportFrequency({
+    this.period,
+    this.value,
+  });
+  factory ReportFrequency.fromJson(Map<String, dynamic> json) {
+    return ReportFrequency(
+      period: (json['period'] as String?)?.toReportFrequencyType(),
+      value: json['value'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final period = this.period;
+    final value = this.value;
+    return {
+      if (period != null) 'period': period.toValue(),
+      if (value != null) 'value': value,
+    };
+  }
+}
+
+enum ReportFrequencyType {
+  day,
+  week,
+  month,
+}
+
+extension on ReportFrequencyType {
+  String toValue() {
+    switch (this) {
+      case ReportFrequencyType.day:
+        return 'DAY';
+      case ReportFrequencyType.week:
+        return 'WEEK';
+      case ReportFrequencyType.month:
+        return 'MONTH';
+    }
+  }
+}
+
+extension on String {
+  ReportFrequencyType toReportFrequencyType() {
+    switch (this) {
+      case 'DAY':
+        return ReportFrequencyType.day;
+      case 'WEEK':
+        return ReportFrequencyType.week;
+      case 'MONTH':
+        return ReportFrequencyType.month;
+    }
+    throw Exception('$this is not known in enum ReportFrequencyType');
+  }
+}
+
+/// Describe the details of a report generator.
+class ReportGenerator {
+  /// Time the report was created.
+  final String? createTime;
+
+  /// Description of the report generator.
+  final String? description;
+
+  /// Time the last report was generated at.
+  final String? lastReportGenerationTime;
+
+  /// Failure message for the last report generation attempt.
+  final String? lastRunFailureReason;
+
+  /// Status of the last report generation attempt.
+  final String? lastRunStatus;
+
+  /// Amazon Resource Name (ARN) of the report generator.
+  final String? licenseManagerReportGeneratorArn;
+
+  /// License configuration type for this generator.
+  final ReportContext? reportContext;
+
+  /// The Amazon Web Services account ID used to create the report generator.
+  final String? reportCreatorAccount;
+
+  /// Details about how frequently reports are generated.
+  final ReportFrequency? reportFrequency;
+
+  /// Name of the report generator.
+  final String? reportGeneratorName;
+
+  /// Type of reports that are generated.
+  final List<ReportType>? reportType;
+
+  /// Details of the S3 bucket that report generator reports are published to.
+  final S3Location? s3Location;
+
+  /// Tags associated with the report generator.
+  final List<Tag>? tags;
+
+  ReportGenerator({
+    this.createTime,
+    this.description,
+    this.lastReportGenerationTime,
+    this.lastRunFailureReason,
+    this.lastRunStatus,
+    this.licenseManagerReportGeneratorArn,
+    this.reportContext,
+    this.reportCreatorAccount,
+    this.reportFrequency,
+    this.reportGeneratorName,
+    this.reportType,
+    this.s3Location,
+    this.tags,
+  });
+  factory ReportGenerator.fromJson(Map<String, dynamic> json) {
+    return ReportGenerator(
+      createTime: json['CreateTime'] as String?,
+      description: json['Description'] as String?,
+      lastReportGenerationTime: json['LastReportGenerationTime'] as String?,
+      lastRunFailureReason: json['LastRunFailureReason'] as String?,
+      lastRunStatus: json['LastRunStatus'] as String?,
+      licenseManagerReportGeneratorArn:
+          json['LicenseManagerReportGeneratorArn'] as String?,
+      reportContext: json['ReportContext'] != null
+          ? ReportContext.fromJson(
+              json['ReportContext'] as Map<String, dynamic>)
+          : null,
+      reportCreatorAccount: json['ReportCreatorAccount'] as String?,
+      reportFrequency: json['ReportFrequency'] != null
+          ? ReportFrequency.fromJson(
+              json['ReportFrequency'] as Map<String, dynamic>)
+          : null,
+      reportGeneratorName: json['ReportGeneratorName'] as String?,
+      reportType: (json['ReportType'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as String).toReportType())
+          .toList(),
+      s3Location: json['S3Location'] != null
+          ? S3Location.fromJson(json['S3Location'] as Map<String, dynamic>)
+          : null,
+      tags: (json['Tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+enum ReportType {
+  licenseConfigurationSummaryReport,
+  licenseConfigurationUsageReport,
+}
+
+extension on ReportType {
+  String toValue() {
+    switch (this) {
+      case ReportType.licenseConfigurationSummaryReport:
+        return 'LicenseConfigurationSummaryReport';
+      case ReportType.licenseConfigurationUsageReport:
+        return 'LicenseConfigurationUsageReport';
+    }
+  }
+}
+
+extension on String {
+  ReportType toReportType() {
+    switch (this) {
+      case 'LicenseConfigurationSummaryReport':
+        return ReportType.licenseConfigurationSummaryReport;
+      case 'LicenseConfigurationUsageReport':
+        return ReportType.licenseConfigurationUsageReport;
+    }
+    throw Exception('$this is not known in enum ReportType');
   }
 }
 
@@ -5184,6 +6270,26 @@ extension on String {
         return ResourceType.systemsManagerManagedInstance;
     }
     throw Exception('$this is not known in enum ResourceType');
+  }
+}
+
+/// Details of the S3 bucket that report generator reports are published to.
+class S3Location {
+  /// Name of the S3 bucket reports are published to.
+  final String? bucket;
+
+  /// Prefix of the S3 bucket reports are published to.
+  final String? keyPrefix;
+
+  S3Location({
+    this.bucket,
+    this.keyPrefix,
+  });
+  factory S3Location.fromJson(Map<String, dynamic> json) {
+    return S3Location(
+      bucket: json['bucket'] as String?,
+      keyPrefix: json['keyPrefix'] as String?,
+    );
   }
 }
 
@@ -5309,6 +6415,14 @@ class UpdateLicenseConfigurationResponse {
   UpdateLicenseConfigurationResponse();
   factory UpdateLicenseConfigurationResponse.fromJson(Map<String, dynamic> _) {
     return UpdateLicenseConfigurationResponse();
+  }
+}
+
+class UpdateLicenseManagerReportGeneratorResponse {
+  UpdateLicenseManagerReportGeneratorResponse();
+  factory UpdateLicenseManagerReportGeneratorResponse.fromJson(
+      Map<String, dynamic> _) {
+    return UpdateLicenseManagerReportGeneratorResponse();
   }
 }
 

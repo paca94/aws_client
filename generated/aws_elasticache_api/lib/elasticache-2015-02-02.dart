@@ -53,23 +53,36 @@ class ElastiCache {
     _protocol.close();
   }
 
-  /// Adds up to 50 cost allocation tags to the named resource. A cost
-  /// allocation tag is a key-value pair where the key and value are
-  /// case-sensitive. You can use cost allocation tags to categorize and track
-  /// your AWS costs.
+  /// A tag is a key-value pair where the key and value are case-sensitive. You
+  /// can use tags to categorize and track all your ElastiCache resources, with
+  /// the exception of global replication group. When you add or remove tags on
+  /// replication groups, those actions will be replicated to all nodes in the
+  /// replication group. For more information, see <a
+  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/IAM.ResourceLevelPermissions.html">Resource-level
+  /// permissions</a>.
   ///
-  /// When you apply tags to your ElastiCache resources, AWS generates a cost
-  /// allocation report as a comma-separated value (CSV) file with your usage
-  /// and costs aggregated by your tags. You can apply tags that represent
-  /// business categories (such as cost centers, application names, or owners)
-  /// to organize your costs across multiple services. For more information, see
-  /// <a
+  /// For example, you can use cost-allocation tags to your ElastiCache
+  /// resources, Amazon generates a cost allocation report as a comma-separated
+  /// value (CSV) file with your usage and costs aggregated by your tags. You
+  /// can apply tags that represent business categories (such as cost centers,
+  /// application names, or owners) to organize your costs across multiple
+  /// services.
+  ///
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Tagging.html">Using
   /// Cost Allocation Tags in Amazon ElastiCache</a> in the <i>ElastiCache User
   /// Guide</i>.
   ///
   /// May throw [CacheClusterNotFoundFault].
+  /// May throw [CacheParameterGroupNotFoundFault].
+  /// May throw [CacheSecurityGroupNotFoundFault].
+  /// May throw [CacheSubnetGroupNotFoundFault].
+  /// May throw [InvalidReplicationGroupStateFault].
+  /// May throw [ReplicationGroupNotFoundFault].
+  /// May throw [ReservedCacheNodeNotFoundFault].
   /// May throw [SnapshotNotFoundFault].
+  /// May throw [UserNotFoundFault].
+  /// May throw [UserGroupNotFoundFault].
   /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidARNFault].
   ///
@@ -82,11 +95,11 @@ class ElastiCache {
   ///
   /// For more information about ARNs, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon
-  /// Resource Names (ARNs) and AWS Service Namespaces</a>.
+  /// Resource Names (ARNs) and Amazon Service Namespaces</a>.
   ///
   /// Parameter [tags] :
-  /// A list of cost allocation tags to be added to this resource. A tag is a
-  /// key-value pair. A tag key must be accompanied by a tag value.
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<TagListMessage> addTagsToResource({
     required String resourceName,
     required List<Tag> tags,
@@ -132,9 +145,9 @@ class ElastiCache {
   /// security group.
   ///
   /// Parameter [eC2SecurityGroupOwnerId] :
-  /// The AWS account number of the Amazon EC2 security group owner. Note that
-  /// this is not the same thing as an AWS access key ID - you must provide a
-  /// valid AWS account number for this parameter.
+  /// The Amazon account number of the Amazon EC2 security group owner. Note
+  /// that this is not the same thing as an Amazon access key ID - you must
+  /// provide a valid Amazon account number for this parameter.
   Future<AuthorizeCacheSecurityGroupIngressResult>
       authorizeCacheSecurityGroupIngress({
     required String cacheSecurityGroupName,
@@ -375,6 +388,7 @@ class ElastiCache {
   /// May throw [SnapshotNotFoundFault].
   /// May throw [SnapshotQuotaExceededFault].
   /// May throw [InvalidSnapshotStateFault].
+  /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
   ///
@@ -389,23 +403,28 @@ class ElastiCache {
   /// Parameter [kmsKeyId] :
   /// The ID of the KMS key used to encrypt the target snapshot.
   ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
+  ///
   /// Parameter [targetBucket] :
   /// The Amazon S3 bucket to which the snapshot is exported. This parameter is
   /// used only when exporting a snapshot for external access.
   ///
   /// When using this parameter to export a snapshot, be sure Amazon ElastiCache
   /// has the needed permissions to this S3 bucket. For more information, see <a
-  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/backups-exporting.html#backups-exporting-grant-access">Step
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/backups-exporting.html#backups-exporting-grant-access">Step
   /// 2: Grant ElastiCache Access to Your Amazon S3 Bucket</a> in the <i>Amazon
   /// ElastiCache User Guide</i>.
   ///
   /// For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Snapshots.Exporting.html">Exporting
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/backups-exporting.html">Exporting
   /// a Snapshot</a> in the <i>Amazon ElastiCache User Guide</i>.
   Future<CopySnapshotResult> copySnapshot({
     required String sourceSnapshotName,
     required String targetSnapshotName,
     String? kmsKeyId,
+    List<Tag>? tags,
     String? targetBucket,
   }) async {
     ArgumentError.checkNotNull(sourceSnapshotName, 'sourceSnapshotName');
@@ -414,6 +433,7 @@ class ElastiCache {
     $request['SourceSnapshotName'] = sourceSnapshotName;
     $request['TargetSnapshotName'] = targetSnapshotName;
     kmsKeyId?.also((arg) => $request['KmsKeyId'] = arg);
+    tags?.also((arg) => $request['Tags'] = arg);
     targetBucket?.also((arg) => $request['TargetBucket'] = arg);
     final $result = await _protocol.send(
       $request,
@@ -500,7 +520,9 @@ class ElastiCache {
   /// password</a> at http://redis.io/commands/AUTH.
   ///
   /// Parameter [autoMinorVersionUpgrade] :
-  /// This parameter is currently disabled.
+  /// If you are running Redis engine version 6.0 or later, set this parameter
+  /// to yes if you want to opt-in to the next auto minor version upgrade
+  /// campaign. This parameter is disabled for previous versions.
   ///
   /// Parameter [cacheNodeType] :
   /// The compute and memory capacity of the nodes in the node group (shard).
@@ -519,16 +541,15 @@ class ElastiCache {
   /// Current generation:
   ///
   /// <b>M6g node types</b> (available only for Redis engine version 5.0.6
-  /// onward and for Memcached engine version 1.5.16 onward).
-  ///
+  /// onward and for Memcached engine version 1.5.16 onward):
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -539,6 +560,11 @@ class ElastiCache {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6
+  /// onward and Memcached engine version 1.5.16 onward):
+  /// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+  /// <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -546,7 +572,8 @@ class ElastiCache {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -564,7 +591,8 @@ class ElastiCache {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
   /// </li>
@@ -584,9 +612,9 @@ class ElastiCache {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -599,7 +627,8 @@ class ElastiCache {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -673,6 +702,9 @@ class ElastiCache {
   /// delete the existing cluster or replication group and create it anew with
   /// the earlier engine version.
   ///
+  /// Parameter [logDeliveryConfigurations] :
+  /// Specifies the destination, format and type of the logs.
+  ///
   /// Parameter [notificationTopicArn] :
   /// The Amazon Resource Name (ARN) of the Amazon Simple Notification Service
   /// (SNS) topic to which notifications are sent.
@@ -684,9 +716,9 @@ class ElastiCache {
   /// The initial number of cache nodes that the cluster has.
   ///
   /// For clusters running Redis, this value must be 1. For clusters running
-  /// Memcached, this value must be between 1 and 20.
+  /// Memcached, this value must be between 1 and 40.
   ///
-  /// If you need more than 20 nodes for your Memcached cluster, please fill out
+  /// If you need more than 40 nodes for your Memcached cluster, please fill out
   /// the ElastiCache Limit Increase Request form at <a
   /// href="http://aws.amazon.com/contact-us/elasticache-node-limit-request/">http://aws.amazon.com/contact-us/elasticache-node-limit-request/</a>.
   ///
@@ -729,39 +761,7 @@ class ElastiCache {
   /// Specifies the weekly time range during which maintenance on the cluster is
   /// performed. It is specified as a range in the format
   /// ddd:hh24:mi-ddd:hh24:mi (24H Clock UTC). The minimum maintenance window is
-  /// a 60 minute period. Valid values for <code>ddd</code> are:
-  ///
-  /// Specifies the weekly time range during which maintenance on the cluster is
-  /// performed. It is specified as a range in the format
-  /// ddd:hh24:mi-ddd:hh24:mi (24H Clock UTC). The minimum maintenance window is
   /// a 60 minute period.
-  ///
-  /// Valid values for <code>ddd</code> are:
-  ///
-  /// <ul>
-  /// <li>
-  /// <code>sun</code>
-  /// </li>
-  /// <li>
-  /// <code>mon</code>
-  /// </li>
-  /// <li>
-  /// <code>tue</code>
-  /// </li>
-  /// <li>
-  /// <code>wed</code>
-  /// </li>
-  /// <li>
-  /// <code>thu</code>
-  /// </li>
-  /// <li>
-  /// <code>fri</code>
-  /// </li>
-  /// <li>
-  /// <code>sat</code>
-  /// </li>
-  /// </ul>
-  /// Example: <code>sun:23:00-mon:01:30</code>
   ///
   /// Parameter [preferredOutpostArn] :
   /// The outpost ARN in which the cache cluster is created.
@@ -836,7 +836,17 @@ class ElastiCache {
   /// </note>
   ///
   /// Parameter [tags] :
-  /// A list of cost allocation tags to be added to this resource.
+  /// A list of tags to be added to this resource.
+  ///
+  /// Parameter [transitEncryptionEnabled] :
+  /// A flag that enables in-transit encryption when set to true. You cannot
+  /// modify the value of <code>TransitEncryptionEnabled</code> after the
+  /// cluster is created. To enable in-transit encryption on a cluster you must
+  /// set <code>TransitEncryptionEnabled</code> to true when you create a
+  /// cluster.
+  ///
+  /// <b>Required:</b> Only available when creating a cache cluster in an Amazon
+  /// VPC using Memcached version <code>1.6.12</code> or later.
   Future<CreateCacheClusterResult> createCacheCluster({
     required String cacheClusterId,
     AZMode? aZMode,
@@ -848,6 +858,7 @@ class ElastiCache {
     String? cacheSubnetGroupName,
     String? engine,
     String? engineVersion,
+    List<LogDeliveryConfigurationRequest>? logDeliveryConfigurations,
     String? notificationTopicArn,
     int? numCacheNodes,
     OutpostMode? outpostMode,
@@ -864,6 +875,7 @@ class ElastiCache {
     int? snapshotRetentionLimit,
     String? snapshotWindow,
     List<Tag>? tags,
+    bool? transitEncryptionEnabled,
   }) async {
     ArgumentError.checkNotNull(cacheClusterId, 'cacheClusterId');
     final $request = <String, dynamic>{};
@@ -880,6 +892,8 @@ class ElastiCache {
     cacheSubnetGroupName?.also((arg) => $request['CacheSubnetGroupName'] = arg);
     engine?.also((arg) => $request['Engine'] = arg);
     engineVersion?.also((arg) => $request['EngineVersion'] = arg);
+    logDeliveryConfigurations
+        ?.also((arg) => $request['LogDeliveryConfigurations'] = arg);
     notificationTopicArn?.also((arg) => $request['NotificationTopicArn'] = arg);
     numCacheNodes?.also((arg) => $request['NumCacheNodes'] = arg);
     outpostMode?.also((arg) => $request['OutpostMode'] = arg.toValue());
@@ -900,6 +914,8 @@ class ElastiCache {
         ?.also((arg) => $request['SnapshotRetentionLimit'] = arg);
     snapshotWindow?.also((arg) => $request['SnapshotWindow'] = arg);
     tags?.also((arg) => $request['Tags'] = arg);
+    transitEncryptionEnabled
+        ?.also((arg) => $request['TransitEncryptionEnabled'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'CreateCacheCluster',
@@ -940,6 +956,7 @@ class ElastiCache {
   /// May throw [CacheParameterGroupQuotaExceededFault].
   /// May throw [CacheParameterGroupAlreadyExistsFault].
   /// May throw [InvalidCacheParameterGroupStateFault].
+  /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
   ///
@@ -950,17 +967,22 @@ class ElastiCache {
   /// Valid values are: <code>memcached1.4</code> | <code>memcached1.5</code> |
   /// <code>memcached1.6</code> | <code>redis2.6</code> | <code>redis2.8</code>
   /// | <code>redis3.2</code> | <code>redis4.0</code> | <code>redis5.0</code> |
-  /// <code>redis6.x</code> |
+  /// <code>redis6.x</code>
   ///
   /// Parameter [cacheParameterGroupName] :
   /// A user-specified name for the cache parameter group.
   ///
   /// Parameter [description] :
   /// A user-specified description for the cache parameter group.
+  ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<CreateCacheParameterGroupResult> createCacheParameterGroup({
     required String cacheParameterGroupFamily,
     required String cacheParameterGroupName,
     required String description,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(
         cacheParameterGroupFamily, 'cacheParameterGroupFamily');
@@ -971,6 +993,7 @@ class ElastiCache {
     $request['CacheParameterGroupFamily'] = cacheParameterGroupFamily;
     $request['CacheParameterGroupName'] = cacheParameterGroupName;
     $request['Description'] = description;
+    tags?.also((arg) => $request['Tags'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'CreateCacheParameterGroup',
@@ -996,6 +1019,7 @@ class ElastiCache {
   ///
   /// May throw [CacheSecurityGroupAlreadyExistsFault].
   /// May throw [CacheSecurityGroupQuotaExceededFault].
+  /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
   ///
@@ -1010,9 +1034,14 @@ class ElastiCache {
   ///
   /// Parameter [description] :
   /// A description for the cache security group.
+  ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<CreateCacheSecurityGroupResult> createCacheSecurityGroup({
     required String cacheSecurityGroupName,
     required String description,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(
         cacheSecurityGroupName, 'cacheSecurityGroupName');
@@ -1020,6 +1049,7 @@ class ElastiCache {
     final $request = <String, dynamic>{};
     $request['CacheSecurityGroupName'] = cacheSecurityGroupName;
     $request['Description'] = description;
+    tags?.also((arg) => $request['Tags'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'CreateCacheSecurityGroup',
@@ -1042,6 +1072,7 @@ class ElastiCache {
   /// May throw [CacheSubnetGroupAlreadyExistsFault].
   /// May throw [CacheSubnetGroupQuotaExceededFault].
   /// May throw [CacheSubnetQuotaExceededFault].
+  /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidSubnet].
   /// May throw [SubnetNotAllowedFault].
   ///
@@ -1059,10 +1090,15 @@ class ElastiCache {
   ///
   /// Parameter [subnetIds] :
   /// A list of VPC subnet IDs for the cache subnet group.
+  ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<CreateCacheSubnetGroupResult> createCacheSubnetGroup({
     required String cacheSubnetGroupDescription,
     required String cacheSubnetGroupName,
     required List<String> subnetIds,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(
         cacheSubnetGroupDescription, 'cacheSubnetGroupDescription');
@@ -1072,6 +1108,7 @@ class ElastiCache {
     $request['CacheSubnetGroupDescription'] = cacheSubnetGroupDescription;
     $request['CacheSubnetGroupName'] = cacheSubnetGroupName;
     $request['SubnetIds'] = subnetIds;
+    tags?.also((arg) => $request['Tags'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'CreateCacheSubnetGroup',
@@ -1097,7 +1134,7 @@ class ElastiCache {
   /// <ul>
   /// <li>
   /// The <b>GlobalReplicationGroupIdSuffix</b> is the name of the Global
-  /// Datastore.
+  /// datastore.
   /// </li>
   /// <li>
   /// The <b>PrimaryReplicationGroupId</b> represents the name of the primary
@@ -1113,25 +1150,25 @@ class ElastiCache {
   /// May throw [InvalidParameterValueException].
   ///
   /// Parameter [globalReplicationGroupIdSuffix] :
-  /// The suffix name of a Global Datastore. Amazon ElastiCache automatically
-  /// applies a prefix to the Global Datastore ID when it is created. Each AWS
-  /// Region has its own prefix. For instance, a Global Datastore ID created in
-  /// the US-West-1 region will begin with "dsdfu" along with the suffix name
-  /// you provide. The suffix, combined with the auto-generated prefix,
-  /// guarantees uniqueness of the Global Datastore name across multiple
+  /// The suffix name of a Global datastore. Amazon ElastiCache automatically
+  /// applies a prefix to the Global datastore ID when it is created. Each
+  /// Amazon Region has its own prefix. For instance, a Global datastore ID
+  /// created in the US-West-1 region will begin with "dsdfu" along with the
+  /// suffix name you provide. The suffix, combined with the auto-generated
+  /// prefix, guarantees uniqueness of the Global datastore name across multiple
   /// regions.
   ///
-  /// For a full list of AWS Regions and their respective Global Datastore iD
+  /// For a full list of Amazon Regions and their respective Global datastore iD
   /// prefixes, see <a
   /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Redis-Global-Datastores-CLI.html">Using
-  /// the AWS CLI with Global Datastores </a>.
+  /// the Amazon CLI with Global datastores </a>.
   ///
   /// Parameter [primaryReplicationGroupId] :
   /// The name of the primary cluster that accepts writes and will replicate
   /// updates to the secondary cluster.
   ///
   /// Parameter [globalReplicationGroupDescription] :
-  /// Provides details of the Global Datastore
+  /// Provides details of the Global datastore
   Future<CreateGlobalReplicationGroupResult> createGlobalReplicationGroup({
     required String globalReplicationGroupIdSuffix,
     required String primaryReplicationGroupId,
@@ -1164,19 +1201,35 @@ class ElastiCache {
   /// replication group.
   ///
   /// This API can be used to create a standalone regional replication group or
-  /// a secondary replication group associated with a Global Datastore.
+  /// a secondary replication group associated with a Global datastore.
   ///
   /// A Redis (cluster mode disabled) replication group is a collection of
   /// clusters, where one of the clusters is a read/write primary and the others
   /// are read-only replicas. Writes to the primary are asynchronously
   /// propagated to the replicas.
   ///
-  /// A Redis (cluster mode enabled) replication group is a collection of 1 to
-  /// 90 node groups (shards). Each node group (shard) has one read/write
-  /// primary node and up to 5 read-only replica nodes. Writes to the primary
-  /// are asynchronously propagated to the replicas. Redis (cluster mode
-  /// enabled) replication groups partition the data across node groups
-  /// (shards).
+  /// A Redis cluster-mode enabled cluster is comprised of from 1 to 90 shards
+  /// (API/CLI: node groups). Each shard has a primary node and up to 5
+  /// read-only replica nodes. The configuration can range from 90 shards and 0
+  /// replicas to 15 shards and 5 replicas, which is the maximum number or
+  /// replicas allowed.
+  ///
+  /// The node or shard limit can be increased to a maximum of 500 per cluster
+  /// if the Redis engine version is 5.0.6 or higher. For example, you can
+  /// choose to configure a 500 node cluster that ranges between 83 shards (one
+  /// primary and 5 replicas per shard) and 500 shards (single primary and no
+  /// replicas). Make sure there are enough available IP addresses to
+  /// accommodate the increase. Common pitfalls include the subnets in the
+  /// subnet group have too small a CIDR range or the subnets are shared and
+  /// heavily used by other clusters. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/SubnetGroups.Creating.html">Creating
+  /// a Subnet Group</a>. For versions below 5.0.6, the limit is 250 per
+  /// cluster.
+  ///
+  /// To request a limit increase, see <a
+  /// href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html">Amazon
+  /// Service Limits</a> and choose the limit type <b>Nodes per cluster per
+  /// instance type</b>.
   ///
   /// When a Redis (cluster mode disabled) replication group has been
   /// successfully created, you can add one or more read replicas to it, up to a
@@ -1274,7 +1327,9 @@ class ElastiCache {
   /// password</a> at http://redis.io/commands/AUTH.
   ///
   /// Parameter [autoMinorVersionUpgrade] :
-  /// This parameter is currently disabled.
+  /// If you are running Redis engine version 6.0 or later, set this parameter
+  /// to yes if you want to opt-in to the next auto minor version upgrade
+  /// campaign. This parameter is disabled for previous versions.
   ///
   /// Parameter [automaticFailoverEnabled] :
   /// Specifies whether a read-only replica is automatically promoted to
@@ -1302,16 +1357,15 @@ class ElastiCache {
   /// Current generation:
   ///
   /// <b>M6g node types</b> (available only for Redis engine version 5.0.6
-  /// onward and for Memcached engine version 1.5.16 onward).
-  ///
+  /// onward and for Memcached engine version 1.5.16 onward):
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -1322,6 +1376,11 @@ class ElastiCache {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6
+  /// onward and Memcached engine version 1.5.16 onward):
+  /// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+  /// <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -1329,7 +1388,8 @@ class ElastiCache {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -1347,9 +1407,25 @@ class ElastiCache {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2
+  /// onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -1367,9 +1443,9 @@ class ElastiCache {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -1382,7 +1458,8 @@ class ElastiCache {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -1417,11 +1494,7 @@ class ElastiCache {
   /// The name of the parameter group to associate with this replication group.
   /// If this argument is omitted, the default cache parameter group for the
   /// specified engine is used.
-  /// <note>
-  /// If you are restoring to an engine version that is different than the
-  /// original, you must specify the default version of that version. For
-  /// example, <code>CacheParameterGroupName=default.redis4.0</code>.
-  /// </note>
+  ///
   /// If you are running Redis version 3.2.4 or later, only one node group
   /// (shard), and want to use a default parameter group, we recommend that you
   /// specify the parameter group by name.
@@ -1451,9 +1524,16 @@ class ElastiCache {
   /// and Subnet Groups</a>.
   /// </important>
   ///
+  /// Parameter [dataTieringEnabled] :
+  /// Enables data tiering. Data tiering is only supported for replication
+  /// groups using the r6gd node type. This parameter must be set to true when
+  /// using r6gd nodes. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/data-tiering.html">Data
+  /// tiering</a>.
+  ///
   /// Parameter [engine] :
   /// The name of the cache engine to be used for the clusters in this
-  /// replication group.
+  /// replication group. Must be Redis.
   ///
   /// Parameter [engineVersion] :
   /// The version number of the cache engine to be used for the clusters in this
@@ -1468,10 +1548,13 @@ class ElastiCache {
   /// replication group and create it anew with the earlier engine version.
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [kmsKeyId] :
   /// The ID of the KMS key used to encrypt the disk in the cluster.
+  ///
+  /// Parameter [logDeliveryConfigurations] :
+  /// Specifies the destination, format and type of the logs.
   ///
   /// Parameter [multiAZEnabled] :
   /// A flag indicating if you have Multi-AZ enabled to enhance fault tolerance.
@@ -1639,11 +1722,12 @@ class ElastiCache {
   /// appropriate time range.
   ///
   /// Parameter [tags] :
-  /// A list of cost allocation tags to be added to this resource. Tags are
-  /// comma-separated key,value pairs (e.g. Key=<code>myKey</code>,
+  /// A list of tags to be added to this resource. Tags are comma-separated
+  /// key,value pairs (e.g. Key=<code>myKey</code>,
   /// Value=<code>myKeyValue</code>. You can include multiple tags as shown
   /// following: Key=<code>myKey</code>, Value=<code>myKeyValue</code>
-  /// Key=<code>mySecondKey</code>, Value=<code>mySecondKeyValue</code>.
+  /// Key=<code>mySecondKey</code>, Value=<code>mySecondKeyValue</code>. Tags on
+  /// replication groups will be replicated to all nodes.
   ///
   /// Parameter [transitEncryptionEnabled] :
   /// A flag that enables in-transit encryption when set to <code>true</code>.
@@ -1673,7 +1757,7 @@ class ElastiCache {
   /// </important>
   ///
   /// Parameter [userGroupIds] :
-  /// The list of user groups to associate with the replication group.
+  /// The user group to associate with the replication group.
   Future<CreateReplicationGroupResult> createReplicationGroup({
     required String replicationGroupDescription,
     required String replicationGroupId,
@@ -1685,10 +1769,12 @@ class ElastiCache {
     String? cacheParameterGroupName,
     List<String>? cacheSecurityGroupNames,
     String? cacheSubnetGroupName,
+    bool? dataTieringEnabled,
     String? engine,
     String? engineVersion,
     String? globalReplicationGroupId,
     String? kmsKeyId,
+    List<LogDeliveryConfigurationRequest>? logDeliveryConfigurations,
     bool? multiAZEnabled,
     List<NodeGroupConfiguration>? nodeGroupConfiguration,
     String? notificationTopicArn,
@@ -1727,11 +1813,14 @@ class ElastiCache {
     cacheSecurityGroupNames
         ?.also((arg) => $request['CacheSecurityGroupNames'] = arg);
     cacheSubnetGroupName?.also((arg) => $request['CacheSubnetGroupName'] = arg);
+    dataTieringEnabled?.also((arg) => $request['DataTieringEnabled'] = arg);
     engine?.also((arg) => $request['Engine'] = arg);
     engineVersion?.also((arg) => $request['EngineVersion'] = arg);
     globalReplicationGroupId
         ?.also((arg) => $request['GlobalReplicationGroupId'] = arg);
     kmsKeyId?.also((arg) => $request['KmsKeyId'] = arg);
+    logDeliveryConfigurations
+        ?.also((arg) => $request['LogDeliveryConfigurations'] = arg);
     multiAZEnabled?.also((arg) => $request['MultiAZEnabled'] = arg);
     nodeGroupConfiguration
         ?.also((arg) => $request['NodeGroupConfiguration'] = arg);
@@ -1782,6 +1871,7 @@ class ElastiCache {
   /// May throw [InvalidReplicationGroupStateFault].
   /// May throw [SnapshotQuotaExceededFault].
   /// May throw [SnapshotFeatureNotSupportedFault].
+  /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidParameterCombinationException].
   /// May throw [InvalidParameterValueException].
   ///
@@ -1798,11 +1888,16 @@ class ElastiCache {
   /// Parameter [replicationGroupId] :
   /// The identifier of an existing replication group. The snapshot is created
   /// from this replication group.
+  ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<CreateSnapshotResult> createSnapshot({
     required String snapshotName,
     String? cacheClusterId,
     String? kmsKeyId,
     String? replicationGroupId,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(snapshotName, 'snapshotName');
     final $request = <String, dynamic>{};
@@ -1810,6 +1905,7 @@ class ElastiCache {
     cacheClusterId?.also((arg) => $request['CacheClusterId'] = arg);
     kmsKeyId?.also((arg) => $request['KmsKeyId'] = arg);
     replicationGroupId?.also((arg) => $request['ReplicationGroupId'] = arg);
+    tags?.also((arg) => $request['Tags'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'CreateSnapshot',
@@ -1824,7 +1920,7 @@ class ElastiCache {
     return CreateSnapshotResult.fromXml($result);
   }
 
-  /// For Redis engine version 6.x onwards: Creates a Redis user. For more
+  /// For Redis engine version 6.0 onwards: Creates a Redis user. For more
   /// information, see <a
   /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Clusters.RBAC.html">Using
   /// Role Based Access Control (RBAC)</a>.
@@ -1832,8 +1928,10 @@ class ElastiCache {
   /// May throw [UserAlreadyExistsFault].
   /// May throw [UserQuotaExceededFault].
   /// May throw [DuplicateUserNameFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
+  /// May throw [TagQuotaPerResourceExceeded].
   ///
   /// Parameter [accessString] :
   /// Access permissions string used for this user.
@@ -1853,6 +1951,10 @@ class ElastiCache {
   /// Parameter [passwords] :
   /// Passwords used for this user. You can create up to two passwords for each
   /// user.
+  ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<User> createUser({
     required String accessString,
     required String engine,
@@ -1860,6 +1962,7 @@ class ElastiCache {
     required String userName,
     bool? noPasswordRequired,
     List<String>? passwords,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(accessString, 'accessString');
     ArgumentError.checkNotNull(engine, 'engine');
@@ -1886,6 +1989,7 @@ class ElastiCache {
     $request['UserName'] = userName;
     noPasswordRequired?.also((arg) => $request['NoPasswordRequired'] = arg);
     passwords?.also((arg) => $request['Passwords'] = arg);
+    tags?.also((arg) => $request['Tags'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'CreateUser',
@@ -1900,7 +2004,7 @@ class ElastiCache {
     return User.fromXml($result);
   }
 
-  /// For Redis engine version 6.x onwards: Creates a Redis user group. For more
+  /// For Redis engine version 6.0 onwards: Creates a Redis user group. For more
   /// information, see <a
   /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Clusters.RBAC.html">Using
   /// Role Based Access Control (RBAC)</a>
@@ -1908,9 +2012,11 @@ class ElastiCache {
   /// May throw [UserNotFoundFault].
   /// May throw [DuplicateUserNameFault].
   /// May throw [UserGroupAlreadyExistsFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [DefaultUserRequired].
   /// May throw [UserGroupQuotaExceededFault].
   /// May throw [InvalidParameterValueException].
+  /// May throw [TagQuotaPerResourceExceeded].
   ///
   /// Parameter [engine] :
   /// The current supported value is Redis.
@@ -1918,11 +2024,16 @@ class ElastiCache {
   /// Parameter [userGroupId] :
   /// The ID of the user group.
   ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
+  ///
   /// Parameter [userIds] :
   /// The list of user IDs that belong to the user group.
   Future<UserGroup> createUserGroup({
     required String engine,
     required String userGroupId,
+    List<Tag>? tags,
     List<String>? userIds,
   }) async {
     ArgumentError.checkNotNull(engine, 'engine');
@@ -1930,6 +2041,7 @@ class ElastiCache {
     final $request = <String, dynamic>{};
     $request['Engine'] = engine;
     $request['UserGroupId'] = userGroupId;
+    tags?.also((arg) => $request['Tags'] = arg);
     userIds?.also((arg) => $request['UserIds'] = arg);
     final $result = await _protocol.send(
       $request,
@@ -1945,7 +2057,7 @@ class ElastiCache {
     return UserGroup.fromXml($result);
   }
 
-  /// Decreases the number of node groups in a Global Datastore
+  /// Decreases the number of node groups in a Global datastore
   ///
   /// May throw [GlobalReplicationGroupNotFoundFault].
   /// May throw [InvalidGlobalReplicationGroupStateFault].
@@ -1957,7 +2069,7 @@ class ElastiCache {
   /// present, the only permitted value for this parameter is true.
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [nodeGroupCount] :
   /// The number of node groups (shards) that results from the modification of
@@ -1966,16 +2078,16 @@ class ElastiCache {
   /// Parameter [globalNodeGroupsToRemove] :
   /// If the value of NodeGroupCount is less than the current number of node
   /// groups (shards), then either NodeGroupsToRemove or NodeGroupsToRetain is
-  /// required. NodeGroupsToRemove is a list of NodeGroupIds to remove from the
-  /// cluster. ElastiCache for Redis will attempt to remove all node groups
-  /// listed by NodeGroupsToRemove from the cluster.
+  /// required. GlobalNodeGroupsToRemove is a list of NodeGroupIds to remove
+  /// from the cluster. ElastiCache for Redis will attempt to remove all node
+  /// groups listed by GlobalNodeGroupsToRemove from the cluster.
   ///
   /// Parameter [globalNodeGroupsToRetain] :
   /// If the value of NodeGroupCount is less than the current number of node
   /// groups (shards), then either NodeGroupsToRemove or NodeGroupsToRetain is
-  /// required. NodeGroupsToRemove is a list of NodeGroupIds to remove from the
-  /// cluster. ElastiCache for Redis will attempt to remove all node groups
-  /// listed by NodeGroupsToRemove from the cluster.
+  /// required. GlobalNodeGroupsToRetain is a list of NodeGroupIds to retain
+  /// from the cluster. ElastiCache for Redis will attempt to retain all node
+  /// groups listed by GlobalNodeGroupsToRetain from the cluster.
   Future<DecreaseNodeGroupsInGlobalReplicationGroupResult>
       decreaseNodeGroupsInGlobalReplicationGroup({
     required bool applyImmediately,
@@ -2116,7 +2228,13 @@ class ElastiCache {
   /// Redis (cluster mode enabled) clusters
   /// </li>
   /// <li>
+  /// Redis (cluster mode disabled) clusters
+  /// </li>
+  /// <li>
   /// A cluster that is the last read replica of a replication group
+  /// </li>
+  /// <li>
+  /// A cluster that is the primary node of a replication group
   /// </li>
   /// <li>
   /// A node group (shard) that has Multi-AZ mode enabled
@@ -2169,7 +2287,8 @@ class ElastiCache {
   }
 
   /// Deletes the specified cache parameter group. You cannot delete a cache
-  /// parameter group if it is associated with any cache clusters.
+  /// parameter group if it is associated with any cache clusters. You cannot
+  /// delete the default cache parameter groups in your account.
   ///
   /// May throw [InvalidCacheParameterGroupStateFault].
   /// May throw [CacheParameterGroupNotFoundFault].
@@ -2238,8 +2357,8 @@ class ElastiCache {
 
   /// Deletes a cache subnet group.
   /// <note>
-  /// You cannot delete a cache subnet group if it is associated with any
-  /// clusters.
+  /// You cannot delete a default cache subnet group or one that is associated
+  /// with any clusters.
   /// </note>
   ///
   /// May throw [CacheSubnetGroupInUse].
@@ -2268,22 +2387,25 @@ class ElastiCache {
     );
   }
 
-  /// Deleting a Global Datastore is a two-step process:
+  /// Deleting a Global datastore is a two-step process:
   ///
   /// <ul>
   /// <li>
   /// First, you must <a>DisassociateGlobalReplicationGroup</a> to remove the
-  /// secondary clusters in the Global Datastore.
+  /// secondary clusters in the Global datastore.
   /// </li>
   /// <li>
-  /// Once the Global Datastore contains only the primary cluster, you can use
-  /// DeleteGlobalReplicationGroup API to delete the Global Datastore while
-  /// retainining the primary cluster using Retain…= true.
+  /// Once the Global datastore contains only the primary cluster, you can use
+  /// the <code>DeleteGlobalReplicationGroup</code> API to delete the Global
+  /// datastore while retainining the primary cluster using
+  /// <code>RetainPrimaryReplicationGroup=true</code>.
   /// </li>
   /// </ul>
   /// Since the Global Datastore has only a primary cluster, you can delete the
   /// Global Datastore while retaining the primary by setting
-  /// <code>RetainPrimaryCluster=true</code>.
+  /// <code>RetainPrimaryReplicationGroup=true</code>. The primary cluster is
+  /// never deleted when deleting a Global Datastore. It can only be deleted
+  /// when it no longer is associated with any Global Datastore.
   ///
   /// When you receive a successful response from this operation, Amazon
   /// ElastiCache immediately begins deleting the selected resources; you cannot
@@ -2294,7 +2416,7 @@ class ElastiCache {
   /// May throw [InvalidParameterValueException].
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [retainPrimaryReplicationGroup] :
   /// The primary replication group is retained as a standalone replication
@@ -2417,7 +2539,7 @@ class ElastiCache {
     return DeleteSnapshotResult.fromXml($result);
   }
 
-  /// For Redis engine version 6.x onwards: Deletes a user. The user will be
+  /// For Redis engine version 6.0 onwards: Deletes a user. The user will be
   /// removed from all user groups and in turn removed from all replication
   /// groups. For more information, see <a
   /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Clusters.RBAC.html">Using
@@ -2425,6 +2547,7 @@ class ElastiCache {
   ///
   /// May throw [InvalidUserStateFault].
   /// May throw [UserNotFoundFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [DefaultUserAssociatedToUserGroupFault].
   ///
@@ -2457,14 +2580,15 @@ class ElastiCache {
     return User.fromXml($result);
   }
 
-  /// For Redis engine version 6.x onwards: Deletes a ser group. The user group
-  /// must first be disassociated from the replcation group before it can be
+  /// For Redis engine version 6.0 onwards: Deletes a user group. The user group
+  /// must first be disassociated from the replication group before it can be
   /// deleted. For more information, see <a
   /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Clusters.RBAC.html">Using
   /// Role Based Access Control (RBAC)</a>.
   ///
   /// May throw [UserGroupNotFoundFault].
   /// May throw [InvalidUserGroupStateFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterValueException].
   ///
   /// Parameter [userGroupId] :
@@ -2583,7 +2707,7 @@ class ElastiCache {
   /// Valid values are: <code>memcached1.4</code> | <code>memcached1.5</code> |
   /// <code>memcached1.6</code> | <code>redis2.6</code> | <code>redis2.8</code>
   /// | <code>redis3.2</code> | <code>redis4.0</code> | <code>redis5.0</code> |
-  /// <code>redis6.x</code> |
+  /// <code>redis6.x</code> | <code>redis6.2</code>
   ///
   /// Constraints:
   ///
@@ -2871,7 +2995,7 @@ class ElastiCache {
   /// Valid values are: <code>memcached1.4</code> | <code>memcached1.5</code> |
   /// <code>memcached1.6</code> | <code>redis2.6</code> | <code>redis2.8</code>
   /// | <code>redis3.2</code> | <code>redis4.0</code> | <code>redis5.0</code> |
-  /// <code>redis6.x</code> |
+  /// <code>redis6.x</code> | <code>redis6.2</code>
   ///
   /// Parameter [marker] :
   /// An optional marker returned from a prior request. Use this marker for
@@ -2993,14 +3117,14 @@ class ElastiCache {
   }
 
   /// Returns information about a particular global replication group. If no
-  /// identifier is specified, returns information about all Global Datastores.
+  /// identifier is specified, returns information about all Global datastores.
   ///
   /// May throw [GlobalReplicationGroupNotFoundFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [marker] :
   /// An optional marker returned from a prior request. Use this marker for
@@ -3014,7 +3138,7 @@ class ElastiCache {
   /// response so that the remaining results can be retrieved.
   ///
   /// Parameter [showMemberInfo] :
-  /// Returns the list of members that comprise the Global Datastore.
+  /// Returns the list of members that comprise the Global datastore.
   Future<DescribeGlobalReplicationGroupsResult>
       describeGlobalReplicationGroups({
     String? globalReplicationGroupId,
@@ -3121,17 +3245,16 @@ class ElastiCache {
   /// <li>
   /// Current generation:
   ///
-  /// <b>M6g node types</b> (available only for Redis engine version 5.0.6
-  /// onward and for Memcached engine version 1.5.16 onward).
-  ///
+  /// <b>M6g node types:</b> (available only for Redis engine version 5.0.6
+  /// onward and for Memcached engine version 1.5.16 onward):
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -3142,6 +3265,11 @@ class ElastiCache {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6
+  /// onward and for Memcached engine version 1.5.16 onward):
+  /// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+  /// <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -3149,7 +3277,8 @@ class ElastiCache {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -3167,9 +3296,25 @@ class ElastiCache {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2
+  /// onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -3187,9 +3332,9 @@ class ElastiCache {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -3202,7 +3347,8 @@ class ElastiCache {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -3329,17 +3475,16 @@ class ElastiCache {
   /// <li>
   /// Current generation:
   ///
-  /// <b>M6g node types</b> (available only for Redis engine version 5.0.6
-  /// onward and for Memcached engine version 1.5.16 onward).
-  ///
+  /// <b>M6g node types:</b> (available only for Redis engine version 5.0.6
+  /// onward and for Memcached engine version 1.5.16 onward)
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -3350,6 +3495,11 @@ class ElastiCache {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6
+  /// onward and for Memcached engine version 1.5.16 onward):
+  /// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+  /// <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -3357,7 +3507,8 @@ class ElastiCache {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -3375,9 +3526,25 @@ class ElastiCache {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2
+  /// onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -3395,9 +3562,9 @@ class ElastiCache {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and
-  /// ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -3410,7 +3577,8 @@ class ElastiCache {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still
+  /// supported but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -3721,6 +3889,7 @@ class ElastiCache {
   /// Returns a list of user groups.
   ///
   /// May throw [UserGroupNotFoundFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterCombinationException].
   ///
   /// Parameter [marker] :
@@ -3762,6 +3931,7 @@ class ElastiCache {
   /// Returns a list of users.
   ///
   /// May throw [UserNotFoundFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterCombinationException].
   ///
   /// Parameter [engine] :
@@ -3816,10 +3986,10 @@ class ElastiCache {
     return DescribeUsersResult.fromXml($result);
   }
 
-  /// Remove a secondary cluster from the Global Datastore using the Global
-  /// Datastore name. The secondary cluster will no longer receive updates from
-  /// the primary cluster, but will remain as a standalone cluster in that AWS
-  /// region.
+  /// Remove a secondary cluster from the Global datastore using the Global
+  /// datastore name. The secondary cluster will no longer receive updates from
+  /// the primary cluster, but will remain as a standalone cluster in that
+  /// Amazon region.
   ///
   /// May throw [GlobalReplicationGroupNotFoundFault].
   /// May throw [InvalidGlobalReplicationGroupStateFault].
@@ -3827,15 +3997,15 @@ class ElastiCache {
   /// May throw [InvalidParameterCombinationException].
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [replicationGroupId] :
   /// The name of the secondary cluster you wish to remove from the Global
-  /// Datastore
+  /// datastore
   ///
   /// Parameter [replicationGroupRegion] :
-  /// The AWS region of secondary cluster you wish to remove from the Global
-  /// Datastore
+  /// The Amazon region of secondary cluster you wish to remove from the Global
+  /// datastore
   Future<DisassociateGlobalReplicationGroupResult>
       disassociateGlobalReplicationGroup({
     required String globalReplicationGroupId,
@@ -3875,10 +4045,10 @@ class ElastiCache {
   /// May throw [InvalidParameterCombinationException].
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [primaryRegion] :
-  /// The AWS region of the primary cluster of the Global Datastore
+  /// The Amazon region of the primary cluster of the Global datastore
   ///
   /// Parameter [primaryReplicationGroupId] :
   /// The name of the primary replication group
@@ -3910,7 +4080,7 @@ class ElastiCache {
     return FailoverGlobalReplicationGroupResult.fromXml($result);
   }
 
-  /// Increase the number of node groups in the Global Datastore
+  /// Increase the number of node groups in the Global datastore
   ///
   /// May throw [GlobalReplicationGroupNotFoundFault].
   /// May throw [InvalidGlobalReplicationGroupStateFault].
@@ -3921,14 +4091,15 @@ class ElastiCache {
   /// permitted value for this parameter is true.
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [nodeGroupCount] :
   /// The number of node groups you wish to add
   ///
   /// Parameter [regionalConfigurations] :
-  /// Describes the replication group IDs, the AWS regions where they are stored
-  /// and the shard configuration for each that comprise the Global Datastore
+  /// Describes the replication group IDs, the Amazon regions where they are
+  /// stored and the shard configuration for each that comprise the Global
+  /// datastore
   Future<IncreaseNodeGroupsInGlobalReplicationGroupResult>
       increaseNodeGroupsInGlobalReplicationGroup({
     required bool applyImmediately,
@@ -3960,7 +4131,7 @@ class ElastiCache {
     return IncreaseNodeGroupsInGlobalReplicationGroupResult.fromXml($result);
   }
 
-  /// Dynamically increases the number of replics in a Redis (cluster mode
+  /// Dynamically increases the number of replicas in a Redis (cluster mode
   /// disabled) replication group or the number of replica nodes in one or more
   /// node groups (shards) of a Redis (cluster mode enabled) replication group.
   /// This operation is performed with no cluster down time.
@@ -4079,21 +4250,29 @@ class ElastiCache {
     return AllowedNodeTypeModificationsMessage.fromXml($result);
   }
 
-  /// Lists all cost allocation tags currently on the named resource. A
-  /// <code>cost allocation tag</code> is a key-value pair where the key is
-  /// case-sensitive and the value is optional. You can use cost allocation tags
-  /// to categorize and track your AWS costs.
+  /// Lists all tags currently on a named resource.
+  ///
+  /// A tag is a key-value pair where the key and value are case-sensitive. You
+  /// can use tags to categorize and track all your ElastiCache resources, with
+  /// the exception of global replication group. When you add or remove tags on
+  /// replication groups, those actions will be replicated to all nodes in the
+  /// replication group. For more information, see <a
+  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/IAM.ResourceLevelPermissions.html">Resource-level
+  /// permissions</a>.
   ///
   /// If the cluster is not in the <i>available</i> state,
   /// <code>ListTagsForResource</code> returns an error.
   ///
-  /// You can have a maximum of 50 cost allocation tags on an ElastiCache
-  /// resource. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Tagging.html">Monitoring
-  /// Costs with Tags</a>.
-  ///
   /// May throw [CacheClusterNotFoundFault].
+  /// May throw [CacheParameterGroupNotFoundFault].
+  /// May throw [CacheSecurityGroupNotFoundFault].
+  /// May throw [CacheSubnetGroupNotFoundFault].
+  /// May throw [InvalidReplicationGroupStateFault].
+  /// May throw [ReplicationGroupNotFoundFault].
+  /// May throw [ReservedCacheNodeNotFoundFault].
   /// May throw [SnapshotNotFoundFault].
+  /// May throw [UserNotFoundFault].
+  /// May throw [UserGroupNotFoundFault].
   /// May throw [InvalidARNFault].
   ///
   /// Parameter [resourceName] :
@@ -4104,7 +4283,7 @@ class ElastiCache {
   ///
   /// For more information about ARNs, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon
-  /// Resource Names (ARNs) and AWS Service Namespaces</a>.
+  /// Resource Names (ARNs) and Amazon Web Services Service Namespaces</a>.
   Future<TagListMessage> listTagsForResource({
     required String resourceName,
   }) async {
@@ -4215,7 +4394,9 @@ class ElastiCache {
   /// Users with Redis AUTH</a>
   ///
   /// Parameter [autoMinorVersionUpgrade] :
-  /// This parameter is currently disabled.
+  /// If you are running Redis engine version 6.0 or later, set this parameter
+  /// to yes if you want to opt-in to the next auto minor version upgrade
+  /// campaign. This parameter is disabled for previous versions.
   ///
   /// Parameter [cacheNodeIdsToRemove] :
   /// A list of cache node IDs to be removed. A node ID is a numeric identifier
@@ -4259,7 +4440,13 @@ class ElastiCache {
   /// delete the existing cluster and create it anew with the earlier engine
   /// version.
   ///
+  /// Parameter [logDeliveryConfigurations] :
+  /// Specifies the destination, format and type of the logs.
+  ///
   /// Parameter [newAvailabilityZones] :
+  /// <note>
+  /// This option is only supported on Memcached clusters.
+  /// </note>
   /// The list of Availability Zones where the new Memcached cache nodes are
   /// created.
   ///
@@ -4268,8 +4455,6 @@ class ElastiCache {
   /// the number of cache nodes pending creation (which may be zero). The number
   /// of Availability Zones supplied in this list must match the cache nodes
   /// being added in this request.
-  ///
-  /// This option is only supported on Memcached clusters.
   ///
   /// Scenarios:
   ///
@@ -4394,7 +4579,7 @@ class ElastiCache {
   /// specific cache nodes to remove.
   ///
   /// For clusters running Redis, this value must be 1. For clusters running
-  /// Memcached, this value must be between 1 and 20.
+  /// Memcached, this value must be between 1 and 40.
   /// <note>
   /// Adding or removing Memcached cache nodes can be applied immediately or as
   /// a pending operation (see <code>ApplyImmediately</code>).
@@ -4482,6 +4667,7 @@ class ElastiCache {
     String? cacheParameterGroupName,
     List<String>? cacheSecurityGroupNames,
     String? engineVersion,
+    List<LogDeliveryConfigurationRequest>? logDeliveryConfigurations,
     List<String>? newAvailabilityZones,
     String? notificationTopicArn,
     String? notificationTopicStatus,
@@ -4508,6 +4694,8 @@ class ElastiCache {
     cacheSecurityGroupNames
         ?.also((arg) => $request['CacheSecurityGroupNames'] = arg);
     engineVersion?.also((arg) => $request['EngineVersion'] = arg);
+    logDeliveryConfigurations
+        ?.also((arg) => $request['LogDeliveryConfigurations'] = arg);
     newAvailabilityZones?.also((arg) => $request['NewAvailabilityZones'] = arg);
     notificationTopicArn?.also((arg) => $request['NotificationTopicArn'] = arg);
     notificationTopicStatus
@@ -4621,7 +4809,7 @@ class ElastiCache {
     return ModifyCacheSubnetGroupResult.fromXml($result);
   }
 
-  /// Modifies the settings for a Global Datastore.
+  /// Modifies the settings for a Global datastore.
   ///
   /// May throw [GlobalReplicationGroupNotFoundFault].
   /// May throw [InvalidGlobalReplicationGroupStateFault].
@@ -4634,26 +4822,32 @@ class ElastiCache {
   /// applied in PreferredMaintenceWindow.
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   ///
   /// Parameter [automaticFailoverEnabled] :
   /// Determines whether a read replica is automatically promoted to read/write
   /// primary if the existing primary encounters a failure.
   ///
   /// Parameter [cacheNodeType] :
-  /// A valid cache node type that you want to scale this Global Datastore to.
+  /// A valid cache node type that you want to scale this Global datastore to.
+  ///
+  /// Parameter [cacheParameterGroupName] :
+  /// The name of the cache parameter group to use with the Global datastore. It
+  /// must be compatible with the major engine version used by the Global
+  /// datastore.
   ///
   /// Parameter [engineVersion] :
   /// The upgraded version of the cache engine to be run on the clusters in the
-  /// Global Datastore.
+  /// Global datastore.
   ///
   /// Parameter [globalReplicationGroupDescription] :
-  /// A description of the Global Datastore
+  /// A description of the Global datastore
   Future<ModifyGlobalReplicationGroupResult> modifyGlobalReplicationGroup({
     required bool applyImmediately,
     required String globalReplicationGroupId,
     bool? automaticFailoverEnabled,
     String? cacheNodeType,
+    String? cacheParameterGroupName,
     String? engineVersion,
     String? globalReplicationGroupDescription,
   }) async {
@@ -4666,6 +4860,8 @@ class ElastiCache {
     automaticFailoverEnabled
         ?.also((arg) => $request['AutomaticFailoverEnabled'] = arg);
     cacheNodeType?.also((arg) => $request['CacheNodeType'] = arg);
+    cacheParameterGroupName
+        ?.also((arg) => $request['CacheParameterGroupName'] = arg);
     engineVersion?.also((arg) => $request['EngineVersion'] = arg);
     globalReplicationGroupDescription
         ?.also((arg) => $request['GlobalReplicationGroupDescription'] = arg);
@@ -4772,7 +4968,9 @@ class ElastiCache {
   /// Users with Redis AUTH</a>
   ///
   /// Parameter [autoMinorVersionUpgrade] :
-  /// This parameter is currently disabled.
+  /// If you are running Redis engine version 6.0 or later, set this parameter
+  /// to yes if you want to opt-in to the next auto minor version upgrade
+  /// campaign. This parameter is disabled for previous versions.
   ///
   /// Parameter [automaticFailoverEnabled] :
   /// Determines whether a read replica is automatically promoted to read/write
@@ -4811,11 +5009,11 @@ class ElastiCache {
   /// delete the existing replication group and create it anew with the earlier
   /// engine version.
   ///
+  /// Parameter [logDeliveryConfigurations] :
+  /// Specifies the destination, format and type of the logs.
+  ///
   /// Parameter [multiAZEnabled] :
-  /// A flag indicating if you have Multi-AZ enabled to enhance fault tolerance.
-  /// For more information, see <a
-  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/AutoFailover.html">Minimizing
-  /// Downtime: Multi-AZ</a>.
+  /// A flag to indicate MultiAZ is enabled.
   ///
   /// Parameter [nodeGroupId] :
   /// Deprecated. This parameter is not used.
@@ -4873,7 +5071,7 @@ class ElastiCache {
   /// the replication group are read replicas.
   ///
   /// Parameter [removeUserGroups] :
-  /// Removes the user groups that can access this replication group.
+  /// Removes the user group associated with this replication group.
   ///
   /// Parameter [replicationGroupDescription] :
   /// A description for the replication group. Maximum length is 255 characters.
@@ -4910,11 +5108,11 @@ class ElastiCache {
   /// enabled) replication groups.
   ///
   /// Parameter [userGroupIdsToAdd] :
-  /// A list of user group IDs.
+  /// The ID of the user group you are associating with the replication group.
   ///
   /// Parameter [userGroupIdsToRemove] :
-  /// A list of users groups to remove, meaning the users in the group no longer
-  /// can access thereplication group.
+  /// The ID of the user group to disassociate from the replication group,
+  /// meaning the users in the group no longer can access the replication group.
   Future<ModifyReplicationGroupResult> modifyReplicationGroup({
     required String replicationGroupId,
     bool? applyImmediately,
@@ -4926,6 +5124,7 @@ class ElastiCache {
     String? cacheParameterGroupName,
     List<String>? cacheSecurityGroupNames,
     String? engineVersion,
+    List<LogDeliveryConfigurationRequest>? logDeliveryConfigurations,
     bool? multiAZEnabled,
     String? nodeGroupId,
     String? notificationTopicArn,
@@ -4958,6 +5157,8 @@ class ElastiCache {
     cacheSecurityGroupNames
         ?.also((arg) => $request['CacheSecurityGroupNames'] = arg);
     engineVersion?.also((arg) => $request['EngineVersion'] = arg);
+    logDeliveryConfigurations
+        ?.also((arg) => $request['LogDeliveryConfigurations'] = arg);
     multiAZEnabled?.also((arg) => $request['MultiAZEnabled'] = arg);
     nodeGroupId?.also((arg) => $request['NodeGroupId'] = arg);
     notificationTopicArn?.also((arg) => $request['NotificationTopicArn'] = arg);
@@ -4992,7 +5193,7 @@ class ElastiCache {
   }
 
   /// Modifies a replication group's shards (node groups) by allowing you to add
-  /// shards, remove shards, or rebalance the keyspaces among exisiting shards.
+  /// shards, remove shards, or rebalance the keyspaces among existing shards.
   ///
   /// May throw [ReplicationGroupNotFoundFault].
   /// May throw [InvalidReplicationGroupStateFault].
@@ -5087,6 +5288,7 @@ class ElastiCache {
   ///
   /// May throw [UserNotFoundFault].
   /// May throw [InvalidUserStateFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
   ///
@@ -5144,6 +5346,7 @@ class ElastiCache {
   /// May throw [UserGroupNotFoundFault].
   /// May throw [UserNotFoundFault].
   /// May throw [DuplicateUserNameFault].
+  /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [DefaultUserRequired].
   /// May throw [InvalidUserGroupStateFault].
   /// May throw [InvalidParameterValueException].
@@ -5181,11 +5384,18 @@ class ElastiCache {
     return UserGroup.fromXml($result);
   }
 
-  /// Allows you to purchase a reserved cache node offering.
+  /// Allows you to purchase a reserved cache node offering. Reserved nodes are
+  /// not eligible for cancellation and are non-refundable. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/reserved-nodes.html">Managing
+  /// Costs with Reserved Nodes</a> for Redis or <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/reserved-nodes.html">Managing
+  /// Costs with Reserved Nodes</a> for Memcached.
   ///
   /// May throw [ReservedCacheNodesOfferingNotFoundFault].
   /// May throw [ReservedCacheNodeAlreadyExistsFault].
   /// May throw [ReservedCacheNodeQuotaExceededFault].
+  /// May throw [TagQuotaPerResourceExceeded].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
   ///
@@ -5207,11 +5417,16 @@ class ElastiCache {
   /// automatically generates an identifier for the reservation.
   /// </note>
   /// Example: myreservationID
+  ///
+  /// Parameter [tags] :
+  /// A list of tags to be added to this resource. A tag is a key-value pair. A
+  /// tag key must be accompanied by a tag value, although null is accepted.
   Future<PurchaseReservedCacheNodesOfferingResult>
       purchaseReservedCacheNodesOffering({
     required String reservedCacheNodesOfferingId,
     int? cacheNodeCount,
     String? reservedCacheNodeId,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(
         reservedCacheNodesOfferingId, 'reservedCacheNodesOfferingId');
@@ -5219,6 +5434,7 @@ class ElastiCache {
     $request['ReservedCacheNodesOfferingId'] = reservedCacheNodesOfferingId;
     cacheNodeCount?.also((arg) => $request['CacheNodeCount'] = arg);
     reservedCacheNodeId?.also((arg) => $request['ReservedCacheNodeId'] = arg);
+    tags?.also((arg) => $request['Tags'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'PurchaseReservedCacheNodesOffering',
@@ -5244,7 +5460,7 @@ class ElastiCache {
   /// If <code>True</code>, redistribution is applied immediately.
   ///
   /// Parameter [globalReplicationGroupId] :
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   Future<RebalanceSlotsInGlobalReplicationGroupResult>
       rebalanceSlotsInGlobalReplicationGroup({
     required bool applyImmediately,
@@ -5287,7 +5503,7 @@ class ElastiCache {
   ///
   /// If you make changes to parameters that require a Redis (cluster mode
   /// enabled) cluster reboot for the changes to be applied, see <a
-  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/Clusters.Rebooting.html">Rebooting
+  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/nodes.rebooting.html">Rebooting
   /// a Cluster</a> for an alternate process.
   ///
   /// May throw [InvalidCacheClusterStateFault].
@@ -5324,10 +5540,25 @@ class ElastiCache {
   }
 
   /// Removes the tags identified by the <code>TagKeys</code> list from the
-  /// named resource.
+  /// named resource. A tag is a key-value pair where the key and value are
+  /// case-sensitive. You can use tags to categorize and track all your
+  /// ElastiCache resources, with the exception of global replication group.
+  /// When you add or remove tags on replication groups, those actions will be
+  /// replicated to all nodes in the replication group. For more information,
+  /// see <a
+  /// href="http://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/IAM.ResourceLevelPermissions.html">Resource-level
+  /// permissions</a>.
   ///
   /// May throw [CacheClusterNotFoundFault].
+  /// May throw [CacheParameterGroupNotFoundFault].
+  /// May throw [CacheSecurityGroupNotFoundFault].
+  /// May throw [CacheSubnetGroupNotFoundFault].
+  /// May throw [InvalidReplicationGroupStateFault].
+  /// May throw [ReplicationGroupNotFoundFault].
+  /// May throw [ReservedCacheNodeNotFoundFault].
   /// May throw [SnapshotNotFoundFault].
+  /// May throw [UserNotFoundFault].
+  /// May throw [UserGroupNotFoundFault].
   /// May throw [InvalidARNFault].
   /// May throw [TagNotFoundFault].
   ///
@@ -5339,7 +5570,7 @@ class ElastiCache {
   ///
   /// For more information about ARNs, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon
-  /// Resource Names (ARNs) and AWS Service Namespaces</a>.
+  /// Resource Names (ARNs) and Amazon Service Namespaces</a>.
   ///
   /// Parameter [tagKeys] :
   /// A list of <code>TagKeys</code> identifying the tags you want removed from
@@ -5438,9 +5669,9 @@ class ElastiCache {
   /// The name of the Amazon EC2 security group to revoke access from.
   ///
   /// Parameter [eC2SecurityGroupOwnerId] :
-  /// The AWS account number of the Amazon EC2 security group owner. Note that
-  /// this is not the same thing as an AWS access key ID - you must provide a
-  /// valid AWS account number for this parameter.
+  /// The Amazon account number of the Amazon EC2 security group owner. Note
+  /// that this is not the same thing as an Amazon access key ID - you must
+  /// provide a valid Amazon account number for this parameter.
   Future<RevokeCacheSecurityGroupIngressResult>
       revokeCacheSecurityGroupIngress({
     required String cacheSecurityGroupName,
@@ -5510,12 +5741,18 @@ class ElastiCache {
   /// Represents the input of a <code>TestFailover</code> operation which test
   /// automatic failover on a specified node group (called shard in the console)
   /// in a replication group (called cluster in the console).
+  ///
+  /// This API is designed for testing the behavior of your application in case
+  /// of ElastiCache failover. It is not designed to be an operational tool for
+  /// initiating a failover to overcome a problem you may have with the cluster.
+  /// Moreover, in certain conditions such as large-scale operational events,
+  /// Amazon may block this API.
   /// <p class="title"> <b>Note the following</b>
   ///
   /// <ul>
   /// <li>
   /// A customer can use this operation to test automatic failover on up to 5
-  /// shards (called node groups in the ElastiCache API and AWS CLI) in any
+  /// shards (called node groups in the ElastiCache API and Amazon CLI) in any
   /// rolling 24-hour period.
   /// </li>
   /// <li>
@@ -5532,9 +5769,9 @@ class ElastiCache {
   /// </li>
   /// <li>
   /// To determine whether the node replacement is complete you can check Events
-  /// using the Amazon ElastiCache console, the AWS CLI, or the ElastiCache API.
-  /// Look for the following automatic failover related events, listed here in
-  /// order of occurrance:
+  /// using the Amazon ElastiCache console, the Amazon CLI, or the ElastiCache
+  /// API. Look for the following automatic failover related events, listed here
+  /// in order of occurrance:
   /// <ol>
   /// <li>
   /// Replication group message: <code>Test Failover API called for node group
@@ -5891,7 +6128,9 @@ class CacheCluster {
   /// The date the auth token was last modified
   final DateTime? authTokenLastModifiedDate;
 
-  /// This parameter is currently disabled.
+  /// If you are running Redis engine version 6.0 or later, set this parameter to
+  /// yes if you want to opt-in to the next auto minor version upgrade campaign.
+  /// This parameter is disabled for previous versions.
   final bool? autoMinorVersionUpgrade;
 
   /// The date and time when the cluster was created.
@@ -5923,16 +6162,16 @@ class CacheCluster {
   /// <li>
   /// Current generation:
   ///
-  /// <b>M6g node types</b> (available only for Redis engine version 5.0.6 onward
-  /// and for Memcached engine version 1.5.16 onward).
-  ///
+  /// <b>M6g node types:</b> (available only for Redis engine version 5.0.6 onward
+  /// and for Memcached engine version 1.5.16 onward):
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -5943,6 +6182,11 @@ class CacheCluster {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6 onward
+  /// and for Memcached engine version 1.5.16 onward):
+  /// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+  /// <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -5950,7 +6194,8 @@ class CacheCluster {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -5968,9 +6213,24 @@ class CacheCluster {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2 onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -5988,8 +6248,9 @@ class CacheCluster {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -6002,7 +6263,8 @@ class CacheCluster {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -6050,10 +6312,9 @@ class CacheCluster {
   /// library.
   final String? clientDownloadLandingPage;
 
-  /// Represents a Memcached cluster endpoint which, if Automatic Discovery is
-  /// enabled on the cluster, can be used by an application to connect to any node
-  /// in the cluster. The configuration endpoint will always have
-  /// <code>.cfg</code> in it.
+  /// Represents a Memcached cluster endpoint which can be used by an application
+  /// to connect to any node in the cluster. The configuration endpoint will
+  /// always have <code>.cfg</code> in it.
   ///
   /// Example: <code>mem-3.9dvc4r<u>.cfg</u>.usw2.cache.amazonaws.com:11211</code>
   final Endpoint? configurationEndpoint;
@@ -6065,6 +6326,9 @@ class CacheCluster {
   /// The version of the cache engine that is used in this cluster.
   final String? engineVersion;
 
+  /// Returns the destination, format and type of the logs.
+  final List<LogDeliveryConfiguration>? logDeliveryConfigurations;
+
   /// Describes a notification topic and its status. Notification topics are used
   /// for publishing ElastiCache events to subscribers using Amazon Simple
   /// Notification Service (SNS).
@@ -6073,7 +6337,7 @@ class CacheCluster {
   /// The number of cache nodes in the cluster.
   ///
   /// For clusters running Redis, this value must be 1. For clusters running
-  /// Memcached, this value must be between 1 and 20.
+  /// Memcached, this value must be between 1 and 40.
   final int? numCacheNodes;
   final PendingModifiedValues? pendingModifiedValues;
 
@@ -6119,6 +6383,10 @@ class CacheCluster {
   /// The replication group to which this cluster belongs. If this field is empty,
   /// the cluster is not associated with any replication group.
   final String? replicationGroupId;
+
+  /// A boolean value indicating whether log delivery is enabled for the
+  /// replication group.
+  final bool? replicationGroupLogDeliveryEnabled;
 
   /// A list of VPC Security Groups associated with the cluster.
   final List<SecurityGroupMembership>? securityGroups;
@@ -6171,6 +6439,7 @@ class CacheCluster {
     this.configurationEndpoint,
     this.engine,
     this.engineVersion,
+    this.logDeliveryConfigurations,
     this.notificationConfiguration,
     this.numCacheNodes,
     this.pendingModifiedValues,
@@ -6178,6 +6447,7 @@ class CacheCluster {
     this.preferredMaintenanceWindow,
     this.preferredOutpostArn,
     this.replicationGroupId,
+    this.replicationGroupLogDeliveryEnabled,
     this.securityGroups,
     this.snapshotRetentionLimit,
     this.snapshotWindow,
@@ -6219,6 +6489,12 @@ class CacheCluster {
           ?.let((e) => Endpoint.fromXml(e)),
       engine: _s.extractXmlStringValue(elem, 'Engine'),
       engineVersion: _s.extractXmlStringValue(elem, 'EngineVersion'),
+      logDeliveryConfigurations: _s
+          .extractXmlChild(elem, 'LogDeliveryConfigurations')
+          ?.let((elem) => elem
+              .findElements('LogDeliveryConfiguration')
+              .map((c) => LogDeliveryConfiguration.fromXml(c))
+              .toList()),
       notificationConfiguration: _s
           .extractXmlChild(elem, 'NotificationConfiguration')
           ?.let((e) => NotificationConfiguration.fromXml(e)),
@@ -6233,6 +6509,8 @@ class CacheCluster {
       preferredOutpostArn:
           _s.extractXmlStringValue(elem, 'PreferredOutpostArn'),
       replicationGroupId: _s.extractXmlStringValue(elem, 'ReplicationGroupId'),
+      replicationGroupLogDeliveryEnabled:
+          _s.extractXmlBoolValue(elem, 'ReplicationGroupLogDeliveryEnabled'),
       securityGroups: _s.extractXmlChild(elem, 'SecurityGroups')?.let((elem) =>
           elem
               .findElements('member')
@@ -6286,7 +6564,7 @@ class CacheEngineVersion {
   /// Valid values are: <code>memcached1.4</code> | <code>memcached1.5</code> |
   /// <code>memcached1.6</code> | <code>redis2.6</code> | <code>redis2.8</code> |
   /// <code>redis3.2</code> | <code>redis4.0</code> | <code>redis5.0</code> |
-  /// <code>redis6.x</code> |
+  /// <code>redis6.x</code>
   final String? cacheParameterGroupFamily;
 
   /// The name of the cache engine.
@@ -6358,16 +6636,16 @@ class CacheEngineVersionMessage {
 /// <li>
 /// Current generation:
 ///
-/// <b>M6g node types</b> (available only for Redis engine version 5.0.6 onward
-/// and for Memcached engine version 1.5.16 onward).
-///
+/// <b>M6g node types:</b> (available only for Redis engine version 5.0.6 onward
+/// and for Memcached engine version 1.5.16 onward):
 /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
 /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
 /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
 /// <code>cache.m6g.16xlarge</code>
 /// <note>
-/// At this time, M6g node types are available in the following regions:
-/// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+/// For region availability, see <a
+/// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+/// Node Types</a>
 /// </note>
 /// <b>M5 node types:</b> <code>cache.m5.large</code>,
 /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -6378,6 +6656,11 @@ class CacheEngineVersionMessage {
 /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
 /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
 ///
+/// <b>T4g node types</b> (available only for Redis engine version 5.0.6 onward
+/// and for Memcached engine version 1.5.16 onward):
+/// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+/// <code>cache.t4g.medium</code>
+///
 /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
 /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
 ///
@@ -6385,7 +6668,8 @@ class CacheEngineVersionMessage {
 /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
 /// </li>
 /// <li>
-/// Previous generation: (not recommended)
+/// Previous generation: (not recommended. Existing clusters are still supported
+/// but creation of new clusters is not supported for these types.)
 ///
 /// <b>T1 node types:</b> <code>cache.t1.micro</code>
 ///
@@ -6403,9 +6687,24 @@ class CacheEngineVersionMessage {
 ///
 /// <ul>
 /// <li>
-/// Previous generation: (not recommended)
+/// Previous generation: (not recommended. Existing clusters are still supported
+/// but creation of new clusters is not supported for these types.)
 ///
 /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+/// </li>
+/// </ul> </li>
+/// <li>
+/// Memory optimized with data tiering:
+///
+/// <ul>
+/// <li>
+/// Current generation:
+///
+/// <b>R6gd node types</b> (available only for Redis engine version 6.2 onward).
+///
+/// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+/// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+/// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
 /// </li>
 /// </ul> </li>
 /// <li>
@@ -6423,8 +6722,9 @@ class CacheEngineVersionMessage {
 /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
 /// <code>cache.r6g.16xlarge</code>
 /// <note>
-/// At this time, R6g node types are available in the following regions:
-/// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+/// For region availability, see <a
+/// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+/// Node Types</a>
 /// </note>
 /// <b>R5 node types:</b> <code>cache.r5.large</code>,
 /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -6437,7 +6737,8 @@ class CacheEngineVersionMessage {
 /// <code>cache.r4.16xlarge</code>
 /// </li>
 /// <li>
-/// Previous generation: (not recommended)
+/// Previous generation: (not recommended. Existing clusters are still supported
+/// but creation of new clusters is not supported for these types.)
 ///
 /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
 /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -6472,7 +6773,7 @@ class CacheNode {
 
   /// The cache node identifier. A node ID is a numeric identifier (0001, 0002,
   /// etc.). The combination of cluster ID and node ID uniquely identifies every
-  /// cache node used in a customer's AWS account.
+  /// cache node used in a customer's Amazon account.
   final String? cacheNodeId;
 
   /// The current state of this cache node, one of the following values:
@@ -6694,7 +6995,7 @@ class CacheParameterGroup {
   /// The description for this cache parameter group.
   final String? description;
 
-  /// Indicates whether the parameter group is associated with a Global Datastore
+  /// Indicates whether the parameter group is associated with a Global datastore
   final bool? isGlobal;
 
   CacheParameterGroup({
@@ -6860,7 +7161,7 @@ class CacheSecurityGroup {
   /// security group.
   final List<EC2SecurityGroup>? eC2SecurityGroups;
 
-  /// The AWS account ID of the cache security group owner.
+  /// The Amazon account ID of the cache security group owner.
   final String? ownerId;
 
   CacheSecurityGroup({
@@ -7033,6 +7334,28 @@ extension on String {
         return ChangeType.requiresReboot;
     }
     throw Exception('$this is not known in enum ChangeType');
+  }
+}
+
+/// The configuration details of the CloudWatch Logs destination.
+class CloudWatchLogsDestinationDetails {
+  /// The name of the CloudWatch Logs log group.
+  final String? logGroup;
+
+  CloudWatchLogsDestinationDetails({
+    this.logGroup,
+  });
+  factory CloudWatchLogsDestinationDetails.fromXml(_s.XmlElement elem) {
+    return CloudWatchLogsDestinationDetails(
+      logGroup: _s.extractXmlStringValue(elem, 'LogGroup'),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final logGroup = this.logGroup;
+    return {
+      if (logGroup != null) 'LogGroup': logGroup,
+    };
   }
 }
 
@@ -7261,6 +7584,34 @@ class CustomerNodeEndpoint {
   }
 }
 
+enum DataTieringStatus {
+  enabled,
+  disabled,
+}
+
+extension on DataTieringStatus {
+  String toValue() {
+    switch (this) {
+      case DataTieringStatus.enabled:
+        return 'enabled';
+      case DataTieringStatus.disabled:
+        return 'disabled';
+    }
+  }
+}
+
+extension on String {
+  DataTieringStatus toDataTieringStatus() {
+    switch (this) {
+      case 'enabled':
+        return DataTieringStatus.enabled;
+      case 'disabled':
+        return DataTieringStatus.disabled;
+    }
+    throw Exception('$this is not known in enum DataTieringStatus');
+  }
+}
+
 class DecreaseNodeGroupsInGlobalReplicationGroupResult {
   final GlobalReplicationGroup? globalReplicationGroup;
 
@@ -7468,6 +7819,70 @@ class DescribeUsersResult {
   }
 }
 
+/// Configuration details of either a CloudWatch Logs destination or Kinesis
+/// Data Firehose destination.
+class DestinationDetails {
+  /// The configuration details of the CloudWatch Logs destination.
+  final CloudWatchLogsDestinationDetails? cloudWatchLogsDetails;
+
+  /// The configuration details of the Kinesis Data Firehose destination.
+  final KinesisFirehoseDestinationDetails? kinesisFirehoseDetails;
+
+  DestinationDetails({
+    this.cloudWatchLogsDetails,
+    this.kinesisFirehoseDetails,
+  });
+  factory DestinationDetails.fromXml(_s.XmlElement elem) {
+    return DestinationDetails(
+      cloudWatchLogsDetails: _s
+          .extractXmlChild(elem, 'CloudWatchLogsDetails')
+          ?.let((e) => CloudWatchLogsDestinationDetails.fromXml(e)),
+      kinesisFirehoseDetails: _s
+          .extractXmlChild(elem, 'KinesisFirehoseDetails')
+          ?.let((e) => KinesisFirehoseDestinationDetails.fromXml(e)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final cloudWatchLogsDetails = this.cloudWatchLogsDetails;
+    final kinesisFirehoseDetails = this.kinesisFirehoseDetails;
+    return {
+      if (cloudWatchLogsDetails != null)
+        'CloudWatchLogsDetails': cloudWatchLogsDetails,
+      if (kinesisFirehoseDetails != null)
+        'KinesisFirehoseDetails': kinesisFirehoseDetails,
+    };
+  }
+}
+
+enum DestinationType {
+  cloudwatchLogs,
+  kinesisFirehose,
+}
+
+extension on DestinationType {
+  String toValue() {
+    switch (this) {
+      case DestinationType.cloudwatchLogs:
+        return 'cloudwatch-logs';
+      case DestinationType.kinesisFirehose:
+        return 'kinesis-firehose';
+    }
+  }
+}
+
+extension on String {
+  DestinationType toDestinationType() {
+    switch (this) {
+      case 'cloudwatch-logs':
+        return DestinationType.cloudwatchLogs;
+      case 'kinesis-firehose':
+        return DestinationType.kinesisFirehose;
+    }
+    throw Exception('$this is not known in enum DestinationType');
+  }
+}
+
 class DisassociateGlobalReplicationGroupResult {
   final GlobalReplicationGroup? globalReplicationGroup;
 
@@ -7488,7 +7903,7 @@ class EC2SecurityGroup {
   /// The name of the Amazon EC2 security group.
   final String? eC2SecurityGroupName;
 
-  /// The AWS account ID of the Amazon EC2 security group owner.
+  /// The Amazon account ID of the Amazon EC2 security group owner.
   final String? eC2SecurityGroupOwnerId;
 
   /// The status of the Amazon EC2 security group.
@@ -7544,7 +7959,7 @@ class EngineDefaults {
   /// Valid values are: <code>memcached1.4</code> | <code>memcached1.5</code> |
   /// <code>memcached1.6</code> | <code>redis2.6</code> | <code>redis2.8</code> |
   /// <code>redis3.2</code> | <code>redis4.0</code> | <code>redis5.0</code> |
-  /// <code>redis6.x</code> |
+  /// <code>redis6.0</code> | <code>redis6.x</code>
   final String? cacheParameterGroupFamily;
 
   /// Provides an identifier to allow retrieval of paginated results.
@@ -7693,14 +8108,14 @@ class GlobalNodeGroup {
 }
 
 /// Consists of a primary cluster that accepts writes and an associated
-/// secondary cluster that resides in a different AWS region. The secondary
+/// secondary cluster that resides in a different Amazon region. The secondary
 /// cluster accepts only reads. The primary cluster automatically replicates
 /// updates to the secondary cluster.
 ///
 /// <ul>
 /// <li>
 /// The <b>GlobalReplicationGroupIdSuffix</b> represents the name of the Global
-/// Datastore, which is what you use to associate a secondary cluster.
+/// datastore, which is what you use to associate a secondary cluster.
 /// </li>
 /// </ul>
 class GlobalReplicationGroup {
@@ -7725,10 +8140,10 @@ class GlobalReplicationGroup {
   /// Default: <code>false</code>
   final bool? authTokenEnabled;
 
-  /// The cache node type of the Global Datastore
+  /// The cache node type of the Global datastore
   final String? cacheNodeType;
 
-  /// A flag that indicates whether the Global Datastore is cluster enabled.
+  /// A flag that indicates whether the Global datastore is cluster enabled.
   final bool? clusterEnabled;
 
   /// The Elasticache engine. For Redis only.
@@ -7740,22 +8155,26 @@ class GlobalReplicationGroup {
   /// Indicates the slot configuration and global identifier for each slice group.
   final List<GlobalNodeGroup>? globalNodeGroups;
 
-  /// The optional description of the Global Datastore
+  /// The optional description of the Global datastore
   final String? globalReplicationGroupDescription;
 
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   final String? globalReplicationGroupId;
 
-  /// The replication groups that comprise the Global Datastore.
+  /// The replication groups that comprise the Global datastore.
   final List<GlobalReplicationGroupMember>? members;
 
-  /// The status of the Global Datastore
+  /// The status of the Global datastore
   final String? status;
 
   /// A flag that enables in-transit encryption when set to true. You cannot
   /// modify the value of <code>TransitEncryptionEnabled</code> after the cluster
   /// is created. To enable in-transit encryption on a cluster you must set
   /// <code>TransitEncryptionEnabled</code> to true when you create a cluster.
+  ///
+  /// <b>Required:</b> Only available when creating a replication group in an
+  /// Amazon VPC using redis version <code>3.2.6</code>, <code>4.x</code> or
+  /// later.
   final bool? transitEncryptionEnabled;
 
   GlobalReplicationGroup({
@@ -7803,13 +8222,13 @@ class GlobalReplicationGroup {
   }
 }
 
-/// The name of the Global Datastore and role of this replication group in the
-/// Global Datastore.
+/// The name of the Global datastore and role of this replication group in the
+/// Global datastore.
 class GlobalReplicationGroupInfo {
-  /// The name of the Global Datastore
+  /// The name of the Global datastore
   final String? globalReplicationGroupId;
 
-  /// The role of the replication group in a Global Datastore. Can be primary or
+  /// The role of the replication group in a Global datastore. Can be primary or
   /// secondary.
   final String? globalReplicationGroupMemberRole;
 
@@ -7827,16 +8246,16 @@ class GlobalReplicationGroupInfo {
   }
 }
 
-/// A member of a Global Datastore. It contains the Replication Group Id, the
-/// AWS region and the role of the replication group.
+/// A member of a Global datastore. It contains the Replication Group Id, the
+/// Amazon region and the role of the replication group.
 class GlobalReplicationGroupMember {
   /// Indicates whether automatic failover is enabled for the replication group.
   final AutomaticFailoverStatus? automaticFailover;
 
-  /// The replication group id of the Global Datastore member.
+  /// The replication group id of the Global datastore member.
   final String? replicationGroupId;
 
-  /// The AWS region of the Global Datastore member.
+  /// The Amazon region of the Global datastore member.
   final String? replicationGroupRegion;
 
   /// Indicates the role of the replication group, primary or secondary.
@@ -7894,6 +8313,222 @@ class IncreaseReplicaCountResult {
           .extractXmlChild(elem, 'ReplicationGroup')
           ?.let((e) => ReplicationGroup.fromXml(e)),
     );
+  }
+}
+
+/// The configuration details of the Kinesis Data Firehose destination.
+class KinesisFirehoseDestinationDetails {
+  /// The name of the Kinesis Data Firehose delivery stream.
+  final String? deliveryStream;
+
+  KinesisFirehoseDestinationDetails({
+    this.deliveryStream,
+  });
+  factory KinesisFirehoseDestinationDetails.fromXml(_s.XmlElement elem) {
+    return KinesisFirehoseDestinationDetails(
+      deliveryStream: _s.extractXmlStringValue(elem, 'DeliveryStream'),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final deliveryStream = this.deliveryStream;
+    return {
+      if (deliveryStream != null) 'DeliveryStream': deliveryStream,
+    };
+  }
+}
+
+/// Returns the destination, format and type of the logs.
+class LogDeliveryConfiguration {
+  /// Configuration details of either a CloudWatch Logs destination or Kinesis
+  /// Data Firehose destination.
+  final DestinationDetails? destinationDetails;
+
+  /// Returns the destination type, either <code>cloudwatch-logs</code> or
+  /// <code>kinesis-firehose</code>.
+  final DestinationType? destinationType;
+
+  /// Returns the log format, either JSON or TEXT.
+  final LogFormat? logFormat;
+
+  /// Refers to <a href="https://redis.io/commands/slowlog">slow-log</a> or
+  /// engine-log.
+  final LogType? logType;
+
+  /// Returns an error message for the log delivery configuration.
+  final String? message;
+
+  /// Returns the log delivery configuration status. Values are one of
+  /// <code>enabling</code> | <code>disabling</code> | <code>modifying</code> |
+  /// <code>active</code> | <code>error</code>
+  final LogDeliveryConfigurationStatus? status;
+
+  LogDeliveryConfiguration({
+    this.destinationDetails,
+    this.destinationType,
+    this.logFormat,
+    this.logType,
+    this.message,
+    this.status,
+  });
+  factory LogDeliveryConfiguration.fromXml(_s.XmlElement elem) {
+    return LogDeliveryConfiguration(
+      destinationDetails: _s
+          .extractXmlChild(elem, 'DestinationDetails')
+          ?.let((e) => DestinationDetails.fromXml(e)),
+      destinationType: _s
+          .extractXmlStringValue(elem, 'DestinationType')
+          ?.toDestinationType(),
+      logFormat: _s.extractXmlStringValue(elem, 'LogFormat')?.toLogFormat(),
+      logType: _s.extractXmlStringValue(elem, 'LogType')?.toLogType(),
+      message: _s.extractXmlStringValue(elem, 'Message'),
+      status: _s
+          .extractXmlStringValue(elem, 'Status')
+          ?.toLogDeliveryConfigurationStatus(),
+    );
+  }
+}
+
+/// Specifies the destination, format and type of the logs.
+class LogDeliveryConfigurationRequest {
+  /// Configuration details of either a CloudWatch Logs destination or Kinesis
+  /// Data Firehose destination.
+  final DestinationDetails? destinationDetails;
+
+  /// Specify either <code>cloudwatch-logs</code> or <code>kinesis-firehose</code>
+  /// as the destination type.
+  final DestinationType? destinationType;
+
+  /// Specify if log delivery is enabled. Default <code>true</code>.
+  final bool? enabled;
+
+  /// Specifies either JSON or TEXT
+  final LogFormat? logFormat;
+
+  /// Refers to <a href="https://redis.io/commands/slowlog">slow-log</a> or
+  /// engine-log..
+  final LogType? logType;
+
+  LogDeliveryConfigurationRequest({
+    this.destinationDetails,
+    this.destinationType,
+    this.enabled,
+    this.logFormat,
+    this.logType,
+  });
+  Map<String, dynamic> toJson() {
+    final destinationDetails = this.destinationDetails;
+    final destinationType = this.destinationType;
+    final enabled = this.enabled;
+    final logFormat = this.logFormat;
+    final logType = this.logType;
+    return {
+      if (destinationDetails != null) 'DestinationDetails': destinationDetails,
+      if (destinationType != null) 'DestinationType': destinationType.toValue(),
+      if (enabled != null) 'Enabled': enabled,
+      if (logFormat != null) 'LogFormat': logFormat.toValue(),
+      if (logType != null) 'LogType': logType.toValue(),
+    };
+  }
+}
+
+enum LogDeliveryConfigurationStatus {
+  active,
+  enabling,
+  modifying,
+  disabling,
+  error,
+}
+
+extension on LogDeliveryConfigurationStatus {
+  String toValue() {
+    switch (this) {
+      case LogDeliveryConfigurationStatus.active:
+        return 'active';
+      case LogDeliveryConfigurationStatus.enabling:
+        return 'enabling';
+      case LogDeliveryConfigurationStatus.modifying:
+        return 'modifying';
+      case LogDeliveryConfigurationStatus.disabling:
+        return 'disabling';
+      case LogDeliveryConfigurationStatus.error:
+        return 'error';
+    }
+  }
+}
+
+extension on String {
+  LogDeliveryConfigurationStatus toLogDeliveryConfigurationStatus() {
+    switch (this) {
+      case 'active':
+        return LogDeliveryConfigurationStatus.active;
+      case 'enabling':
+        return LogDeliveryConfigurationStatus.enabling;
+      case 'modifying':
+        return LogDeliveryConfigurationStatus.modifying;
+      case 'disabling':
+        return LogDeliveryConfigurationStatus.disabling;
+      case 'error':
+        return LogDeliveryConfigurationStatus.error;
+    }
+    throw Exception(
+        '$this is not known in enum LogDeliveryConfigurationStatus');
+  }
+}
+
+enum LogFormat {
+  text,
+  json,
+}
+
+extension on LogFormat {
+  String toValue() {
+    switch (this) {
+      case LogFormat.text:
+        return 'text';
+      case LogFormat.json:
+        return 'json';
+    }
+  }
+}
+
+extension on String {
+  LogFormat toLogFormat() {
+    switch (this) {
+      case 'text':
+        return LogFormat.text;
+      case 'json':
+        return LogFormat.json;
+    }
+    throw Exception('$this is not known in enum LogFormat');
+  }
+}
+
+enum LogType {
+  slowLog,
+  engineLog,
+}
+
+extension on LogType {
+  String toValue() {
+    switch (this) {
+      case LogType.slowLog:
+        return 'slow-log';
+      case LogType.engineLog:
+        return 'engine-log';
+    }
+  }
+}
+
+extension on String {
+  LogType toLogType() {
+    switch (this) {
+      case 'slow-log':
+        return LogType.slowLog;
+      case 'engine-log':
+        return LogType.engineLog;
+    }
+    throw Exception('$this is not known in enum LogType');
   }
 }
 
@@ -8569,6 +9204,43 @@ extension on String {
   }
 }
 
+/// The log delivery configurations being modified
+class PendingLogDeliveryConfiguration {
+  /// Configuration details of either a CloudWatch Logs destination or Kinesis
+  /// Data Firehose destination.
+  final DestinationDetails? destinationDetails;
+
+  /// Returns the destination type, either CloudWatch Logs or Kinesis Data
+  /// Firehose.
+  final DestinationType? destinationType;
+
+  /// Returns the log format, either JSON or TEXT
+  final LogFormat? logFormat;
+
+  /// Refers to <a href="https://redis.io/commands/slowlog">slow-log</a> or
+  /// engine-log..
+  final LogType? logType;
+
+  PendingLogDeliveryConfiguration({
+    this.destinationDetails,
+    this.destinationType,
+    this.logFormat,
+    this.logType,
+  });
+  factory PendingLogDeliveryConfiguration.fromXml(_s.XmlElement elem) {
+    return PendingLogDeliveryConfiguration(
+      destinationDetails: _s
+          .extractXmlChild(elem, 'DestinationDetails')
+          ?.let((e) => DestinationDetails.fromXml(e)),
+      destinationType: _s
+          .extractXmlStringValue(elem, 'DestinationType')
+          ?.toDestinationType(),
+      logFormat: _s.extractXmlStringValue(elem, 'LogFormat')?.toLogFormat(),
+      logType: _s.extractXmlStringValue(elem, 'LogType')?.toLogType(),
+    );
+  }
+}
+
 /// A group of settings that are applied to the cluster in the future, or that
 /// are currently being applied.
 class PendingModifiedValues {
@@ -8585,10 +9257,13 @@ class PendingModifiedValues {
   /// The new cache engine version that the cluster runs.
   final String? engineVersion;
 
+  /// The log delivery configurations being modified
+  final List<PendingLogDeliveryConfiguration>? logDeliveryConfigurations;
+
   /// The new number of cache nodes for the cluster.
   ///
   /// For clusters running Redis, this value must be 1. For clusters running
-  /// Memcached, this value must be between 1 and 20.
+  /// Memcached, this value must be between 1 and 40.
   final int? numCacheNodes;
 
   PendingModifiedValues({
@@ -8596,6 +9271,7 @@ class PendingModifiedValues {
     this.cacheNodeIdsToRemove,
     this.cacheNodeType,
     this.engineVersion,
+    this.logDeliveryConfigurations,
     this.numCacheNodes,
   });
   factory PendingModifiedValues.fromXml(_s.XmlElement elem) {
@@ -8608,6 +9284,12 @@ class PendingModifiedValues {
           ?.let((elem) => _s.extractXmlStringListValues(elem, 'CacheNodeId')),
       cacheNodeType: _s.extractXmlStringValue(elem, 'CacheNodeType'),
       engineVersion: _s.extractXmlStringValue(elem, 'EngineVersion'),
+      logDeliveryConfigurations: _s
+          .extractXmlChild(elem, 'PendingLogDeliveryConfiguration')
+          ?.let((elem) => elem
+              .findElements('member')
+              .map((c) => PendingLogDeliveryConfiguration.fromXml(c))
+              .toList()),
       numCacheNodes: _s.extractXmlIntValue(elem, 'NumCacheNodes'),
     );
   }
@@ -8720,7 +9402,7 @@ class RegionalConfiguration {
   /// The name of the secondary cluster
   final String replicationGroupId;
 
-  /// The AWS region where the cluster is stored
+  /// The Amazon region where the cluster is stored
   final String replicationGroupRegion;
 
   /// A list of <code>PreferredAvailabilityZones</code> objects that specifies the
@@ -8772,6 +9454,11 @@ class ReplicationGroup {
   /// The date the auth token was last modified
   final DateTime? authTokenLastModifiedDate;
 
+  /// If you are running Redis engine version 6.0 or later, set this parameter to
+  /// yes if you want to opt-in to the next auto minor version upgrade campaign.
+  /// This parameter is disabled for previous versions.
+  final bool? autoMinorVersionUpgrade;
+
   /// Indicates the status of automatic failover for this Redis replication group.
   final AutomaticFailoverStatus? automaticFailover;
 
@@ -8790,15 +9477,25 @@ class ReplicationGroup {
   /// endpoint to connect to this replication group.
   final Endpoint? configurationEndpoint;
 
+  /// Enables data tiering. Data tiering is only supported for replication groups
+  /// using the r6gd node type. This parameter must be set to true when using r6gd
+  /// nodes. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/data-tiering.html">Data
+  /// tiering</a>.
+  final DataTieringStatus? dataTiering;
+
   /// The user supplied description of the replication group.
   final String? description;
 
-  /// The name of the Global Datastore and role of this replication group in the
-  /// Global Datastore.
+  /// The name of the Global datastore and role of this replication group in the
+  /// Global datastore.
   final GlobalReplicationGroupInfo? globalReplicationGroupInfo;
 
   /// The ID of the KMS key used to encrypt the disk in the cluster.
   final String? kmsKeyId;
+
+  /// Returns the destination, format and type of the logs.
+  final List<LogDeliveryConfiguration>? logDeliveryConfigurations;
 
   /// The names of all the cache clusters that are part of this replication group.
   final List<String>? memberClusters;
@@ -8821,6 +9518,9 @@ class ReplicationGroup {
   /// A group of settings to be applied to the replication group, either
   /// immediately or during the next maintenance window.
   final ReplicationGroupPendingModifiedValues? pendingModifiedValues;
+
+  /// The date and time when the cluster was created.
+  final DateTime? replicationGroupCreateTime;
 
   /// The identifier for the replication group.
   final String? replicationGroupId;
@@ -8871,7 +9571,7 @@ class ReplicationGroup {
   /// Default: <code>false</code>
   final bool? transitEncryptionEnabled;
 
-  /// The list of user group IDs that have access to the replication group.
+  /// The ID of the user group associated to the replication group.
   final List<String>? userGroupIds;
 
   ReplicationGroup({
@@ -8879,18 +9579,22 @@ class ReplicationGroup {
     this.atRestEncryptionEnabled,
     this.authTokenEnabled,
     this.authTokenLastModifiedDate,
+    this.autoMinorVersionUpgrade,
     this.automaticFailover,
     this.cacheNodeType,
     this.clusterEnabled,
     this.configurationEndpoint,
+    this.dataTiering,
     this.description,
     this.globalReplicationGroupInfo,
     this.kmsKeyId,
+    this.logDeliveryConfigurations,
     this.memberClusters,
     this.memberClustersOutpostArns,
     this.multiAZ,
     this.nodeGroups,
     this.pendingModifiedValues,
+    this.replicationGroupCreateTime,
     this.replicationGroupId,
     this.snapshotRetentionLimit,
     this.snapshotWindow,
@@ -8907,6 +9611,8 @@ class ReplicationGroup {
       authTokenEnabled: _s.extractXmlBoolValue(elem, 'AuthTokenEnabled'),
       authTokenLastModifiedDate:
           _s.extractXmlDateTimeValue(elem, 'AuthTokenLastModifiedDate'),
+      autoMinorVersionUpgrade:
+          _s.extractXmlBoolValue(elem, 'AutoMinorVersionUpgrade'),
       automaticFailover: _s
           .extractXmlStringValue(elem, 'AutomaticFailover')
           ?.toAutomaticFailoverStatus(),
@@ -8915,11 +9621,19 @@ class ReplicationGroup {
       configurationEndpoint: _s
           .extractXmlChild(elem, 'ConfigurationEndpoint')
           ?.let((e) => Endpoint.fromXml(e)),
+      dataTiering:
+          _s.extractXmlStringValue(elem, 'DataTiering')?.toDataTieringStatus(),
       description: _s.extractXmlStringValue(elem, 'Description'),
       globalReplicationGroupInfo: _s
           .extractXmlChild(elem, 'GlobalReplicationGroupInfo')
           ?.let((e) => GlobalReplicationGroupInfo.fromXml(e)),
       kmsKeyId: _s.extractXmlStringValue(elem, 'KmsKeyId'),
+      logDeliveryConfigurations: _s
+          .extractXmlChild(elem, 'LogDeliveryConfigurations')
+          ?.let((elem) => elem
+              .findElements('LogDeliveryConfiguration')
+              .map((c) => LogDeliveryConfiguration.fromXml(c))
+              .toList()),
       memberClusters: _s
           .extractXmlChild(elem, 'MemberClusters')
           ?.let((elem) => _s.extractXmlStringListValues(elem, 'ClusterId')),
@@ -8935,6 +9649,8 @@ class ReplicationGroup {
       pendingModifiedValues: _s
           .extractXmlChild(elem, 'PendingModifiedValues')
           ?.let((e) => ReplicationGroupPendingModifiedValues.fromXml(e)),
+      replicationGroupCreateTime:
+          _s.extractXmlDateTimeValue(elem, 'ReplicationGroupCreateTime'),
       replicationGroupId: _s.extractXmlStringValue(elem, 'ReplicationGroupId'),
       snapshotRetentionLimit:
           _s.extractXmlIntValue(elem, 'SnapshotRetentionLimit'),
@@ -8985,6 +9701,9 @@ class ReplicationGroupPendingModifiedValues {
   /// Indicates the status of automatic failover for this Redis replication group.
   final PendingAutomaticFailoverStatus? automaticFailoverStatus;
 
+  /// The log delivery configurations being modified
+  final List<PendingLogDeliveryConfiguration>? logDeliveryConfigurations;
+
   /// The primary cluster ID that is applied immediately (if
   /// <code>--apply-immediately</code> was specified), or during the next
   /// maintenance window.
@@ -8993,12 +9712,13 @@ class ReplicationGroupPendingModifiedValues {
   /// The status of an online resharding operation.
   final ReshardingStatus? resharding;
 
-  /// The user groups being modified.
+  /// The user group being modified.
   final UserGroupsUpdateStatus? userGroups;
 
   ReplicationGroupPendingModifiedValues({
     this.authTokenStatus,
     this.automaticFailoverStatus,
+    this.logDeliveryConfigurations,
     this.primaryClusterId,
     this.resharding,
     this.userGroups,
@@ -9011,6 +9731,12 @@ class ReplicationGroupPendingModifiedValues {
       automaticFailoverStatus: _s
           .extractXmlStringValue(elem, 'AutomaticFailoverStatus')
           ?.toPendingAutomaticFailoverStatus(),
+      logDeliveryConfigurations: _s
+          .extractXmlChild(elem, 'PendingLogDeliveryConfiguration')
+          ?.let((elem) => elem
+              .findElements('member')
+              .map((c) => PendingLogDeliveryConfiguration.fromXml(c))
+              .toList()),
       primaryClusterId: _s.extractXmlStringValue(elem, 'PrimaryClusterId'),
       resharding: _s
           .extractXmlChild(elem, 'Resharding')
@@ -9043,16 +9769,16 @@ class ReservedCacheNode {
   /// <li>
   /// Current generation:
   ///
-  /// <b>M6g node types</b> (available only for Redis engine version 5.0.6 onward
-  /// and for Memcached engine version 1.5.16 onward).
-  ///
+  /// <b>M6g node types:</b> (available only for Redis engine version 5.0.6 onward
+  /// and for Memcached engine version 1.5.16 onward):
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -9063,6 +9789,10 @@ class ReservedCacheNode {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6 onward
+  /// and Memcached engine version 1.5.16 onward): <code>cache.t4g.micro</code>,
+  /// <code>cache.t4g.small</code>, <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -9070,7 +9800,8 @@ class ReservedCacheNode {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -9088,9 +9819,24 @@ class ReservedCacheNode {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2 onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -9108,8 +9854,9 @@ class ReservedCacheNode {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -9122,7 +9869,8 @@ class ReservedCacheNode {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -9272,16 +10020,16 @@ class ReservedCacheNodesOffering {
   /// <li>
   /// Current generation:
   ///
-  /// <b>M6g node types</b> (available only for Redis engine version 5.0.6 onward
-  /// and for Memcached engine version 1.5.16 onward).
-  ///
+  /// <b>M6g node types:</b> (available only for Redis engine version 5.0.6 onward
+  /// and for Memcached engine version 1.5.16 onward):
   /// <code>cache.m6g.large</code>, <code>cache.m6g.xlarge</code>,
   /// <code>cache.m6g.2xlarge</code>, <code>cache.m6g.4xlarge</code>,
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -9292,6 +10040,10 @@ class ReservedCacheNodesOffering {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6 onward
+  /// and Memcached engine version 1.5.16 onward): <code>cache.t4g.micro</code>,
+  /// <code>cache.t4g.small</code>, <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -9299,7 +10051,8 @@ class ReservedCacheNodesOffering {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -9317,9 +10070,24 @@ class ReservedCacheNodesOffering {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2 onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -9337,8 +10105,9 @@ class ReservedCacheNodesOffering {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -9351,7 +10120,8 @@ class ReservedCacheNodesOffering {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -9800,7 +10570,9 @@ class Snapshot {
   /// The ARN (Amazon Resource Name) of the snapshot.
   final String? arn;
 
-  /// This parameter is currently disabled.
+  /// If you are running Redis engine version 6.0 or later, set this parameter to
+  /// yes if you want to opt-in to the next auto minor version upgrade campaign.
+  /// This parameter is disabled for previous versions.
   final bool? autoMinorVersionUpgrade;
 
   /// Indicates the status of automatic failover for the source Redis replication
@@ -9837,8 +10609,9 @@ class Snapshot {
   /// <code>cache.m6g.8xlarge</code>, <code>cache.m6g.12xlarge</code>,
   /// <code>cache.m6g.16xlarge</code>
   /// <note>
-  /// At this time, M6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>M5 node types:</b> <code>cache.m5.large</code>,
   /// <code>cache.m5.xlarge</code>, <code>cache.m5.2xlarge</code>,
@@ -9849,6 +10622,12 @@ class Snapshot {
   /// <code>cache.m4.xlarge</code>, <code>cache.m4.2xlarge</code>,
   /// <code>cache.m4.4xlarge</code>, <code>cache.m4.10xlarge</code>
   ///
+  /// <b>T4g node types</b> (available only for Redis engine version 5.0.6 onward
+  /// and Memcached engine version 1.5.16 onward):
+  ///
+  /// <code>cache.t4g.micro</code>, <code>cache.t4g.small</code>,
+  /// <code>cache.t4g.medium</code>
+  ///
   /// <b>T3 node types:</b> <code>cache.t3.micro</code>,
   /// <code>cache.t3.small</code>, <code>cache.t3.medium</code>
   ///
@@ -9856,7 +10635,8 @@ class Snapshot {
   /// <code>cache.t2.small</code>, <code>cache.t2.medium</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>T1 node types:</b> <code>cache.t1.micro</code>
   ///
@@ -9874,9 +10654,24 @@ class Snapshot {
   ///
   /// <ul>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>C1 node types:</b> <code>cache.c1.xlarge</code>
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// Memory optimized with data tiering:
+  ///
+  /// <ul>
+  /// <li>
+  /// Current generation:
+  ///
+  /// <b>R6gd node types</b> (available only for Redis engine version 6.2 onward).
+  ///
+  /// <code>cache.r6gd.xlarge</code>, <code>cache.r6gd.2xlarge</code>,
+  /// <code>cache.r6gd.4xlarge</code>, <code>cache.r6gd.8xlarge</code>,
+  /// <code>cache.r6gd.12xlarge</code>, <code>cache.r6gd.16xlarge</code>
   /// </li>
   /// </ul> </li>
   /// <li>
@@ -9894,8 +10689,13 @@ class Snapshot {
   /// <code>cache.r6g.8xlarge</code>, <code>cache.r6g.12xlarge</code>,
   /// <code>cache.r6g.16xlarge</code>
   /// <note>
-  /// At this time, R6g node types are available in the following regions:
-  /// us-east-1, us-west-2, us-east-2, eu-central-1, eu-west-1 and ap-northeast-1.
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
+  /// </note> <note>
+  /// For region availability, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html#CacheNodes.SupportedTypesByRegion">Supported
+  /// Node Types</a>
   /// </note>
   /// <b>R5 node types:</b> <code>cache.r5.large</code>,
   /// <code>cache.r5.xlarge</code>, <code>cache.r5.2xlarge</code>,
@@ -9908,7 +10708,8 @@ class Snapshot {
   /// <code>cache.r4.16xlarge</code>
   /// </li>
   /// <li>
-  /// Previous generation: (not recommended)
+  /// Previous generation: (not recommended. Existing clusters are still supported
+  /// but creation of new clusters is not supported for these types.)
   ///
   /// <b>M2 node types:</b> <code>cache.m2.xlarge</code>,
   /// <code>cache.m2.2xlarge</code>, <code>cache.m2.4xlarge</code>
@@ -9945,6 +10746,13 @@ class Snapshot {
   /// The name of the cache subnet group associated with the source cluster.
   final String? cacheSubnetGroupName;
 
+  /// Enables data tiering. Data tiering is only supported for replication groups
+  /// using the r6gd node type. This parameter must be set to true when using r6gd
+  /// nodes. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/data-tiering.html">Data
+  /// tiering</a>.
+  final DataTieringStatus? dataTiering;
+
   /// The name of the cache engine (<code>memcached</code> or <code>redis</code>)
   /// used by the source cluster.
   final String? engine;
@@ -9961,7 +10769,7 @@ class Snapshot {
   /// The number of cache nodes in the source cluster.
   ///
   /// For clusters running Redis, this value must be 1. For clusters running
-  /// Memcached, this value must be between 1 and 20.
+  /// Memcached, this value must be between 1 and 40.
   final int? numCacheNodes;
 
   /// The number of node groups (shards) in this snapshot. When restoring from a
@@ -10063,6 +10871,7 @@ class Snapshot {
     this.cacheNodeType,
     this.cacheParameterGroupName,
     this.cacheSubnetGroupName,
+    this.dataTiering,
     this.engine,
     this.engineVersion,
     this.kmsKeyId,
@@ -10099,6 +10908,8 @@ class Snapshot {
           _s.extractXmlStringValue(elem, 'CacheParameterGroupName'),
       cacheSubnetGroupName:
           _s.extractXmlStringValue(elem, 'CacheSubnetGroupName'),
+      dataTiering:
+          _s.extractXmlStringValue(elem, 'DataTiering')?.toDataTieringStatus(),
       engine: _s.extractXmlStringValue(elem, 'Engine'),
       engineVersion: _s.extractXmlStringValue(elem, 'EngineVersion'),
       kmsKeyId: _s.extractXmlStringValue(elem, 'KmsKeyId'),
@@ -10245,9 +11056,12 @@ class SubnetOutpost {
   }
 }
 
-/// A cost allocation Tag that can be added to an ElastiCache cluster or
-/// replication group. Tags are composed of a Key/Value pair. A tag with a null
-/// Value is permitted.
+/// A tag that can be added to an ElastiCache cluster or replication group. Tags
+/// are composed of a Key/Value pair. You can use tags to categorize and track
+/// all your ElastiCache resources, with the exception of global replication
+/// group. When you add or remove tags on replication groups, those actions will
+/// be replicated to all nodes in the replication group. A tag with a null Value
+/// is permitted.
 class Tag {
   /// The key for the tag. May not be null.
   final String? key;
@@ -10280,7 +11094,7 @@ class Tag {
 /// <code>ListTagsForResource</code>, and <code>RemoveTagsFromResource</code>
 /// operations.
 class TagListMessage {
-  /// A list of cost allocation tags as key-value pairs.
+  /// A list of tags as key-value pairs.
   final List<Tag>? tagList;
 
   TagListMessage({
@@ -10624,6 +11438,9 @@ class User {
   /// The current supported value is Redis.
   final String? engine;
 
+  /// The minimum engine version required, which is Redis 6.0
+  final String? minimumEngineVersion;
+
   /// Indicates the user status. Can be "active", "modifying" or "deleting".
   final String? status;
 
@@ -10641,6 +11458,7 @@ class User {
     this.accessString,
     this.authentication,
     this.engine,
+    this.minimumEngineVersion,
     this.status,
     this.userGroupIds,
     this.userId,
@@ -10654,6 +11472,8 @@ class User {
           .extractXmlChild(elem, 'Authentication')
           ?.let((e) => Authentication.fromXml(e)),
       engine: _s.extractXmlStringValue(elem, 'Engine'),
+      minimumEngineVersion:
+          _s.extractXmlStringValue(elem, 'MinimumEngineVersion'),
       status: _s.extractXmlStringValue(elem, 'Status'),
       userGroupIds: _s
           .extractXmlChild(elem, 'UserGroupIds')
@@ -10671,7 +11491,10 @@ class UserGroup {
   /// The current supported value is Redis.
   final String? engine;
 
-  /// A list of updates being applied to the user groups.
+  /// The minimum engine version required, which is Redis 6.0
+  final String? minimumEngineVersion;
+
+  /// A list of updates being applied to the user group.
   final UserGroupPendingChanges? pendingChanges;
 
   /// A list of replication groups that the user group can access.
@@ -10690,6 +11513,7 @@ class UserGroup {
   UserGroup({
     this.arn,
     this.engine,
+    this.minimumEngineVersion,
     this.pendingChanges,
     this.replicationGroups,
     this.status,
@@ -10700,6 +11524,8 @@ class UserGroup {
     return UserGroup(
       arn: _s.extractXmlStringValue(elem, 'ARN'),
       engine: _s.extractXmlStringValue(elem, 'Engine'),
+      minimumEngineVersion:
+          _s.extractXmlStringValue(elem, 'MinimumEngineVersion'),
       pendingChanges: _s
           .extractXmlChild(elem, 'PendingChanges')
           ?.let((e) => UserGroupPendingChanges.fromXml(e)),
@@ -10741,10 +11567,10 @@ class UserGroupPendingChanges {
 
 /// The status of the user group update.
 class UserGroupsUpdateStatus {
-  /// The list of user group IDs to add.
+  /// The ID of the user group to add.
   final List<String>? userGroupIdsToAdd;
 
-  /// The list of user group IDs to remove.
+  /// The ID of the user group to remove.
   final List<String>? userGroupIdsToRemove;
 
   UserGroupsUpdateStatus({

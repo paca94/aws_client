@@ -62,6 +62,7 @@ class CloudSearch {
   /// May throw [BaseException].
   /// May throw [InternalException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   Future<BuildSuggestersResponse> buildSuggesters({
     required String domainName,
   }) async {
@@ -97,6 +98,8 @@ class CloudSearch {
   /// May throw [BaseException].
   /// May throw [InternalException].
   /// May throw [LimitExceededException].
+  /// May throw [ResourceAlreadyExistsException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [domainName] :
   /// A name for the domain you are creating. Allowed characters are a-z
@@ -141,6 +144,7 @@ class CloudSearch {
   /// May throw [LimitExceededException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   Future<DefineAnalysisSchemeResponse> defineAnalysisScheme({
     required AnalysisScheme analysisScheme,
     required String domainName,
@@ -184,6 +188,7 @@ class CloudSearch {
   /// May throw [LimitExceededException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   Future<DefineExpressionResponse> defineExpression({
     required String domainName,
     required Expression expression,
@@ -231,6 +236,7 @@ class CloudSearch {
   /// May throw [LimitExceededException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [indexField] :
   /// The index field and field options you want to configure.
@@ -278,6 +284,7 @@ class CloudSearch {
   /// May throw [LimitExceededException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   Future<DefineSuggesterResponse> defineSuggester({
     required String domainName,
     required Suggester suggester,
@@ -317,6 +324,7 @@ class CloudSearch {
   /// May throw [InternalException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [analysisSchemeName] :
   /// The name of the analysis scheme you want to delete.
@@ -405,6 +413,7 @@ class CloudSearch {
   /// May throw [InternalException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [expressionName] :
   /// The name of the <code><a>Expression</a></code> to delete.
@@ -455,6 +464,7 @@ class CloudSearch {
   /// May throw [InternalException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [indexFieldName] :
   /// The name of the index field your want to remove from the domain's indexing
@@ -505,6 +515,7 @@ class CloudSearch {
   /// May throw [InternalException].
   /// May throw [InvalidTypeException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [suggesterName] :
   /// Specifies the name of the suggester you want to delete.
@@ -992,6 +1003,7 @@ class CloudSearch {
   /// May throw [BaseException].
   /// May throw [InternalException].
   /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
   Future<IndexDocumentsResponse> indexDocuments({
     required String domainName,
   }) async {
@@ -1156,6 +1168,7 @@ class CloudSearch {
   /// May throw [LimitExceededException].
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidTypeException].
+  /// May throw [ValidationException].
   Future<UpdateScalingParametersResponse> updateScalingParameters({
     required String domainName,
     required ScalingParameters scalingParameters,
@@ -1196,6 +1209,7 @@ class CloudSearch {
   /// May throw [LimitExceededException].
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidTypeException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [accessPolicies] :
   /// The access rules you want to configure. These rules replace any existing
@@ -3116,6 +3130,10 @@ enum PartitionInstanceType {
   searchLarge,
   searchXlarge,
   search_2xlarge,
+  searchPreviousgenerationSmall,
+  searchPreviousgenerationLarge,
+  searchPreviousgenerationXlarge,
+  searchPreviousgeneration_2xlarge,
 }
 
 extension on PartitionInstanceType {
@@ -3147,6 +3165,14 @@ extension on PartitionInstanceType {
         return 'search.xlarge';
       case PartitionInstanceType.search_2xlarge:
         return 'search.2xlarge';
+      case PartitionInstanceType.searchPreviousgenerationSmall:
+        return 'search.previousgeneration.small';
+      case PartitionInstanceType.searchPreviousgenerationLarge:
+        return 'search.previousgeneration.large';
+      case PartitionInstanceType.searchPreviousgenerationXlarge:
+        return 'search.previousgeneration.xlarge';
+      case PartitionInstanceType.searchPreviousgeneration_2xlarge:
+        return 'search.previousgeneration.2xlarge';
     }
   }
 }
@@ -3180,6 +3206,14 @@ extension on String {
         return PartitionInstanceType.searchXlarge;
       case 'search.2xlarge':
         return PartitionInstanceType.search_2xlarge;
+      case 'search.previousgeneration.small':
+        return PartitionInstanceType.searchPreviousgenerationSmall;
+      case 'search.previousgeneration.large':
+        return PartitionInstanceType.searchPreviousgenerationLarge;
+      case 'search.previousgeneration.xlarge':
+        return PartitionInstanceType.searchPreviousgenerationXlarge;
+      case 'search.previousgeneration.2xlarge':
+        return PartitionInstanceType.searchPreviousgeneration_2xlarge;
     }
     throw Exception('$this is not known in enum PartitionInstanceType');
   }
@@ -3576,6 +3610,14 @@ class LimitExceededException extends _s.GenericAwsException {
       : super(type: type, code: 'LimitExceededException', message: message);
 }
 
+class ResourceAlreadyExistsException extends _s.GenericAwsException {
+  ResourceAlreadyExistsException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'ResourceAlreadyExistsException',
+            message: message);
+}
+
 class ResourceNotFoundException extends _s.GenericAwsException {
   ResourceNotFoundException({String? type, String? message})
       : super(type: type, code: 'ResourceNotFoundException', message: message);
@@ -3597,6 +3639,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       InvalidTypeException(type: type, message: message),
   'LimitExceededException': (type, message) =>
       LimitExceededException(type: type, message: message),
+  'ResourceAlreadyExistsException': (type, message) =>
+      ResourceAlreadyExistsException(type: type, message: message),
   'ResourceNotFoundException': (type, message) =>
       ResourceNotFoundException(type: type, message: message),
   'ValidationException': (type, message) =>

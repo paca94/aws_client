@@ -18,26 +18,28 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// The AWS Support API reference is intended for programmers who need detailed
-/// information about the AWS Support operations and data types. This service
-/// enables you to manage your AWS Support cases programmatically. It uses HTTP
-/// methods that return results in JSON format.
+/// The <i>Amazon Web Services Support API Reference</i> is intended for
+/// programmers who need detailed information about the Amazon Web Services
+/// Support operations and data types. You can use the API to manage your
+/// support cases programmatically. The Amazon Web Services Support API uses
+/// HTTP methods that return results in JSON format.
 /// <note>
 /// <ul>
 /// <li>
-/// You must have a Business or Enterprise support plan to use the AWS Support
-/// API.
+/// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan to
+/// use the Amazon Web Services Support API.
 /// </li>
 /// <li>
-/// If you call the AWS Support API from an account that does not have a
-/// Business or Enterprise support plan, the
+/// If you call the Amazon Web Services Support API from an account that does
+/// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
 /// <code>SubscriptionRequiredException</code> error message appears. For
 /// information about changing your support plan, see <a
-/// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+/// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+/// Support</a>.
 /// </li>
 /// </ul> </note>
-/// The AWS Support service also exposes a set of <a
-/// href="http://aws.amazon.com/premiumsupport/trustedadvisor/">AWS Trusted
+/// The Amazon Web Services Support service also exposes a set of <a
+/// href="http://aws.amazon.com/premiumsupport/trustedadvisor/">Trusted
 /// Advisor</a> features. You can retrieve a list of checks and their
 /// descriptions, get check results, specify checks to refresh, and get the
 /// refresh status of checks.
@@ -78,15 +80,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -136,24 +139,25 @@ class Support {
     return AddAttachmentsToSetResponse.fromJson(jsonResponse.body);
   }
 
-  /// Adds additional customer communication to an AWS Support case. Use the
-  /// <code>caseId</code> parameter to identify the case to which to add
-  /// communication. You can list a set of email addresses to copy on the
+  /// Adds additional customer communication to an Amazon Web Services Support
+  /// case. Use the <code>caseId</code> parameter to identify the case to which
+  /// to add communication. You can list a set of email addresses to copy on the
   /// communication by using the <code>ccEmailAddresses</code> parameter. The
   /// <code>communicationBody</code> value contains the text of the
   /// communication.
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -170,8 +174,8 @@ class Support {
   /// the case. Create the set by calling <a>AddAttachmentsToSet</a>
   ///
   /// Parameter [caseId] :
-  /// The AWS Support case ID requested or returned in the call. The case ID is
-  /// an alphanumeric string formatted as shown in this example:
+  /// The support case ID requested or returned in the call. The case ID is an
+  /// alphanumeric string formatted as shown in this example:
   /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>
   ///
   /// Parameter [ccEmailAddresses] :
@@ -212,17 +216,19 @@ class Support {
     return AddCommunicationToCaseResponse.fromJson(jsonResponse.body);
   }
 
-  /// Creates a case in the AWS Support Center. This operation is similar to how
-  /// you create a case in the AWS Support Center <a
+  /// Creates a case in the Amazon Web Services Support Center. This operation
+  /// is similar to how you create a case in the Amazon Web Services Support
+  /// Center <a
   /// href="https://console.aws.amazon.com/support/home#/case/create">Create
   /// Case</a> page.
   ///
-  /// The AWS Support API doesn't support requesting service limit increases.
-  /// You can submit a service limit increase in the following ways:
+  /// The Amazon Web Services Support API doesn't support requesting service
+  /// limit increases. You can submit a service limit increase in the following
+  /// ways:
   ///
   /// <ul>
   /// <li>
-  /// Submit a request from the AWS Support Center <a
+  /// Submit a request from the Amazon Web Services Support Center <a
   /// href="https://console.aws.amazon.com/support/home#/case/create">Create
   /// Case</a> page.
   /// </li>
@@ -232,28 +238,30 @@ class Support {
   /// operation.
   /// </li>
   /// </ul>
-  /// A successful <code>CreateCase</code> request returns an AWS Support case
-  /// number. You can use the <a>DescribeCases</a> operation and specify the
-  /// case number to get existing AWS Support cases. After you create a case,
-  /// use the <a>AddCommunicationToCase</a> operation to add additional
-  /// communication or attachments to an existing case.
+  /// A successful <code>CreateCase</code> request returns an Amazon Web
+  /// Services Support case number. You can use the <a>DescribeCases</a>
+  /// operation and specify the case number to get existing Amazon Web Services
+  /// Support cases. After you create a case, use the
+  /// <a>AddCommunicationToCase</a> operation to add additional communication or
+  /// attachments to an existing case.
   ///
   /// The <code>caseId</code> is separate from the <code>displayId</code> that
-  /// appears in the <a href="https://console.aws.amazon.com/support">AWS
-  /// Support Center</a>. Use the <a>DescribeCases</a> operation to get the
-  /// <code>displayId</code>.
+  /// appears in the <a href="https://console.aws.amazon.com/support">Amazon Web
+  /// Services Support Center</a>. Use the <a>DescribeCases</a> operation to get
+  /// the <code>displayId</code>.
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -264,13 +272,13 @@ class Support {
   ///
   /// Parameter [communicationBody] :
   /// The communication body text that describes the issue. This text appears in
-  /// the <b>Description</b> field on the AWS Support Center <a
+  /// the <b>Description</b> field on the Amazon Web Services Support Center <a
   /// href="https://console.aws.amazon.com/support/home#/case/create">Create
   /// Case</a> page.
   ///
   /// Parameter [subject] :
-  /// The title of the AWS Support case. The title appears in the <b>Subject</b>
-  /// field on the AWS Support Center <a
+  /// The title of the support case. The title appears in the <b>Subject</b>
+  /// field on the Amazon Web Services Support Center <a
   /// href="https://console.aws.amazon.com/support/home#/case/create">Create
   /// Case</a> page.
   ///
@@ -279,15 +287,16 @@ class Support {
   /// using the <a>AddAttachmentsToSet</a> operation.
   ///
   /// Parameter [categoryCode] :
-  /// The category of problem for the AWS Support case. You also use the
+  /// The category of problem for the support case. You also use the
   /// <a>DescribeServices</a> operation to get the category code for a service.
-  /// Each AWS service defines its own set of category codes.
+  /// Each Amazon Web Services service defines its own set of category codes.
   ///
   /// Parameter [ccEmailAddresses] :
-  /// A list of email addresses that AWS Support copies on case correspondence.
-  /// AWS Support identifies the account that creates the case when you specify
-  /// your AWS credentials in an HTTP POST method or use the <a
-  /// href="http://aws.amazon.com/tools/">AWS SDKs</a>.
+  /// A list of email addresses that Amazon Web Services Support copies on case
+  /// correspondence. Amazon Web Services Support identifies the account that
+  /// creates the case when you specify your Amazon Web Services credentials in
+  /// an HTTP POST method or use the <a
+  /// href="http://aws.amazon.com/tools/">Amazon Web Services SDKs</a>.
   ///
   /// Parameter [issueType] :
   /// The type of issue for the case. You can specify
@@ -295,27 +304,28 @@ class Support {
   /// specify a value, the default is <code>technical</code>.
   ///
   /// Parameter [language] :
-  /// The language in which AWS Support handles the case. You must specify the
-  /// ISO 639-1 code for the <code>language</code> parameter if you want support
-  /// in that language. Currently, English ("en") and Japanese ("ja") are
-  /// supported.
+  /// The language in which Amazon Web Services Support handles the case. You
+  /// must specify the ISO 639-1 code for the <code>language</code> parameter if
+  /// you want support in that language. Currently, English ("en") and Japanese
+  /// ("ja") are supported.
   ///
   /// Parameter [serviceCode] :
-  /// The code for the AWS service. You can use the <a>DescribeServices</a>
-  /// operation to get the possible <code>serviceCode</code> values.
+  /// The code for the Amazon Web Services service. You can use the
+  /// <a>DescribeServices</a> operation to get the possible
+  /// <code>serviceCode</code> values.
   ///
   /// Parameter [severityCode] :
   /// A value that indicates the urgency of the case. This value determines the
-  /// response time according to your service level agreement with AWS Support.
-  /// You can use the <a>DescribeSeverityLevels</a> operation to get the
-  /// possible values for <code>severityCode</code>.
+  /// response time according to your service level agreement with Amazon Web
+  /// Services Support. You can use the <a>DescribeSeverityLevels</a> operation
+  /// to get the possible values for <code>severityCode</code>.
   ///
   /// For more information, see <a>SeverityLevel</a> and <a
   /// href="https://docs.aws.amazon.com/awssupport/latest/user/getting-started.html#choosing-severity">Choosing
-  /// a Severity</a> in the <i>AWS Support User Guide</i>.
+  /// a Severity</a> in the <i>Amazon Web Services Support User Guide</i>.
   /// <note>
   /// The availability of severity levels depends on the support plan for the
-  /// AWS account.
+  /// Amazon Web Services account.
   /// </note>
   Future<CreateCaseResponse> createCase({
     required String communicationBody,
@@ -372,15 +382,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -437,15 +448,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -465,12 +477,13 @@ class Support {
   /// number of cases is 100.
   ///
   /// Parameter [displayId] :
-  /// The ID displayed for a case in the AWS Support Center user interface.
+  /// The ID displayed for a case in the Amazon Web Services Support Center user
+  /// interface.
   ///
   /// Parameter [includeCommunications] :
   /// Specifies whether to include communications in the
   /// <code>DescribeCases</code> response. By default, communications are
-  /// incuded.
+  /// included.
   ///
   /// Parameter [includeResolvedCases] :
   /// Specifies whether to include resolved support cases in the
@@ -478,9 +491,10 @@ class Support {
   /// included.
   ///
   /// Parameter [language] :
-  /// The ISO 639-1 code for the language in which AWS provides support. AWS
-  /// Support currently supports English ("en") and Japanese ("ja"). Language
-  /// parameters must be passed explicitly for operations that take them.
+  /// The ISO 639-1 code for the language in which Amazon Web Services provides
+  /// support. Amazon Web Services Support currently supports English ("en") and
+  /// Japanese ("ja"). Language parameters must be passed explicitly for
+  /// operations that take them.
   ///
   /// Parameter [maxResults] :
   /// The maximum number of results to return before paginating.
@@ -548,15 +562,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -564,8 +579,8 @@ class Support {
   /// May throw [CaseIdNotFound].
   ///
   /// Parameter [caseId] :
-  /// The AWS Support case ID requested or returned in the call. The case ID is
-  /// an alphanumeric string formatted as shown in this example:
+  /// The support case ID requested or returned in the call. The case ID is an
+  /// alphanumeric string formatted as shown in this example:
   /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>
   ///
   /// Parameter [afterTime] :
@@ -617,14 +632,15 @@ class Support {
     return DescribeCommunicationsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Returns the current list of AWS services and a list of service categories
-  /// for each service. You then use service names and categories in your
-  /// <a>CreateCase</a> requests. Each AWS service has its own set of
-  /// categories.
+  /// Returns the current list of Amazon Web Services services and a list of
+  /// service categories for each service. You then use service names and
+  /// categories in your <a>CreateCase</a> requests. Each Amazon Web Services
+  /// service has its own set of categories.
   ///
   /// The service codes and category codes correspond to the values that appear
-  /// in the <b>Service</b> and <b>Category</b> lists on the AWS Support Center
-  /// <a href="https://console.aws.amazon.com/support/home#/case/create">Create
+  /// in the <b>Service</b> and <b>Category</b> lists on the Amazon Web Services
+  /// Support Center <a
+  /// href="https://console.aws.amazon.com/support/home#/case/create">Create
   /// Case</a> page. The values in those fields don't necessarily match the
   /// service codes and categories returned by the <code>DescribeServices</code>
   /// operation. Always use the service codes and categories that the
@@ -633,27 +649,30 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
   /// May throw [InternalServerError].
   ///
   /// Parameter [language] :
-  /// The ISO 639-1 code for the language in which AWS provides support. AWS
-  /// Support currently supports English ("en") and Japanese ("ja"). Language
-  /// parameters must be passed explicitly for operations that take them.
+  /// The ISO 639-1 code for the language in which Amazon Web Services provides
+  /// support. Amazon Web Services Support currently supports English ("en") and
+  /// Japanese ("ja"). Language parameters must be passed explicitly for
+  /// operations that take them.
   ///
   /// Parameter [serviceCodeList] :
-  /// A JSON-formatted list of service codes available for AWS services.
+  /// A JSON-formatted list of service codes available for Amazon Web Services
+  /// services.
   Future<DescribeServicesResponse> describeServices({
     String? language,
     List<String>? serviceCodeList,
@@ -677,31 +696,32 @@ class Support {
     return DescribeServicesResponse.fromJson(jsonResponse.body);
   }
 
-  /// Returns the list of severity levels that you can assign to an AWS Support
-  /// case. The severity level for a case is also a field in the
-  /// <a>CaseDetails</a> data type that you include for a <a>CreateCase</a>
-  /// request.
+  /// Returns the list of severity levels that you can assign to a support case.
+  /// The severity level for a case is also a field in the <a>CaseDetails</a>
+  /// data type that you include for a <a>CreateCase</a> request.
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
   /// May throw [InternalServerError].
   ///
   /// Parameter [language] :
-  /// The ISO 639-1 code for the language in which AWS provides support. AWS
-  /// Support currently supports English ("en") and Japanese ("ja"). Language
-  /// parameters must be passed explicitly for operations that take them.
+  /// The ISO 639-1 code for the language in which Amazon Web Services provides
+  /// support. Amazon Web Services Support currently supports English ("en") and
+  /// Japanese ("ja"). Language parameters must be passed explicitly for
+  /// operations that take them.
   Future<DescribeSeverityLevelsResponse> describeSeverityLevels({
     String? language,
   }) async {
@@ -723,7 +743,7 @@ class Support {
     return DescribeSeverityLevelsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Returns the refresh status of the AWS Trusted Advisor checks that have the
+  /// Returns the refresh status of the Trusted Advisor checks that have the
   /// specified check IDs. You can get the check IDs by calling the
   /// <a>DescribeTrustedAdvisorChecks</a> operation.
   ///
@@ -735,22 +755,23 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
   /// May throw [InternalServerError].
   ///
   /// Parameter [checkIds] :
-  /// The IDs of the Trusted Advisor checks to get the status of.
+  /// The IDs of the Trusted Advisor checks to get the status.
   /// <note>
   /// If you specify the check ID of a check that is automatically refreshed,
   /// you might see an <code>InvalidParameterValue</code> error.
@@ -780,8 +801,8 @@ class Support {
         jsonResponse.body);
   }
 
-  /// Returns the results of the AWS Trusted Advisor check that has the
-  /// specified check ID. You can get the check IDs by calling the
+  /// Returns the results of the Trusted Advisor check that has the specified
+  /// check ID. You can get the check IDs by calling the
   /// <a>DescribeTrustedAdvisorChecks</a> operation.
   ///
   /// The response contains a <a>TrustedAdvisorCheckResult</a> object, which
@@ -802,8 +823,9 @@ class Support {
   ///
   /// <ul>
   /// <li>
-  /// <b>status</b> - The alert status of the check: "ok" (green), "warning"
-  /// (yellow), "error" (red), or "not_available".
+  /// <b>status</b> - The alert status of the check can be <code>ok</code>
+  /// (green), <code>warning</code> (yellow), <code>error</code> (red), or
+  /// <code>not_available</code>.
   /// </li>
   /// <li>
   /// <b>timestamp</b> - The time of the last refresh of the check.
@@ -814,15 +836,16 @@ class Support {
   /// </ul> <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -832,9 +855,10 @@ class Support {
   /// The unique identifier for the Trusted Advisor check.
   ///
   /// Parameter [language] :
-  /// The ISO 639-1 code for the language in which AWS provides support. AWS
-  /// Support currently supports English ("en") and Japanese ("ja"). Language
-  /// parameters must be passed explicitly for operations that take them.
+  /// The ISO 639-1 code for the language in which Amazon Web Services provides
+  /// support. Amazon Web Services Support currently supports English ("en") and
+  /// Japanese ("ja"). Language parameters must be passed explicitly for
+  /// operations that take them.
   Future<DescribeTrustedAdvisorCheckResultResponse>
       describeTrustedAdvisorCheckResult({
     required String checkId,
@@ -861,8 +885,8 @@ class Support {
         jsonResponse.body);
   }
 
-  /// Returns the results for the AWS Trusted Advisor check summaries for the
-  /// check IDs that you specified. You can get the check IDs by calling the
+  /// Returns the results for the Trusted Advisor check summaries for the check
+  /// IDs that you specified. You can get the check IDs by calling the
   /// <a>DescribeTrustedAdvisorChecks</a> operation.
   ///
   /// The response contains an array of <a>TrustedAdvisorCheckSummary</a>
@@ -870,15 +894,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -910,33 +935,40 @@ class Support {
         jsonResponse.body);
   }
 
-  /// Returns information about all available AWS Trusted Advisor checks,
-  /// including the name, ID, category, description, and metadata. You must
-  /// specify a language code. The AWS Support API currently supports English
-  /// ("en") and Japanese ("ja"). The response contains a
+  /// Returns information about all available Trusted Advisor checks, including
+  /// the name, ID, category, description, and metadata. You must specify a
+  /// language code. The Amazon Web Services Support API currently supports
+  /// English ("en") and Japanese ("ja"). The response contains a
   /// <a>TrustedAdvisorCheckDescription</a> object for each check. You must set
-  /// the AWS Region to us-east-1.
+  /// the Amazon Web Services Region to us-east-1.
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
+  /// </li>
+  /// <li>
+  /// The names and descriptions for Trusted Advisor checks are subject to
+  /// change. We recommend that you specify the check ID in your code to
+  /// uniquely identify a check.
   /// </li>
   /// </ul> </note>
   ///
   /// May throw [InternalServerError].
   ///
   /// Parameter [language] :
-  /// The ISO 639-1 code for the language in which AWS provides support. AWS
-  /// Support currently supports English ("en") and Japanese ("ja"). Language
-  /// parameters must be passed explicitly for operations that take them.
+  /// The ISO 639-1 code for the language in which Amazon Web Services provides
+  /// support. Amazon Web Services Support currently supports English ("en") and
+  /// Japanese ("ja"). Language parameters must be passed explicitly for
+  /// operations that take them.
   Future<DescribeTrustedAdvisorChecksResponse> describeTrustedAdvisorChecks({
     required String language,
   }) async {
@@ -959,8 +991,8 @@ class Support {
     return DescribeTrustedAdvisorChecksResponse.fromJson(jsonResponse.body);
   }
 
-  /// Refreshes the AWS Trusted Advisor check that you specify using the check
-  /// ID. You can get the check IDs by calling the
+  /// Refreshes the Trusted Advisor check that you specify using the check ID.
+  /// You can get the check IDs by calling the
   /// <a>DescribeTrustedAdvisorChecks</a> operation.
   /// <note>
   /// Some checks are refreshed automatically. If you call the
@@ -971,15 +1003,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -987,8 +1020,10 @@ class Support {
   ///
   /// Parameter [checkId] :
   /// The unique identifier for the Trusted Advisor check to refresh.
-  /// <b>Note:</b> Specifying the check ID of a check that is automatically
-  /// refreshed causes an <code>InvalidParameterValue</code> error.
+  /// <note>
+  /// Specifying the check ID of a check that is automatically refreshed causes
+  /// an <code>InvalidParameterValue</code> error.
+  /// </note>
   Future<RefreshTrustedAdvisorCheckResponse> refreshTrustedAdvisorCheck({
     required String checkId,
   }) async {
@@ -1016,15 +1051,16 @@ class Support {
   /// <note>
   /// <ul>
   /// <li>
-  /// You must have a Business or Enterprise support plan to use the AWS Support
-  /// API.
+  /// You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+  /// to use the Amazon Web Services Support API.
   /// </li>
   /// <li>
-  /// If you call the AWS Support API from an account that does not have a
-  /// Business or Enterprise support plan, the
+  /// If you call the Amazon Web Services Support API from an account that does
+  /// not have a Business, Enterprise On-Ramp, or Enterprise Support plan, the
   /// <code>SubscriptionRequiredException</code> error message appears. For
   /// information about changing your support plan, see <a
-  /// href="http://aws.amazon.com/premiumsupport/">AWS Support</a>.
+  /// href="http://aws.amazon.com/premiumsupport/">Amazon Web Services
+  /// Support</a>.
   /// </li>
   /// </ul> </note>
   ///
@@ -1032,8 +1068,8 @@ class Support {
   /// May throw [CaseIdNotFound].
   ///
   /// Parameter [caseId] :
-  /// The AWS Support case ID requested or returned in the call. The case ID is
-  /// an alphanumeric string formatted as shown in this example:
+  /// The support case ID requested or returned in the call. The case ID is an
+  /// alphanumeric string formatted as shown in this example:
   /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>
   Future<ResolveCaseResponse> resolveCase({
     String? caseId,
@@ -1154,45 +1190,47 @@ class AttachmentDetails {
 ///
 /// <ul>
 /// <li>
-/// <b>caseId.</b> The AWS Support case ID requested or returned in the call.
-/// The case ID is an alphanumeric string formatted as shown in this example:
+/// <b>caseId</b> - The support case ID requested or returned in the call. The
+/// case ID is an alphanumeric string formatted as shown in this example:
 /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>.
 /// </li>
 /// <li>
-/// <b>categoryCode.</b> The category of problem for the AWS Support case.
-/// Corresponds to the CategoryCode values returned by a call to
+/// <b>categoryCode</b> - The category of problem for the support case.
+/// Corresponds to the <code>CategoryCode</code> values returned by a call to
 /// <a>DescribeServices</a>.
 /// </li>
 /// <li>
-/// <b>displayId.</b> The identifier for the case on pages in the AWS Support
-/// Center.
+/// <b>displayId</b> - The identifier for the case on pages in the Amazon Web
+/// Services Support Center.
 /// </li>
 /// <li>
-/// <b>language.</b> The ISO 639-1 code for the language in which AWS provides
-/// support. AWS Support currently supports English ("en") and Japanese ("ja").
-/// Language parameters must be passed explicitly for operations that take them.
+/// <b>language</b> - The ISO 639-1 code for the language in which Amazon Web
+/// Services provides support. Amazon Web Services Support currently supports
+/// English ("en") and Japanese ("ja"). Language parameters must be passed
+/// explicitly for operations that take them.
 /// </li>
 /// <li>
-/// <b>nextToken.</b> A resumption point for pagination.
+/// <b>nextToken</b> - A resumption point for pagination.
 /// </li>
 /// <li>
-/// <b>recentCommunications.</b> One or more <a>Communication</a> objects.
+/// <b>recentCommunications</b> - One or more <a>Communication</a> objects.
 /// Fields of these objects are <code>attachments</code>, <code>body</code>,
 /// <code>caseId</code>, <code>submittedBy</code>, and <code>timeCreated</code>.
 /// </li>
 /// <li>
-/// <b>serviceCode.</b> The identifier for the AWS service that corresponds to
-/// the service code defined in the call to <a>DescribeServices</a>.
+/// <b>serviceCode</b> - The identifier for the Amazon Web Services service that
+/// corresponds to the service code defined in the call to
+/// <a>DescribeServices</a>.
 /// </li>
 /// <li>
-/// <b>severityCode.</b> The severity code assigned to the case. Contains one of
-/// the values returned by the call to <a>DescribeSeverityLevels</a>. The
+/// <b>severityCode</b> - The severity code assigned to the case. Contains one
+/// of the values returned by the call to <a>DescribeSeverityLevels</a>. The
 /// possible values are: <code>low</code>, <code>normal</code>,
 /// <code>high</code>, <code>urgent</code>, and <code>critical</code>.
 /// </li>
 /// <li>
-/// <b>status.</b> The status of the case in the AWS Support Center. Valid
-/// values:
+/// <b>status</b> - The status of the case in the Amazon Web Services Support
+/// Center. Valid values:
 ///
 /// <ul>
 /// <li>
@@ -1215,44 +1253,46 @@ class AttachmentDetails {
 /// </li>
 /// </ul> </li>
 /// <li>
-/// <b>subject.</b> The subject line of the case.
+/// <b>subject</b> - The subject line of the case.
 /// </li>
 /// <li>
-/// <b>submittedBy.</b> The email address of the account that submitted the
+/// <b>submittedBy</b> - The email address of the account that submitted the
 /// case.
 /// </li>
 /// <li>
-/// <b>timeCreated.</b> The time the case was created, in ISO-8601 format.
+/// <b>timeCreated</b> - The time the case was created, in ISO-8601 format.
 /// </li>
 /// </ul>
 class CaseDetails {
-  /// The AWS Support case ID requested or returned in the call. The case ID is an
+  /// The support case ID requested or returned in the call. The case ID is an
   /// alphanumeric string formatted as shown in this example:
   /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>
   final String? caseId;
 
-  /// The category of problem for the AWS Support case.
+  /// The category of problem for the support case.
   final String? categoryCode;
 
   /// The email addresses that receive copies of communication about the case.
   final List<String>? ccEmailAddresses;
 
-  /// The ID displayed for the case in the AWS Support Center. This is a numeric
-  /// string.
+  /// The ID displayed for the case in the Amazon Web Services Support Center.
+  /// This is a numeric string.
   final String? displayId;
 
-  /// The ISO 639-1 code for the language in which AWS provides support. AWS
-  /// Support currently supports English ("en") and Japanese ("ja"). Language
-  /// parameters must be passed explicitly for operations that take them.
+  /// The ISO 639-1 code for the language in which Amazon Web Services provides
+  /// support. Amazon Web Services Support currently supports English ("en") and
+  /// Japanese ("ja"). Language parameters must be passed explicitly for
+  /// operations that take them.
   final String? language;
 
-  /// The five most recent communications between you and AWS Support Center,
-  /// including the IDs of any attachments to the communications. Also includes a
-  /// <code>nextToken</code> that you can use to retrieve earlier communications.
+  /// The five most recent communications between you and Amazon Web Services
+  /// Support Center, including the IDs of any attachments to the communications.
+  /// Also includes a <code>nextToken</code> that you can use to retrieve earlier
+  /// communications.
   final RecentCaseCommunications? recentCommunications;
 
-  /// The code for the AWS service. You can get a list of codes and the
-  /// corresponding service names by calling <a>DescribeServices</a>.
+  /// The code for the Amazon Web Services service. You can get a list of codes
+  /// and the corresponding service names by calling <a>DescribeServices</a>.
   final String? serviceCode;
 
   /// The code for the severity level returned by the call to
@@ -1285,13 +1325,14 @@ class CaseDetails {
   /// </ul>
   final String? status;
 
-  /// The subject line for the case in the AWS Support Center.
+  /// The subject line for the case in the Amazon Web Services Support Center.
   final String? subject;
 
   /// The email address of the account that submitted the case.
   final String? submittedBy;
 
-  /// The time that the case was created in the AWS Support Center.
+  /// The time that the case was created in the Amazon Web Services Support
+  /// Center.
   final String? timeCreated;
 
   CaseDetails({
@@ -1334,7 +1375,7 @@ class CaseDetails {
 
 /// A JSON-formatted name/value pair that represents the category name and
 /// category code of the problem, selected from the <a>DescribeServices</a>
-/// response for each AWS service.
+/// response for each Amazon Web Services service.
 class Category {
   /// The category code for the support case.
   final String? code;
@@ -1354,26 +1395,27 @@ class Category {
   }
 }
 
-/// A communication associated with an AWS Support case. The communication
-/// consists of the case ID, the message body, attachment information, the
-/// submitter of the communication, and the date and time of the communication.
+/// A communication associated with a support case. The communication consists
+/// of the case ID, the message body, attachment information, the submitter of
+/// the communication, and the date and time of the communication.
 class Communication {
   /// Information about the attachments to the case communication.
   final List<AttachmentDetails>? attachmentSet;
 
-  /// The text of the communication between the customer and AWS Support.
+  /// The text of the communication between the customer and Amazon Web Services
+  /// Support.
   final String? body;
 
-  /// The AWS Support case ID requested or returned in the call. The case ID is an
+  /// The support case ID requested or returned in the call. The case ID is an
   /// alphanumeric string formatted as shown in this example:
   /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>
   final String? caseId;
 
   /// The identity of the account that submitted, or responded to, the support
   /// case. Customer entries include the role or IAM user as well as the email
-  /// address. For example, "AdminRole (Role) &lt;someone@example.com&gt;. Entries
-  /// from the AWS Support team display "Amazon Web Services," and do not show an
-  /// email address.
+  /// address. For example, "AdminRole (Role) &lt;janedoe@example.com&gt;. Entries
+  /// from the Amazon Web Services Support team display "Amazon Web Services," and
+  /// don't show an email address.
   final String? submittedBy;
 
   /// The time the communication was created.
@@ -1400,10 +1442,10 @@ class Communication {
   }
 }
 
-/// The AWS Support case ID returned by a successful completion of the
+/// The support case ID returned by a successful completion of the
 /// <a>CreateCase</a> operation.
 class CreateCaseResponse {
-  /// The AWS Support case ID requested or returned in the call. The case ID is an
+  /// The support case ID requested or returned in the call. The case ID is an
   /// alphanumeric string in the following format:
   /// case-<i>12345678910-2013-c4c1d2bf33c5cf47</i>
   final String? caseId;
@@ -1490,9 +1532,10 @@ class DescribeCommunicationsResponse {
   }
 }
 
-/// The list of AWS services returned by the <a>DescribeServices</a> operation.
+/// The list of Amazon Web Services services returned by the
+/// <a>DescribeServices</a> operation.
 class DescribeServicesResponse {
-  /// A JSON-formatted list of AWS services.
+  /// A JSON-formatted list of Amazon Web Services services.
   final List<Service>? services;
 
   DescribeServicesResponse({
@@ -1512,7 +1555,7 @@ class DescribeServicesResponse {
 /// operation.
 class DescribeSeverityLevelsResponse {
   /// The available severity levels for the support case. Available severity
-  /// levels are defined by your service level agreement with AWS.
+  /// levels are defined by your service level agreement with Amazon Web Services.
   final List<SeverityLevel>? severityLevels;
 
   DescribeSeverityLevelsResponse({
@@ -1672,22 +1715,22 @@ class ResolveCaseResponse {
   }
 }
 
-/// Information about an AWS service returned by the <a>DescribeServices</a>
-/// operation.
+/// Information about an Amazon Web Services service returned by the
+/// <a>DescribeServices</a> operation.
 class Service {
   /// A list of categories that describe the type of support issue a case
   /// describes. Categories consist of a category name and a category code.
-  /// Category names and codes are passed to AWS Support when you call
-  /// <a>CreateCase</a>.
+  /// Category names and codes are passed to Amazon Web Services Support when you
+  /// call <a>CreateCase</a>.
   final List<Category>? categories;
 
-  /// The code for an AWS service returned by the <a>DescribeServices</a>
-  /// response. The <code>name</code> element contains the corresponding friendly
-  /// name.
+  /// The code for an Amazon Web Services service returned by the
+  /// <a>DescribeServices</a> response. The <code>name</code> element contains the
+  /// corresponding friendly name.
   final String? code;
 
-  /// The friendly name for an AWS service. The <code>code</code> element contains
-  /// the corresponding code.
+  /// The friendly name for an Amazon Web Services service. The <code>code</code>
+  /// element contains the corresponding code.
   final String? name;
 
   Service({
@@ -1711,7 +1754,7 @@ class Service {
 /// The available values depend on the support plan for the account. For more
 /// information, see <a
 /// href="https://docs.aws.amazon.com/awssupport/latest/user/case-management.html#choosing-severity">Choosing
-/// a severity</a> in the <i>AWS Support User Guide</i>.
+/// a severity</a> in the <i>Amazon Web Services Support User Guide</i>.
 class SeverityLevel {
   /// The code for case severity level.
   ///
@@ -1721,31 +1764,33 @@ class SeverityLevel {
 
   /// The name of the severity level that corresponds to the severity level code.
   /// <note>
-  /// The values returned by the API differ from the values that are displayed in
-  /// the AWS Support Center. For example, for the code "low", the API name is
-  /// "Low", but the name in the Support Center is "General guidance". These are
-  /// the Support Center code/name mappings:
+  /// The values returned by the API are different from the values that appear in
+  /// the Amazon Web Services Support Center. For example, the API uses the code
+  /// <code>low</code>, but the name appears as General guidance in Support
+  /// Center.
+  ///
+  /// The following are the API code names and how they appear in the console:
   ///
   /// <ul>
   /// <li>
-  /// <code>low</code>: General guidance
+  /// <code>low</code> - General guidance
   /// </li>
   /// <li>
-  /// <code>normal</code>: System impaired
+  /// <code>normal</code> - System impaired
   /// </li>
   /// <li>
-  /// <code>high</code>: Production system impaired
+  /// <code>high</code> - Production system impaired
   /// </li>
   /// <li>
-  /// <code>urgent</code>: Production system down
+  /// <code>urgent</code> - Production system down
   /// </li>
   /// <li>
-  /// <code>critical</code>: Business-critical system down
+  /// <code>critical</code> - Business-critical system down
   /// </li>
   /// </ul> </note>
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/awssupport/latest/user/case-management.html#choosing-severity">Choosing
-  /// a severity</a> in the <i>AWS Support User Guide</i>.
+  /// a severity</a> in the <i>Amazon Web Services Support User Guide</i>.
   final String? name;
 
   SeverityLevel({
@@ -1838,22 +1883,22 @@ class TrustedAdvisorCheckRefreshStatus {
   ///
   /// <ul>
   /// <li>
-  /// <code>none:</code> The check is not refreshed or the non-success status
+  /// <code>none</code> - The check is not refreshed or the non-success status
   /// exceeds the timeout
   /// </li>
   /// <li>
-  /// <code>enqueued:</code> The check refresh requests has entered the refresh
+  /// <code>enqueued</code> - The check refresh requests has entered the refresh
   /// queue
   /// </li>
   /// <li>
-  /// <code>processing:</code> The check refresh request is picked up by the rule
+  /// <code>processing</code> - The check refresh request is picked up by the rule
   /// processing engine
   /// </li>
   /// <li>
-  /// <code>success:</code> The check is successfully refreshed
+  /// <code>success</code> - The check is successfully refreshed
   /// </li>
   /// <li>
-  /// <code>abandoned:</code> The check refresh has failed
+  /// <code>abandoned</code> - The check refresh has failed
   /// </li>
   /// </ul>
   final String status;
@@ -2003,11 +2048,11 @@ class TrustedAdvisorResourceDetail {
   /// The status code for the resource identified in the Trusted Advisor check.
   final String status;
 
-  /// Specifies whether the AWS resource was ignored by Trusted Advisor because it
-  /// was marked as suppressed by the user.
+  /// Specifies whether the Amazon Web Services resource was ignored by Trusted
+  /// Advisor because it was marked as suppressed by the user.
   final bool? isSuppressed;
 
-  /// The AWS region in which the identified resource is located.
+  /// The Amazon Web Services Region in which the identified resource is located.
   final String? region;
 
   TrustedAdvisorResourceDetail({
@@ -2031,22 +2076,23 @@ class TrustedAdvisorResourceDetail {
   }
 }
 
-/// Details about AWS resources that were analyzed in a call to Trusted Advisor
-/// <a>DescribeTrustedAdvisorCheckSummaries</a>.
+/// Details about Amazon Web Services resources that were analyzed in a call to
+/// Trusted Advisor <a>DescribeTrustedAdvisorCheckSummaries</a>.
 class TrustedAdvisorResourcesSummary {
-  /// The number of AWS resources that were flagged (listed) by the Trusted
-  /// Advisor check.
+  /// The number of Amazon Web Services resources that were flagged (listed) by
+  /// the Trusted Advisor check.
   final int resourcesFlagged;
 
-  /// The number of AWS resources ignored by Trusted Advisor because information
-  /// was unavailable.
+  /// The number of Amazon Web Services resources ignored by Trusted Advisor
+  /// because information was unavailable.
   final int resourcesIgnored;
 
-  /// The number of AWS resources that were analyzed by the Trusted Advisor check.
+  /// The number of Amazon Web Services resources that were analyzed by the
+  /// Trusted Advisor check.
   final int resourcesProcessed;
 
-  /// The number of AWS resources ignored by Trusted Advisor because they were
-  /// marked as suppressed by the user.
+  /// The number of Amazon Web Services resources ignored by Trusted Advisor
+  /// because they were marked as suppressed by the user.
   final int resourcesSuppressed;
 
   TrustedAdvisorResourcesSummary({

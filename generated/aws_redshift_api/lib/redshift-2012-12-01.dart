@@ -120,6 +120,151 @@ class Redshift {
     return AcceptReservedNodeExchangeOutputMessage.fromXml($result);
   }
 
+  /// Adds a partner integration to a cluster. This operation authorizes a
+  /// partner to push status updates for the specified database. To complete the
+  /// integration, you also set up the integration on the partner website.
+  ///
+  /// May throw [PartnerNotFoundFault].
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [UnauthorizedPartnerIntegrationFault].
+  ///
+  /// Parameter [accountId] :
+  /// The Amazon Web Services account ID that owns the cluster.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster that receives data from the partner.
+  ///
+  /// Parameter [databaseName] :
+  /// The name of the database that receives data from the partner.
+  ///
+  /// Parameter [partnerName] :
+  /// The name of the partner that is authorized to send data.
+  Future<PartnerIntegrationOutputMessage> addPartner({
+    required String accountId,
+    required String clusterIdentifier,
+    required String databaseName,
+    required String partnerName,
+  }) async {
+    ArgumentError.checkNotNull(accountId, 'accountId');
+    _s.validateStringLength(
+      'accountId',
+      accountId,
+      12,
+      12,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      63,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(databaseName, 'databaseName');
+    _s.validateStringLength(
+      'databaseName',
+      databaseName,
+      0,
+      127,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(partnerName, 'partnerName');
+    _s.validateStringLength(
+      'partnerName',
+      partnerName,
+      0,
+      255,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['AccountId'] = accountId;
+    $request['ClusterIdentifier'] = clusterIdentifier;
+    $request['DatabaseName'] = databaseName;
+    $request['PartnerName'] = partnerName;
+    final $result = await _protocol.send(
+      $request,
+      action: 'AddPartner',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['PartnerIntegrationInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'AddPartnerResult',
+    );
+    return PartnerIntegrationOutputMessage.fromXml($result);
+  }
+
+  /// From a datashare consumer account, associates a datashare with the account
+  /// (AssociateEntireAccount) or the specified namespace (ConsumerArn). If you
+  /// make this association, the consumer can consume the datashare.
+  ///
+  /// May throw [InvalidDataShareFault].
+  /// May throw [InvalidNamespaceFault].
+  ///
+  /// Parameter [dataShareArn] :
+  /// The Amazon Resource Name (ARN) of the datashare that the consumer is to
+  /// use with the account or the namespace.
+  ///
+  /// Parameter [associateEntireAccount] :
+  /// A value that specifies whether the datashare is associated with the entire
+  /// account.
+  ///
+  /// Parameter [consumerArn] :
+  /// The Amazon Resource Name (ARN) of the consumer that is associated with the
+  /// datashare.
+  ///
+  /// Parameter [consumerRegion] :
+  /// From a datashare consumer account, associates a datashare with all
+  /// existing and future namespaces in the specified Amazon Web Services
+  /// Region.
+  Future<DataShare> associateDataShareConsumer({
+    required String dataShareArn,
+    bool? associateEntireAccount,
+    String? consumerArn,
+    String? consumerRegion,
+  }) async {
+    ArgumentError.checkNotNull(dataShareArn, 'dataShareArn');
+    _s.validateStringLength(
+      'dataShareArn',
+      dataShareArn,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'consumerArn',
+      consumerArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'consumerRegion',
+      consumerRegion,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    $request['DataShareArn'] = dataShareArn;
+    associateEntireAccount
+        ?.also((arg) => $request['AssociateEntireAccount'] = arg);
+    consumerArn?.also((arg) => $request['ConsumerArn'] = arg);
+    consumerRegion?.also((arg) => $request['ConsumerRegion'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'AssociateDataShareConsumer',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['AssociateDataShareConsumerMessage'],
+      shapes: shapes,
+      resultWrapper: 'AssociateDataShareConsumerResult',
+    );
+    return DataShare.fromXml($result);
+  }
+
   /// Adds an inbound (ingress) rule to an Amazon Redshift security group.
   /// Depending on whether the application accessing your cluster is running on
   /// the Internet or an Amazon EC2 instance, you can authorize inbound access
@@ -129,8 +274,8 @@ class Redshift {
   ///
   /// If you authorize access to an Amazon EC2 security group, specify
   /// <i>EC2SecurityGroupName</i> and <i>EC2SecurityGroupOwnerId</i>. The Amazon
-  /// EC2 security group and Amazon Redshift cluster must be in the same AWS
-  /// Region.
+  /// EC2 security group and Amazon Redshift cluster must be in the same Amazon
+  /// Web Services Region.
   ///
   /// If you authorize access to a CIDR/IP address range, specify <i>CIDRIP</i>.
   /// For an overview of CIDR blocks, see the Wikipedia article on <a
@@ -160,9 +305,9 @@ class Redshift {
   /// The EC2 security group to be added the Amazon Redshift security group.
   ///
   /// Parameter [eC2SecurityGroupOwnerId] :
-  /// The AWS account number of the owner of the security group specified by the
-  /// <i>EC2SecurityGroupName</i> parameter. The AWS Access Key ID is not an
-  /// acceptable value.
+  /// The Amazon Web Services account number of the owner of the security group
+  /// specified by the <i>EC2SecurityGroupName</i> parameter. The Amazon Web
+  /// Services Access Key ID is not an acceptable value.
   ///
   /// Example: <code>111122223333</code>
   Future<AuthorizeClusterSecurityGroupIngressResult>
@@ -219,8 +364,114 @@ class Redshift {
     return AuthorizeClusterSecurityGroupIngressResult.fromXml($result);
   }
 
-  /// Authorizes the specified AWS customer account to restore the specified
-  /// snapshot.
+  /// From a data producer account, authorizes the sharing of a datashare with
+  /// one or more consumer accounts or managing entities. To authorize a
+  /// datashare for a data consumer, the producer account must have the correct
+  /// access permissions.
+  ///
+  /// May throw [InvalidDataShareFault].
+  ///
+  /// Parameter [consumerIdentifier] :
+  /// The identifier of the data consumer that is authorized to access the
+  /// datashare. This identifier is an Amazon Web Services account ID or a
+  /// keyword, such as ADX.
+  ///
+  /// Parameter [dataShareArn] :
+  /// The Amazon Resource Name (ARN) of the datashare that producers are to
+  /// authorize sharing for.
+  Future<DataShare> authorizeDataShare({
+    required String consumerIdentifier,
+    required String dataShareArn,
+  }) async {
+    ArgumentError.checkNotNull(consumerIdentifier, 'consumerIdentifier');
+    _s.validateStringLength(
+      'consumerIdentifier',
+      consumerIdentifier,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(dataShareArn, 'dataShareArn');
+    _s.validateStringLength(
+      'dataShareArn',
+      dataShareArn,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['ConsumerIdentifier'] = consumerIdentifier;
+    $request['DataShareArn'] = dataShareArn;
+    final $result = await _protocol.send(
+      $request,
+      action: 'AuthorizeDataShare',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['AuthorizeDataShareMessage'],
+      shapes: shapes,
+      resultWrapper: 'AuthorizeDataShareResult',
+    );
+    return DataShare.fromXml($result);
+  }
+
+  /// Grants access to a cluster.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [EndpointAuthorizationsPerClusterLimitExceededFault].
+  /// May throw [UnsupportedOperationFault].
+  /// May throw [EndpointAuthorizationAlreadyExistsFault].
+  /// May throw [InvalidAuthorizationStateFault].
+  /// May throw [InvalidClusterStateFault].
+  ///
+  /// Parameter [account] :
+  /// The Amazon Web Services account ID to grant access to.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster to grant access to.
+  ///
+  /// Parameter [vpcIds] :
+  /// The virtual private cloud (VPC) identifiers to grant access to.
+  Future<EndpointAuthorization> authorizeEndpointAccess({
+    required String account,
+    String? clusterIdentifier,
+    List<String>? vpcIds,
+  }) async {
+    ArgumentError.checkNotNull(account, 'account');
+    _s.validateStringLength(
+      'account',
+      account,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    $request['Account'] = account;
+    clusterIdentifier?.also((arg) => $request['ClusterIdentifier'] = arg);
+    vpcIds?.also((arg) => $request['VpcIds'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'AuthorizeEndpointAccess',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['AuthorizeEndpointAccessMessage'],
+      shapes: shapes,
+      resultWrapper: 'AuthorizeEndpointAccessResult',
+    );
+    return EndpointAuthorization.fromXml($result);
+  }
+
+  /// Authorizes the specified Amazon Web Services account to restore the
+  /// specified snapshot.
   ///
   /// For more information about working with snapshots, go to <a
   /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-snapshots.html">Amazon
@@ -233,25 +484,31 @@ class Redshift {
   /// May throw [DependentServiceRequestThrottlingFault].
   /// May throw [InvalidClusterSnapshotStateFault].
   /// May throw [LimitExceededFault].
+  /// May throw [UnsupportedOperationFault].
   ///
   /// Parameter [accountWithRestoreAccess] :
-  /// The identifier of the AWS customer account authorized to restore the
-  /// specified snapshot.
+  /// The identifier of the Amazon Web Services account authorized to restore
+  /// the specified snapshot.
   ///
-  /// To share a snapshot with AWS support, specify amazon-redshift-support.
+  /// To share a snapshot with Amazon Web Services Support, specify
+  /// amazon-redshift-support.
   ///
-  /// Parameter [snapshotIdentifier] :
-  /// The identifier of the snapshot the account is authorized to restore.
+  /// Parameter [snapshotArn] :
+  /// The Amazon Resource Name (ARN) of the snapshot to authorize access to.
   ///
   /// Parameter [snapshotClusterIdentifier] :
   /// The identifier of the cluster the snapshot was created from. This
   /// parameter is required if your IAM user has a policy containing a snapshot
   /// resource element that specifies anything other than * for the cluster
   /// name.
+  ///
+  /// Parameter [snapshotIdentifier] :
+  /// The identifier of the snapshot the account is authorized to restore.
   Future<AuthorizeSnapshotAccessResult> authorizeSnapshotAccess({
     required String accountWithRestoreAccess,
-    required String snapshotIdentifier,
+    String? snapshotArn,
     String? snapshotClusterIdentifier,
+    String? snapshotIdentifier,
   }) async {
     ArgumentError.checkNotNull(
         accountWithRestoreAccess, 'accountWithRestoreAccess');
@@ -262,13 +519,11 @@ class Redshift {
       2147483647,
       isRequired: true,
     );
-    ArgumentError.checkNotNull(snapshotIdentifier, 'snapshotIdentifier');
     _s.validateStringLength(
-      'snapshotIdentifier',
-      snapshotIdentifier,
+      'snapshotArn',
+      snapshotArn,
       0,
       2147483647,
-      isRequired: true,
     );
     _s.validateStringLength(
       'snapshotClusterIdentifier',
@@ -276,11 +531,18 @@ class Redshift {
       0,
       2147483647,
     );
+    _s.validateStringLength(
+      'snapshotIdentifier',
+      snapshotIdentifier,
+      0,
+      2147483647,
+    );
     final $request = <String, dynamic>{};
     $request['AccountWithRestoreAccess'] = accountWithRestoreAccess;
-    $request['SnapshotIdentifier'] = snapshotIdentifier;
+    snapshotArn?.also((arg) => $request['SnapshotArn'] = arg);
     snapshotClusterIdentifier
         ?.also((arg) => $request['SnapshotClusterIdentifier'] = arg);
+    snapshotIdentifier?.also((arg) => $request['SnapshotIdentifier'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'AuthorizeSnapshotAccess',
@@ -458,7 +720,8 @@ class Redshift {
   /// Cannot end with a hyphen or contain two consecutive hyphens.
   /// </li>
   /// <li>
-  /// Must be unique for the AWS account that is making the request.
+  /// Must be unique for the Amazon Web Services account that is making the
+  /// request.
   /// </li>
   /// </ul>
   ///
@@ -534,6 +797,57 @@ class Redshift {
     return CopyClusterSnapshotResult.fromXml($result);
   }
 
+  /// Creates an authentication profile with the specified parameters.
+  ///
+  /// May throw [AuthenticationProfileAlreadyExistsFault].
+  /// May throw [AuthenticationProfileQuotaExceededFault].
+  /// May throw [InvalidAuthenticationProfileRequestFault].
+  ///
+  /// Parameter [authenticationProfileContent] :
+  /// The content of the authentication profile in JSON format. The maximum
+  /// length of the JSON string is determined by a quota for your account.
+  ///
+  /// Parameter [authenticationProfileName] :
+  /// The name of the authentication profile to be created.
+  Future<CreateAuthenticationProfileResult> createAuthenticationProfile({
+    required String authenticationProfileContent,
+    required String authenticationProfileName,
+  }) async {
+    ArgumentError.checkNotNull(
+        authenticationProfileContent, 'authenticationProfileContent');
+    _s.validateStringLength(
+      'authenticationProfileContent',
+      authenticationProfileContent,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(
+        authenticationProfileName, 'authenticationProfileName');
+    _s.validateStringLength(
+      'authenticationProfileName',
+      authenticationProfileName,
+      0,
+      63,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['AuthenticationProfileContent'] = authenticationProfileContent;
+    $request['AuthenticationProfileName'] = authenticationProfileName;
+    final $result = await _protocol.send(
+      $request,
+      action: 'CreateAuthenticationProfile',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['CreateAuthenticationProfileMessage'],
+      shapes: shapes,
+      resultWrapper: 'CreateAuthenticationProfileResult',
+    );
+    return CreateAuthenticationProfileResult.fromXml($result);
+  }
+
   /// Creates a new cluster with the specified parameters.
   ///
   /// To create a cluster in Virtual Private Cloud (VPC), you must provide a
@@ -588,13 +902,13 @@ class Redshift {
   /// Cannot end with a hyphen or contain two consecutive hyphens.
   /// </li>
   /// <li>
-  /// Must be unique for all clusters within an AWS account.
+  /// Must be unique for all clusters within an Amazon Web Services account.
   /// </li>
   /// </ul>
   /// Example: <code>myexamplecluster</code>
   ///
   /// Parameter [masterUserPassword] :
-  /// The password associated with the master user account for the cluster that
+  /// The password associated with the admin user account for the cluster that
   /// is being created.
   ///
   /// Constraints:
@@ -613,13 +927,14 @@ class Redshift {
   /// Must contain one number.
   /// </li>
   /// <li>
-  /// Can be any printable ASCII character (ASCII code 33 to 126) except '
-  /// (single quote), " (double quote), \, /, @, or space.
+  /// Can be any printable ASCII character (ASCII code 33-126) except
+  /// <code>'</code> (single quote), <code>"</code> (double quote),
+  /// <code>\</code>, <code>/</code>, or <code>@</code>.
   /// </li>
   /// </ul>
   ///
   /// Parameter [masterUsername] :
-  /// The user name associated with the master user account for the cluster that
+  /// The user name associated with the admin user account for the cluster that
   /// is being created.
   ///
   /// Constraints:
@@ -666,11 +981,32 @@ class Redshift {
   ///
   /// Default: <code>true</code>
   ///
+  /// Parameter [aquaConfigurationStatus] :
+  /// The value represents how the cluster is configured to use AQUA (Advanced
+  /// Query Accelerator) when it is created. Possible values include the
+  /// following.
+  ///
+  /// <ul>
+  /// <li>
+  /// enabled - Use AQUA if it is available for the current Amazon Web Services
+  /// Region and Amazon Redshift node type.
+  /// </li>
+  /// <li>
+  /// disabled - Don't use AQUA.
+  /// </li>
+  /// <li>
+  /// auto - Amazon Redshift determines whether to use AQUA.
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [automatedSnapshotRetentionPeriod] :
   /// The number of days that automated snapshots are retained. If the value is
   /// 0, automated snapshots are disabled. Even if automated snapshots are
   /// disabled, you can still create manual snapshots when you want with
   /// <a>CreateClusterSnapshot</a>.
+  ///
+  /// You can't disable automated snapshots for RA3 node types. Set the
+  /// automated retention period from 1-35 days.
   ///
   /// Default: <code>1</code>
   ///
@@ -781,8 +1117,14 @@ class Redshift {
   /// </li>
   /// </ul>
   ///
+  /// Parameter [defaultIamRoleArn] :
+  /// The Amazon Resource Name (ARN) for the IAM role that was set as default
+  /// for the cluster when the cluster was created.
+  ///
   /// Parameter [elasticIp] :
-  /// The Elastic IP (EIP) address for the cluster.
+  /// The Elastic IP (EIP) address for the cluster. You don't have to specify
+  /// the EIP for a publicly accessible cluster with AvailabilityZoneRelocation
+  /// turned on.
   ///
   /// Constraints: The cluster must be provisioned in EC2-VPC and
   /// publicly-accessible through an Internet gateway. For more information
@@ -816,16 +1158,22 @@ class Redshift {
   /// the Amazon Redshift cluster can use to retrieve and store keys in an HSM.
   ///
   /// Parameter [iamRoles] :
-  /// A list of AWS Identity and Access Management (IAM) roles that can be used
-  /// by the cluster to access other AWS services. You must supply the IAM roles
-  /// in their Amazon Resource Name (ARN) format. You can supply up to 10 IAM
-  /// roles in a single request.
+  /// A list of Identity and Access Management (IAM) roles that can be used by
+  /// the cluster to access other Amazon Web Services services. You must supply
+  /// the IAM roles in their Amazon Resource Name (ARN) format.
   ///
-  /// A cluster can have up to 10 IAM roles associated with it at any time.
+  /// The maximum number of IAM roles that you can associate is subject to a
+  /// quota. For more information, go to <a
+  /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/amazon-redshift-limits.html">Quotas
+  /// and limits</a> in the <i>Amazon Redshift Cluster Management Guide</i>.
   ///
   /// Parameter [kmsKeyId] :
-  /// The AWS Key Management Service (KMS) key ID of the encryption key that you
+  /// The Key Management Service (KMS) key ID of the encryption key that you
   /// want to use to encrypt data in the cluster.
+  ///
+  /// Parameter [loadSampleData] :
+  /// A flag that specifies whether to load sample data once the cluster is
+  /// created.
   ///
   /// Parameter [maintenanceTrackName] :
   /// An optional parameter for the name of the maintenance track for the
@@ -905,6 +1253,7 @@ class Redshift {
     required String nodeType,
     String? additionalInfo,
     bool? allowVersionUpgrade,
+    AquaConfigurationStatus? aquaConfigurationStatus,
     int? automatedSnapshotRetentionPeriod,
     String? availabilityZone,
     bool? availabilityZoneRelocation,
@@ -914,6 +1263,7 @@ class Redshift {
     String? clusterType,
     String? clusterVersion,
     String? dBName,
+    String? defaultIamRoleArn,
     String? elasticIp,
     bool? encrypted,
     bool? enhancedVpcRouting,
@@ -921,6 +1271,7 @@ class Redshift {
     String? hsmConfigurationIdentifier,
     List<String>? iamRoles,
     String? kmsKeyId,
+    String? loadSampleData,
     String? maintenanceTrackName,
     int? manualSnapshotRetentionPeriod,
     int? numberOfNodes,
@@ -1006,6 +1357,12 @@ class Redshift {
       2147483647,
     );
     _s.validateStringLength(
+      'defaultIamRoleArn',
+      defaultIamRoleArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
       'elasticIp',
       elasticIp,
       0,
@@ -1026,6 +1383,12 @@ class Redshift {
     _s.validateStringLength(
       'kmsKeyId',
       kmsKeyId,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'loadSampleData',
+      loadSampleData,
       0,
       2147483647,
     );
@@ -1054,6 +1417,8 @@ class Redshift {
     $request['NodeType'] = nodeType;
     additionalInfo?.also((arg) => $request['AdditionalInfo'] = arg);
     allowVersionUpgrade?.also((arg) => $request['AllowVersionUpgrade'] = arg);
+    aquaConfigurationStatus
+        ?.also((arg) => $request['AquaConfigurationStatus'] = arg.toValue());
     automatedSnapshotRetentionPeriod
         ?.also((arg) => $request['AutomatedSnapshotRetentionPeriod'] = arg);
     availabilityZone?.also((arg) => $request['AvailabilityZone'] = arg);
@@ -1068,6 +1433,7 @@ class Redshift {
     clusterType?.also((arg) => $request['ClusterType'] = arg);
     clusterVersion?.also((arg) => $request['ClusterVersion'] = arg);
     dBName?.also((arg) => $request['DBName'] = arg);
+    defaultIamRoleArn?.also((arg) => $request['DefaultIamRoleArn'] = arg);
     elasticIp?.also((arg) => $request['ElasticIp'] = arg);
     encrypted?.also((arg) => $request['Encrypted'] = arg);
     enhancedVpcRouting?.also((arg) => $request['EnhancedVpcRouting'] = arg);
@@ -1077,6 +1443,7 @@ class Redshift {
         ?.also((arg) => $request['HsmConfigurationIdentifier'] = arg);
     iamRoles?.also((arg) => $request['IamRoles'] = arg);
     kmsKeyId?.also((arg) => $request['KmsKeyId'] = arg);
+    loadSampleData?.also((arg) => $request['LoadSampleData'] = arg);
     maintenanceTrackName?.also((arg) => $request['MaintenanceTrackName'] = arg);
     manualSnapshotRetentionPeriod
         ?.also((arg) => $request['ManualSnapshotRetentionPeriod'] = arg);
@@ -1131,11 +1498,11 @@ class Redshift {
   ///
   /// To get a list of valid parameter group family names, you can call
   /// <a>DescribeClusterParameterGroups</a>. By default, Amazon Redshift returns
-  /// a list of all the parameter groups that are owned by your AWS account,
-  /// including the default parameter groups for each Amazon Redshift engine
-  /// version. The parameter group family names associated with the default
-  /// parameter groups provide you the valid values. For example, a valid family
-  /// name is "redshift-1.0".
+  /// a list of all the parameter groups that are owned by your Amazon Web
+  /// Services account, including the default parameter groups for each Amazon
+  /// Redshift engine version. The parameter group family names associated with
+  /// the default parameter groups provide you the valid values. For example, a
+  /// valid family name is "redshift-1.0".
   ///
   /// Parameter [parameterGroupName] :
   /// The name of the cluster parameter group.
@@ -1153,7 +1520,7 @@ class Redshift {
   /// Cannot end with a hyphen or contain two consecutive hyphens.
   /// </li>
   /// <li>
-  /// Must be unique withing your AWS account.
+  /// Must be unique withing your Amazon Web Services account.
   /// </li>
   /// </ul> <note>
   /// This value is stored as a lower-case string.
@@ -1237,8 +1604,8 @@ class Redshift {
   /// Must not be "Default".
   /// </li>
   /// <li>
-  /// Must be unique for all security groups that are created by your AWS
-  /// account.
+  /// Must be unique for all security groups that are created by your Amazon Web
+  /// Services account.
   /// </li>
   /// </ul>
   /// Example: <code>examplesecuritygroup</code>
@@ -1309,7 +1676,8 @@ class Redshift {
   ///
   /// Parameter [snapshotIdentifier] :
   /// A unique identifier for the snapshot that you are requesting. This
-  /// identifier must be unique for all snapshots within the AWS account.
+  /// identifier must be unique for all snapshots within the Amazon Web Services
+  /// account.
   ///
   /// Constraints:
   ///
@@ -1413,7 +1781,8 @@ class Redshift {
   /// Must not be "Default".
   /// </li>
   /// <li>
-  /// Must be unique for all subnet groups that are created by your AWS account.
+  /// Must be unique for all subnet groups that are created by your Amazon Web
+  /// Services account.
   /// </li>
   /// </ul>
   /// Example: <code>examplesubnetgroup</code>
@@ -1470,6 +1839,95 @@ class Redshift {
     return CreateClusterSubnetGroupResult.fromXml($result);
   }
 
+  /// Creates a Redshift-managed VPC endpoint.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [AccessToClusterDeniedFault].
+  /// May throw [EndpointsPerClusterLimitExceededFault].
+  /// May throw [EndpointsPerAuthorizationLimitExceededFault].
+  /// May throw [InvalidClusterSecurityGroupStateFault].
+  /// May throw [ClusterSubnetGroupNotFoundFault].
+  /// May throw [EndpointAlreadyExistsFault].
+  /// May throw [UnsupportedOperationFault].
+  /// May throw [InvalidClusterStateFault].
+  /// May throw [UnauthorizedOperation].
+  ///
+  /// Parameter [endpointName] :
+  /// The Redshift-managed VPC endpoint name.
+  ///
+  /// An endpoint name must contain 1-30 characters. Valid characters are A-Z,
+  /// a-z, 0-9, and hyphen(-). The first character must be a letter. The name
+  /// can't contain two consecutive hyphens or end with a hyphen.
+  ///
+  /// Parameter [subnetGroupName] :
+  /// The subnet group from which Amazon Redshift chooses the subnet to deploy
+  /// the endpoint.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster to access.
+  ///
+  /// Parameter [resourceOwner] :
+  /// The Amazon Web Services account ID of the owner of the cluster. This is
+  /// only required if the cluster is in another Amazon Web Services account.
+  ///
+  /// Parameter [vpcSecurityGroupIds] :
+  /// The security group that defines the ports, protocols, and sources for
+  /// inbound traffic that you are authorizing into your endpoint.
+  Future<EndpointAccess> createEndpointAccess({
+    required String endpointName,
+    required String subnetGroupName,
+    String? clusterIdentifier,
+    String? resourceOwner,
+    List<String>? vpcSecurityGroupIds,
+  }) async {
+    ArgumentError.checkNotNull(endpointName, 'endpointName');
+    _s.validateStringLength(
+      'endpointName',
+      endpointName,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(subnetGroupName, 'subnetGroupName');
+    _s.validateStringLength(
+      'subnetGroupName',
+      subnetGroupName,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'resourceOwner',
+      resourceOwner,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    $request['EndpointName'] = endpointName;
+    $request['SubnetGroupName'] = subnetGroupName;
+    clusterIdentifier?.also((arg) => $request['ClusterIdentifier'] = arg);
+    resourceOwner?.also((arg) => $request['ResourceOwner'] = arg);
+    vpcSecurityGroupIds?.also((arg) => $request['VpcSecurityGroupIds'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'CreateEndpointAccess',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['CreateEndpointAccessMessage'],
+      shapes: shapes,
+      resultWrapper: 'CreateEndpointAccessResult',
+    );
+    return EndpointAccess.fromXml($result);
+  }
+
   /// Creates an Amazon Redshift event notification subscription. This action
   /// requires an ARN (Amazon Resource Name) of an Amazon SNS topic created by
   /// either the Amazon Redshift console, the Amazon SNS console, or the Amazon
@@ -1489,11 +1947,11 @@ class Redshift {
   /// cluster and source identifier = my-cluster-1, notifications will be sent
   /// for all the cluster events for my-cluster-1. If you specify a source type
   /// but do not specify a source identifier, you will receive notice of the
-  /// events for the objects of that type in your AWS account. If you do not
-  /// specify either the SourceType nor the SourceIdentifier, you will be
-  /// notified of events generated from all Amazon Redshift sources belonging to
-  /// your AWS account. You must specify a source type if you specify a source
-  /// ID.
+  /// events for the objects of that type in your Amazon Web Services account.
+  /// If you do not specify either the SourceType nor the SourceIdentifier, you
+  /// will be notified of events generated from all Amazon Redshift sources
+  /// belonging to your Amazon Web Services account. You must specify a source
+  /// type if you specify a source ID.
   ///
   /// May throw [EventSubscriptionQuotaExceededFault].
   /// May throw [SubscriptionAlreadyExistFault].
@@ -1541,7 +1999,7 @@ class Redshift {
   /// Specifies the Amazon Redshift event categories to be published by the
   /// event notification subscription.
   ///
-  /// Values: configuration, management, monitoring, security
+  /// Values: configuration, management, monitoring, security, pending
   ///
   /// Parameter [severity] :
   /// Specifies the Amazon Redshift event severity to be published by the event
@@ -1564,8 +2022,8 @@ class Redshift {
   /// The type of source that will be generating the events. For example, if you
   /// want to be notified of events generated by a cluster, you would set this
   /// parameter to cluster. If this value is not specified, events are returned
-  /// for all Amazon Redshift objects in your AWS account. You must specify a
-  /// source type in order to specify source IDs.
+  /// for all Amazon Redshift objects in your Amazon Web Services account. You
+  /// must specify a source type in order to specify source IDs.
   ///
   /// Valid values: cluster, cluster-parameter-group, cluster-security-group,
   /// cluster-snapshot, and scheduled-action.
@@ -1642,8 +2100,9 @@ class Redshift {
   /// Redshift HSM configuration that provides a cluster the information needed
   /// to store and use encryption keys in the HSM. For more information, go to
   /// <a
-  /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-HSM.html">Hardware
-  /// Security Modules</a> in the Amazon Redshift Cluster Management Guide.
+  /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-db-encryption.html#working-with-HSM">Hardware
+  /// Security Modules</a> in the <i>Amazon Redshift Cluster Management
+  /// Guide</i>.
   ///
   /// May throw [HsmClientCertificateAlreadyExistsFault].
   /// May throw [HsmClientCertificateQuotaExceededFault].
@@ -1919,9 +2378,9 @@ class Redshift {
     return ScheduledAction.fromXml($result);
   }
 
-  /// Creates a snapshot copy grant that permits Amazon Redshift to use a
-  /// customer master key (CMK) from AWS Key Management Service (AWS KMS) to
-  /// encrypt copied snapshots in a destination region.
+  /// Creates a snapshot copy grant that permits Amazon Redshift to use an
+  /// encrypted symmetric key from Key Management Service (KMS) to encrypt
+  /// copied snapshots in a destination region.
   ///
   /// For more information about managing snapshot copy grants, go to <a
   /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-db-encryption.html">Amazon
@@ -1937,7 +2396,7 @@ class Redshift {
   ///
   /// Parameter [snapshotCopyGrantName] :
   /// The name of the snapshot copy grant. This name must be unique in the
-  /// region for the AWS account.
+  /// region for the Amazon Web Services account.
   ///
   /// Constraints:
   ///
@@ -1955,12 +2414,12 @@ class Redshift {
   /// Cannot end with a hyphen or contain two consecutive hyphens.
   /// </li>
   /// <li>
-  /// Must be unique for all clusters within an AWS account.
+  /// Must be unique for all clusters within an Amazon Web Services account.
   /// </li>
   /// </ul>
   ///
   /// Parameter [kmsKeyId] :
-  /// The unique identifier of the customer master key (CMK) to which to grant
+  /// The unique identifier of the encrypted symmetric key to which to grant
   /// Amazon Redshift permission. If no key is specified, the default key is
   /// used.
   ///
@@ -2154,7 +2613,9 @@ class Redshift {
   /// <code>spectrum</code>, then <code>LimitType</code> must be
   /// <code>data-scanned</code>. If <code>FeatureType</code> is
   /// <code>concurrency-scaling</code>, then <code>LimitType</code> must be
-  /// <code>time</code>.
+  /// <code>time</code>. If <code>FeatureType</code> is
+  /// <code>cross-region-datasharing</code>, then <code>LimitType</code> must be
+  /// <code>data-scanned</code>.
   ///
   /// Parameter [breachAction] :
   /// The action that Amazon Redshift takes when the limit is reached. The
@@ -2207,6 +2668,91 @@ class Redshift {
       resultWrapper: 'CreateUsageLimitResult',
     );
     return UsageLimit.fromXml($result);
+  }
+
+  /// From a datashare producer account, removes authorization from the
+  /// specified datashare.
+  ///
+  /// May throw [InvalidDataShareFault].
+  ///
+  /// Parameter [consumerIdentifier] :
+  /// The identifier of the data consumer that is to have authorization removed
+  /// from the datashare. This identifier is an Amazon Web Services account ID
+  /// or a keyword, such as ADX.
+  ///
+  /// Parameter [dataShareArn] :
+  /// The Amazon Resource Name (ARN) of the datashare to remove authorization
+  /// from.
+  Future<DataShare> deauthorizeDataShare({
+    required String consumerIdentifier,
+    required String dataShareArn,
+  }) async {
+    ArgumentError.checkNotNull(consumerIdentifier, 'consumerIdentifier');
+    _s.validateStringLength(
+      'consumerIdentifier',
+      consumerIdentifier,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(dataShareArn, 'dataShareArn');
+    _s.validateStringLength(
+      'dataShareArn',
+      dataShareArn,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['ConsumerIdentifier'] = consumerIdentifier;
+    $request['DataShareArn'] = dataShareArn;
+    final $result = await _protocol.send(
+      $request,
+      action: 'DeauthorizeDataShare',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DeauthorizeDataShareMessage'],
+      shapes: shapes,
+      resultWrapper: 'DeauthorizeDataShareResult',
+    );
+    return DataShare.fromXml($result);
+  }
+
+  /// Deletes an authentication profile.
+  ///
+  /// May throw [AuthenticationProfileNotFoundFault].
+  /// May throw [InvalidAuthenticationProfileRequestFault].
+  ///
+  /// Parameter [authenticationProfileName] :
+  /// The name of the authentication profile to delete.
+  Future<DeleteAuthenticationProfileResult> deleteAuthenticationProfile({
+    required String authenticationProfileName,
+  }) async {
+    ArgumentError.checkNotNull(
+        authenticationProfileName, 'authenticationProfileName');
+    _s.validateStringLength(
+      'authenticationProfileName',
+      authenticationProfileName,
+      0,
+      63,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['AuthenticationProfileName'] = authenticationProfileName;
+    final $result = await _protocol.send(
+      $request,
+      action: 'DeleteAuthenticationProfile',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DeleteAuthenticationProfileMessage'],
+      shapes: shapes,
+      resultWrapper: 'DeleteAuthenticationProfileResult',
+    );
+    return DeleteAuthenticationProfileResult.fromXml($result);
   }
 
   /// Deletes a previously provisioned cluster without its final snapshot being
@@ -2521,6 +3067,43 @@ class Redshift {
     );
   }
 
+  /// Deletes a Redshift-managed VPC endpoint.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [InvalidEndpointStateFault].
+  /// May throw [InvalidClusterSecurityGroupStateFault].
+  /// May throw [EndpointNotFoundFault].
+  /// May throw [InvalidClusterStateFault].
+  ///
+  /// Parameter [endpointName] :
+  /// The Redshift-managed VPC endpoint to delete.
+  Future<EndpointAccess> deleteEndpointAccess({
+    required String endpointName,
+  }) async {
+    ArgumentError.checkNotNull(endpointName, 'endpointName');
+    _s.validateStringLength(
+      'endpointName',
+      endpointName,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['EndpointName'] = endpointName;
+    final $result = await _protocol.send(
+      $request,
+      action: 'DeleteEndpointAccess',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DeleteEndpointAccessMessage'],
+      shapes: shapes,
+      resultWrapper: 'DeleteEndpointAccessResult',
+    );
+    return EndpointAccess.fromXml($result);
+  }
+
   /// Deletes an Amazon Redshift event notification subscription.
   ///
   /// May throw [SubscriptionNotFoundFault].
@@ -2618,6 +3201,81 @@ class Redshift {
       shape: shapes['DeleteHsmConfigurationMessage'],
       shapes: shapes,
     );
+  }
+
+  /// Deletes a partner integration from a cluster. Data can still flow to the
+  /// cluster until the integration is deleted at the partner's website.
+  ///
+  /// May throw [PartnerNotFoundFault].
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [UnauthorizedPartnerIntegrationFault].
+  ///
+  /// Parameter [accountId] :
+  /// The Amazon Web Services account ID that owns the cluster.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster that receives data from the partner.
+  ///
+  /// Parameter [databaseName] :
+  /// The name of the database that receives data from the partner.
+  ///
+  /// Parameter [partnerName] :
+  /// The name of the partner that is authorized to send data.
+  Future<PartnerIntegrationOutputMessage> deletePartner({
+    required String accountId,
+    required String clusterIdentifier,
+    required String databaseName,
+    required String partnerName,
+  }) async {
+    ArgumentError.checkNotNull(accountId, 'accountId');
+    _s.validateStringLength(
+      'accountId',
+      accountId,
+      12,
+      12,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      63,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(databaseName, 'databaseName');
+    _s.validateStringLength(
+      'databaseName',
+      databaseName,
+      0,
+      127,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(partnerName, 'partnerName');
+    _s.validateStringLength(
+      'partnerName',
+      partnerName,
+      0,
+      255,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['AccountId'] = accountId;
+    $request['ClusterIdentifier'] = clusterIdentifier;
+    $request['DatabaseName'] = databaseName;
+    $request['PartnerName'] = partnerName;
+    final $result = await _protocol.send(
+      $request,
+      action: 'DeletePartner',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['PartnerIntegrationInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'DeletePartnerResult',
+    );
+    return PartnerIntegrationOutputMessage.fromXml($result);
   }
 
   /// Deletes a scheduled action.
@@ -2812,6 +3470,40 @@ class Redshift {
     return AccountAttributeList.fromXml($result);
   }
 
+  /// Describes an authentication profile.
+  ///
+  /// May throw [AuthenticationProfileNotFoundFault].
+  /// May throw [InvalidAuthenticationProfileRequestFault].
+  ///
+  /// Parameter [authenticationProfileName] :
+  /// The name of the authentication profile to describe. If not specified then
+  /// all authentication profiles owned by the account are listed.
+  Future<DescribeAuthenticationProfilesResult> describeAuthenticationProfiles({
+    String? authenticationProfileName,
+  }) async {
+    _s.validateStringLength(
+      'authenticationProfileName',
+      authenticationProfileName,
+      0,
+      63,
+    );
+    final $request = <String, dynamic>{};
+    authenticationProfileName
+        ?.also((arg) => $request['AuthenticationProfileName'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeAuthenticationProfiles',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeAuthenticationProfilesMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeAuthenticationProfilesResult',
+    );
+    return DescribeAuthenticationProfilesResult.fromXml($result);
+  }
+
   /// Returns an array of <code>ClusterDbRevision</code> objects.
   ///
   /// May throw [ClusterNotFoundFault].
@@ -2909,10 +3601,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeClusterParameterGroups</a> request exceed the value specified
-  /// in <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// in <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3009,10 +3701,11 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeClusterParameters</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3113,10 +3806,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeClusterSecurityGroups</a> request exceed the value specified in
-  /// <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Constraints: You can specify either the <b>ClusterSecurityGroupName</b>
   /// parameter or the <b>Marker</b> parameter, but not both.
@@ -3191,9 +3884,9 @@ class Redshift {
 
   /// Returns one or more snapshot objects, which contain metadata about your
   /// cluster snapshots. By default, this operation returns information about
-  /// all snapshots of all clusters that are owned by you AWS customer account.
-  /// No information is returned for snapshots owned by inactive AWS customer
-  /// accounts.
+  /// all snapshots of all clusters that are owned by your Amazon Web Services
+  /// account. No information is returned for snapshots owned by inactive Amazon
+  /// Web Services accounts.
   ///
   /// If you specify both tag keys and tag values in the same request, Amazon
   /// Redshift returns all snapshots that match any combination of the specified
@@ -3211,6 +3904,7 @@ class Redshift {
   /// May throw [ClusterNotFoundFault].
   /// May throw [ClusterSnapshotNotFoundFault].
   /// May throw [InvalidTagFault].
+  /// May throw [UnsupportedOperationFault].
   ///
   /// Parameter [clusterExists] :
   /// A value that indicates whether to return snapshots only for an existing
@@ -3254,10 +3948,11 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeClusterSnapshots</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3271,10 +3966,14 @@ class Redshift {
   /// Constraints: minimum 20, maximum 100.
   ///
   /// Parameter [ownerAccount] :
-  /// The AWS customer account used to create or copy the snapshot. Use this
-  /// field to filter the results to snapshots owned by a particular account. To
-  /// describe snapshots you own, either specify your AWS customer account, or
-  /// do not specify the parameter.
+  /// The Amazon Web Services account used to create or copy the snapshot. Use
+  /// this field to filter the results to snapshots owned by a particular
+  /// account. To describe snapshots you own, either specify your Amazon Web
+  /// Services account, or do not specify the parameter.
+  ///
+  /// Parameter [snapshotArn] :
+  /// The Amazon Resource Name (ARN) of the snapshot associated with the message
+  /// to describe cluster snapshots.
   ///
   /// Parameter [snapshotIdentifier] :
   /// The snapshot identifier of the snapshot about which to return information.
@@ -3319,6 +4018,7 @@ class Redshift {
     String? marker,
     int? maxRecords,
     String? ownerAccount,
+    String? snapshotArn,
     String? snapshotIdentifier,
     String? snapshotType,
     List<SnapshotSortingEntity>? sortingEntities,
@@ -3345,6 +4045,12 @@ class Redshift {
       2147483647,
     );
     _s.validateStringLength(
+      'snapshotArn',
+      snapshotArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
       'snapshotIdentifier',
       snapshotIdentifier,
       0,
@@ -3363,6 +4069,7 @@ class Redshift {
     marker?.also((arg) => $request['Marker'] = arg);
     maxRecords?.also((arg) => $request['MaxRecords'] = arg);
     ownerAccount?.also((arg) => $request['OwnerAccount'] = arg);
+    snapshotArn?.also((arg) => $request['SnapshotArn'] = arg);
     snapshotIdentifier?.also((arg) => $request['SnapshotIdentifier'] = arg);
     snapshotType?.also((arg) => $request['SnapshotType'] = arg);
     sortingEntities?.also((arg) => $request['SortingEntities'] = arg);
@@ -3385,8 +4092,8 @@ class Redshift {
 
   /// Returns one or more cluster subnet group objects, which contain metadata
   /// about your cluster subnet groups. By default, this operation returns
-  /// information about all cluster subnet groups that are defined in you AWS
-  /// account.
+  /// information about all cluster subnet groups that are defined in your
+  /// Amazon Web Services account.
   ///
   /// If you specify both tag keys and tag values in the same request, Amazon
   /// Redshift returns all subnet groups that match any combination of the
@@ -3408,10 +4115,11 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeClusterSubnetGroups</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3569,10 +4277,11 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeClusterVersions</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3659,10 +4368,10 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeClusters</a> request
-  /// exceed the value specified in <code>MaxRecords</code>, AWS returns a value
-  /// in the <code>Marker</code> field of the response. You can retrieve the
-  /// next set of response records by providing the returned marker value in the
-  /// <code>Marker</code> parameter and retrying the request.
+  /// exceed the value specified in <code>MaxRecords</code>, Amazon Web Services
+  /// returns a value in the <code>Marker</code> field of the response. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
   ///
   /// Constraints: You can specify either the <b>ClusterIdentifier</b> parameter
   /// or the <b>Marker</b> parameter, but not both.
@@ -3733,6 +4442,195 @@ class Redshift {
     return ClustersMessage.fromXml($result);
   }
 
+  /// Shows the status of any inbound or outbound datashares available in the
+  /// specified account.
+  ///
+  /// May throw [InvalidDataShareFault].
+  ///
+  /// Parameter [dataShareArn] :
+  /// The identifier of the datashare to describe details of.
+  ///
+  /// Parameter [marker] :
+  /// An optional parameter that specifies the starting point to return a set of
+  /// response records. When the results of a <a>DescribeDataShares</a> request
+  /// exceed the value specified in <code>MaxRecords</code>, Amazon Web Services
+  /// returns a value in the <code>Marker</code> field of the response. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of response records to return in each call. If the
+  /// number of remaining response records exceeds the specified
+  /// <code>MaxRecords</code> value, a value is returned in a
+  /// <code>marker</code> field of the response. You can retrieve the next set
+  /// of records by retrying the command with the returned marker value.
+  Future<DescribeDataSharesResult> describeDataShares({
+    String? dataShareArn,
+    String? marker,
+    int? maxRecords,
+  }) async {
+    _s.validateStringLength(
+      'dataShareArn',
+      dataShareArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    dataShareArn?.also((arg) => $request['DataShareArn'] = arg);
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeDataShares',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeDataSharesMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeDataSharesResult',
+    );
+    return DescribeDataSharesResult.fromXml($result);
+  }
+
+  /// Returns a list of datashares where the account identifier being called is
+  /// a consumer account identifier.
+  ///
+  /// May throw [InvalidNamespaceFault].
+  ///
+  /// Parameter [consumerArn] :
+  /// The Amazon Resource Name (ARN) of the consumer that returns in the list of
+  /// datashares.
+  ///
+  /// Parameter [marker] :
+  /// An optional parameter that specifies the starting point to return a set of
+  /// response records. When the results of a
+  /// <a>DescribeDataSharesForConsumer</a> request exceed the value specified in
+  /// <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of response records to return in each call. If the
+  /// number of remaining response records exceeds the specified
+  /// <code>MaxRecords</code> value, a value is returned in a
+  /// <code>marker</code> field of the response. You can retrieve the next set
+  /// of records by retrying the command with the returned marker value.
+  ///
+  /// Parameter [status] :
+  /// An identifier giving the status of a datashare in the consumer cluster. If
+  /// this field is specified, Amazon Redshift returns the list of datashares
+  /// that have the specified status.
+  Future<DescribeDataSharesForConsumerResult> describeDataSharesForConsumer({
+    String? consumerArn,
+    String? marker,
+    int? maxRecords,
+    DataShareStatusForConsumer? status,
+  }) async {
+    _s.validateStringLength(
+      'consumerArn',
+      consumerArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    consumerArn?.also((arg) => $request['ConsumerArn'] = arg);
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    status?.also((arg) => $request['Status'] = arg.toValue());
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeDataSharesForConsumer',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeDataSharesForConsumerMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeDataSharesForConsumerResult',
+    );
+    return DescribeDataSharesForConsumerResult.fromXml($result);
+  }
+
+  /// Returns a list of datashares when the account identifier being called is a
+  /// producer account identifier.
+  ///
+  /// May throw [InvalidNamespaceFault].
+  ///
+  /// Parameter [marker] :
+  /// An optional parameter that specifies the starting point to return a set of
+  /// response records. When the results of a
+  /// <a>DescribeDataSharesForProducer</a> request exceed the value specified in
+  /// <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of response records to return in each call. If the
+  /// number of remaining response records exceeds the specified
+  /// <code>MaxRecords</code> value, a value is returned in a
+  /// <code>marker</code> field of the response. You can retrieve the next set
+  /// of records by retrying the command with the returned marker value.
+  ///
+  /// Parameter [producerArn] :
+  /// The Amazon Resource Name (ARN) of the producer that returns in the list of
+  /// datashares.
+  ///
+  /// Parameter [status] :
+  /// An identifier giving the status of a datashare in the producer. If this
+  /// field is specified, Amazon Redshift returns the list of datashares that
+  /// have the specified status.
+  Future<DescribeDataSharesForProducerResult> describeDataSharesForProducer({
+    String? marker,
+    int? maxRecords,
+    String? producerArn,
+    DataShareStatusForProducer? status,
+  }) async {
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'producerArn',
+      producerArn,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    producerArn?.also((arg) => $request['ProducerArn'] = arg);
+    status?.also((arg) => $request['Status'] = arg.toValue());
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeDataSharesForProducer',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeDataSharesForProducerMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeDataSharesForProducerResult',
+    );
+    return DescribeDataSharesForProducerResult.fromXml($result);
+  }
+
   /// Returns a list of parameter settings for the specified parameter group
   /// family.
   ///
@@ -3748,10 +4646,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeDefaultClusterParameters</a> request exceed the value specified
-  /// in <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// in <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3799,6 +4697,169 @@ class Redshift {
       resultWrapper: 'DescribeDefaultClusterParametersResult',
     );
     return DescribeDefaultClusterParametersResult.fromXml($result);
+  }
+
+  /// Describes a Redshift-managed VPC endpoint.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [InvalidClusterStateFault].
+  /// May throw [EndpointNotFoundFault].
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier associated with the described endpoint.
+  ///
+  /// Parameter [endpointName] :
+  /// The name of the endpoint to be described.
+  ///
+  /// Parameter [marker] :
+  /// An optional pagination token provided by a previous
+  /// <code>DescribeEndpointAccess</code> request. If this parameter is
+  /// specified, the response includes only records beyond the marker, up to the
+  /// value specified by the <code>MaxRecords</code> parameter.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of records to include in the response. If more records
+  /// exist than the specified <code>MaxRecords</code> value, a pagination token
+  /// called a <code>Marker</code> is included in the response so that the
+  /// remaining results can be retrieved.
+  ///
+  /// Parameter [resourceOwner] :
+  /// The Amazon Web Services account ID of the owner of the cluster.
+  ///
+  /// Parameter [vpcId] :
+  /// The virtual private cloud (VPC) identifier with access to the cluster.
+  Future<EndpointAccessList> describeEndpointAccess({
+    String? clusterIdentifier,
+    String? endpointName,
+    String? marker,
+    int? maxRecords,
+    String? resourceOwner,
+    String? vpcId,
+  }) async {
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'endpointName',
+      endpointName,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'resourceOwner',
+      resourceOwner,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'vpcId',
+      vpcId,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    clusterIdentifier?.also((arg) => $request['ClusterIdentifier'] = arg);
+    endpointName?.also((arg) => $request['EndpointName'] = arg);
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    resourceOwner?.also((arg) => $request['ResourceOwner'] = arg);
+    vpcId?.also((arg) => $request['VpcId'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeEndpointAccess',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeEndpointAccessMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeEndpointAccessResult',
+    );
+    return EndpointAccessList.fromXml($result);
+  }
+
+  /// Describes an endpoint authorization.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [UnsupportedOperationFault].
+  ///
+  /// Parameter [account] :
+  /// The AAmazon Web Services account ID of either the cluster owner (grantor)
+  /// or grantee. If <code>Grantee</code> parameter is true, then the
+  /// <code>Account</code> value is of the grantor.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster to access.
+  ///
+  /// Parameter [grantee] :
+  /// Indicates whether to check authorization from a grantor or grantee point
+  /// of view. If true, Amazon Redshift returns endpoint authorizations that
+  /// you've been granted. If false (default), checks authorization from a
+  /// grantor point of view.
+  ///
+  /// Parameter [marker] :
+  /// An optional pagination token provided by a previous
+  /// <code>DescribeEndpointAuthorization</code> request. If this parameter is
+  /// specified, the response includes only records beyond the marker, up to the
+  /// value specified by the <code>MaxRecords</code> parameter.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of records to include in the response. If more records
+  /// exist than the specified <code>MaxRecords</code> value, a pagination token
+  /// called a <code>Marker</code> is included in the response so that the
+  /// remaining results can be retrieved.
+  Future<EndpointAuthorizationList> describeEndpointAuthorization({
+    String? account,
+    String? clusterIdentifier,
+    bool? grantee,
+    String? marker,
+    int? maxRecords,
+  }) async {
+    _s.validateStringLength(
+      'account',
+      account,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    account?.also((arg) => $request['Account'] = arg);
+    clusterIdentifier?.also((arg) => $request['ClusterIdentifier'] = arg);
+    grantee?.also((arg) => $request['Grantee'] = arg);
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeEndpointAuthorization',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeEndpointAuthorizationMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeEndpointAuthorizationResult',
+    );
+    return EndpointAuthorizationList.fromXml($result);
   }
 
   /// Displays a list of event categories for all event source types, or for a
@@ -3859,10 +4920,10 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a DescribeEventSubscriptions request
-  /// exceed the value specified in <code>MaxRecords</code>, AWS returns a value
-  /// in the <code>Marker</code> field of the response. You can retrieve the
-  /// next set of response records by providing the returned marker value in the
-  /// <code>Marker</code> parameter and retrying the request.
+  /// exceed the value specified in <code>MaxRecords</code>, Amazon Web Services
+  /// returns a value in the <code>Marker</code> field of the response. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -3959,10 +5020,10 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeEvents</a> request
-  /// exceed the value specified in <code>MaxRecords</code>, AWS returns a value
-  /// in the <code>Marker</code> field of the response. You can retrieve the
-  /// next set of response records by providing the returned marker value in the
-  /// <code>Marker</code> parameter and retrying the request.
+  /// exceed the value specified in <code>MaxRecords</code>, Amazon Web Services
+  /// returns a value in the <code>Marker</code> field of the response. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4083,7 +5144,7 @@ class Redshift {
 
   /// Returns information about the specified HSM client certificate. If no
   /// certificate ID is specified, returns information about all the HSM
-  /// certificates owned by your AWS customer account.
+  /// certificates owned by your Amazon Web Services account.
   ///
   /// If you specify both tag keys and tag values in the same request, Amazon
   /// Redshift returns all HSM client certificates that match any combination of
@@ -4102,16 +5163,16 @@ class Redshift {
   /// Parameter [hsmClientCertificateIdentifier] :
   /// The identifier of a specific HSM client certificate for which you want
   /// information. If no identifier is specified, information is returned for
-  /// all HSM client certificates owned by your AWS customer account.
+  /// all HSM client certificates owned by your Amazon Web Services account.
   ///
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeHsmClientCertificates</a> request exceed the value specified in
-  /// <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4183,7 +5244,7 @@ class Redshift {
 
   /// Returns information about the specified Amazon Redshift HSM configuration.
   /// If no configuration ID is specified, returns information about all the HSM
-  /// configurations owned by your AWS customer account.
+  /// configurations owned by your Amazon Web Services account.
   ///
   /// If you specify both tag keys and tag values in the same request, Amazon
   /// Redshift returns all HSM connections that match any combination of the
@@ -4202,15 +5263,16 @@ class Redshift {
   /// Parameter [hsmConfigurationIdentifier] :
   /// The identifier of a specific Amazon Redshift HSM configuration to be
   /// described. If no identifier is specified, information is returned for all
-  /// HSM configurations owned by your AWS customer account.
+  /// HSM configurations owned by your Amazon Web Services account.
   ///
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeHsmConfigurations</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4323,6 +5385,7 @@ class Redshift {
   /// May throw [InvalidClusterSnapshotStateFault].
   /// May throw [ClusterNotFoundFault].
   /// May throw [AccessToSnapshotDeniedFault].
+  /// May throw [UnsupportedOperationFault].
   ///
   /// Parameter [actionType] :
   /// The action type to evaluate for possible node configurations. Specify
@@ -4343,10 +5406,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeNodeConfigurationOptions</a> request exceed the value specified
-  /// in <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// in <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4360,9 +5423,13 @@ class Redshift {
   /// Constraints: minimum 100, maximum 500.
   ///
   /// Parameter [ownerAccount] :
-  /// The AWS customer account used to create or copy the snapshot. Required if
-  /// you are restoring a snapshot you do not own, optional if you own the
-  /// snapshot.
+  /// The Amazon Web Services account used to create or copy the snapshot.
+  /// Required if you are restoring a snapshot you do not own, optional if you
+  /// own the snapshot.
+  ///
+  /// Parameter [snapshotArn] :
+  /// The Amazon Resource Name (ARN) of the snapshot associated with the message
+  /// to describe node configuration.
   ///
   /// Parameter [snapshotIdentifier] :
   /// The identifier of the snapshot to evaluate for possible node
@@ -4374,6 +5441,7 @@ class Redshift {
     String? marker,
     int? maxRecords,
     String? ownerAccount,
+    String? snapshotArn,
     String? snapshotIdentifier,
   }) async {
     ArgumentError.checkNotNull(actionType, 'actionType');
@@ -4396,6 +5464,12 @@ class Redshift {
       2147483647,
     );
     _s.validateStringLength(
+      'snapshotArn',
+      snapshotArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
       'snapshotIdentifier',
       snapshotIdentifier,
       0,
@@ -4408,6 +5482,7 @@ class Redshift {
     marker?.also((arg) => $request['Marker'] = arg);
     maxRecords?.also((arg) => $request['MaxRecords'] = arg);
     ownerAccount?.also((arg) => $request['OwnerAccount'] = arg);
+    snapshotArn?.also((arg) => $request['SnapshotArn'] = arg);
     snapshotIdentifier?.also((arg) => $request['SnapshotIdentifier'] = arg);
     final $result = await _protocol.send(
       $request,
@@ -4425,12 +5500,12 @@ class Redshift {
 
   /// Returns a list of orderable cluster options. Before you create a new
   /// cluster you can use this operation to find what options are available,
-  /// such as the EC2 Availability Zones (AZ) in the specific AWS Region that
-  /// you can specify, and the node types you can request. The node types differ
-  /// by available storage, memory, CPU and price. With the cost involved you
-  /// might want to obtain a list of cluster options in the specific region and
-  /// specify values when creating a cluster. For more information about
-  /// managing clusters, go to <a
+  /// such as the EC2 Availability Zones (AZ) in the specific Amazon Web
+  /// Services Region that you can specify, and the node types you can request.
+  /// The node types differ by available storage, memory, CPU and price. With
+  /// the cost involved you might want to obtain a list of cluster options in
+  /// the specific region and specify values when creating a cluster. For more
+  /// information about managing clusters, go to <a
   /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html">Amazon
   /// Redshift Clusters</a> in the <i>Amazon Redshift Cluster Management
   /// Guide</i>.
@@ -4448,10 +5523,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeOrderableClusterOptions</a> request exceed the value specified
-  /// in <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// in <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4510,6 +5585,153 @@ class Redshift {
     return OrderableClusterOptionsMessage.fromXml($result);
   }
 
+  /// Returns information about the partner integrations defined for a cluster.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [UnauthorizedPartnerIntegrationFault].
+  ///
+  /// Parameter [accountId] :
+  /// The Amazon Web Services account ID that owns the cluster.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster whose partner integration is being
+  /// described.
+  ///
+  /// Parameter [databaseName] :
+  /// The name of the database whose partner integration is being described. If
+  /// database name is not specified, then all databases in the cluster are
+  /// described.
+  ///
+  /// Parameter [partnerName] :
+  /// The name of the partner that is being described. If partner name is not
+  /// specified, then all partner integrations are described.
+  Future<DescribePartnersOutputMessage> describePartners({
+    required String accountId,
+    required String clusterIdentifier,
+    String? databaseName,
+    String? partnerName,
+  }) async {
+    ArgumentError.checkNotNull(accountId, 'accountId');
+    _s.validateStringLength(
+      'accountId',
+      accountId,
+      12,
+      12,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      63,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'databaseName',
+      databaseName,
+      0,
+      127,
+    );
+    _s.validateStringLength(
+      'partnerName',
+      partnerName,
+      0,
+      255,
+    );
+    final $request = <String, dynamic>{};
+    $request['AccountId'] = accountId;
+    $request['ClusterIdentifier'] = clusterIdentifier;
+    databaseName?.also((arg) => $request['DatabaseName'] = arg);
+    partnerName?.also((arg) => $request['PartnerName'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribePartners',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribePartnersInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribePartnersResult',
+    );
+    return DescribePartnersOutputMessage.fromXml($result);
+  }
+
+  /// Returns exchange status details and associated metadata for a
+  /// reserved-node exchange. Statuses include such values as in progress and
+  /// requested.
+  ///
+  /// May throw [ReservedNodeNotFoundFault].
+  /// May throw [ReservedNodeExchangeNotFoundFault].
+  /// May throw [UnsupportedOperationFault].
+  ///
+  /// Parameter [marker] :
+  /// An optional pagination token provided by a previous
+  /// <code>DescribeReservedNodeExchangeStatus</code> request. If this parameter
+  /// is specified, the response includes only records beyond the marker, up to
+  /// the value specified by the <code>MaxRecords</code> parameter. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of response records to return in each call. If the
+  /// number of remaining response records exceeds the specified
+  /// <code>MaxRecords</code> value, a value is returned in a
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of records by retrying the command with the returned marker value.
+  ///
+  /// Parameter [reservedNodeExchangeRequestId] :
+  /// The identifier of the reserved-node exchange request.
+  ///
+  /// Parameter [reservedNodeId] :
+  /// The identifier of the source reserved node in a reserved-node exchange
+  /// request.
+  Future<DescribeReservedNodeExchangeStatusOutputMessage>
+      describeReservedNodeExchangeStatus({
+    String? marker,
+    int? maxRecords,
+    String? reservedNodeExchangeRequestId,
+    String? reservedNodeId,
+  }) async {
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'reservedNodeExchangeRequestId',
+      reservedNodeExchangeRequestId,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'reservedNodeId',
+      reservedNodeId,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    reservedNodeExchangeRequestId
+        ?.also((arg) => $request['ReservedNodeExchangeRequestId'] = arg);
+    reservedNodeId?.also((arg) => $request['ReservedNodeId'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DescribeReservedNodeExchangeStatus',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DescribeReservedNodeExchangeStatusInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'DescribeReservedNodeExchangeStatusResult',
+    );
+    return DescribeReservedNodeExchangeStatusOutputMessage.fromXml($result);
+  }
+
   /// Returns a list of the available reserved node offerings by Amazon Redshift
   /// with their descriptions including the node type, the fixed and recurring
   /// costs of reserving the node and duration the node will be reserved for
@@ -4530,10 +5752,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <a>DescribeReservedNodeOfferings</a> request exceed the value specified in
-  /// <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4592,10 +5814,11 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeReservedNodes</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4661,8 +5884,8 @@ class Redshift {
   /// The unique identifier of a cluster whose resize progress you are
   /// requesting. This parameter is case-sensitive.
   ///
-  /// By default, resize operations for all clusters defined for an AWS account
-  /// are returned.
+  /// By default, resize operations for all clusters defined for an Amazon Web
+  /// Services account are returned.
   Future<ResizeProgressMessage> describeResize({
     required String clusterIdentifier,
   }) async {
@@ -4709,10 +5932,11 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeScheduledActions</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns
-  /// a value in the <code>Marker</code> field of the response. You can retrieve
-  /// the next set of response records by providing the returned marker value in
-  /// the <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the
+  /// returned marker value in the <code>Marker</code> parameter and retrying
+  /// the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -4780,8 +6004,8 @@ class Redshift {
     return ScheduledActionsMessage.fromXml($result);
   }
 
-  /// Returns a list of snapshot copy grants owned by the AWS account in the
-  /// destination region.
+  /// Returns a list of snapshot copy grants owned by the Amazon Web Services
+  /// account in the destination region.
   ///
   /// For more information about managing snapshot copy grants, go to <a
   /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-db-encryption.html">Amazon
@@ -4795,10 +6019,10 @@ class Redshift {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <code>DescribeSnapshotCopyGrant</code> request exceed the value specified
-  /// in <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records
-  /// by providing the returned marker value in the <code>Marker</code>
-  /// parameter and retrying the request.
+  /// in <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Constraints: You can specify either the <b>SnapshotCopyGrantName</b>
   /// parameter or the <b>Marker</b> parameter, but not both.
@@ -5237,10 +6461,10 @@ class Redshift {
   /// Parameter [marker] :
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeUsageLimits</a> request
-  /// exceed the value specified in <code>MaxRecords</code>, AWS returns a value
-  /// in the <code>Marker</code> field of the response. You can retrieve the
-  /// next set of response records by providing the returned marker value in the
-  /// <code>Marker</code> parameter and retrying the request.
+  /// exceed the value specified in <code>MaxRecords</code>, Amazon Web Services
+  /// returns a value in the <code>Marker</code> field of the response. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
   ///
   /// Parameter [maxRecords] :
   /// The maximum number of response records to return in each call. If the
@@ -5326,6 +6550,7 @@ class Redshift {
   /// the specified Amazon Redshift cluster.
   ///
   /// May throw [ClusterNotFoundFault].
+  /// May throw [InvalidClusterStateFault].
   ///
   /// Parameter [clusterIdentifier] :
   /// The identifier of the cluster on which logging is to be stopped.
@@ -5361,10 +6586,10 @@ class Redshift {
   /// Disables the automatic copying of snapshots from one region to another
   /// region for a specified cluster.
   ///
-  /// If your cluster and its snapshots are encrypted using a customer master
-  /// key (CMK) from AWS KMS, use <a>DeleteSnapshotCopyGrant</a> to delete the
-  /// grant that grants Amazon Redshift permission to the CMK in the destination
-  /// region.
+  /// If your cluster and its snapshots are encrypted using an encrypted
+  /// symmetric key from Key Management Service, use
+  /// <a>DeleteSnapshotCopyGrant</a> to delete the grant that grants Amazon
+  /// Redshift permission to the key in the destination region.
   ///
   /// May throw [ClusterNotFoundFault].
   /// May throw [SnapshotCopyAlreadyDisabledFault].
@@ -5404,6 +6629,73 @@ class Redshift {
     return DisableSnapshotCopyResult.fromXml($result);
   }
 
+  /// From a datashare consumer account, remove association for the specified
+  /// datashare.
+  ///
+  /// May throw [InvalidDataShareFault].
+  /// May throw [InvalidNamespaceFault].
+  ///
+  /// Parameter [dataShareArn] :
+  /// The Amazon Resource Name (ARN) of the datashare to remove association for.
+  ///
+  /// Parameter [consumerArn] :
+  /// The Amazon Resource Name (ARN) of the consumer that association for the
+  /// datashare is removed from.
+  ///
+  /// Parameter [consumerRegion] :
+  /// From a datashare consumer account, removes association of a datashare from
+  /// all the existing and future namespaces in the specified Amazon Web
+  /// Services Region.
+  ///
+  /// Parameter [disassociateEntireAccount] :
+  /// A value that specifies whether association for the datashare is removed
+  /// from the entire account.
+  Future<DataShare> disassociateDataShareConsumer({
+    required String dataShareArn,
+    String? consumerArn,
+    String? consumerRegion,
+    bool? disassociateEntireAccount,
+  }) async {
+    ArgumentError.checkNotNull(dataShareArn, 'dataShareArn');
+    _s.validateStringLength(
+      'dataShareArn',
+      dataShareArn,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'consumerArn',
+      consumerArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'consumerRegion',
+      consumerRegion,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    $request['DataShareArn'] = dataShareArn;
+    consumerArn?.also((arg) => $request['ConsumerArn'] = arg);
+    consumerRegion?.also((arg) => $request['ConsumerRegion'] = arg);
+    disassociateEntireAccount
+        ?.also((arg) => $request['DisassociateEntireAccount'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'DisassociateDataShareConsumer',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DisassociateDataShareConsumerMessage'],
+      shapes: shapes,
+      resultWrapper: 'DisassociateDataShareConsumerResult',
+    );
+    return DataShare.fromXml($result);
+  }
+
   /// Starts logging information, such as queries and connection attempts, for
   /// the specified Amazon Redshift cluster.
   ///
@@ -5413,6 +6705,11 @@ class Redshift {
   /// May throw [InvalidS3KeyPrefixFault].
   /// May throw [InvalidS3BucketNameFault].
   /// May throw [InvalidClusterStateFault].
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The identifier of the cluster on which logging is to be started.
+  ///
+  /// Example: <code>examplecluster</code>
   ///
   /// Parameter [bucketName] :
   /// The name of an existing S3 bucket where the log files are to be stored.
@@ -5428,10 +6725,13 @@ class Redshift {
   /// </li>
   /// </ul>
   ///
-  /// Parameter [clusterIdentifier] :
-  /// The identifier of the cluster on which logging is to be started.
+  /// Parameter [logDestinationType] :
+  /// The log destination type. An enum with possible values of <code>s3</code>
+  /// and <code>cloudwatch</code>.
   ///
-  /// Example: <code>examplecluster</code>
+  /// Parameter [logExports] :
+  /// The collection of exported log types. Log types include the connection
+  /// log, user log and user activity log.
   ///
   /// Parameter [s3KeyPrefix] :
   /// The prefix applied to the log file names.
@@ -5466,18 +6766,12 @@ class Redshift {
   /// </ul> </li>
   /// </ul>
   Future<LoggingStatus> enableLogging({
-    required String bucketName,
     required String clusterIdentifier,
+    String? bucketName,
+    LogDestinationType? logDestinationType,
+    List<String>? logExports,
     String? s3KeyPrefix,
   }) async {
-    ArgumentError.checkNotNull(bucketName, 'bucketName');
-    _s.validateStringLength(
-      'bucketName',
-      bucketName,
-      0,
-      2147483647,
-      isRequired: true,
-    );
     ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
     _s.validateStringLength(
       'clusterIdentifier',
@@ -5487,14 +6781,23 @@ class Redshift {
       isRequired: true,
     );
     _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
       's3KeyPrefix',
       s3KeyPrefix,
       0,
       2147483647,
     );
     final $request = <String, dynamic>{};
-    $request['BucketName'] = bucketName;
     $request['ClusterIdentifier'] = clusterIdentifier;
+    bucketName?.also((arg) => $request['BucketName'] = arg);
+    logDestinationType
+        ?.also((arg) => $request['LogDestinationType'] = arg.toValue());
+    logExports?.also((arg) => $request['LogExports'] = arg);
     s3KeyPrefix?.also((arg) => $request['S3KeyPrefix'] = arg);
     final $result = await _protocol.send(
       $request,
@@ -5532,17 +6835,19 @@ class Redshift {
   /// already have cross-region snapshot copy enabled.
   ///
   /// Parameter [destinationRegion] :
-  /// The destination AWS Region that you want to copy snapshots to.
+  /// The destination Amazon Web Services Region that you want to copy snapshots
+  /// to.
   ///
-  /// Constraints: Must be the name of a valid AWS Region. For more information,
-  /// see <a
+  /// Constraints: Must be the name of a valid Amazon Web Services Region. For
+  /// more information, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/rande.html#redshift_region">Regions
   /// and Endpoints</a> in the Amazon Web Services General Reference.
   ///
   /// Parameter [manualSnapshotRetentionPeriod] :
-  /// The number of days to retain newly copied snapshots in the destination AWS
-  /// Region after they are copied from the source AWS Region. If the value is
-  /// -1, the manual snapshot is retained indefinitely.
+  /// The number of days to retain newly copied snapshots in the destination
+  /// Amazon Web Services Region after they are copied from the source Amazon
+  /// Web Services Region. If the value is -1, the manual snapshot is retained
+  /// indefinitely.
   ///
   /// The value must be either -1 or an integer between 1 and 3,653.
   ///
@@ -5555,8 +6860,8 @@ class Redshift {
   /// Constraints: Must be at least 1 and no more than 35.
   ///
   /// Parameter [snapshotCopyGrantName] :
-  /// The name of the snapshot copy grant to use when snapshots of an AWS
-  /// KMS-encrypted cluster are copied to the destination region.
+  /// The name of the snapshot copy grant to use when snapshots of an Amazon Web
+  /// Services KMS-encrypted cluster are copied to the destination region.
   Future<EnableSnapshotCopyResult> enableSnapshotCopy({
     required String clusterIdentifier,
     required String destinationRegion,
@@ -5621,7 +6926,7 @@ class Redshift {
   /// IAM Authentication to Generate Database User Credentials</a> in the Amazon
   /// Redshift Cluster Management Guide.
   ///
-  /// The AWS Identity and Access Management (IAM)user or role that executes
+  /// The Identity and Access Management (IAM) user or role that runs
   /// GetClusterCredentials must have an IAM policy attached that allows access
   /// to all necessary actions and resources. For more information about
   /// permissions, see <a
@@ -5635,7 +6940,7 @@ class Redshift {
   ///
   /// In addition, if the <code>AutoCreate</code> parameter is set to
   /// <code>True</code>, then the policy must include the
-  /// <code>redshift:CreateClusterUser</code> privilege.
+  /// <code>redshift:CreateClusterUser</code> permission.
   ///
   /// If the <code>DbName</code> parameter is specified, the IAM policy must
   /// allow access to the resource <code>dbname</code> for the specified
@@ -5646,7 +6951,7 @@ class Redshift {
   ///
   /// Parameter [clusterIdentifier] :
   /// The unique identifier of the cluster that contains the database for which
-  /// your are requesting credentials. This parameter is case sensitive.
+  /// you are requesting credentials. This parameter is case sensitive.
   ///
   /// Parameter [dbUser] :
   /// The name of a database user. If a user name matching <code>DbUser</code>
@@ -5805,6 +7110,164 @@ class Redshift {
     return ClusterCredentials.fromXml($result);
   }
 
+  /// Returns a database user name and temporary password with temporary
+  /// authorization to log in to an Amazon Redshift database. The database user
+  /// is mapped 1:1 to the source Identity and Access Management (IAM) identity.
+  /// For more information about IAM identities, see <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id.html">IAM
+  /// Identities (users, user groups, and roles)</a> in the Amazon Web Services
+  /// Identity and Access Management User Guide.
+  ///
+  /// The Identity and Access Management (IAM) identity that runs this operation
+  /// must have an IAM policy attached that allows access to all necessary
+  /// actions and resources. For more information about permissions, see <a
+  /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/redshift-iam-access-control-identity-based.html">Using
+  /// identity-based policies (IAM policies)</a> in the Amazon Redshift Cluster
+  /// Management Guide.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [UnsupportedOperationFault].
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The unique identifier of the cluster that contains the database for which
+  /// you are requesting credentials.
+  ///
+  /// Parameter [dbName] :
+  /// The name of the database for which you are requesting credentials. If the
+  /// database name is specified, the IAM policy must allow access to the
+  /// resource <code>dbname</code> for the specified database name. If the
+  /// database name is not specified, access to all databases is allowed.
+  ///
+  /// Parameter [durationSeconds] :
+  /// The number of seconds until the returned temporary password expires.
+  ///
+  /// Range: 900-3600. Default: 900.
+  Future<ClusterExtendedCredentials> getClusterCredentialsWithIAM({
+    required String clusterIdentifier,
+    String? dbName,
+    int? durationSeconds,
+  }) async {
+    ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'dbName',
+      dbName,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    $request['ClusterIdentifier'] = clusterIdentifier;
+    dbName?.also((arg) => $request['DbName'] = arg);
+    durationSeconds?.also((arg) => $request['DurationSeconds'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'GetClusterCredentialsWithIAM',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['GetClusterCredentialsWithIAMMessage'],
+      shapes: shapes,
+      resultWrapper: 'GetClusterCredentialsWithIAMResult',
+    );
+    return ClusterExtendedCredentials.fromXml($result);
+  }
+
+  /// Gets the configuration options for the reserved-node exchange. These
+  /// options include information about the source reserved node and target
+  /// reserved node offering. Details include the node type, the price, the node
+  /// count, and the offering type.
+  ///
+  /// May throw [ReservedNodeNotFoundFault].
+  /// May throw [InvalidReservedNodeStateFault].
+  /// May throw [ReservedNodeAlreadyMigratedFault].
+  /// May throw [ReservedNodeOfferingNotFoundFault].
+  /// May throw [UnsupportedOperationFault].
+  /// May throw [DependentServiceUnavailableFault].
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [ClusterSnapshotNotFoundFault].
+  ///
+  /// Parameter [actionType] :
+  /// The action type of the reserved-node configuration. The action type can be
+  /// an exchange initiated from either a snapshot or a resize.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The identifier for the cluster that is the source for a reserved-node
+  /// exchange.
+  ///
+  /// Parameter [marker] :
+  /// An optional pagination token provided by a previous
+  /// <code>GetReservedNodeExchangeConfigurationOptions</code> request. If this
+  /// parameter is specified, the response includes only records beyond the
+  /// marker, up to the value specified by the <code>MaxRecords</code>
+  /// parameter. You can retrieve the next set of response records by providing
+  /// the returned marker value in the <code>Marker</code> parameter and
+  /// retrying the request.
+  ///
+  /// Parameter [maxRecords] :
+  /// The maximum number of response records to return in each call. If the
+  /// number of remaining response records exceeds the specified
+  /// <code>MaxRecords</code> value, a value is returned in a
+  /// <code>Marker</code> field of the response. You can retrieve the next set
+  /// of records by retrying the command with the returned marker value.
+  ///
+  /// Parameter [snapshotIdentifier] :
+  /// The identifier for the snapshot that is the source for the reserved-node
+  /// exchange.
+  Future<GetReservedNodeExchangeConfigurationOptionsOutputMessage>
+      getReservedNodeExchangeConfigurationOptions({
+    required ReservedNodeExchangeActionType actionType,
+    String? clusterIdentifier,
+    String? marker,
+    int? maxRecords,
+    String? snapshotIdentifier,
+  }) async {
+    ArgumentError.checkNotNull(actionType, 'actionType');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'snapshotIdentifier',
+      snapshotIdentifier,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    $request['ActionType'] = actionType.toValue();
+    clusterIdentifier?.also((arg) => $request['ClusterIdentifier'] = arg);
+    marker?.also((arg) => $request['Marker'] = arg);
+    maxRecords?.also((arg) => $request['MaxRecords'] = arg);
+    snapshotIdentifier?.also((arg) => $request['SnapshotIdentifier'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'GetReservedNodeExchangeConfigurationOptions',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['GetReservedNodeExchangeConfigurationOptionsInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'GetReservedNodeExchangeConfigurationOptionsResult',
+    );
+    return GetReservedNodeExchangeConfigurationOptionsOutputMessage.fromXml(
+        $result);
+  }
+
   /// Returns an array of DC2 ReservedNodeOfferings that matches the payment
   /// type, term, and usage price of the given DC1 reserved node.
   ///
@@ -5864,13 +7327,119 @@ class Redshift {
     return GetReservedNodeExchangeOfferingsOutputMessage.fromXml($result);
   }
 
+  /// Modifies whether a cluster can use AQUA (Advanced Query Accelerator).
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [InvalidClusterStateFault].
+  /// May throw [UnsupportedOperationFault].
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The identifier of the cluster to be modified.
+  ///
+  /// Parameter [aquaConfigurationStatus] :
+  /// The new value of AQUA configuration status. Possible values include the
+  /// following.
+  ///
+  /// <ul>
+  /// <li>
+  /// enabled - Use AQUA if it is available for the current Amazon Web Services
+  /// Region and Amazon Redshift node type.
+  /// </li>
+  /// <li>
+  /// disabled - Don't use AQUA.
+  /// </li>
+  /// <li>
+  /// auto - Amazon Redshift determines whether to use AQUA.
+  /// </li>
+  /// </ul>
+  Future<ModifyAquaOutputMessage> modifyAquaConfiguration({
+    required String clusterIdentifier,
+    AquaConfigurationStatus? aquaConfigurationStatus,
+  }) async {
+    ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['ClusterIdentifier'] = clusterIdentifier;
+    aquaConfigurationStatus
+        ?.also((arg) => $request['AquaConfigurationStatus'] = arg.toValue());
+    final $result = await _protocol.send(
+      $request,
+      action: 'ModifyAquaConfiguration',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['ModifyAquaInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'ModifyAquaConfigurationResult',
+    );
+    return ModifyAquaOutputMessage.fromXml($result);
+  }
+
+  /// Modifies an authentication profile.
+  ///
+  /// May throw [AuthenticationProfileNotFoundFault].
+  /// May throw [AuthenticationProfileQuotaExceededFault].
+  /// May throw [InvalidAuthenticationProfileRequestFault].
+  ///
+  /// Parameter [authenticationProfileContent] :
+  /// The new content of the authentication profile in JSON format. The maximum
+  /// length of the JSON string is determined by a quota for your account.
+  ///
+  /// Parameter [authenticationProfileName] :
+  /// The name of the authentication profile to replace.
+  Future<ModifyAuthenticationProfileResult> modifyAuthenticationProfile({
+    required String authenticationProfileContent,
+    required String authenticationProfileName,
+  }) async {
+    ArgumentError.checkNotNull(
+        authenticationProfileContent, 'authenticationProfileContent');
+    _s.validateStringLength(
+      'authenticationProfileContent',
+      authenticationProfileContent,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(
+        authenticationProfileName, 'authenticationProfileName');
+    _s.validateStringLength(
+      'authenticationProfileName',
+      authenticationProfileName,
+      0,
+      63,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['AuthenticationProfileContent'] = authenticationProfileContent;
+    $request['AuthenticationProfileName'] = authenticationProfileName;
+    final $result = await _protocol.send(
+      $request,
+      action: 'ModifyAuthenticationProfile',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['ModifyAuthenticationProfileMessage'],
+      shapes: shapes,
+      resultWrapper: 'ModifyAuthenticationProfileResult',
+    );
+    return ModifyAuthenticationProfileResult.fromXml($result);
+  }
+
   /// Modifies the settings for a cluster.
   ///
   /// You can also change node type and the number of nodes to scale up or down
   /// the cluster. When resizing a cluster, you must specify both the number of
   /// nodes and the node type even if one of the parameters does not change.
   ///
-  /// You can add another security or parameter group, or change the master user
+  /// You can add another security or parameter group, or change the admin user
   /// password. Resetting a cluster password or modifying the security groups
   /// associated with a cluster do not need a reboot. However, modifying a
   /// parameter group requires a reboot for parameters to take effect. For more
@@ -5919,6 +7488,9 @@ class Redshift {
   /// If you decrease the automated snapshot retention period from its current
   /// value, existing automated snapshots that fall outside of the new retention
   /// period will be immediately deleted.
+  ///
+  /// You can't disable automated snapshots for RA3 node types. Set the
+  /// automated retention period from 1-35 days.
   ///
   /// Default: Uses existing setting.
   ///
@@ -6028,7 +7600,7 @@ class Redshift {
   /// the Amazon Redshift cluster can use to retrieve and store keys in an HSM.
   ///
   /// Parameter [kmsKeyId] :
-  /// The AWS Key Management Service (KMS) key ID of the encryption key that you
+  /// The Key Management Service (KMS) key ID of the encryption key that you
   /// want to use to encrypt data in the cluster.
   ///
   /// Parameter [maintenanceTrackName] :
@@ -6050,14 +7622,14 @@ class Redshift {
   /// The default value is -1.
   ///
   /// Parameter [masterUserPassword] :
-  /// The new password for the cluster master user. This change is
-  /// asynchronously applied as soon as possible. Between the time of the
-  /// request and the completion of the request, the
-  /// <code>MasterUserPassword</code> element exists in the
-  /// <code>PendingModifiedValues</code> element of the operation response.
+  /// The new password for the cluster admin user. This change is asynchronously
+  /// applied as soon as possible. Between the time of the request and the
+  /// completion of the request, the <code>MasterUserPassword</code> element
+  /// exists in the <code>PendingModifiedValues</code> element of the operation
+  /// response.
   /// <note>
   /// Operations never return the password, so this operation provides a way to
-  /// regain access to the master user account for a cluster if the password is
+  /// regain access to the admin user account for a cluster if the password is
   /// lost.
   /// </note>
   /// Default: Uses existing setting.
@@ -6078,8 +7650,9 @@ class Redshift {
   /// Must contain one number.
   /// </li>
   /// <li>
-  /// Can be any printable ASCII character (ASCII code 33 to 126) except '
-  /// (single quote), " (double quote), \, /, @, or space.
+  /// Can be any printable ASCII character (ASCII code 33-126) except
+  /// <code>'</code> (single quote), <code>"</code> (double quote),
+  /// <code>\</code>, <code>/</code>, or <code>@</code>.
   /// </li>
   /// </ul>
   ///
@@ -6102,7 +7675,7 @@ class Redshift {
   /// Cannot end with a hyphen or contain two consecutive hyphens.
   /// </li>
   /// <li>
-  /// Must be unique for all clusters within an AWS account.
+  /// Must be unique for all clusters within an Amazon Web Services account.
   /// </li>
   /// </ul>
   /// Example: <code>examplecluster</code>
@@ -6376,10 +7949,13 @@ class Redshift {
     return ModifyClusterDbRevisionResult.fromXml($result);
   }
 
-  /// Modifies the list of AWS Identity and Access Management (IAM) roles that
-  /// can be used by the cluster to access other AWS services.
+  /// Modifies the list of Identity and Access Management (IAM) roles that can
+  /// be used by the cluster to access other Amazon Web Services services.
   ///
-  /// A cluster can have up to 10 IAM roles associated at any time.
+  /// The maximum number of IAM roles that you can associate is subject to a
+  /// quota. For more information, go to <a
+  /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/amazon-redshift-limits.html">Quotas
+  /// and limits</a> in the <i>Amazon Redshift Cluster Management Guide</i>.
   ///
   /// May throw [InvalidClusterStateFault].
   /// May throw [ClusterNotFoundFault].
@@ -6390,16 +7966,18 @@ class Redshift {
   ///
   /// Parameter [addIamRoles] :
   /// Zero or more IAM roles to associate with the cluster. The roles must be in
-  /// their Amazon Resource Name (ARN) format. You can associate up to 10 IAM
-  /// roles with a single cluster in a single request.
+  /// their Amazon Resource Name (ARN) format.
+  ///
+  /// Parameter [defaultIamRoleArn] :
+  /// The Amazon Resource Name (ARN) for the IAM role that was set as default
+  /// for the cluster when the cluster was last modified.
   ///
   /// Parameter [removeIamRoles] :
-  /// Zero or more IAM roles in ARN format to disassociate from the cluster. You
-  /// can disassociate up to 10 IAM roles from a single cluster in a single
-  /// request.
+  /// Zero or more IAM roles in ARN format to disassociate from the cluster.
   Future<ModifyClusterIamRolesResult> modifyClusterIamRoles({
     required String clusterIdentifier,
     List<String>? addIamRoles,
+    String? defaultIamRoleArn,
     List<String>? removeIamRoles,
   }) async {
     ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
@@ -6410,9 +7988,16 @@ class Redshift {
       2147483647,
       isRequired: true,
     );
+    _s.validateStringLength(
+      'defaultIamRoleArn',
+      defaultIamRoleArn,
+      0,
+      2147483647,
+    );
     final $request = <String, dynamic>{};
     $request['ClusterIdentifier'] = clusterIdentifier;
     addIamRoles?.also((arg) => $request['AddIamRoles'] = arg);
+    defaultIamRoleArn?.also((arg) => $request['DefaultIamRoleArn'] = arg);
     removeIamRoles?.also((arg) => $request['RemoveIamRoles'] = arg);
     final $result = await _protocol.send(
       $request,
@@ -6500,7 +8085,8 @@ class Redshift {
     return ModifyClusterMaintenanceResult.fromXml($result);
   }
 
-  /// Modifies the parameters of a parameter group.
+  /// Modifies the parameters of a parameter group. For the parameters
+  /// parameter, it can't contain ASCII characters.
   ///
   /// For more information about parameters and parameter groups, go to <a
   /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-parameter-groups.html">Amazon
@@ -6720,6 +8306,50 @@ class Redshift {
     return ModifyClusterSubnetGroupResult.fromXml($result);
   }
 
+  /// Modifies a Redshift-managed VPC endpoint.
+  ///
+  /// May throw [InvalidClusterSecurityGroupStateFault].
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [InvalidEndpointStateFault].
+  /// May throw [EndpointNotFoundFault].
+  /// May throw [InvalidClusterStateFault].
+  /// May throw [UnauthorizedOperation].
+  ///
+  /// Parameter [endpointName] :
+  /// The endpoint to be modified.
+  ///
+  /// Parameter [vpcSecurityGroupIds] :
+  /// The complete list of VPC security groups associated with the endpoint
+  /// after the endpoint is modified.
+  Future<EndpointAccess> modifyEndpointAccess({
+    required String endpointName,
+    List<String>? vpcSecurityGroupIds,
+  }) async {
+    ArgumentError.checkNotNull(endpointName, 'endpointName');
+    _s.validateStringLength(
+      'endpointName',
+      endpointName,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['EndpointName'] = endpointName;
+    vpcSecurityGroupIds?.also((arg) => $request['VpcSecurityGroupIds'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'ModifyEndpointAccess',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['ModifyEndpointAccessMessage'],
+      shapes: shapes,
+      resultWrapper: 'ModifyEndpointAccessResult',
+    );
+    return EndpointAccess.fromXml($result);
+  }
+
   /// Modifies an existing Amazon Redshift event notification subscription.
   ///
   /// May throw [SubscriptionNotFoundFault].
@@ -6743,7 +8373,7 @@ class Redshift {
   /// Specifies the Amazon Redshift event categories to be published by the
   /// event notification subscription.
   ///
-  /// Values: configuration, management, monitoring, security
+  /// Values: configuration, management, monitoring, security, pending
   ///
   /// Parameter [severity] :
   /// Specifies the Amazon Redshift event severity to be published by the event
@@ -6770,8 +8400,8 @@ class Redshift {
   /// The type of source that will be generating the events. For example, if you
   /// want to be notified of events generated by a cluster, you would set this
   /// parameter to cluster. If this value is not specified, events are returned
-  /// for all Amazon Redshift objects in your AWS account. You must specify a
-  /// source type in order to specify source IDs.
+  /// for all Amazon Redshift objects in your Amazon Web Services account. You
+  /// must specify a source type in order to specify source IDs.
   ///
   /// Valid values: cluster, cluster-parameter-group, cluster-security-group,
   /// cluster-snapshot, and scheduled-action.
@@ -6930,14 +8560,14 @@ class Redshift {
     return ScheduledAction.fromXml($result);
   }
 
-  /// Modifies the number of days to retain snapshots in the destination AWS
-  /// Region after they are copied from the source AWS Region. By default, this
-  /// operation only changes the retention period of copied automated snapshots.
-  /// The retention periods for both new and existing copied automated snapshots
-  /// are updated with the new retention period. You can set the manual option
-  /// to change only the retention periods of copied manual snapshots. If you
-  /// set this option, only newly copied manual snapshots have the new retention
-  /// period.
+  /// Modifies the number of days to retain snapshots in the destination Amazon
+  /// Web Services Region after they are copied from the source Amazon Web
+  /// Services Region. By default, this operation only changes the retention
+  /// period of copied automated snapshots. The retention periods for both new
+  /// and existing copied automated snapshots are updated with the new retention
+  /// period. You can set the manual option to change only the retention periods
+  /// of copied manual snapshots. If you set this option, only newly copied
+  /// manual snapshots have the new retention period.
   ///
   /// May throw [ClusterNotFoundFault].
   /// May throw [SnapshotCopyDisabledFault].
@@ -6948,22 +8578,24 @@ class Redshift {
   /// Parameter [clusterIdentifier] :
   /// The unique identifier of the cluster for which you want to change the
   /// retention period for either automated or manual snapshots that are copied
-  /// to a destination AWS Region.
+  /// to a destination Amazon Web Services Region.
   ///
   /// Constraints: Must be the valid name of an existing cluster that has
   /// cross-region snapshot copy enabled.
   ///
   /// Parameter [retentionPeriod] :
-  /// The number of days to retain automated snapshots in the destination AWS
-  /// Region after they are copied from the source AWS Region.
+  /// The number of days to retain automated snapshots in the destination Amazon
+  /// Web Services Region after they are copied from the source Amazon Web
+  /// Services Region.
   ///
   /// By default, this only changes the retention period of copied automated
   /// snapshots.
   ///
   /// If you decrease the retention period for automated snapshots that are
-  /// copied to a destination AWS Region, Amazon Redshift deletes any existing
-  /// automated snapshots that were copied to the destination AWS Region and
-  /// that fall outside of the new retention period.
+  /// copied to a destination Amazon Web Services Region, Amazon Redshift
+  /// deletes any existing automated snapshots that were copied to the
+  /// destination Amazon Web Services Region and that fall outside of the new
+  /// retention period.
   ///
   /// Constraints: Must be at least 1 and no more than 35 for automated
   /// snapshots.
@@ -7233,6 +8865,39 @@ class Redshift {
     return RebootClusterResult.fromXml($result);
   }
 
+  /// From a datashare consumer account, rejects the specified datashare.
+  ///
+  /// May throw [InvalidDataShareFault].
+  ///
+  /// Parameter [dataShareArn] :
+  /// The Amazon Resource Name (ARN) of the datashare to reject.
+  Future<DataShare> rejectDataShare({
+    required String dataShareArn,
+  }) async {
+    ArgumentError.checkNotNull(dataShareArn, 'dataShareArn');
+    _s.validateStringLength(
+      'dataShareArn',
+      dataShareArn,
+      0,
+      2147483647,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['DataShareArn'] = dataShareArn;
+    final $result = await _protocol.send(
+      $request,
+      action: 'RejectDataShare',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['RejectDataShareMessage'],
+      shapes: shapes,
+      resultWrapper: 'RejectDataShareResult',
+    );
+    return DataShare.fromXml($result);
+  }
+
   /// Sets one or more parameters of the specified parameter group to their
   /// default values and sets the source values of the parameters to
   /// "engine-default". To reset the entire parameter group specify the
@@ -7342,6 +9007,12 @@ class Redshift {
   /// May throw [UnsupportedOperationFault].
   /// May throw [UnauthorizedOperation].
   /// May throw [LimitExceededFault].
+  /// May throw [ReservedNodeNotFoundFault].
+  /// May throw [InvalidReservedNodeStateFault].
+  /// May throw [ReservedNodeAlreadyMigratedFault].
+  /// May throw [ReservedNodeOfferingNotFoundFault].
+  /// May throw [DependentServiceUnavailableFault].
+  /// May throw [ReservedNodeAlreadyExistsFault].
   ///
   /// Parameter [clusterIdentifier] :
   /// The unique identifier for the cluster to resize.
@@ -7361,12 +9032,20 @@ class Redshift {
   /// Parameter [numberOfNodes] :
   /// The new number of nodes for the cluster. If not specified, the cluster's
   /// current number of nodes is used.
+  ///
+  /// Parameter [reservedNodeId] :
+  /// The identifier of the reserved node.
+  ///
+  /// Parameter [targetReservedNodeOfferingId] :
+  /// The identifier of the target reserved node offering.
   Future<ResizeClusterResult> resizeCluster({
     required String clusterIdentifier,
     bool? classic,
     String? clusterType,
     String? nodeType,
     int? numberOfNodes,
+    String? reservedNodeId,
+    String? targetReservedNodeOfferingId,
   }) async {
     ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
     _s.validateStringLength(
@@ -7388,12 +9067,27 @@ class Redshift {
       0,
       2147483647,
     );
+    _s.validateStringLength(
+      'reservedNodeId',
+      reservedNodeId,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'targetReservedNodeOfferingId',
+      targetReservedNodeOfferingId,
+      0,
+      2147483647,
+    );
     final $request = <String, dynamic>{};
     $request['ClusterIdentifier'] = clusterIdentifier;
     classic?.also((arg) => $request['Classic'] = arg);
     clusterType?.also((arg) => $request['ClusterType'] = arg);
     nodeType?.also((arg) => $request['NodeType'] = arg);
     numberOfNodes?.also((arg) => $request['NumberOfNodes'] = arg);
+    reservedNodeId?.also((arg) => $request['ReservedNodeId'] = arg);
+    targetReservedNodeOfferingId
+        ?.also((arg) => $request['TargetReservedNodeOfferingId'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'ResizeCluster',
@@ -7450,6 +9144,13 @@ class Redshift {
   /// May throw [SnapshotScheduleNotFoundFault].
   /// May throw [TagLimitExceededFault].
   /// May throw [InvalidTagFault].
+  /// May throw [ReservedNodeNotFoundFault].
+  /// May throw [InvalidReservedNodeStateFault].
+  /// May throw [ReservedNodeAlreadyMigratedFault].
+  /// May throw [ReservedNodeOfferingNotFoundFault].
+  /// May throw [DependentServiceUnavailableFault].
+  /// May throw [ReservedNodeAlreadyExistsFault].
+  /// May throw [UnsupportedOperationFault].
   ///
   /// Parameter [clusterIdentifier] :
   /// The identifier of the cluster that will be created from restoring the
@@ -7471,15 +9172,9 @@ class Redshift {
   /// Cannot end with a hyphen or contain two consecutive hyphens.
   /// </li>
   /// <li>
-  /// Must be unique for all clusters within an AWS account.
+  /// Must be unique for all clusters within an Amazon Web Services account.
   /// </li>
   /// </ul>
-  ///
-  /// Parameter [snapshotIdentifier] :
-  /// The name of the snapshot from which to create the new cluster. This
-  /// parameter isn't case sensitive.
-  ///
-  /// Example: <code>my-snapshot-id</code>
   ///
   /// Parameter [additionalInfo] :
   /// Reserved.
@@ -7491,11 +9186,32 @@ class Redshift {
   ///
   /// Default: <code>true</code>
   ///
+  /// Parameter [aquaConfigurationStatus] :
+  /// The value represents how the cluster is configured to use AQUA (Advanced
+  /// Query Accelerator) after the cluster is restored. Possible values include
+  /// the following.
+  ///
+  /// <ul>
+  /// <li>
+  /// enabled - Use AQUA if it is available for the current Amazon Web Services
+  /// Region and Amazon Redshift node type.
+  /// </li>
+  /// <li>
+  /// disabled - Don't use AQUA.
+  /// </li>
+  /// <li>
+  /// auto - Amazon Redshift determines whether to use AQUA.
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [automatedSnapshotRetentionPeriod] :
   /// The number of days that automated snapshots are retained. If the value is
   /// 0, automated snapshots are disabled. Even if automated snapshots are
   /// disabled, you can still create manual snapshots when you want with
   /// <a>CreateClusterSnapshot</a>.
+  ///
+  /// You can't disable automated snapshots for RA3 node types. Set the
+  /// automated retention period from 1-35 days.
   ///
   /// Default: The value selected for the cluster from which the snapshot was
   /// taken.
@@ -7548,8 +9264,19 @@ class Redshift {
   /// A snapshot of cluster in VPC can be restored only in VPC. Therefore, you
   /// must provide subnet group name where you want the cluster restored.
   ///
+  /// Parameter [defaultIamRoleArn] :
+  /// The Amazon Resource Name (ARN) for the IAM role that was set as default
+  /// for the cluster when the cluster was last modified while it was restored
+  /// from a snapshot.
+  ///
   /// Parameter [elasticIp] :
-  /// The elastic IP (EIP) address for the cluster.
+  /// The elastic IP (EIP) address for the cluster. You don't have to specify
+  /// the EIP for a publicly accessible cluster with AvailabilityZoneRelocation
+  /// turned on.
+  ///
+  /// Parameter [encrypted] :
+  /// Enables support for restoring an unencrypted snapshot to a cluster
+  /// encrypted with Key Management Service (KMS) and a customer managed key.
   ///
   /// Parameter [enhancedVpcRouting] :
   /// An option that specifies whether to create the cluster with enhanced VPC
@@ -7571,17 +9298,23 @@ class Redshift {
   /// the Amazon Redshift cluster can use to retrieve and store keys in an HSM.
   ///
   /// Parameter [iamRoles] :
-  /// A list of AWS Identity and Access Management (IAM) roles that can be used
-  /// by the cluster to access other AWS services. You must supply the IAM roles
-  /// in their Amazon Resource Name (ARN) format. You can supply up to 10 IAM
-  /// roles in a single request.
+  /// A list of Identity and Access Management (IAM) roles that can be used by
+  /// the cluster to access other Amazon Web Services services. You must supply
+  /// the IAM roles in their Amazon Resource Name (ARN) format.
   ///
-  /// A cluster can have up to 10 IAM roles associated at any time.
+  /// The maximum number of IAM roles that you can associate is subject to a
+  /// quota. For more information, go to <a
+  /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/amazon-redshift-limits.html">Quotas
+  /// and limits</a> in the <i>Amazon Redshift Cluster Management Guide</i>.
   ///
   /// Parameter [kmsKeyId] :
-  /// The AWS Key Management Service (KMS) key ID of the encryption key that you
-  /// want to use to encrypt data in the cluster that you restore from a shared
-  /// snapshot.
+  /// The Key Management Service (KMS) key ID of the encryption key that
+  /// encrypts data in the cluster restored from a shared snapshot. You can also
+  /// provide the key ID when you restore from an unencrypted snapshot to an
+  /// encrypted cluster in the same account. Additionally, you can specify a new
+  /// KMS key ID when you restore from an encrypted snapshot in the same account
+  /// in order to change it. In that case, the restored cluster is encrypted
+  /// with the new KMS key ID.
   ///
   /// Parameter [maintenanceTrackName] :
   /// The name of the maintenance track for the restored cluster. When you take
@@ -7620,9 +9353,9 @@ class Redshift {
   /// The number of nodes specified when provisioning the restored cluster.
   ///
   /// Parameter [ownerAccount] :
-  /// The AWS customer account used to create or copy the snapshot. Required if
-  /// you are restoring a snapshot you do not own, optional if you own the
-  /// snapshot.
+  /// The Amazon Web Services account used to create or copy the snapshot.
+  /// Required if you are restoring a snapshot you do not own, optional if you
+  /// own the snapshot.
   ///
   /// Parameter [port] :
   /// The port number on which the cluster accepts connections.
@@ -7649,14 +9382,30 @@ class Redshift {
   /// Parameter [publiclyAccessible] :
   /// If <code>true</code>, the cluster can be accessed from a public network.
   ///
+  /// Parameter [reservedNodeId] :
+  /// The identifier of the target reserved node offering.
+  ///
+  /// Parameter [snapshotArn] :
+  /// The Amazon Resource Name (ARN) of the snapshot associated with the message
+  /// to restore from a cluster.
+  ///
   /// Parameter [snapshotClusterIdentifier] :
   /// The name of the cluster the source snapshot was created from. This
   /// parameter is required if your IAM user has a policy containing a snapshot
   /// resource element that specifies anything other than * for the cluster
   /// name.
   ///
+  /// Parameter [snapshotIdentifier] :
+  /// The name of the snapshot from which to create the new cluster. This
+  /// parameter isn't case sensitive.
+  ///
+  /// Example: <code>my-snapshot-id</code>
+  ///
   /// Parameter [snapshotScheduleIdentifier] :
   /// A unique identifier for the snapshot schedule.
+  ///
+  /// Parameter [targetReservedNodeOfferingId] :
+  /// The identifier of the target reserved node offering.
   ///
   /// Parameter [vpcSecurityGroupIds] :
   /// A list of Virtual Private Cloud (VPC) security groups to be associated
@@ -7667,16 +9416,18 @@ class Redshift {
   /// VPC security groups only apply to clusters in VPCs.
   Future<RestoreFromClusterSnapshotResult> restoreFromClusterSnapshot({
     required String clusterIdentifier,
-    required String snapshotIdentifier,
     String? additionalInfo,
     bool? allowVersionUpgrade,
+    AquaConfigurationStatus? aquaConfigurationStatus,
     int? automatedSnapshotRetentionPeriod,
     String? availabilityZone,
     bool? availabilityZoneRelocation,
     String? clusterParameterGroupName,
     List<String>? clusterSecurityGroups,
     String? clusterSubnetGroupName,
+    String? defaultIamRoleArn,
     String? elasticIp,
+    bool? encrypted,
     bool? enhancedVpcRouting,
     String? hsmClientCertificateIdentifier,
     String? hsmConfigurationIdentifier,
@@ -7690,22 +9441,18 @@ class Redshift {
     int? port,
     String? preferredMaintenanceWindow,
     bool? publiclyAccessible,
+    String? reservedNodeId,
+    String? snapshotArn,
     String? snapshotClusterIdentifier,
+    String? snapshotIdentifier,
     String? snapshotScheduleIdentifier,
+    String? targetReservedNodeOfferingId,
     List<String>? vpcSecurityGroupIds,
   }) async {
     ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
     _s.validateStringLength(
       'clusterIdentifier',
       clusterIdentifier,
-      0,
-      2147483647,
-      isRequired: true,
-    );
-    ArgumentError.checkNotNull(snapshotIdentifier, 'snapshotIdentifier');
-    _s.validateStringLength(
-      'snapshotIdentifier',
-      snapshotIdentifier,
       0,
       2147483647,
       isRequired: true,
@@ -7731,6 +9478,12 @@ class Redshift {
     _s.validateStringLength(
       'clusterSubnetGroupName',
       clusterSubnetGroupName,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'defaultIamRoleArn',
+      defaultIamRoleArn,
       0,
       2147483647,
     );
@@ -7783,8 +9536,26 @@ class Redshift {
       2147483647,
     );
     _s.validateStringLength(
+      'reservedNodeId',
+      reservedNodeId,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'snapshotArn',
+      snapshotArn,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
       'snapshotClusterIdentifier',
       snapshotClusterIdentifier,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'snapshotIdentifier',
+      snapshotIdentifier,
       0,
       2147483647,
     );
@@ -7794,11 +9565,18 @@ class Redshift {
       0,
       2147483647,
     );
+    _s.validateStringLength(
+      'targetReservedNodeOfferingId',
+      targetReservedNodeOfferingId,
+      0,
+      2147483647,
+    );
     final $request = <String, dynamic>{};
     $request['ClusterIdentifier'] = clusterIdentifier;
-    $request['SnapshotIdentifier'] = snapshotIdentifier;
     additionalInfo?.also((arg) => $request['AdditionalInfo'] = arg);
     allowVersionUpgrade?.also((arg) => $request['AllowVersionUpgrade'] = arg);
+    aquaConfigurationStatus
+        ?.also((arg) => $request['AquaConfigurationStatus'] = arg.toValue());
     automatedSnapshotRetentionPeriod
         ?.also((arg) => $request['AutomatedSnapshotRetentionPeriod'] = arg);
     availabilityZone?.also((arg) => $request['AvailabilityZone'] = arg);
@@ -7810,7 +9588,9 @@ class Redshift {
         ?.also((arg) => $request['ClusterSecurityGroups'] = arg);
     clusterSubnetGroupName
         ?.also((arg) => $request['ClusterSubnetGroupName'] = arg);
+    defaultIamRoleArn?.also((arg) => $request['DefaultIamRoleArn'] = arg);
     elasticIp?.also((arg) => $request['ElasticIp'] = arg);
+    encrypted?.also((arg) => $request['Encrypted'] = arg);
     enhancedVpcRouting?.also((arg) => $request['EnhancedVpcRouting'] = arg);
     hsmClientCertificateIdentifier
         ?.also((arg) => $request['HsmClientCertificateIdentifier'] = arg);
@@ -7828,10 +9608,15 @@ class Redshift {
     preferredMaintenanceWindow
         ?.also((arg) => $request['PreferredMaintenanceWindow'] = arg);
     publiclyAccessible?.also((arg) => $request['PubliclyAccessible'] = arg);
+    reservedNodeId?.also((arg) => $request['ReservedNodeId'] = arg);
+    snapshotArn?.also((arg) => $request['SnapshotArn'] = arg);
     snapshotClusterIdentifier
         ?.also((arg) => $request['SnapshotClusterIdentifier'] = arg);
+    snapshotIdentifier?.also((arg) => $request['SnapshotIdentifier'] = arg);
     snapshotScheduleIdentifier
         ?.also((arg) => $request['SnapshotScheduleIdentifier'] = arg);
+    targetReservedNodeOfferingId
+        ?.also((arg) => $request['TargetReservedNodeOfferingId'] = arg);
     vpcSecurityGroupIds?.also((arg) => $request['VpcSecurityGroupIds'] = arg);
     final $result = await _protocol.send(
       $request,
@@ -7887,6 +9672,11 @@ class Redshift {
   /// Parameter [sourceTableName] :
   /// The name of the source table to restore from.
   ///
+  /// Parameter [enableCaseSensitiveIdentifier] :
+  /// Indicates whether name identifiers for database, schema, and table are
+  /// case sensitive. If <code>true</code>, the names are case sensitive. If
+  /// <code>false</code> (default), the names are not case sensitive.
+  ///
   /// Parameter [sourceSchemaName] :
   /// The name of the source schema that contains the table to restore from. If
   /// you do not specify a <code>SourceSchemaName</code> value, the default is
@@ -7904,6 +9694,7 @@ class Redshift {
     required String snapshotIdentifier,
     required String sourceDatabaseName,
     required String sourceTableName,
+    bool? enableCaseSensitiveIdentifier,
     String? sourceSchemaName,
     String? targetDatabaseName,
     String? targetSchemaName,
@@ -7972,6 +9763,8 @@ class Redshift {
     $request['SnapshotIdentifier'] = snapshotIdentifier;
     $request['SourceDatabaseName'] = sourceDatabaseName;
     $request['SourceTableName'] = sourceTableName;
+    enableCaseSensitiveIdentifier
+        ?.also((arg) => $request['EnableCaseSensitiveIdentifier'] = arg);
     sourceSchemaName?.also((arg) => $request['SourceSchemaName'] = arg);
     targetDatabaseName?.also((arg) => $request['TargetDatabaseName'] = arg);
     targetSchemaName?.also((arg) => $request['TargetSchemaName'] = arg);
@@ -8052,9 +9845,10 @@ class Redshift {
   /// <code>CIDRIP</code> cannot be provided.
   ///
   /// Parameter [eC2SecurityGroupOwnerId] :
-  /// The AWS account number of the owner of the security group specified in the
-  /// <code>EC2SecurityGroupName</code> parameter. The AWS access key ID is not
-  /// an acceptable value. If <code>EC2SecurityGroupOwnerId</code> is specified,
+  /// The Amazon Web Services account number of the owner of the security group
+  /// specified in the <code>EC2SecurityGroupName</code> parameter. The Amazon
+  /// Web Services access key ID is not an acceptable value. If
+  /// <code>EC2SecurityGroupOwnerId</code> is specified,
   /// <code>EC2SecurityGroupName</code> must also be provided. and
   /// <code>CIDRIP</code> cannot be provided.
   ///
@@ -8113,9 +9907,70 @@ class Redshift {
     return RevokeClusterSecurityGroupIngressResult.fromXml($result);
   }
 
-  /// Removes the ability of the specified AWS customer account to restore the
-  /// specified snapshot. If the account is currently restoring the snapshot,
-  /// the restore will run to completion.
+  /// Revokes access to a cluster.
+  ///
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [InvalidEndpointStateFault].
+  /// May throw [InvalidClusterSecurityGroupStateFault].
+  /// May throw [EndpointNotFoundFault].
+  /// May throw [EndpointAuthorizationNotFoundFault].
+  /// May throw [InvalidAuthorizationStateFault].
+  /// May throw [InvalidClusterStateFault].
+  ///
+  /// Parameter [account] :
+  /// The Amazon Web Services account ID whose access is to be revoked.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster to revoke access from.
+  ///
+  /// Parameter [force] :
+  /// Indicates whether to force the revoke action. If true, the
+  /// Redshift-managed VPC endpoints associated with the endpoint authorization
+  /// are also deleted.
+  ///
+  /// Parameter [vpcIds] :
+  /// The virtual private cloud (VPC) identifiers for which access is to be
+  /// revoked.
+  Future<EndpointAuthorization> revokeEndpointAccess({
+    String? account,
+    String? clusterIdentifier,
+    bool? force,
+    List<String>? vpcIds,
+  }) async {
+    _s.validateStringLength(
+      'account',
+      account,
+      0,
+      2147483647,
+    );
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      2147483647,
+    );
+    final $request = <String, dynamic>{};
+    account?.also((arg) => $request['Account'] = arg);
+    clusterIdentifier?.also((arg) => $request['ClusterIdentifier'] = arg);
+    force?.also((arg) => $request['Force'] = arg);
+    vpcIds?.also((arg) => $request['VpcIds'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'RevokeEndpointAccess',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['RevokeEndpointAccessMessage'],
+      shapes: shapes,
+      resultWrapper: 'RevokeEndpointAccessResult',
+    );
+    return EndpointAuthorization.fromXml($result);
+  }
+
+  /// Removes the ability of the specified Amazon Web Services account to
+  /// restore the specified snapshot. If the account is currently restoring the
+  /// snapshot, the restore will run to completion.
   ///
   /// For more information about working with snapshots, go to <a
   /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-snapshots.html">Amazon
@@ -8125,23 +9980,29 @@ class Redshift {
   /// May throw [AccessToSnapshotDeniedFault].
   /// May throw [AuthorizationNotFoundFault].
   /// May throw [ClusterSnapshotNotFoundFault].
+  /// May throw [UnsupportedOperationFault].
   ///
   /// Parameter [accountWithRestoreAccess] :
-  /// The identifier of the AWS customer account that can no longer restore the
-  /// specified snapshot.
+  /// The identifier of the Amazon Web Services account that can no longer
+  /// restore the specified snapshot.
   ///
-  /// Parameter [snapshotIdentifier] :
-  /// The identifier of the snapshot that the account can no longer access.
+  /// Parameter [snapshotArn] :
+  /// The Amazon Resource Name (ARN) of the snapshot associated with the message
+  /// to revoke access.
   ///
   /// Parameter [snapshotClusterIdentifier] :
   /// The identifier of the cluster the snapshot was created from. This
   /// parameter is required if your IAM user has a policy containing a snapshot
   /// resource element that specifies anything other than * for the cluster
   /// name.
+  ///
+  /// Parameter [snapshotIdentifier] :
+  /// The identifier of the snapshot that the account can no longer access.
   Future<RevokeSnapshotAccessResult> revokeSnapshotAccess({
     required String accountWithRestoreAccess,
-    required String snapshotIdentifier,
+    String? snapshotArn,
     String? snapshotClusterIdentifier,
+    String? snapshotIdentifier,
   }) async {
     ArgumentError.checkNotNull(
         accountWithRestoreAccess, 'accountWithRestoreAccess');
@@ -8152,13 +10013,11 @@ class Redshift {
       2147483647,
       isRequired: true,
     );
-    ArgumentError.checkNotNull(snapshotIdentifier, 'snapshotIdentifier');
     _s.validateStringLength(
-      'snapshotIdentifier',
-      snapshotIdentifier,
+      'snapshotArn',
+      snapshotArn,
       0,
       2147483647,
-      isRequired: true,
     );
     _s.validateStringLength(
       'snapshotClusterIdentifier',
@@ -8166,11 +10025,18 @@ class Redshift {
       0,
       2147483647,
     );
+    _s.validateStringLength(
+      'snapshotIdentifier',
+      snapshotIdentifier,
+      0,
+      2147483647,
+    );
     final $request = <String, dynamic>{};
     $request['AccountWithRestoreAccess'] = accountWithRestoreAccess;
-    $request['SnapshotIdentifier'] = snapshotIdentifier;
+    snapshotArn?.also((arg) => $request['SnapshotArn'] = arg);
     snapshotClusterIdentifier
         ?.also((arg) => $request['SnapshotClusterIdentifier'] = arg);
+    snapshotIdentifier?.also((arg) => $request['SnapshotIdentifier'] = arg);
     final $result = await _protocol.send(
       $request,
       action: 'RevokeSnapshotAccess',
@@ -8222,6 +10088,99 @@ class Redshift {
       resultWrapper: 'RotateEncryptionKeyResult',
     );
     return RotateEncryptionKeyResult.fromXml($result);
+  }
+
+  /// Updates the status of a partner integration.
+  ///
+  /// May throw [PartnerNotFoundFault].
+  /// May throw [ClusterNotFoundFault].
+  /// May throw [UnauthorizedPartnerIntegrationFault].
+  ///
+  /// Parameter [accountId] :
+  /// The Amazon Web Services account ID that owns the cluster.
+  ///
+  /// Parameter [clusterIdentifier] :
+  /// The cluster identifier of the cluster whose partner integration status is
+  /// being updated.
+  ///
+  /// Parameter [databaseName] :
+  /// The name of the database whose partner integration status is being
+  /// updated.
+  ///
+  /// Parameter [partnerName] :
+  /// The name of the partner whose integration status is being updated.
+  ///
+  /// Parameter [status] :
+  /// The value of the updated status.
+  ///
+  /// Parameter [statusMessage] :
+  /// The status message provided by the partner.
+  Future<PartnerIntegrationOutputMessage> updatePartnerStatus({
+    required String accountId,
+    required String clusterIdentifier,
+    required String databaseName,
+    required String partnerName,
+    required PartnerIntegrationStatus status,
+    String? statusMessage,
+  }) async {
+    ArgumentError.checkNotNull(accountId, 'accountId');
+    _s.validateStringLength(
+      'accountId',
+      accountId,
+      12,
+      12,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(clusterIdentifier, 'clusterIdentifier');
+    _s.validateStringLength(
+      'clusterIdentifier',
+      clusterIdentifier,
+      0,
+      63,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(databaseName, 'databaseName');
+    _s.validateStringLength(
+      'databaseName',
+      databaseName,
+      0,
+      127,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(partnerName, 'partnerName');
+    _s.validateStringLength(
+      'partnerName',
+      partnerName,
+      0,
+      255,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(status, 'status');
+    _s.validateStringLength(
+      'statusMessage',
+      statusMessage,
+      0,
+      262144,
+    );
+    final $request = <String, dynamic>{};
+    $request['AccountId'] = accountId;
+    $request['ClusterIdentifier'] = clusterIdentifier;
+    $request['DatabaseName'] = databaseName;
+    $request['PartnerName'] = partnerName;
+    $request['Status'] = status.toValue();
+    statusMessage?.also((arg) => $request['StatusMessage'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'UpdatePartnerStatus',
+      version: '2012-12-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['UpdatePartnerStatusInputMessage'],
+      shapes: shapes,
+      resultWrapper: 'UpdatePartnerStatusResult',
+    );
+    return PartnerIntegrationOutputMessage.fromXml($result);
   }
 }
 
@@ -8283,13 +10242,15 @@ class AccountAttributeList {
   }
 }
 
-/// Describes an AWS customer account authorized to restore a snapshot.
+/// Describes an Amazon Web Services account authorized to restore a snapshot.
 class AccountWithRestoreAccess {
-  /// The identifier of an AWS support account authorized to restore a snapshot.
-  /// For AWS support, the identifier is <code>amazon-redshift-support</code>.
+  /// The identifier of an Amazon Web Services support account authorized to
+  /// restore a snapshot. For Amazon Web Services Support, the identifier is
+  /// <code>amazon-redshift-support</code>.
   final String? accountAlias;
 
-  /// The identifier of an AWS customer account authorized to restore a snapshot.
+  /// The identifier of an Amazon Web Services account authorized to restore a
+  /// snapshot.
   final String? accountId;
 
   AccountWithRestoreAccess({
@@ -8337,6 +10298,121 @@ extension on String {
   }
 }
 
+/// The AQUA (Advanced Query Accelerator) configuration of the cluster.
+class AquaConfiguration {
+  /// The value represents how the cluster is configured to use AQUA. Possible
+  /// values include the following.
+  ///
+  /// <ul>
+  /// <li>
+  /// enabled - Use AQUA if it is available for the current Amazon Web Services
+  /// Region and Amazon Redshift node type.
+  /// </li>
+  /// <li>
+  /// disabled - Don't use AQUA.
+  /// </li>
+  /// <li>
+  /// auto - Amazon Redshift determines whether to use AQUA.
+  /// </li>
+  /// </ul>
+  final AquaConfigurationStatus? aquaConfigurationStatus;
+
+  /// The value indicates the status of AQUA on the cluster. Possible values
+  /// include the following.
+  ///
+  /// <ul>
+  /// <li>
+  /// enabled - AQUA is enabled.
+  /// </li>
+  /// <li>
+  /// disabled - AQUA is not enabled.
+  /// </li>
+  /// <li>
+  /// applying - AQUA status is being applied.
+  /// </li>
+  /// </ul>
+  final AquaStatus? aquaStatus;
+
+  AquaConfiguration({
+    this.aquaConfigurationStatus,
+    this.aquaStatus,
+  });
+  factory AquaConfiguration.fromXml(_s.XmlElement elem) {
+    return AquaConfiguration(
+      aquaConfigurationStatus: _s
+          .extractXmlStringValue(elem, 'AquaConfigurationStatus')
+          ?.toAquaConfigurationStatus(),
+      aquaStatus: _s.extractXmlStringValue(elem, 'AquaStatus')?.toAquaStatus(),
+    );
+  }
+}
+
+enum AquaConfigurationStatus {
+  enabled,
+  disabled,
+  auto,
+}
+
+extension on AquaConfigurationStatus {
+  String toValue() {
+    switch (this) {
+      case AquaConfigurationStatus.enabled:
+        return 'enabled';
+      case AquaConfigurationStatus.disabled:
+        return 'disabled';
+      case AquaConfigurationStatus.auto:
+        return 'auto';
+    }
+  }
+}
+
+extension on String {
+  AquaConfigurationStatus toAquaConfigurationStatus() {
+    switch (this) {
+      case 'enabled':
+        return AquaConfigurationStatus.enabled;
+      case 'disabled':
+        return AquaConfigurationStatus.disabled;
+      case 'auto':
+        return AquaConfigurationStatus.auto;
+    }
+    throw Exception('$this is not known in enum AquaConfigurationStatus');
+  }
+}
+
+enum AquaStatus {
+  enabled,
+  disabled,
+  applying,
+}
+
+extension on AquaStatus {
+  String toValue() {
+    switch (this) {
+      case AquaStatus.enabled:
+        return 'enabled';
+      case AquaStatus.disabled:
+        return 'disabled';
+      case AquaStatus.applying:
+        return 'applying';
+    }
+  }
+}
+
+extension on String {
+  AquaStatus toAquaStatus() {
+    switch (this) {
+      case 'enabled':
+        return AquaStatus.enabled;
+      case 'disabled':
+        return AquaStatus.disabled;
+      case 'applying':
+        return AquaStatus.applying;
+    }
+    throw Exception('$this is not known in enum AquaStatus');
+  }
+}
+
 /// Describes an attribute value.
 class AttributeValueTarget {
   /// The value of the attribute.
@@ -8349,6 +10425,57 @@ class AttributeValueTarget {
     return AttributeValueTarget(
       attributeValue: _s.extractXmlStringValue(elem, 'AttributeValue'),
     );
+  }
+}
+
+/// Describes an authentication profile.
+class AuthenticationProfile {
+  /// The content of the authentication profile in JSON format. The maximum length
+  /// of the JSON string is determined by a quota for your account.
+  final String? authenticationProfileContent;
+
+  /// The name of the authentication profile.
+  final String? authenticationProfileName;
+
+  AuthenticationProfile({
+    this.authenticationProfileContent,
+    this.authenticationProfileName,
+  });
+  factory AuthenticationProfile.fromXml(_s.XmlElement elem) {
+    return AuthenticationProfile(
+      authenticationProfileContent:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileContent'),
+      authenticationProfileName:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileName'),
+    );
+  }
+}
+
+enum AuthorizationStatus {
+  authorized,
+  revoking,
+}
+
+extension on AuthorizationStatus {
+  String toValue() {
+    switch (this) {
+      case AuthorizationStatus.authorized:
+        return 'Authorized';
+      case AuthorizationStatus.revoking:
+        return 'Revoking';
+    }
+  }
+}
+
+extension on String {
+  AuthorizationStatus toAuthorizationStatus() {
+    switch (this) {
+      case 'Authorized':
+        return AuthorizationStatus.authorized;
+      case 'Revoking':
+        return AuthorizationStatus.revoking;
+    }
+    throw Exception('$this is not known in enum AuthorizationStatus');
   }
 }
 
@@ -8460,6 +10587,9 @@ class Cluster {
   /// upgrades will be applied automatically to the cluster during the maintenance
   /// window.
   final bool? allowVersionUpgrade;
+
+  /// The AQUA (Advanced Query Accelerator) configuration of the cluster.
+  final AquaConfiguration? aquaConfiguration;
 
   /// The number of days that automatic cluster snapshots are retained.
   final int? automatedSnapshotRetentionPeriod;
@@ -8613,6 +10743,10 @@ class Cluster {
   /// <p/>
   final DataTransferProgress? dataTransferProgress;
 
+  /// The Amazon Resource Name (ARN) for the IAM role set as default for the
+  /// cluster.
+  final String? defaultIamRoleArn;
+
   /// Describes a group of <code>DeferredMaintenanceWindow</code> objects.
   final List<DeferredMaintenanceWindow>? deferredMaintenanceWindows;
 
@@ -8665,12 +10799,12 @@ class Cluster {
   /// Values: active, applying
   final HsmStatus? hsmStatus;
 
-  /// A list of AWS Identity and Access Management (IAM) roles that can be used by
-  /// the cluster to access other AWS services.
+  /// A list of Identity and Access Management (IAM) roles that can be used by the
+  /// cluster to access other Amazon Web Services services.
   final List<ClusterIamRole>? iamRoles;
 
-  /// The AWS Key Management Service (AWS KMS) key ID of the encryption key used
-  /// to encrypt data in the cluster.
+  /// The Key Management Service (KMS) key ID of the encryption key used to
+  /// encrypt data in the cluster.
   final String? kmsKeyId;
 
   /// The name of the maintenance track for the cluster.
@@ -8683,7 +10817,7 @@ class Cluster {
   /// The value must be either -1 or an integer between 1 and 3,653.
   final int? manualSnapshotRetentionPeriod;
 
-  /// The master user name for the cluster. This name is used to connect to the
+  /// The admin user name for the cluster. This name is used to connect to the
   /// database that is specified in the <b>DBName</b> parameter.
   final String? masterUsername;
 
@@ -8714,6 +10848,10 @@ class Cluster {
   /// be accessed from a public network.
   final bool? publiclyAccessible;
 
+  /// The status of the reserved-node exchange request. Statuses include
+  /// in-progress and requested.
+  final ReservedNodeExchangeStatus? reservedNodeExchangeStatus;
+
   /// Returns the following:
   ///
   /// <ul>
@@ -8741,6 +10879,9 @@ class Cluster {
   /// The list of tags for the cluster.
   final List<Tag>? tags;
 
+  /// The total storage capacity of the cluster in megabytes.
+  final int? totalStorageCapacityInMegaBytes;
+
   /// The identifier of the VPC the cluster is in, if the cluster is in a VPC.
   final String? vpcId;
 
@@ -8751,6 +10892,7 @@ class Cluster {
 
   Cluster({
     this.allowVersionUpgrade,
+    this.aquaConfiguration,
     this.automatedSnapshotRetentionPeriod,
     this.availabilityZone,
     this.availabilityZoneRelocationStatus,
@@ -8769,6 +10911,7 @@ class Cluster {
     this.clusterVersion,
     this.dBName,
     this.dataTransferProgress,
+    this.defaultIamRoleArn,
     this.deferredMaintenanceWindows,
     this.elasticIpStatus,
     this.elasticResizeNumberOfNodeOptions,
@@ -8791,17 +10934,22 @@ class Cluster {
     this.pendingModifiedValues,
     this.preferredMaintenanceWindow,
     this.publiclyAccessible,
+    this.reservedNodeExchangeStatus,
     this.resizeInfo,
     this.restoreStatus,
     this.snapshotScheduleIdentifier,
     this.snapshotScheduleState,
     this.tags,
+    this.totalStorageCapacityInMegaBytes,
     this.vpcId,
     this.vpcSecurityGroups,
   });
   factory Cluster.fromXml(_s.XmlElement elem) {
     return Cluster(
       allowVersionUpgrade: _s.extractXmlBoolValue(elem, 'AllowVersionUpgrade'),
+      aquaConfiguration: _s
+          .extractXmlChild(elem, 'AquaConfiguration')
+          ?.let((e) => AquaConfiguration.fromXml(e)),
       automatedSnapshotRetentionPeriod:
           _s.extractXmlIntValue(elem, 'AutomatedSnapshotRetentionPeriod'),
       availabilityZone: _s.extractXmlStringValue(elem, 'AvailabilityZone'),
@@ -8843,6 +10991,7 @@ class Cluster {
       dataTransferProgress: _s
           .extractXmlChild(elem, 'DataTransferProgress')
           ?.let((e) => DataTransferProgress.fromXml(e)),
+      defaultIamRoleArn: _s.extractXmlStringValue(elem, 'DefaultIamRoleArn'),
       deferredMaintenanceWindows: _s
           .extractXmlChild(elem, 'DeferredMaintenanceWindows')
           ?.let((elem) => elem
@@ -8889,6 +11038,9 @@ class Cluster {
       preferredMaintenanceWindow:
           _s.extractXmlStringValue(elem, 'PreferredMaintenanceWindow'),
       publiclyAccessible: _s.extractXmlBoolValue(elem, 'PubliclyAccessible'),
+      reservedNodeExchangeStatus: _s
+          .extractXmlChild(elem, 'ReservedNodeExchangeStatus')
+          ?.let((e) => ReservedNodeExchangeStatus.fromXml(e)),
       resizeInfo: _s
           .extractXmlChild(elem, 'ResizeInfo')
           ?.let((e) => ResizeInfo.fromXml(e)),
@@ -8902,6 +11054,8 @@ class Cluster {
           ?.toScheduleState(),
       tags: _s.extractXmlChild(elem, 'Tags')?.let((elem) =>
           elem.findElements('Tag').map((c) => Tag.fromXml(c)).toList()),
+      totalStorageCapacityInMegaBytes:
+          _s.extractXmlIntValue(elem, 'TotalStorageCapacityInMegaBytes'),
       vpcId: _s.extractXmlStringValue(elem, 'VpcId'),
       vpcSecurityGroups: _s.extractXmlChild(elem, 'VpcSecurityGroups')?.let(
           (elem) => elem
@@ -8944,8 +11098,8 @@ class ClusterCredentials {
   /// A database user name that is authorized to log on to the database
   /// <code>DbName</code> using the password <code>DbPassword</code>. If the
   /// specified DbUser exists in the database, the new user name has the same
-  /// database privileges as the the user named in DbUser. By default, the user is
-  /// added to PUBLIC. If the <code>DbGroups</code> parameter is specifed,
+  /// database permissions as the the user named in DbUser. By default, the user
+  /// is added to PUBLIC. If the <code>DbGroups</code> parameter is specifed,
   /// <code>DbUser</code> is added to the listed groups for any sessions created
   /// using these credentials.
   final String? dbUser;
@@ -9031,8 +11185,40 @@ class ClusterDbRevisionsMessage {
   }
 }
 
-/// An AWS Identity and Access Management (IAM) role that can be used by the
-/// associated Amazon Redshift cluster to access other AWS services.
+class ClusterExtendedCredentials {
+  /// A temporary password that you provide when you connect to a database.
+  final String? dbPassword;
+
+  /// A database user name that you provide when you connect to a database. The
+  /// database user is mapped 1:1 to the source IAM identity.
+  final String? dbUser;
+
+  /// The time (UTC) when the temporary password expires. After this timestamp, a
+  /// log in with the temporary password fails.
+  final DateTime? expiration;
+
+  /// Reserved for future use.
+  final DateTime? nextRefreshTime;
+
+  ClusterExtendedCredentials({
+    this.dbPassword,
+    this.dbUser,
+    this.expiration,
+    this.nextRefreshTime,
+  });
+  factory ClusterExtendedCredentials.fromXml(_s.XmlElement elem) {
+    return ClusterExtendedCredentials(
+      dbPassword: _s.extractXmlStringValue(elem, 'DbPassword'),
+      dbUser: _s.extractXmlStringValue(elem, 'DbUser'),
+      expiration: _s.extractXmlDateTimeValue(elem, 'Expiration'),
+      nextRefreshTime: _s.extractXmlDateTimeValue(elem, 'NextRefreshTime'),
+    );
+  }
+}
+
+/// An Identity and Access Management (IAM) role that can be used by the
+/// associated Amazon Redshift cluster to access other Amazon Web Services
+/// services.
 class ClusterIamRole {
   /// A value that describes the status of the IAM role's association with an
   /// Amazon Redshift cluster.
@@ -9610,6 +11796,27 @@ class CopyClusterSnapshotResult {
   }
 }
 
+class CreateAuthenticationProfileResult {
+  /// The content of the authentication profile in JSON format.
+  final String? authenticationProfileContent;
+
+  /// The name of the authentication profile that was created.
+  final String? authenticationProfileName;
+
+  CreateAuthenticationProfileResult({
+    this.authenticationProfileContent,
+    this.authenticationProfileName,
+  });
+  factory CreateAuthenticationProfileResult.fromXml(_s.XmlElement elem) {
+    return CreateAuthenticationProfileResult(
+      authenticationProfileContent:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileContent'),
+      authenticationProfileName:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileName'),
+    );
+  }
+}
+
 class CreateClusterParameterGroupResult {
   final ClusterParameterGroup? clusterParameterGroup;
 
@@ -9764,6 +11971,207 @@ class CustomerStorageMessage {
   }
 }
 
+class DataShare {
+  /// A value that specifies whether the datashare can be shared to a publicly
+  /// accessible cluster.
+  final bool? allowPubliclyAccessibleConsumers;
+
+  /// An Amazon Resource Name (ARN) that references the datashare that is owned by
+  /// a specific namespace of the producer cluster. A datashare ARN is in the
+  /// <code>arn:aws:redshift:{region}:{account-id}:{datashare}:{namespace-guid}/{datashare-name}</code>
+  /// format.
+  final String? dataShareArn;
+
+  /// A value that specifies when the datashare has an association between
+  /// producer and data consumers.
+  final List<DataShareAssociation>? dataShareAssociations;
+
+  /// The identifier of a datashare to show its managing entity.
+  final String? managedBy;
+
+  /// The Amazon Resource Name (ARN) of the producer.
+  final String? producerArn;
+
+  DataShare({
+    this.allowPubliclyAccessibleConsumers,
+    this.dataShareArn,
+    this.dataShareAssociations,
+    this.managedBy,
+    this.producerArn,
+  });
+  factory DataShare.fromXml(_s.XmlElement elem) {
+    return DataShare(
+      allowPubliclyAccessibleConsumers:
+          _s.extractXmlBoolValue(elem, 'AllowPubliclyAccessibleConsumers'),
+      dataShareArn: _s.extractXmlStringValue(elem, 'DataShareArn'),
+      dataShareAssociations: _s
+          .extractXmlChild(elem, 'DataShareAssociations')
+          ?.let((elem) => elem
+              .findElements('member')
+              .map((c) => DataShareAssociation.fromXml(c))
+              .toList()),
+      managedBy: _s.extractXmlStringValue(elem, 'ManagedBy'),
+      producerArn: _s.extractXmlStringValue(elem, 'ProducerArn'),
+    );
+  }
+}
+
+/// The association of a datashare from a producer account with a data consumer.
+class DataShareAssociation {
+  /// The name of the consumer accounts that have an association with a producer
+  /// datashare.
+  final String? consumerIdentifier;
+
+  /// The Amazon Web Services Region of the consumer accounts that have an
+  /// association with a producer datashare.
+  final String? consumerRegion;
+
+  /// The creation date of the datashare that is associated.
+  final DateTime? createdDate;
+
+  /// The status of the datashare that is associated.
+  final DataShareStatus? status;
+
+  /// The status change data of the datashare that is associated.
+  final DateTime? statusChangeDate;
+
+  DataShareAssociation({
+    this.consumerIdentifier,
+    this.consumerRegion,
+    this.createdDate,
+    this.status,
+    this.statusChangeDate,
+  });
+  factory DataShareAssociation.fromXml(_s.XmlElement elem) {
+    return DataShareAssociation(
+      consumerIdentifier: _s.extractXmlStringValue(elem, 'ConsumerIdentifier'),
+      consumerRegion: _s.extractXmlStringValue(elem, 'ConsumerRegion'),
+      createdDate: _s.extractXmlDateTimeValue(elem, 'CreatedDate'),
+      status: _s.extractXmlStringValue(elem, 'Status')?.toDataShareStatus(),
+      statusChangeDate: _s.extractXmlDateTimeValue(elem, 'StatusChangeDate'),
+    );
+  }
+}
+
+enum DataShareStatus {
+  active,
+  pendingAuthorization,
+  authorized,
+  deauthorized,
+  rejected,
+  available,
+}
+
+extension on DataShareStatus {
+  String toValue() {
+    switch (this) {
+      case DataShareStatus.active:
+        return 'ACTIVE';
+      case DataShareStatus.pendingAuthorization:
+        return 'PENDING_AUTHORIZATION';
+      case DataShareStatus.authorized:
+        return 'AUTHORIZED';
+      case DataShareStatus.deauthorized:
+        return 'DEAUTHORIZED';
+      case DataShareStatus.rejected:
+        return 'REJECTED';
+      case DataShareStatus.available:
+        return 'AVAILABLE';
+    }
+  }
+}
+
+extension on String {
+  DataShareStatus toDataShareStatus() {
+    switch (this) {
+      case 'ACTIVE':
+        return DataShareStatus.active;
+      case 'PENDING_AUTHORIZATION':
+        return DataShareStatus.pendingAuthorization;
+      case 'AUTHORIZED':
+        return DataShareStatus.authorized;
+      case 'DEAUTHORIZED':
+        return DataShareStatus.deauthorized;
+      case 'REJECTED':
+        return DataShareStatus.rejected;
+      case 'AVAILABLE':
+        return DataShareStatus.available;
+    }
+    throw Exception('$this is not known in enum DataShareStatus');
+  }
+}
+
+enum DataShareStatusForConsumer {
+  active,
+  available,
+}
+
+extension on DataShareStatusForConsumer {
+  String toValue() {
+    switch (this) {
+      case DataShareStatusForConsumer.active:
+        return 'ACTIVE';
+      case DataShareStatusForConsumer.available:
+        return 'AVAILABLE';
+    }
+  }
+}
+
+extension on String {
+  DataShareStatusForConsumer toDataShareStatusForConsumer() {
+    switch (this) {
+      case 'ACTIVE':
+        return DataShareStatusForConsumer.active;
+      case 'AVAILABLE':
+        return DataShareStatusForConsumer.available;
+    }
+    throw Exception('$this is not known in enum DataShareStatusForConsumer');
+  }
+}
+
+enum DataShareStatusForProducer {
+  active,
+  authorized,
+  pendingAuthorization,
+  deauthorized,
+  rejected,
+}
+
+extension on DataShareStatusForProducer {
+  String toValue() {
+    switch (this) {
+      case DataShareStatusForProducer.active:
+        return 'ACTIVE';
+      case DataShareStatusForProducer.authorized:
+        return 'AUTHORIZED';
+      case DataShareStatusForProducer.pendingAuthorization:
+        return 'PENDING_AUTHORIZATION';
+      case DataShareStatusForProducer.deauthorized:
+        return 'DEAUTHORIZED';
+      case DataShareStatusForProducer.rejected:
+        return 'REJECTED';
+    }
+  }
+}
+
+extension on String {
+  DataShareStatusForProducer toDataShareStatusForProducer() {
+    switch (this) {
+      case 'ACTIVE':
+        return DataShareStatusForProducer.active;
+      case 'AUTHORIZED':
+        return DataShareStatusForProducer.authorized;
+      case 'PENDING_AUTHORIZATION':
+        return DataShareStatusForProducer.pendingAuthorization;
+      case 'DEAUTHORIZED':
+        return DataShareStatusForProducer.deauthorized;
+      case 'REJECTED':
+        return DataShareStatusForProducer.rejected;
+    }
+    throw Exception('$this is not known in enum DataShareStatusForProducer');
+  }
+}
+
 /// Describes the status of a cluster while it is in the process of resizing
 /// with an incremental resize.
 class DataTransferProgress {
@@ -9873,6 +12281,21 @@ class DeferredMaintenanceWindow {
   }
 }
 
+class DeleteAuthenticationProfileResult {
+  /// The name of the authentication profile that was deleted.
+  final String? authenticationProfileName;
+
+  DeleteAuthenticationProfileResult({
+    this.authenticationProfileName,
+  });
+  factory DeleteAuthenticationProfileResult.fromXml(_s.XmlElement elem) {
+    return DeleteAuthenticationProfileResult(
+      authenticationProfileName:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileName'),
+    );
+  }
+}
+
 class DeleteClusterResult {
   final Cluster? cluster;
 
@@ -9932,6 +12355,106 @@ class DeleteClusterSnapshotResult {
   }
 }
 
+class DescribeAuthenticationProfilesResult {
+  /// The list of authentication profiles.
+  final List<AuthenticationProfile>? authenticationProfiles;
+
+  DescribeAuthenticationProfilesResult({
+    this.authenticationProfiles,
+  });
+  factory DescribeAuthenticationProfilesResult.fromXml(_s.XmlElement elem) {
+    return DescribeAuthenticationProfilesResult(
+      authenticationProfiles: _s
+          .extractXmlChild(elem, 'AuthenticationProfiles')
+          ?.let((elem) => elem
+              .findElements('member')
+              .map((c) => AuthenticationProfile.fromXml(c))
+              .toList()),
+    );
+  }
+}
+
+class DescribeDataSharesForConsumerResult {
+  /// Shows the results of datashares available for consumers.
+  final List<DataShare>? dataShares;
+
+  /// An optional parameter that specifies the starting point to return a set of
+  /// response records. When the results of a <a>DescribeDataSharesForConsumer</a>
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the returned
+  /// marker value in the <code>Marker</code> parameter and retrying the request.
+  final String? marker;
+
+  DescribeDataSharesForConsumerResult({
+    this.dataShares,
+    this.marker,
+  });
+  factory DescribeDataSharesForConsumerResult.fromXml(_s.XmlElement elem) {
+    return DescribeDataSharesForConsumerResult(
+      dataShares: _s.extractXmlChild(elem, 'DataShares')?.let((elem) => elem
+          .findElements('member')
+          .map((c) => DataShare.fromXml(c))
+          .toList()),
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
+    );
+  }
+}
+
+class DescribeDataSharesForProducerResult {
+  /// Shows the results of datashares available for producers.
+  final List<DataShare>? dataShares;
+
+  /// An optional parameter that specifies the starting point to return a set of
+  /// response records. When the results of a <a>DescribeDataSharesForProducer</a>
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the returned
+  /// marker value in the <code>Marker</code> parameter and retrying the request.
+  final String? marker;
+
+  DescribeDataSharesForProducerResult({
+    this.dataShares,
+    this.marker,
+  });
+  factory DescribeDataSharesForProducerResult.fromXml(_s.XmlElement elem) {
+    return DescribeDataSharesForProducerResult(
+      dataShares: _s.extractXmlChild(elem, 'DataShares')?.let((elem) => elem
+          .findElements('member')
+          .map((c) => DataShare.fromXml(c))
+          .toList()),
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
+    );
+  }
+}
+
+class DescribeDataSharesResult {
+  /// The results returned from describing datashares.
+  final List<DataShare>? dataShares;
+
+  /// An optional parameter that specifies the starting point to return a set of
+  /// response records. When the results of a <a>DescribeDataShares</a> request
+  /// exceed the value specified in <code>MaxRecords</code>, Amazon Web Services
+  /// returns a value in the <code>Marker</code> field of the response. You can
+  /// retrieve the next set of response records by providing the returned marker
+  /// value in the <code>Marker</code> parameter and retrying the request.
+  final String? marker;
+
+  DescribeDataSharesResult({
+    this.dataShares,
+    this.marker,
+  });
+  factory DescribeDataSharesResult.fromXml(_s.XmlElement elem) {
+    return DescribeDataSharesResult(
+      dataShares: _s.extractXmlChild(elem, 'DataShares')?.let((elem) => elem
+          .findElements('member')
+          .map((c) => DataShare.fromXml(c))
+          .toList()),
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
+    );
+  }
+}
+
 class DescribeDefaultClusterParametersResult {
   final DefaultClusterParameters? defaultClusterParameters;
 
@@ -9943,6 +12466,52 @@ class DescribeDefaultClusterParametersResult {
       defaultClusterParameters: _s
           .extractXmlChild(elem, 'DefaultClusterParameters')
           ?.let((e) => DefaultClusterParameters.fromXml(e)),
+    );
+  }
+}
+
+class DescribePartnersOutputMessage {
+  /// A list of partner integrations.
+  final List<PartnerIntegrationInfo>? partnerIntegrationInfoList;
+
+  DescribePartnersOutputMessage({
+    this.partnerIntegrationInfoList,
+  });
+  factory DescribePartnersOutputMessage.fromXml(_s.XmlElement elem) {
+    return DescribePartnersOutputMessage(
+      partnerIntegrationInfoList: _s
+          .extractXmlChild(elem, 'PartnerIntegrationInfoList')
+          ?.let((elem) => elem
+              .findElements('PartnerIntegrationInfo')
+              .map((c) => PartnerIntegrationInfo.fromXml(c))
+              .toList()),
+    );
+  }
+}
+
+class DescribeReservedNodeExchangeStatusOutputMessage {
+  /// A pagination token provided by a previous
+  /// <code>DescribeReservedNodeExchangeStatus</code> request.
+  final String? marker;
+
+  /// The details of the reserved-node exchange request, including the status,
+  /// request time, source reserved-node identifier, and additional details.
+  final List<ReservedNodeExchangeStatus>? reservedNodeExchangeStatusDetails;
+
+  DescribeReservedNodeExchangeStatusOutputMessage({
+    this.marker,
+    this.reservedNodeExchangeStatusDetails,
+  });
+  factory DescribeReservedNodeExchangeStatusOutputMessage.fromXml(
+      _s.XmlElement elem) {
+    return DescribeReservedNodeExchangeStatusOutputMessage(
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
+      reservedNodeExchangeStatusDetails: _s
+          .extractXmlChild(elem, 'ReservedNodeExchangeStatusDetails')
+          ?.let((elem) => elem
+              .findElements('ReservedNodeExchangeStatus')
+              .map((c) => ReservedNodeExchangeStatus.fromXml(c))
+              .toList()),
     );
   }
 }
@@ -9994,8 +12563,8 @@ class EC2SecurityGroup {
   /// The name of the EC2 Security Group.
   final String? eC2SecurityGroupName;
 
-  /// The AWS ID of the owner of the EC2 security group specified in the
-  /// <code>EC2SecurityGroupName</code> field.
+  /// The Amazon Web Services account ID of the owner of the EC2 security group
+  /// specified in the <code>EC2SecurityGroupName</code> field.
   final String? eC2SecurityGroupOwnerId;
 
   /// The status of the EC2 security group.
@@ -10066,7 +12635,7 @@ class Endpoint {
   final int? port;
 
   /// Describes a connection endpoint.
-  final List<SpartaProxyVpcEndpoint>? vpcEndpoints;
+  final List<VpcEndpoint>? vpcEndpoints;
 
   Endpoint({
     this.address,
@@ -10078,9 +12647,186 @@ class Endpoint {
       address: _s.extractXmlStringValue(elem, 'Address'),
       port: _s.extractXmlIntValue(elem, 'Port'),
       vpcEndpoints: _s.extractXmlChild(elem, 'VpcEndpoints')?.let((elem) => elem
-          .findElements('SpartaProxyVpcEndpoint')
-          .map((c) => SpartaProxyVpcEndpoint.fromXml(c))
+          .findElements('VpcEndpoint')
+          .map((c) => VpcEndpoint.fromXml(c))
           .toList()),
+    );
+  }
+}
+
+/// Describes a Redshift-managed VPC endpoint.
+class EndpointAccess {
+  /// The DNS address of the endpoint.
+  final String? address;
+
+  /// The cluster identifier of the cluster associated with the endpoint.
+  final String? clusterIdentifier;
+
+  /// The time (UTC) that the endpoint was created.
+  final DateTime? endpointCreateTime;
+
+  /// The name of the endpoint.
+  final String? endpointName;
+
+  /// The status of the endpoint.
+  final String? endpointStatus;
+
+  /// The port number on which the cluster accepts incoming connections.
+  final int? port;
+
+  /// The Amazon Web Services account ID of the owner of the cluster.
+  final String? resourceOwner;
+
+  /// The subnet group name where Amazon Redshift chooses to deploy the endpoint.
+  final String? subnetGroupName;
+  final VpcEndpoint? vpcEndpoint;
+
+  /// The security groups associated with the endpoint.
+  final List<VpcSecurityGroupMembership>? vpcSecurityGroups;
+
+  EndpointAccess({
+    this.address,
+    this.clusterIdentifier,
+    this.endpointCreateTime,
+    this.endpointName,
+    this.endpointStatus,
+    this.port,
+    this.resourceOwner,
+    this.subnetGroupName,
+    this.vpcEndpoint,
+    this.vpcSecurityGroups,
+  });
+  factory EndpointAccess.fromXml(_s.XmlElement elem) {
+    return EndpointAccess(
+      address: _s.extractXmlStringValue(elem, 'Address'),
+      clusterIdentifier: _s.extractXmlStringValue(elem, 'ClusterIdentifier'),
+      endpointCreateTime:
+          _s.extractXmlDateTimeValue(elem, 'EndpointCreateTime'),
+      endpointName: _s.extractXmlStringValue(elem, 'EndpointName'),
+      endpointStatus: _s.extractXmlStringValue(elem, 'EndpointStatus'),
+      port: _s.extractXmlIntValue(elem, 'Port'),
+      resourceOwner: _s.extractXmlStringValue(elem, 'ResourceOwner'),
+      subnetGroupName: _s.extractXmlStringValue(elem, 'SubnetGroupName'),
+      vpcEndpoint: _s
+          .extractXmlChild(elem, 'VpcEndpoint')
+          ?.let((e) => VpcEndpoint.fromXml(e)),
+      vpcSecurityGroups: _s.extractXmlChild(elem, 'VpcSecurityGroups')?.let(
+          (elem) => elem
+              .findElements('VpcSecurityGroup')
+              .map((c) => VpcSecurityGroupMembership.fromXml(c))
+              .toList()),
+    );
+  }
+}
+
+class EndpointAccessList {
+  /// The list of endpoints with access to the cluster.
+  final List<EndpointAccess>? endpointAccessList;
+
+  /// An optional pagination token provided by a previous
+  /// <code>DescribeEndpointAccess</code> request. If this parameter is specified,
+  /// the response includes only records beyond the marker, up to the value
+  /// specified by the <code>MaxRecords</code> parameter.
+  final String? marker;
+
+  EndpointAccessList({
+    this.endpointAccessList,
+    this.marker,
+  });
+  factory EndpointAccessList.fromXml(_s.XmlElement elem) {
+    return EndpointAccessList(
+      endpointAccessList: _s.extractXmlChild(elem, 'EndpointAccessList')?.let(
+          (elem) => elem
+              .findElements('member')
+              .map((c) => EndpointAccess.fromXml(c))
+              .toList()),
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
+    );
+  }
+}
+
+/// Describes an endpoint authorization for authorizing Redshift-managed VPC
+/// endpoint access to a cluster across Amazon Web Services accounts.
+class EndpointAuthorization {
+  /// Indicates whether all VPCs in the grantee account are allowed access to the
+  /// cluster.
+  final bool? allowedAllVPCs;
+
+  /// The VPCs allowed access to the cluster.
+  final List<String>? allowedVPCs;
+
+  /// The time (UTC) when the authorization was created.
+  final DateTime? authorizeTime;
+
+  /// The cluster identifier.
+  final String? clusterIdentifier;
+
+  /// The status of the cluster.
+  final String? clusterStatus;
+
+  /// The number of Redshift-managed VPC endpoints created for the authorization.
+  final int? endpointCount;
+
+  /// The Amazon Web Services account ID of the grantee of the cluster.
+  final String? grantee;
+
+  /// The Amazon Web Services account ID of the cluster owner.
+  final String? grantor;
+
+  /// The status of the authorization action.
+  final AuthorizationStatus? status;
+
+  EndpointAuthorization({
+    this.allowedAllVPCs,
+    this.allowedVPCs,
+    this.authorizeTime,
+    this.clusterIdentifier,
+    this.clusterStatus,
+    this.endpointCount,
+    this.grantee,
+    this.grantor,
+    this.status,
+  });
+  factory EndpointAuthorization.fromXml(_s.XmlElement elem) {
+    return EndpointAuthorization(
+      allowedAllVPCs: _s.extractXmlBoolValue(elem, 'AllowedAllVPCs'),
+      allowedVPCs: _s
+          .extractXmlChild(elem, 'AllowedVPCs')
+          ?.let((elem) => _s.extractXmlStringListValues(elem, 'VpcIdentifier')),
+      authorizeTime: _s.extractXmlDateTimeValue(elem, 'AuthorizeTime'),
+      clusterIdentifier: _s.extractXmlStringValue(elem, 'ClusterIdentifier'),
+      clusterStatus: _s.extractXmlStringValue(elem, 'ClusterStatus'),
+      endpointCount: _s.extractXmlIntValue(elem, 'EndpointCount'),
+      grantee: _s.extractXmlStringValue(elem, 'Grantee'),
+      grantor: _s.extractXmlStringValue(elem, 'Grantor'),
+      status: _s.extractXmlStringValue(elem, 'Status')?.toAuthorizationStatus(),
+    );
+  }
+}
+
+class EndpointAuthorizationList {
+  /// The authorizations to an endpoint.
+  final List<EndpointAuthorization>? endpointAuthorizationList;
+
+  /// An optional pagination token provided by a previous
+  /// <code>DescribeEndpointAuthorization</code> request. If this parameter is
+  /// specified, the response includes only records beyond the marker, up to the
+  /// value specified by the <code>MaxRecords</code> parameter.
+  final String? marker;
+
+  EndpointAuthorizationList({
+    this.endpointAuthorizationList,
+    this.marker,
+  });
+  factory EndpointAuthorizationList.fromXml(_s.XmlElement elem) {
+    return EndpointAuthorizationList(
+      endpointAuthorizationList: _s
+          .extractXmlChild(elem, 'EndpointAuthorizationList')
+          ?.let((elem) => elem
+              .findElements('member')
+              .map((c) => EndpointAuthorization.fromXml(c))
+              .toList()),
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
     );
   }
 }
@@ -10092,7 +12838,7 @@ class Event {
 
   /// A list of the event categories.
   ///
-  /// Values: Configuration, Management, Monitoring, Security
+  /// Values: Configuration, Management, Monitoring, Security, Pending
   final List<String>? eventCategories;
 
   /// The identifier of the event.
@@ -10219,7 +12965,7 @@ class EventSubscription {
   /// The name of the Amazon Redshift event notification subscription.
   final String? custSubscriptionId;
 
-  /// The AWS customer account associated with the Amazon Redshift event
+  /// The Amazon Web Services account associated with the Amazon Redshift event
   /// notification subscription.
   final String? customerAwsId;
 
@@ -10230,7 +12976,7 @@ class EventSubscription {
   /// The list of Amazon Redshift event categories specified in the event
   /// notification subscription.
   ///
-  /// Values: Configuration, Management, Monitoring, Security
+  /// Values: Configuration, Management, Monitoring, Security, Pending
   final List<String>? eventCategoriesList;
 
   /// The event severity specified in the Amazon Redshift event notification
@@ -10363,6 +13109,36 @@ class EventsMessage {
       events: _s.extractXmlChild(elem, 'Events')?.let((elem) =>
           elem.findElements('Event').map((c) => Event.fromXml(c)).toList()),
       marker: _s.extractXmlStringValue(elem, 'Marker'),
+    );
+  }
+}
+
+class GetReservedNodeExchangeConfigurationOptionsOutputMessage {
+  /// A pagination token provided by a previous
+  /// <code>GetReservedNodeExchangeConfigurationOptions</code> request.
+  final String? marker;
+
+  /// the configuration options for the reserved-node exchange. These options
+  /// include information about the source reserved node and target reserved node.
+  /// Details include the node type, the price, the node count, and the offering
+  /// type.
+  final List<ReservedNodeConfigurationOption>?
+      reservedNodeConfigurationOptionList;
+
+  GetReservedNodeExchangeConfigurationOptionsOutputMessage({
+    this.marker,
+    this.reservedNodeConfigurationOptionList,
+  });
+  factory GetReservedNodeExchangeConfigurationOptionsOutputMessage.fromXml(
+      _s.XmlElement elem) {
+    return GetReservedNodeExchangeConfigurationOptionsOutputMessage(
+      marker: _s.extractXmlStringValue(elem, 'Marker'),
+      reservedNodeConfigurationOptionList: _s
+          .extractXmlChild(elem, 'ReservedNodeConfigurationOptionList')
+          ?.let((elem) => elem
+              .findElements('ReservedNodeConfigurationOption')
+              .map((c) => ReservedNodeConfigurationOption.fromXml(c))
+              .toList()),
     );
   }
 }
@@ -10588,6 +13364,34 @@ class IPRange {
   }
 }
 
+enum LogDestinationType {
+  s3,
+  cloudwatch,
+}
+
+extension on LogDestinationType {
+  String toValue() {
+    switch (this) {
+      case LogDestinationType.s3:
+        return 's3';
+      case LogDestinationType.cloudwatch:
+        return 'cloudwatch';
+    }
+  }
+}
+
+extension on String {
+  LogDestinationType toLogDestinationType() {
+    switch (this) {
+      case 's3':
+        return LogDestinationType.s3;
+      case 'cloudwatch':
+        return LogDestinationType.cloudwatch;
+    }
+    throw Exception('$this is not known in enum LogDestinationType');
+  }
+}
+
 /// Describes the status of logging for a cluster.
 class LoggingStatus {
   /// The name of the S3 bucket where the log files are stored.
@@ -10602,6 +13406,14 @@ class LoggingStatus {
   /// The last time that logs were delivered.
   final DateTime? lastSuccessfulDeliveryTime;
 
+  /// The log destination type. An enum with possible values of <code>s3</code>
+  /// and <code>cloudwatch</code>.
+  final LogDestinationType? logDestinationType;
+
+  /// The collection of exported log types. Log types include the connection log,
+  /// user log and user activity log.
+  final List<String>? logExports;
+
   /// <code>true</code> if logging is on, <code>false</code> if logging is off.
   final bool? loggingEnabled;
 
@@ -10613,6 +13425,8 @@ class LoggingStatus {
     this.lastFailureMessage,
     this.lastFailureTime,
     this.lastSuccessfulDeliveryTime,
+    this.logDestinationType,
+    this.logExports,
     this.loggingEnabled,
     this.s3KeyPrefix,
   });
@@ -10623,6 +13437,12 @@ class LoggingStatus {
       lastFailureTime: _s.extractXmlDateTimeValue(elem, 'LastFailureTime'),
       lastSuccessfulDeliveryTime:
           _s.extractXmlDateTimeValue(elem, 'LastSuccessfulDeliveryTime'),
+      logDestinationType: _s
+          .extractXmlStringValue(elem, 'LogDestinationType')
+          ?.toLogDestinationType(),
+      logExports: _s
+          .extractXmlChild(elem, 'LogExports')
+          ?.let((elem) => _s.extractXmlStringListValues(elem, 'member')),
       loggingEnabled: _s.extractXmlBoolValue(elem, 'LoggingEnabled'),
       s3KeyPrefix: _s.extractXmlStringValue(elem, 'S3KeyPrefix'),
     );
@@ -10691,6 +13511,43 @@ extension on String {
         return Mode.highPerformance;
     }
     throw Exception('$this is not known in enum Mode');
+  }
+}
+
+class ModifyAquaOutputMessage {
+  /// The updated AQUA configuration of the cluster.
+  final AquaConfiguration? aquaConfiguration;
+
+  ModifyAquaOutputMessage({
+    this.aquaConfiguration,
+  });
+  factory ModifyAquaOutputMessage.fromXml(_s.XmlElement elem) {
+    return ModifyAquaOutputMessage(
+      aquaConfiguration: _s
+          .extractXmlChild(elem, 'AquaConfiguration')
+          ?.let((e) => AquaConfiguration.fromXml(e)),
+    );
+  }
+}
+
+class ModifyAuthenticationProfileResult {
+  /// The updated content of the authentication profile in JSON format.
+  final String? authenticationProfileContent;
+
+  /// The name of the authentication profile that was replaced.
+  final String? authenticationProfileName;
+
+  ModifyAuthenticationProfileResult({
+    this.authenticationProfileContent,
+    this.authenticationProfileName,
+  });
+  factory ModifyAuthenticationProfileResult.fromXml(_s.XmlElement elem) {
+    return ModifyAuthenticationProfileResult(
+      authenticationProfileContent:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileContent'),
+      authenticationProfileName:
+          _s.extractXmlStringValue(elem, 'AuthenticationProfileName'),
+    );
   }
 }
 
@@ -10804,6 +13661,36 @@ class ModifySnapshotCopyRetentionPeriodResult {
     return ModifySnapshotCopyRetentionPeriodResult(
       cluster:
           _s.extractXmlChild(elem, 'Cluster')?.let((e) => Cluster.fromXml(e)),
+    );
+  }
+}
+
+/// Describes a network interface.
+class NetworkInterface {
+  /// The Availability Zone.
+  final String? availabilityZone;
+
+  /// The network interface identifier.
+  final String? networkInterfaceId;
+
+  /// The IPv4 address of the network interface within the subnet.
+  final String? privateIpAddress;
+
+  /// The subnet identifier.
+  final String? subnetId;
+
+  NetworkInterface({
+    this.availabilityZone,
+    this.networkInterfaceId,
+    this.privateIpAddress,
+    this.subnetId,
+  });
+  factory NetworkInterface.fromXml(_s.XmlElement elem) {
+    return NetworkInterface(
+      availabilityZone: _s.extractXmlStringValue(elem, 'AvailabilityZone'),
+      networkInterfaceId: _s.extractXmlStringValue(elem, 'NetworkInterfaceId'),
+      privateIpAddress: _s.extractXmlStringValue(elem, 'PrivateIpAddress'),
+      subnetId: _s.extractXmlStringValue(elem, 'SubnetId'),
     );
   }
 }
@@ -11090,7 +13977,9 @@ class Parameter {
   /// The name of the parameter.
   final String? parameterName;
 
-  /// The value of the parameter.
+  /// The value of the parameter. If <code>ParameterName</code> is
+  /// <code>wlm_json_configuration</code>, then the maximum size of
+  /// <code>ParameterValue</code> is 8000 characters.
   final String? parameterValue;
 
   /// The source of the parameter value, such as "engine-default" or "user".
@@ -11176,6 +14065,106 @@ extension on String {
   }
 }
 
+/// Describes a partner integration.
+class PartnerIntegrationInfo {
+  /// The date (UTC) that the partner integration was created.
+  final DateTime? createdAt;
+
+  /// The name of the database that receives data from a partner.
+  final String? databaseName;
+
+  /// The name of the partner.
+  final String? partnerName;
+
+  /// The partner integration status.
+  final PartnerIntegrationStatus? status;
+
+  /// The status message provided by the partner.
+  final String? statusMessage;
+
+  /// The date (UTC) that the partner integration status was last updated by the
+  /// partner.
+  final DateTime? updatedAt;
+
+  PartnerIntegrationInfo({
+    this.createdAt,
+    this.databaseName,
+    this.partnerName,
+    this.status,
+    this.statusMessage,
+    this.updatedAt,
+  });
+  factory PartnerIntegrationInfo.fromXml(_s.XmlElement elem) {
+    return PartnerIntegrationInfo(
+      createdAt: _s.extractXmlDateTimeValue(elem, 'CreatedAt'),
+      databaseName: _s.extractXmlStringValue(elem, 'DatabaseName'),
+      partnerName: _s.extractXmlStringValue(elem, 'PartnerName'),
+      status: _s
+          .extractXmlStringValue(elem, 'Status')
+          ?.toPartnerIntegrationStatus(),
+      statusMessage: _s.extractXmlStringValue(elem, 'StatusMessage'),
+      updatedAt: _s.extractXmlDateTimeValue(elem, 'UpdatedAt'),
+    );
+  }
+}
+
+class PartnerIntegrationOutputMessage {
+  /// The name of the database that receives data from the partner.
+  final String? databaseName;
+
+  /// The name of the partner that is authorized to send data.
+  final String? partnerName;
+
+  PartnerIntegrationOutputMessage({
+    this.databaseName,
+    this.partnerName,
+  });
+  factory PartnerIntegrationOutputMessage.fromXml(_s.XmlElement elem) {
+    return PartnerIntegrationOutputMessage(
+      databaseName: _s.extractXmlStringValue(elem, 'DatabaseName'),
+      partnerName: _s.extractXmlStringValue(elem, 'PartnerName'),
+    );
+  }
+}
+
+enum PartnerIntegrationStatus {
+  active,
+  inactive,
+  runtimeFailure,
+  connectionFailure,
+}
+
+extension on PartnerIntegrationStatus {
+  String toValue() {
+    switch (this) {
+      case PartnerIntegrationStatus.active:
+        return 'Active';
+      case PartnerIntegrationStatus.inactive:
+        return 'Inactive';
+      case PartnerIntegrationStatus.runtimeFailure:
+        return 'RuntimeFailure';
+      case PartnerIntegrationStatus.connectionFailure:
+        return 'ConnectionFailure';
+    }
+  }
+}
+
+extension on String {
+  PartnerIntegrationStatus toPartnerIntegrationStatus() {
+    switch (this) {
+      case 'Active':
+        return PartnerIntegrationStatus.active;
+      case 'Inactive':
+        return PartnerIntegrationStatus.inactive;
+      case 'RuntimeFailure':
+        return PartnerIntegrationStatus.runtimeFailure;
+      case 'ConnectionFailure':
+        return PartnerIntegrationStatus.connectionFailure;
+    }
+    throw Exception('$this is not known in enum PartnerIntegrationStatus');
+  }
+}
+
 /// Describes a pause cluster operation. For example, a scheduled action to run
 /// the <code>PauseCluster</code> API operation.
 class PauseClusterMessage {
@@ -11247,7 +14236,7 @@ class PendingModifiedValues {
   /// next maintenance window.
   final String? maintenanceTrackName;
 
-  /// The pending or in-progress change of the master user password for the
+  /// The pending or in-progress change of the admin user password for the
   /// cluster.
   final String? masterUserPassword;
 
@@ -11453,6 +14442,179 @@ class ReservedNode {
   }
 }
 
+/// Details for a reserved-node exchange. Examples include the node type for a
+/// reserved node, the price for a node, the node's state, and other details.
+class ReservedNodeConfigurationOption {
+  final ReservedNode? sourceReservedNode;
+
+  /// The target reserved-node count.
+  final int? targetReservedNodeCount;
+  final ReservedNodeOffering? targetReservedNodeOffering;
+
+  ReservedNodeConfigurationOption({
+    this.sourceReservedNode,
+    this.targetReservedNodeCount,
+    this.targetReservedNodeOffering,
+  });
+  factory ReservedNodeConfigurationOption.fromXml(_s.XmlElement elem) {
+    return ReservedNodeConfigurationOption(
+      sourceReservedNode: _s
+          .extractXmlChild(elem, 'SourceReservedNode')
+          ?.let((e) => ReservedNode.fromXml(e)),
+      targetReservedNodeCount:
+          _s.extractXmlIntValue(elem, 'TargetReservedNodeCount'),
+      targetReservedNodeOffering: _s
+          .extractXmlChild(elem, 'TargetReservedNodeOffering')
+          ?.let((e) => ReservedNodeOffering.fromXml(e)),
+    );
+  }
+}
+
+enum ReservedNodeExchangeActionType {
+  restoreCluster,
+  resizeCluster,
+}
+
+extension on ReservedNodeExchangeActionType {
+  String toValue() {
+    switch (this) {
+      case ReservedNodeExchangeActionType.restoreCluster:
+        return 'restore-cluster';
+      case ReservedNodeExchangeActionType.resizeCluster:
+        return 'resize-cluster';
+    }
+  }
+}
+
+extension on String {
+  ReservedNodeExchangeActionType toReservedNodeExchangeActionType() {
+    switch (this) {
+      case 'restore-cluster':
+        return ReservedNodeExchangeActionType.restoreCluster;
+      case 'resize-cluster':
+        return ReservedNodeExchangeActionType.resizeCluster;
+    }
+    throw Exception(
+        '$this is not known in enum ReservedNodeExchangeActionType');
+  }
+}
+
+/// Reserved-node status details, such as the source reserved-node identifier,
+/// the target reserved-node identifier, the node type, the node count, and
+/// other details.
+class ReservedNodeExchangeStatus {
+  /// A date and time that indicate when the reserved-node exchange was requested.
+  final DateTime? requestTime;
+
+  /// The identifier of the reserved-node exchange request.
+  final String? reservedNodeExchangeRequestId;
+
+  /// The source reserved-node count in the cluster.
+  final int? sourceReservedNodeCount;
+
+  /// The identifier of the source reserved node.
+  final String? sourceReservedNodeId;
+
+  /// The source reserved-node type, for example ds2.xlarge.
+  final String? sourceReservedNodeType;
+
+  /// The status of the reserved-node exchange request. Statuses include
+  /// in-progress and requested.
+  final ReservedNodeExchangeStatusType? status;
+
+  /// The count of target reserved nodes in the cluster.
+  final int? targetReservedNodeCount;
+
+  /// The identifier of the target reserved node offering.
+  final String? targetReservedNodeOfferingId;
+
+  /// The node type of the target reserved node, for example ra3.4xlarge.
+  final String? targetReservedNodeType;
+
+  ReservedNodeExchangeStatus({
+    this.requestTime,
+    this.reservedNodeExchangeRequestId,
+    this.sourceReservedNodeCount,
+    this.sourceReservedNodeId,
+    this.sourceReservedNodeType,
+    this.status,
+    this.targetReservedNodeCount,
+    this.targetReservedNodeOfferingId,
+    this.targetReservedNodeType,
+  });
+  factory ReservedNodeExchangeStatus.fromXml(_s.XmlElement elem) {
+    return ReservedNodeExchangeStatus(
+      requestTime: _s.extractXmlDateTimeValue(elem, 'RequestTime'),
+      reservedNodeExchangeRequestId:
+          _s.extractXmlStringValue(elem, 'ReservedNodeExchangeRequestId'),
+      sourceReservedNodeCount:
+          _s.extractXmlIntValue(elem, 'SourceReservedNodeCount'),
+      sourceReservedNodeId:
+          _s.extractXmlStringValue(elem, 'SourceReservedNodeId'),
+      sourceReservedNodeType:
+          _s.extractXmlStringValue(elem, 'SourceReservedNodeType'),
+      status: _s
+          .extractXmlStringValue(elem, 'Status')
+          ?.toReservedNodeExchangeStatusType(),
+      targetReservedNodeCount:
+          _s.extractXmlIntValue(elem, 'TargetReservedNodeCount'),
+      targetReservedNodeOfferingId:
+          _s.extractXmlStringValue(elem, 'TargetReservedNodeOfferingId'),
+      targetReservedNodeType:
+          _s.extractXmlStringValue(elem, 'TargetReservedNodeType'),
+    );
+  }
+}
+
+enum ReservedNodeExchangeStatusType {
+  requested,
+  pending,
+  inProgress,
+  retrying,
+  succeeded,
+  failed,
+}
+
+extension on ReservedNodeExchangeStatusType {
+  String toValue() {
+    switch (this) {
+      case ReservedNodeExchangeStatusType.requested:
+        return 'REQUESTED';
+      case ReservedNodeExchangeStatusType.pending:
+        return 'PENDING';
+      case ReservedNodeExchangeStatusType.inProgress:
+        return 'IN_PROGRESS';
+      case ReservedNodeExchangeStatusType.retrying:
+        return 'RETRYING';
+      case ReservedNodeExchangeStatusType.succeeded:
+        return 'SUCCEEDED';
+      case ReservedNodeExchangeStatusType.failed:
+        return 'FAILED';
+    }
+  }
+}
+
+extension on String {
+  ReservedNodeExchangeStatusType toReservedNodeExchangeStatusType() {
+    switch (this) {
+      case 'REQUESTED':
+        return ReservedNodeExchangeStatusType.requested;
+      case 'PENDING':
+        return ReservedNodeExchangeStatusType.pending;
+      case 'IN_PROGRESS':
+        return ReservedNodeExchangeStatusType.inProgress;
+      case 'RETRYING':
+        return ReservedNodeExchangeStatusType.retrying;
+      case 'SUCCEEDED':
+        return ReservedNodeExchangeStatusType.succeeded;
+      case 'FAILED':
+        return ReservedNodeExchangeStatusType.failed;
+    }
+    throw Exception(
+        '$this is not known in enum ReservedNodeExchangeStatusType');
+  }
+}
+
 /// Describes a reserved node offering.
 class ReservedNodeOffering {
   /// The currency code for the compute nodes offering.
@@ -11629,12 +14791,20 @@ class ResizeClusterMessage {
   /// current number of nodes is used.
   final int? numberOfNodes;
 
+  /// The identifier of the reserved node.
+  final String? reservedNodeId;
+
+  /// The identifier of the target reserved node offering.
+  final String? targetReservedNodeOfferingId;
+
   ResizeClusterMessage({
     required this.clusterIdentifier,
     this.classic,
     this.clusterType,
     this.nodeType,
     this.numberOfNodes,
+    this.reservedNodeId,
+    this.targetReservedNodeOfferingId,
   });
   factory ResizeClusterMessage.fromXml(_s.XmlElement elem) {
     return ResizeClusterMessage(
@@ -11643,6 +14813,9 @@ class ResizeClusterMessage {
       clusterType: _s.extractXmlStringValue(elem, 'ClusterType'),
       nodeType: _s.extractXmlStringValue(elem, 'NodeType'),
       numberOfNodes: _s.extractXmlIntValue(elem, 'NumberOfNodes'),
+      reservedNodeId: _s.extractXmlStringValue(elem, 'ReservedNodeId'),
+      targetReservedNodeOfferingId:
+          _s.extractXmlStringValue(elem, 'TargetReservedNodeOfferingId'),
     );
   }
 
@@ -11652,12 +14825,17 @@ class ResizeClusterMessage {
     final clusterType = this.clusterType;
     final nodeType = this.nodeType;
     final numberOfNodes = this.numberOfNodes;
+    final reservedNodeId = this.reservedNodeId;
+    final targetReservedNodeOfferingId = this.targetReservedNodeOfferingId;
     return {
       'ClusterIdentifier': clusterIdentifier,
       if (classic != null) 'Classic': classic,
       if (clusterType != null) 'ClusterType': clusterType,
       if (nodeType != null) 'NodeType': nodeType,
       if (numberOfNodes != null) 'NumberOfNodes': numberOfNodes,
+      if (reservedNodeId != null) 'ReservedNodeId': reservedNodeId,
+      if (targetReservedNodeOfferingId != null)
+        'TargetReservedNodeOfferingId': targetReservedNodeOfferingId,
     };
   }
 }
@@ -12294,10 +15472,10 @@ extension on String {
 class ScheduledActionsMessage {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a <a>DescribeScheduledActions</a>
-  /// request exceed the value specified in <code>MaxRecords</code>, AWS returns a
-  /// value in the <code>Marker</code> field of the response. You can retrieve the
-  /// next set of response records by providing the returned marker value in the
-  /// <code>Marker</code> parameter and retrying the request.
+  /// request exceed the value specified in <code>MaxRecords</code>, Amazon Web
+  /// Services returns a value in the <code>Marker</code> field of the response.
+  /// You can retrieve the next set of response records by providing the returned
+  /// marker value in the <code>Marker</code> parameter and retrying the request.
   final String? marker;
 
   /// List of retrieved scheduled actions.
@@ -12321,9 +15499,9 @@ class ScheduledActionsMessage {
 
 /// Describes a snapshot.
 class Snapshot {
-  /// A list of the AWS customer accounts authorized to restore the snapshot.
-  /// Returns <code>null</code> if no accounts are authorized. Visible only to the
-  /// snapshot owner.
+  /// A list of the Amazon Web Services accounts authorized to restore the
+  /// snapshot. Returns <code>null</code> if no accounts are authorized. Visible
+  /// only to the snapshot owner.
   final List<AccountWithRestoreAccess>? accountsWithRestoreAccess;
 
   /// The size of the incremental backup.
@@ -12382,8 +15560,8 @@ class Snapshot {
   /// Returns <code>0</code> for a completed backup.
   final int? estimatedSecondsToCompletion;
 
-  /// The AWS Key Management Service (KMS) key ID of the encryption key that was
-  /// used to encrypt data in the cluster from which the snapshot was taken.
+  /// The Key Management Service (KMS) key ID of the encryption key that was used
+  /// to encrypt data in the cluster from which the snapshot was taken.
   final String? kmsKeyId;
 
   /// The name of the maintenance track for the snapshot.
@@ -12398,7 +15576,7 @@ class Snapshot {
   /// The value must be either -1 or an integer between 1 and 3,653.
   final int? manualSnapshotRetentionPeriod;
 
-  /// The master user name for the cluster.
+  /// The admin user name for the cluster.
   final String? masterUsername;
 
   /// The node type of the nodes in the cluster.
@@ -12407,9 +15585,9 @@ class Snapshot {
   /// The number of nodes in the cluster.
   final int? numberOfNodes;
 
-  /// For manual snapshots, the AWS customer account used to create or copy the
-  /// snapshot. For automatic snapshots, the owner of the cluster. The owner can
-  /// perform all snapshot actions, such as sharing a manual snapshot.
+  /// For manual snapshots, the Amazon Web Services account used to create or copy
+  /// the snapshot. For automatic snapshots, the owner of the cluster. The owner
+  /// can perform all snapshot actions, such as sharing a manual snapshot.
   final String? ownerAccount;
 
   /// The port that the cluster is listening on.
@@ -12592,16 +15770,16 @@ extension on String {
 }
 
 /// The snapshot copy grant that grants Amazon Redshift permission to encrypt
-/// copied snapshots with the specified customer master key (CMK) from AWS KMS
-/// in the destination region.
+/// copied snapshots with the specified encrypted symmetric key from Amazon Web
+/// Services KMS in the destination region.
 ///
 /// For more information about managing snapshot copy grants, go to <a
 /// href="https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-db-encryption.html">Amazon
 /// Redshift Database Encryption</a> in the <i>Amazon Redshift Cluster
 /// Management Guide</i>.
 class SnapshotCopyGrant {
-  /// The unique identifier of the customer master key (CMK) in AWS KMS to which
-  /// Amazon Redshift is granted permission.
+  /// The unique identifier of the encrypted symmetric key in Amazon Web Services
+  /// KMS to which Amazon Redshift is granted permission.
   final String? kmsKeyId;
 
   /// The name of the snapshot copy grant.
@@ -12631,10 +15809,10 @@ class SnapshotCopyGrantMessage {
   /// An optional parameter that specifies the starting point to return a set of
   /// response records. When the results of a
   /// <code>DescribeSnapshotCopyGrant</code> request exceed the value specified in
-  /// <code>MaxRecords</code>, AWS returns a value in the <code>Marker</code>
-  /// field of the response. You can retrieve the next set of response records by
-  /// providing the returned marker value in the <code>Marker</code> parameter and
-  /// retrying the request.
+  /// <code>MaxRecords</code>, Amazon Web Services returns a value in the
+  /// <code>Marker</code> field of the response. You can retrieve the next set of
+  /// response records by providing the returned marker value in the
+  /// <code>Marker</code> parameter and retrying the request.
   ///
   /// Constraints: You can specify either the <b>SnapshotCopyGrantName</b>
   /// parameter or the <b>Marker</b> parameter, but not both.
@@ -12864,23 +16042,6 @@ extension on String {
         return SourceType.scheduledAction;
     }
     throw Exception('$this is not known in enum SourceType');
-  }
-}
-
-/// The connection endpoint for connecting an Amazon Redshift cluster through
-/// the proxy.
-class SpartaProxyVpcEndpoint {
-  /// The connection endpoint ID for connecting an Amazon Redshift cluster through
-  /// the proxy.
-  final String? vpcEndpointId;
-
-  SpartaProxyVpcEndpoint({
-    this.vpcEndpointId,
-  });
-  factory SpartaProxyVpcEndpoint.fromXml(_s.XmlElement elem) {
-    return SpartaProxyVpcEndpoint(
-      vpcEndpointId: _s.extractXmlStringValue(elem, 'VpcEndpointId'),
-    );
   }
 }
 
@@ -13383,6 +16544,7 @@ extension on String {
 enum UsageLimitFeatureType {
   spectrum,
   concurrencyScaling,
+  crossRegionDatasharing,
 }
 
 extension on UsageLimitFeatureType {
@@ -13392,6 +16554,8 @@ extension on UsageLimitFeatureType {
         return 'spectrum';
       case UsageLimitFeatureType.concurrencyScaling:
         return 'concurrency-scaling';
+      case UsageLimitFeatureType.crossRegionDatasharing:
+        return 'cross-region-datasharing';
     }
   }
 }
@@ -13403,6 +16567,8 @@ extension on String {
         return UsageLimitFeatureType.spectrum;
       case 'concurrency-scaling':
         return UsageLimitFeatureType.concurrencyScaling;
+      case 'cross-region-datasharing':
+        return UsageLimitFeatureType.crossRegionDatasharing;
     }
     throw Exception('$this is not known in enum UsageLimitFeatureType');
   }
@@ -13496,6 +16662,38 @@ extension on String {
   }
 }
 
+/// The connection endpoint for connecting to an Amazon Redshift cluster through
+/// the proxy.
+class VpcEndpoint {
+  /// One or more network interfaces of the endpoint. Also known as an interface
+  /// endpoint.
+  final List<NetworkInterface>? networkInterfaces;
+
+  /// The connection endpoint ID for connecting an Amazon Redshift cluster through
+  /// the proxy.
+  final String? vpcEndpointId;
+
+  /// The VPC identifier that the endpoint is associated.
+  final String? vpcId;
+
+  VpcEndpoint({
+    this.networkInterfaces,
+    this.vpcEndpointId,
+    this.vpcId,
+  });
+  factory VpcEndpoint.fromXml(_s.XmlElement elem) {
+    return VpcEndpoint(
+      networkInterfaces: _s.extractXmlChild(elem, 'NetworkInterfaces')?.let(
+          (elem) => elem
+              .findElements('NetworkInterface')
+              .map((c) => NetworkInterface.fromXml(c))
+              .toList()),
+      vpcEndpointId: _s.extractXmlStringValue(elem, 'VpcEndpointId'),
+      vpcId: _s.extractXmlStringValue(elem, 'VpcId'),
+    );
+  }
+}
+
 /// Describes the members of a VPC security group.
 class VpcSecurityGroupMembership {
   /// The status of the VPC security group.
@@ -13516,10 +16714,39 @@ class VpcSecurityGroupMembership {
   }
 }
 
+class AccessToClusterDeniedFault extends _s.GenericAwsException {
+  AccessToClusterDeniedFault({String? type, String? message})
+      : super(type: type, code: 'AccessToClusterDeniedFault', message: message);
+}
+
 class AccessToSnapshotDeniedFault extends _s.GenericAwsException {
   AccessToSnapshotDeniedFault({String? type, String? message})
       : super(
             type: type, code: 'AccessToSnapshotDeniedFault', message: message);
+}
+
+class AuthenticationProfileAlreadyExistsFault extends _s.GenericAwsException {
+  AuthenticationProfileAlreadyExistsFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'AuthenticationProfileAlreadyExistsFault',
+            message: message);
+}
+
+class AuthenticationProfileNotFoundFault extends _s.GenericAwsException {
+  AuthenticationProfileNotFoundFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'AuthenticationProfileNotFoundFault',
+            message: message);
+}
+
+class AuthenticationProfileQuotaExceededFault extends _s.GenericAwsException {
+  AuthenticationProfileQuotaExceededFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'AuthenticationProfileQuotaExceededFault',
+            message: message);
 }
 
 class AuthorizationAlreadyExistsFault extends _s.GenericAwsException {
@@ -13709,6 +16936,59 @@ class DependentServiceUnavailableFault extends _s.GenericAwsException {
             message: message);
 }
 
+class EndpointAlreadyExistsFault extends _s.GenericAwsException {
+  EndpointAlreadyExistsFault({String? type, String? message})
+      : super(type: type, code: 'EndpointAlreadyExistsFault', message: message);
+}
+
+class EndpointAuthorizationAlreadyExistsFault extends _s.GenericAwsException {
+  EndpointAuthorizationAlreadyExistsFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EndpointAuthorizationAlreadyExistsFault',
+            message: message);
+}
+
+class EndpointAuthorizationNotFoundFault extends _s.GenericAwsException {
+  EndpointAuthorizationNotFoundFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EndpointAuthorizationNotFoundFault',
+            message: message);
+}
+
+class EndpointAuthorizationsPerClusterLimitExceededFault
+    extends _s.GenericAwsException {
+  EndpointAuthorizationsPerClusterLimitExceededFault(
+      {String? type, String? message})
+      : super(
+            type: type,
+            code: 'EndpointAuthorizationsPerClusterLimitExceededFault',
+            message: message);
+}
+
+class EndpointNotFoundFault extends _s.GenericAwsException {
+  EndpointNotFoundFault({String? type, String? message})
+      : super(type: type, code: 'EndpointNotFoundFault', message: message);
+}
+
+class EndpointsPerAuthorizationLimitExceededFault
+    extends _s.GenericAwsException {
+  EndpointsPerAuthorizationLimitExceededFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EndpointsPerAuthorizationLimitExceededFault',
+            message: message);
+}
+
+class EndpointsPerClusterLimitExceededFault extends _s.GenericAwsException {
+  EndpointsPerClusterLimitExceededFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EndpointsPerClusterLimitExceededFault',
+            message: message);
+}
+
 class EventSubscriptionQuotaExceededFault extends _s.GenericAwsException {
   EventSubscriptionQuotaExceededFault({String? type, String? message})
       : super(
@@ -13795,6 +17075,22 @@ class InsufficientS3BucketPolicyFault extends _s.GenericAwsException {
             message: message);
 }
 
+class InvalidAuthenticationProfileRequestFault extends _s.GenericAwsException {
+  InvalidAuthenticationProfileRequestFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'InvalidAuthenticationProfileRequestFault',
+            message: message);
+}
+
+class InvalidAuthorizationStateFault extends _s.GenericAwsException {
+  InvalidAuthorizationStateFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'InvalidAuthorizationStateFault',
+            message: message);
+}
+
 class InvalidClusterParameterGroupStateFault extends _s.GenericAwsException {
   InvalidClusterParameterGroupStateFault({String? type, String? message})
       : super(
@@ -13853,9 +17149,19 @@ class InvalidClusterTrackFault extends _s.GenericAwsException {
       : super(type: type, code: 'InvalidClusterTrackFault', message: message);
 }
 
+class InvalidDataShareFault extends _s.GenericAwsException {
+  InvalidDataShareFault({String? type, String? message})
+      : super(type: type, code: 'InvalidDataShareFault', message: message);
+}
+
 class InvalidElasticIpFault extends _s.GenericAwsException {
   InvalidElasticIpFault({String? type, String? message})
       : super(type: type, code: 'InvalidElasticIpFault', message: message);
+}
+
+class InvalidEndpointStateFault extends _s.GenericAwsException {
+  InvalidEndpointStateFault({String? type, String? message})
+      : super(type: type, code: 'InvalidEndpointStateFault', message: message);
 }
 
 class InvalidHsmClientCertificateStateFault extends _s.GenericAwsException {
@@ -13872,6 +17178,11 @@ class InvalidHsmConfigurationStateFault extends _s.GenericAwsException {
             type: type,
             code: 'InvalidHsmConfigurationStateFault',
             message: message);
+}
+
+class InvalidNamespaceFault extends _s.GenericAwsException {
+  InvalidNamespaceFault({String? type, String? message})
+      : super(type: type, code: 'InvalidNamespaceFault', message: message);
 }
 
 class InvalidReservedNodeStateFault extends _s.GenericAwsException {
@@ -13980,6 +17291,11 @@ class NumberOfNodesQuotaExceededFault extends _s.GenericAwsException {
             message: message);
 }
 
+class PartnerNotFoundFault extends _s.GenericAwsException {
+  PartnerNotFoundFault({String? type, String? message})
+      : super(type: type, code: 'PartnerNotFoundFault', message: message);
+}
+
 class ReservedNodeAlreadyExistsFault extends _s.GenericAwsException {
   ReservedNodeAlreadyExistsFault({String? type, String? message})
       : super(
@@ -13993,6 +17309,14 @@ class ReservedNodeAlreadyMigratedFault extends _s.GenericAwsException {
       : super(
             type: type,
             code: 'ReservedNodeAlreadyMigratedFault',
+            message: message);
+}
+
+class ReservedNodeExchangeNotFoundFault extends _s.GenericAwsException {
+  ReservedNodeExchangeNotFoundFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'ReservedNodeExchangeNotFoundFault',
             message: message);
 }
 
@@ -14224,6 +17548,14 @@ class UnauthorizedOperation extends _s.GenericAwsException {
       : super(type: type, code: 'UnauthorizedOperation', message: message);
 }
 
+class UnauthorizedPartnerIntegrationFault extends _s.GenericAwsException {
+  UnauthorizedPartnerIntegrationFault({String? type, String? message})
+      : super(
+            type: type,
+            code: 'UnauthorizedPartnerIntegrationFault',
+            message: message);
+}
+
 class UnknownSnapshotCopyRegionFault extends _s.GenericAwsException {
   UnknownSnapshotCopyRegionFault({String? type, String? message})
       : super(
@@ -14254,8 +17586,16 @@ class UsageLimitNotFoundFault extends _s.GenericAwsException {
 }
 
 final _exceptionFns = <String, _s.AwsExceptionFn>{
+  'AccessToClusterDeniedFault': (type, message) =>
+      AccessToClusterDeniedFault(type: type, message: message),
   'AccessToSnapshotDeniedFault': (type, message) =>
       AccessToSnapshotDeniedFault(type: type, message: message),
+  'AuthenticationProfileAlreadyExistsFault': (type, message) =>
+      AuthenticationProfileAlreadyExistsFault(type: type, message: message),
+  'AuthenticationProfileNotFoundFault': (type, message) =>
+      AuthenticationProfileNotFoundFault(type: type, message: message),
+  'AuthenticationProfileQuotaExceededFault': (type, message) =>
+      AuthenticationProfileQuotaExceededFault(type: type, message: message),
   'AuthorizationAlreadyExistsFault': (type, message) =>
       AuthorizationAlreadyExistsFault(type: type, message: message),
   'AuthorizationNotFoundFault': (type, message) =>
@@ -14309,6 +17649,21 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       DependentServiceRequestThrottlingFault(type: type, message: message),
   'DependentServiceUnavailableFault': (type, message) =>
       DependentServiceUnavailableFault(type: type, message: message),
+  'EndpointAlreadyExistsFault': (type, message) =>
+      EndpointAlreadyExistsFault(type: type, message: message),
+  'EndpointAuthorizationAlreadyExistsFault': (type, message) =>
+      EndpointAuthorizationAlreadyExistsFault(type: type, message: message),
+  'EndpointAuthorizationNotFoundFault': (type, message) =>
+      EndpointAuthorizationNotFoundFault(type: type, message: message),
+  'EndpointAuthorizationsPerClusterLimitExceededFault': (type, message) =>
+      EndpointAuthorizationsPerClusterLimitExceededFault(
+          type: type, message: message),
+  'EndpointNotFoundFault': (type, message) =>
+      EndpointNotFoundFault(type: type, message: message),
+  'EndpointsPerAuthorizationLimitExceededFault': (type, message) =>
+      EndpointsPerAuthorizationLimitExceededFault(type: type, message: message),
+  'EndpointsPerClusterLimitExceededFault': (type, message) =>
+      EndpointsPerClusterLimitExceededFault(type: type, message: message),
   'EventSubscriptionQuotaExceededFault': (type, message) =>
       EventSubscriptionQuotaExceededFault(type: type, message: message),
   'HsmClientCertificateAlreadyExistsFault': (type, message) =>
@@ -14331,6 +17686,10 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       InsufficientClusterCapacityFault(type: type, message: message),
   'InsufficientS3BucketPolicyFault': (type, message) =>
       InsufficientS3BucketPolicyFault(type: type, message: message),
+  'InvalidAuthenticationProfileRequestFault': (type, message) =>
+      InvalidAuthenticationProfileRequestFault(type: type, message: message),
+  'InvalidAuthorizationStateFault': (type, message) =>
+      InvalidAuthorizationStateFault(type: type, message: message),
   'InvalidClusterParameterGroupStateFault': (type, message) =>
       InvalidClusterParameterGroupStateFault(type: type, message: message),
   'InvalidClusterSecurityGroupStateFault': (type, message) =>
@@ -14347,12 +17706,18 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       InvalidClusterSubnetStateFault(type: type, message: message),
   'InvalidClusterTrackFault': (type, message) =>
       InvalidClusterTrackFault(type: type, message: message),
+  'InvalidDataShareFault': (type, message) =>
+      InvalidDataShareFault(type: type, message: message),
   'InvalidElasticIpFault': (type, message) =>
       InvalidElasticIpFault(type: type, message: message),
+  'InvalidEndpointStateFault': (type, message) =>
+      InvalidEndpointStateFault(type: type, message: message),
   'InvalidHsmClientCertificateStateFault': (type, message) =>
       InvalidHsmClientCertificateStateFault(type: type, message: message),
   'InvalidHsmConfigurationStateFault': (type, message) =>
       InvalidHsmConfigurationStateFault(type: type, message: message),
+  'InvalidNamespaceFault': (type, message) =>
+      InvalidNamespaceFault(type: type, message: message),
   'InvalidReservedNodeStateFault': (type, message) =>
       InvalidReservedNodeStateFault(type: type, message: message),
   'InvalidRestoreFault': (type, message) =>
@@ -14387,10 +17752,14 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       NumberOfNodesPerClusterLimitExceededFault(type: type, message: message),
   'NumberOfNodesQuotaExceededFault': (type, message) =>
       NumberOfNodesQuotaExceededFault(type: type, message: message),
+  'PartnerNotFoundFault': (type, message) =>
+      PartnerNotFoundFault(type: type, message: message),
   'ReservedNodeAlreadyExistsFault': (type, message) =>
       ReservedNodeAlreadyExistsFault(type: type, message: message),
   'ReservedNodeAlreadyMigratedFault': (type, message) =>
       ReservedNodeAlreadyMigratedFault(type: type, message: message),
+  'ReservedNodeExchangeNotFoundFault': (type, message) =>
+      ReservedNodeExchangeNotFoundFault(type: type, message: message),
   'ReservedNodeNotFoundFault': (type, message) =>
       ReservedNodeNotFoundFault(type: type, message: message),
   'ReservedNodeOfferingNotFoundFault': (type, message) =>
@@ -14459,6 +17828,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       TagLimitExceededFault(type: type, message: message),
   'UnauthorizedOperation': (type, message) =>
       UnauthorizedOperation(type: type, message: message),
+  'UnauthorizedPartnerIntegrationFault': (type, message) =>
+      UnauthorizedPartnerIntegrationFault(type: type, message: message),
   'UnknownSnapshotCopyRegionFault': (type, message) =>
       UnknownSnapshotCopyRegionFault(type: type, message: message),
   'UnsupportedOperationFault': (type, message) =>

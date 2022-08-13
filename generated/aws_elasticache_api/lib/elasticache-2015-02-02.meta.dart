@@ -139,7 +139,15 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "shape": "BooleanOptional",
         "flattened": false
       },
-      "ARN": {"shape": "String", "flattened": false}
+      "ARN": {"shape": "String", "flattened": false},
+      "ReplicationGroupLogDeliveryEnabled": {
+        "shape": "Boolean",
+        "flattened": false
+      },
+      "LogDeliveryConfigurations": {
+        "shape": "LogDeliveryConfigurationList",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -419,6 +427,13 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "flattened": false
   },
   "ChangeType": {"type": "string", "flattened": false},
+  "CloudWatchLogsDestinationDetails": {
+    "type": "structure",
+    "members": {
+      "LogGroup": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
   "ClusterIdList": {
     "type": "list",
     "member": {"shape": "String", "locationName": "ClusterId"},
@@ -461,7 +476,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "SourceSnapshotName": {"shape": "String", "flattened": false},
       "TargetSnapshotName": {"shape": "String", "flattened": false},
       "TargetBucket": {"shape": "String", "flattened": false},
-      "KmsKeyId": {"shape": "String", "flattened": false}
+      "KmsKeyId": {"shape": "String", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -515,6 +531,14 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "PreferredOutpostArns": {
         "shape": "PreferredOutpostArnList",
         "flattened": false
+      },
+      "LogDeliveryConfigurations": {
+        "shape": "LogDeliveryConfigurationRequestList",
+        "flattened": false
+      },
+      "TransitEncryptionEnabled": {
+        "shape": "BooleanOptional",
+        "flattened": false
       }
     },
     "flattened": false
@@ -531,7 +555,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "CacheParameterGroupName": {"shape": "String", "flattened": false},
       "CacheParameterGroupFamily": {"shape": "String", "flattened": false},
-      "Description": {"shape": "String", "flattened": false}
+      "Description": {"shape": "String", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -549,7 +574,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "type": "structure",
     "members": {
       "CacheSecurityGroupName": {"shape": "String", "flattened": false},
-      "Description": {"shape": "String", "flattened": false}
+      "Description": {"shape": "String", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -565,7 +591,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "CacheSubnetGroupName": {"shape": "String", "flattened": false},
       "CacheSubnetGroupDescription": {"shape": "String", "flattened": false},
-      "SubnetIds": {"shape": "SubnetIdentifierList", "flattened": false}
+      "SubnetIds": {"shape": "SubnetIdentifierList", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -656,7 +683,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "flattened": false
       },
       "KmsKeyId": {"shape": "String", "flattened": false},
-      "UserGroupIds": {"shape": "UserGroupIdListInput", "flattened": false}
+      "UserGroupIds": {"shape": "UserGroupIdListInput", "flattened": false},
+      "LogDeliveryConfigurations": {
+        "shape": "LogDeliveryConfigurationRequestList",
+        "flattened": false
+      },
+      "DataTieringEnabled": {"shape": "BooleanOptional", "flattened": false}
     },
     "flattened": false
   },
@@ -673,7 +705,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "ReplicationGroupId": {"shape": "String", "flattened": false},
       "CacheClusterId": {"shape": "String", "flattened": false},
       "SnapshotName": {"shape": "String", "flattened": false},
-      "KmsKeyId": {"shape": "String", "flattened": false}
+      "KmsKeyId": {"shape": "String", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -689,7 +722,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "UserGroupId": {"shape": "String", "flattened": false},
       "Engine": {"shape": "EngineType", "flattened": false},
-      "UserIds": {"shape": "UserIdListInput", "flattened": false}
+      "UserIds": {"shape": "UserIdListInput", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -701,7 +735,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Engine": {"shape": "EngineType", "flattened": false},
       "Passwords": {"shape": "PasswordListInput", "flattened": false},
       "AccessString": {"shape": "AccessString", "flattened": false},
-      "NoPasswordRequired": {"shape": "BooleanOptional", "flattened": false}
+      "NoPasswordRequired": {"shape": "BooleanOptional", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -718,6 +753,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "CustomerNodeEndpoint"},
     "flattened": false
   },
+  "DataTieringStatus": {"type": "string", "flattened": false},
   "DecreaseNodeGroupsInGlobalReplicationGroupMessage": {
     "type": "structure",
     "members": {
@@ -1114,6 +1150,21 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "DestinationDetails": {
+    "type": "structure",
+    "members": {
+      "CloudWatchLogsDetails": {
+        "shape": "CloudWatchLogsDestinationDetails",
+        "flattened": false
+      },
+      "KinesisFirehoseDetails": {
+        "shape": "KinesisFirehoseDestinationDetails",
+        "flattened": false
+      }
+    },
+    "flattened": false
+  },
+  "DestinationType": {"type": "string", "flattened": false},
   "DisassociateGlobalReplicationGroupMessage": {
     "type": "structure",
     "members": {
@@ -1372,6 +1423,13 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "String"},
     "flattened": false
   },
+  "KinesisFirehoseDestinationDetails": {
+    "type": "structure",
+    "members": {
+      "DeliveryStream": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
   "ListAllowedNodeTypeModificationsMessage": {
     "type": "structure",
     "members": {
@@ -1387,6 +1445,48 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "LogDeliveryConfiguration": {
+    "type": "structure",
+    "members": {
+      "LogType": {"shape": "LogType", "flattened": false},
+      "DestinationType": {"shape": "DestinationType", "flattened": false},
+      "DestinationDetails": {"shape": "DestinationDetails", "flattened": false},
+      "LogFormat": {"shape": "LogFormat", "flattened": false},
+      "Status": {"shape": "LogDeliveryConfigurationStatus", "flattened": false},
+      "Message": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
+  "LogDeliveryConfigurationList": {
+    "type": "list",
+    "member": {
+      "shape": "LogDeliveryConfiguration",
+      "locationName": "LogDeliveryConfiguration"
+    },
+    "flattened": false
+  },
+  "LogDeliveryConfigurationRequest": {
+    "type": "structure",
+    "members": {
+      "LogType": {"shape": "LogType", "flattened": false},
+      "DestinationType": {"shape": "DestinationType", "flattened": false},
+      "DestinationDetails": {"shape": "DestinationDetails", "flattened": false},
+      "LogFormat": {"shape": "LogFormat", "flattened": false},
+      "Enabled": {"shape": "BooleanOptional", "flattened": false}
+    },
+    "flattened": false
+  },
+  "LogDeliveryConfigurationRequestList": {
+    "type": "list",
+    "member": {
+      "shape": "LogDeliveryConfigurationRequest",
+      "locationName": "LogDeliveryConfigurationRequest"
+    },
+    "flattened": false
+  },
+  "LogDeliveryConfigurationStatus": {"type": "string", "flattened": false},
+  "LogFormat": {"type": "string", "flattened": false},
+  "LogType": {"type": "string", "flattened": false},
   "ModifyCacheClusterMessage": {
     "type": "structure",
     "members": {
@@ -1422,6 +1522,10 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "AuthToken": {"shape": "String", "flattened": false},
       "AuthTokenUpdateStrategy": {
         "shape": "AuthTokenUpdateStrategyType",
+        "flattened": false
+      },
+      "LogDeliveryConfigurations": {
+        "shape": "LogDeliveryConfigurationRequestList",
         "flattened": false
       }
     },
@@ -1468,6 +1572,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "ApplyImmediately": {"shape": "Boolean", "flattened": false},
       "CacheNodeType": {"shape": "String", "flattened": false},
       "EngineVersion": {"shape": "String", "flattened": false},
+      "CacheParameterGroupName": {"shape": "String", "flattened": false},
       "GlobalReplicationGroupDescription": {
         "shape": "String",
         "flattened": false
@@ -1530,7 +1635,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       },
       "UserGroupIdsToAdd": {"shape": "UserGroupIdList", "flattened": false},
       "UserGroupIdsToRemove": {"shape": "UserGroupIdList", "flattened": false},
-      "RemoveUserGroups": {"shape": "BooleanOptional", "flattened": false}
+      "RemoveUserGroups": {"shape": "BooleanOptional", "flattened": false},
+      "LogDeliveryConfigurations": {
+        "shape": "LogDeliveryConfigurationRequestList",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -1793,6 +1902,22 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "flattened": false
   },
   "PendingAutomaticFailoverStatus": {"type": "string", "flattened": false},
+  "PendingLogDeliveryConfiguration": {
+    "type": "structure",
+    "members": {
+      "LogType": {"shape": "LogType", "flattened": false},
+      "DestinationType": {"shape": "DestinationType", "flattened": false},
+      "DestinationDetails": {"shape": "DestinationDetails", "flattened": false},
+      "LogFormat": {"shape": "LogFormat", "flattened": false}
+    },
+    "flattened": false
+  },
+  "PendingLogDeliveryConfigurationList": {
+    "type": "list",
+    "member": {"shape": "PendingLogDeliveryConfiguration"},
+    "locationName": "PendingLogDeliveryConfiguration",
+    "flattened": false
+  },
   "PendingModifiedValues": {
     "type": "structure",
     "members": {
@@ -1800,7 +1925,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "CacheNodeIdsToRemove": {"shape": "CacheNodeIdsList", "flattened": false},
       "EngineVersion": {"shape": "String", "flattened": false},
       "CacheNodeType": {"shape": "String", "flattened": false},
-      "AuthTokenStatus": {"shape": "AuthTokenUpdateStatus", "flattened": false}
+      "AuthTokenStatus": {"shape": "AuthTokenUpdateStatus", "flattened": false},
+      "LogDeliveryConfigurations": {
+        "shape": "PendingLogDeliveryConfigurationList",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -1837,7 +1966,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "ReservedCacheNodesOfferingId": {"shape": "String", "flattened": false},
       "ReservedCacheNodeId": {"shape": "String", "flattened": false},
-      "CacheNodeCount": {"shape": "IntegerOptional", "flattened": false}
+      "CacheNodeCount": {"shape": "IntegerOptional", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -1978,7 +2108,14 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       },
       "KmsKeyId": {"shape": "String", "flattened": false},
       "ARN": {"shape": "String", "flattened": false},
-      "UserGroupIds": {"shape": "UserGroupIdList", "flattened": false}
+      "UserGroupIds": {"shape": "UserGroupIdList", "flattened": false},
+      "LogDeliveryConfigurations": {
+        "shape": "LogDeliveryConfigurationList",
+        "flattened": false
+      },
+      "ReplicationGroupCreateTime": {"shape": "TStamp", "flattened": false},
+      "DataTiering": {"shape": "DataTieringStatus", "flattened": false},
+      "AutoMinorVersionUpgrade": {"shape": "Boolean", "flattened": false}
     },
     "flattened": false
   },
@@ -2015,7 +2152,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       },
       "Resharding": {"shape": "ReshardingStatus", "flattened": false},
       "AuthTokenStatus": {"shape": "AuthTokenUpdateStatus", "flattened": false},
-      "UserGroups": {"shape": "UserGroupsUpdateStatus", "flattened": false}
+      "UserGroups": {"shape": "UserGroupsUpdateStatus", "flattened": false},
+      "LogDeliveryConfigurations": {
+        "shape": "PendingLogDeliveryConfigurationList",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -2256,7 +2397,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       },
       "NodeSnapshots": {"shape": "NodeSnapshotList", "flattened": false},
       "KmsKeyId": {"shape": "String", "flattened": false},
-      "ARN": {"shape": "String", "flattened": false}
+      "ARN": {"shape": "String", "flattened": false},
+      "DataTiering": {"shape": "DataTieringStatus", "flattened": false}
     },
     "flattened": false
   },
@@ -2465,6 +2607,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "UserName": {"shape": "String", "flattened": false},
       "Status": {"shape": "String", "flattened": false},
       "Engine": {"shape": "EngineType", "flattened": false},
+      "MinimumEngineVersion": {"shape": "String", "flattened": false},
       "AccessString": {"shape": "String", "flattened": false},
       "UserGroupIds": {"shape": "UserGroupIdList", "flattened": false},
       "Authentication": {"shape": "Authentication", "flattened": false},
@@ -2479,6 +2622,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Status": {"shape": "String", "flattened": false},
       "Engine": {"shape": "EngineType", "flattened": false},
       "UserIds": {"shape": "UserIdList", "flattened": false},
+      "MinimumEngineVersion": {"shape": "String", "flattened": false},
       "PendingChanges": {
         "shape": "UserGroupPendingChanges",
         "flattened": false

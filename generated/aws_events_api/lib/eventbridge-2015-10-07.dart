@@ -18,21 +18,21 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// Amazon EventBridge helps you to respond to state changes in your AWS
-/// resources. When your resources change state, they automatically send events
-/// into an event stream. You can create rules that match selected events in the
-/// stream and route them to targets to take action. You can also use rules to
-/// take action on a predetermined schedule. For example, you can configure
-/// rules to:
+/// Amazon EventBridge helps you to respond to state changes in your Amazon Web
+/// Services resources. When your resources change state, they automatically
+/// send events to an event stream. You can create rules that match selected
+/// events in the stream and route them to targets to take action. You can also
+/// use rules to take action on a predetermined schedule. For example, you can
+/// configure rules to:
 ///
 /// <ul>
 /// <li>
-/// Automatically invoke an AWS Lambda function to update DNS entries when an
-/// event notifies you that Amazon EC2 instance enters the running state.
+/// Automatically invoke an Lambda function to update DNS entries when an event
+/// notifies you that Amazon EC2 instance enters the running state.
 /// </li>
 /// <li>
-/// Direct specific API records from AWS CloudTrail to an Amazon Kinesis data
-/// stream for detailed analysis of potential security or availability risks.
+/// Direct specific API records from CloudTrail to an Amazon Kinesis data stream
+/// for detailed analysis of potential security or availability risks.
 /// </li>
 /// <li>
 /// Periodically invoke a built-in target to create a snapshot of an Amazon EBS
@@ -147,6 +147,102 @@ class EventBridge {
     return CancelReplayResponse.fromJson(jsonResponse.body);
   }
 
+  /// Creates an API destination, which is an HTTP invocation endpoint
+  /// configured as a target for events.
+  ///
+  /// May throw [ResourceAlreadyExistsException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [LimitExceededException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [connectionArn] :
+  /// The ARN of the connection to use for the API destination. The destination
+  /// endpoint must support the authorization type specified for the connection.
+  ///
+  /// Parameter [httpMethod] :
+  /// The method to use for the request to the HTTP invocation endpoint.
+  ///
+  /// Parameter [invocationEndpoint] :
+  /// The URL to the HTTP invocation endpoint for the API destination.
+  ///
+  /// Parameter [name] :
+  /// The name for the API destination to create.
+  ///
+  /// Parameter [description] :
+  /// A description for the API destination to create.
+  ///
+  /// Parameter [invocationRateLimitPerSecond] :
+  /// The maximum number of requests per second to send to the HTTP invocation
+  /// endpoint.
+  Future<CreateApiDestinationResponse> createApiDestination({
+    required String connectionArn,
+    required ApiDestinationHttpMethod httpMethod,
+    required String invocationEndpoint,
+    required String name,
+    String? description,
+    int? invocationRateLimitPerSecond,
+  }) async {
+    ArgumentError.checkNotNull(connectionArn, 'connectionArn');
+    _s.validateStringLength(
+      'connectionArn',
+      connectionArn,
+      1,
+      1600,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(httpMethod, 'httpMethod');
+    ArgumentError.checkNotNull(invocationEndpoint, 'invocationEndpoint');
+    _s.validateStringLength(
+      'invocationEndpoint',
+      invocationEndpoint,
+      1,
+      2048,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      512,
+    );
+    _s.validateNumRange(
+      'invocationRateLimitPerSecond',
+      invocationRateLimitPerSecond,
+      1,
+      1152921504606846976,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.CreateApiDestination'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ConnectionArn': connectionArn,
+        'HttpMethod': httpMethod.toValue(),
+        'InvocationEndpoint': invocationEndpoint,
+        'Name': name,
+        if (description != null) 'Description': description,
+        if (invocationRateLimitPerSecond != null)
+          'InvocationRateLimitPerSecond': invocationRateLimitPerSecond,
+      },
+    );
+
+    return CreateApiDestinationResponse.fromJson(jsonResponse.body);
+  }
+
   /// Creates an archive of events with the specified settings. When you create
   /// an archive, incoming events might not immediately start being sent to the
   /// archive. Allow a short period of time for changes to take effect. If you
@@ -165,7 +261,7 @@ class EventBridge {
   /// The name for the archive to create.
   ///
   /// Parameter [eventSourceArn] :
-  /// The ARN of the event source associated with the archive.
+  /// The ARN of the event bus that sends events to the archive.
   ///
   /// Parameter [description] :
   /// A description for the archive.
@@ -205,6 +301,12 @@ class EventBridge {
       0,
       512,
     );
+    _s.validateStringLength(
+      'eventPattern',
+      eventPattern,
+      0,
+      4096,
+    );
     _s.validateNumRange(
       'retentionDays',
       retentionDays,
@@ -231,6 +333,156 @@ class EventBridge {
     );
 
     return CreateArchiveResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Creates a connection. A connection defines the authorization type and
+  /// credentials to use for authorization with an API destination HTTP
+  /// endpoint.
+  ///
+  /// May throw [ResourceAlreadyExistsException].
+  /// May throw [LimitExceededException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [authParameters] :
+  /// A <code>CreateConnectionAuthRequestParameters</code> object that contains
+  /// the authorization parameters to use to authorize with the endpoint.
+  ///
+  /// Parameter [authorizationType] :
+  /// The type of authorization to use for the connection.
+  ///
+  /// Parameter [name] :
+  /// The name for the connection to create.
+  ///
+  /// Parameter [description] :
+  /// A description for the connection to create.
+  Future<CreateConnectionResponse> createConnection({
+    required CreateConnectionAuthRequestParameters authParameters,
+    required ConnectionAuthorizationType authorizationType,
+    required String name,
+    String? description,
+  }) async {
+    ArgumentError.checkNotNull(authParameters, 'authParameters');
+    ArgumentError.checkNotNull(authorizationType, 'authorizationType');
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      512,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.CreateConnection'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'AuthParameters': authParameters,
+        'AuthorizationType': authorizationType.toValue(),
+        'Name': name,
+        if (description != null) 'Description': description,
+      },
+    );
+
+    return CreateConnectionResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Creates a global endpoint. Global endpoints improve your application's
+  /// availability by making it regional-fault tolerant. To do this, you define
+  /// a primary and secondary Region with event buses in each Region. You also
+  /// create a Amazon Route 53 health check that will tell EventBridge to route
+  /// events to the secondary Region when an "unhealthy" state is encountered
+  /// and events will be routed back to the primary Region when the health check
+  /// reports a "healthy" state.
+  ///
+  /// May throw [ResourceAlreadyExistsException].
+  /// May throw [LimitExceededException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [eventBuses] :
+  /// Define the event buses used.
+  /// <important>
+  /// The names of the event buses must be identical in each Region.
+  /// </important>
+  ///
+  /// Parameter [name] :
+  /// The name of the global endpoint. For example,
+  /// <code>"Name":"us-east-2-custom_bus_A-endpoint"</code>.
+  ///
+  /// Parameter [routingConfig] :
+  /// Configure the routing policy, including the health check and secondary
+  /// Region..
+  ///
+  /// Parameter [description] :
+  /// A description of the global endpoint.
+  ///
+  /// Parameter [replicationConfig] :
+  /// Enable or disable event replication.
+  ///
+  /// Parameter [roleArn] :
+  /// The ARN of the role used for replication.
+  Future<CreateEndpointResponse> createEndpoint({
+    required List<EndpointEventBus> eventBuses,
+    required String name,
+    required RoutingConfig routingConfig,
+    String? description,
+    ReplicationConfig? replicationConfig,
+    String? roleArn,
+  }) async {
+    ArgumentError.checkNotNull(eventBuses, 'eventBuses');
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(routingConfig, 'routingConfig');
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      512,
+    );
+    _s.validateStringLength(
+      'roleArn',
+      roleArn,
+      1,
+      256,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.CreateEndpoint'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventBuses': eventBuses,
+        'Name': name,
+        'RoutingConfig': routingConfig,
+        if (description != null) 'Description': description,
+        if (replicationConfig != null) 'ReplicationConfig': replicationConfig,
+        if (roleArn != null) 'RoleArn': roleArn,
+      },
+    );
+
+    return CreateEndpointResponse.fromJson(jsonResponse.body);
   }
 
   /// Creates a new event bus within your account. This can be a custom event
@@ -302,19 +554,20 @@ class EventBridge {
   }
 
   /// Called by an SaaS partner to create a partner event source. This operation
-  /// is not used by AWS customers.
+  /// is not used by Amazon Web Services customers.
   ///
-  /// Each partner event source can be used by one AWS account to create a
-  /// matching partner event bus in that AWS account. A SaaS partner must create
-  /// one partner event source for each AWS account that wants to receive those
-  /// event types.
+  /// Each partner event source can be used by one Amazon Web Services account
+  /// to create a matching partner event bus in that Amazon Web Services
+  /// account. A SaaS partner must create one partner event source for each
+  /// Amazon Web Services account that wants to receive those event types.
   ///
   /// A partner event source creates events based on resources within the SaaS
   /// partner's service or application.
   ///
-  /// An AWS account that creates a partner event bus that matches the partner
-  /// event source can use that event bus to receive events from the partner,
-  /// and then process them using AWS Events rules and targets.
+  /// An Amazon Web Services account that creates a partner event bus that
+  /// matches the partner event source can use that event bus to receive events
+  /// from the partner, and then process them using Amazon Web Services Events
+  /// rules and targets.
   ///
   /// Partner event source names follow this format:
   ///
@@ -322,13 +575,13 @@ class EventBridge {
   /// </code>
   ///
   /// <i>partner_name</i> is determined during partner registration and
-  /// identifies the partner to AWS customers. <i>event_namespace</i> is
-  /// determined by the partner and is a way for the partner to categorize their
-  /// events. <i>event_name</i> is determined by the partner, and should
-  /// uniquely identify an event-generating resource within the partner system.
-  /// The combination of <i>event_namespace</i> and <i>event_name</i> should
-  /// help AWS customers decide whether to create an event bus to receive these
-  /// events.
+  /// identifies the partner to Amazon Web Services customers.
+  /// <i>event_namespace</i> is determined by the partner and is a way for the
+  /// partner to categorize their events. <i>event_name</i> is determined by the
+  /// partner, and should uniquely identify an event-generating resource within
+  /// the partner system. The combination of <i>event_namespace</i> and
+  /// <i>event_name</i> should help Amazon Web Services customers decide whether
+  /// to create an event bus to receive these events.
   ///
   /// May throw [ResourceAlreadyExistsException].
   /// May throw [InternalException].
@@ -337,16 +590,16 @@ class EventBridge {
   /// May throw [OperationDisabledException].
   ///
   /// Parameter [account] :
-  /// The AWS account ID that is permitted to create a matching partner event
-  /// bus for this partner event source.
+  /// The Amazon Web Services account ID that is permitted to create a matching
+  /// partner event bus for this partner event source.
   ///
   /// Parameter [name] :
   /// The name of the partner event source. This name must be unique and must be
   /// in the format <code>
   /// <i>partner_name</i>/<i>event_namespace</i>/<i>event_name</i> </code>. The
-  /// AWS account that wants to use this partner event source must create a
-  /// partner event bus with a name that matches the name of the partner event
-  /// source.
+  /// Amazon Web Services account that wants to use this partner event source
+  /// must create a partner event bus with a name that matches the name of the
+  /// partner event source.
   Future<CreatePartnerEventSourceResponse> createPartnerEventSource({
     required String account,
     required String name,
@@ -393,8 +646,8 @@ class EventBridge {
   /// state. If it remains in PENDING state for more than two weeks, it is
   /// deleted.
   ///
-  /// To activate a deactivated partner event source, use
-  /// <a>ActivateEventSource</a>.
+  /// To activate a deactivated partner event source, use <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_ActivateEventSource.html">ActivateEventSource</a>.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ConcurrentModificationException].
@@ -418,6 +671,80 @@ class EventBridge {
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AWSEvents.DeactivateEventSource'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+      },
+    );
+  }
+
+  /// Removes all authorization parameters from the connection. This lets you
+  /// remove the secret from the connection so you can reuse it without having
+  /// to create a new connection.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the connection to remove authorization from.
+  Future<DeauthorizeConnectionResponse> deauthorizeConnection({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DeauthorizeConnection'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+      },
+    );
+
+    return DeauthorizeConnectionResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Deletes the specified API destination.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the destination to delete.
+  Future<void> deleteApiDestination({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DeleteApiDestination'
     };
     await _protocol.send(
       method: 'POST',
@@ -466,6 +793,83 @@ class EventBridge {
     );
   }
 
+  /// Deletes a connection.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the connection to delete.
+  Future<DeleteConnectionResponse> deleteConnection({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DeleteConnection'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+      },
+    );
+
+    return DeleteConnectionResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Delete an existing global endpoint. For more information about global
+  /// endpoints, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html">Making
+  /// applications Regional-fault tolerant with global endpoints and event
+  /// replication</a> in the Amazon EventBridge User Guide.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the endpoint you want to delete. For example,
+  /// <code>"Name":"us-east-2-custom_bus_A-endpoint"</code>..
+  Future<void> deleteEndpoint({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DeleteEndpoint'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+      },
+    );
+  }
+
   /// Deletes the specified custom event bus or partner event bus. All rules
   /// associated with this event bus need to be deleted. You can't delete your
   /// account's default event bus.
@@ -503,10 +907,10 @@ class EventBridge {
   }
 
   /// This operation is used by SaaS partners to delete a partner event source.
-  /// This operation is not used by AWS customers.
+  /// This operation is not used by Amazon Web Services customers.
   ///
   /// When you delete an event source, the status of the corresponding partner
-  /// event bus in the AWS customer account becomes DELETED.
+  /// event bus in the Amazon Web Services customer account becomes DELETED.
   /// <p/>
   ///
   /// May throw [InternalException].
@@ -514,8 +918,8 @@ class EventBridge {
   /// May throw [OperationDisabledException].
   ///
   /// Parameter [account] :
-  /// The AWS account ID of the AWS customer that the event source was created
-  /// for.
+  /// The Amazon Web Services account ID of the Amazon Web Services customer
+  /// that the event source was created for.
   ///
   /// Parameter [name] :
   /// The name of the event source to delete.
@@ -558,17 +962,21 @@ class EventBridge {
 
   /// Deletes the specified rule.
   ///
-  /// Before you can delete the rule, you must remove all targets, using
-  /// <a>RemoveTargets</a>.
+  /// Before you can delete the rule, you must remove all targets, using <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_RemoveTargets.html">RemoveTargets</a>.
   ///
   /// When you delete a rule, incoming events might continue to match to the
   /// deleted rule. Allow a short period of time for changes to take effect.
   ///
-  /// Managed rules are rules created and managed by another AWS service on your
-  /// behalf. These rules are created by those other AWS services to support
-  /// functionality in those services. You can delete these rules using the
-  /// <code>Force</code> option, but you should do so only if you are sure the
-  /// other service is not still using that rule.
+  /// If you call delete rule multiple times for the same rule, all calls will
+  /// succeed. When you call delete rule for a non-existent custom eventbus,
+  /// <code>ResourceNotFoundException</code> is returned.
+  ///
+  /// Managed rules are rules created and managed by another Amazon Web Services
+  /// service on your behalf. These rules are created by those other Amazon Web
+  /// Services services to support functionality in those services. You can
+  /// delete these rules using the <code>Force</code> option, but you should do
+  /// so only if you are sure the other service is not still using that rule.
   ///
   /// May throw [ConcurrentModificationException].
   /// May throw [ManagedRuleException].
@@ -583,12 +991,12 @@ class EventBridge {
   /// this, the default event bus is used.
   ///
   /// Parameter [force] :
-  /// If this is a managed rule, created by an AWS service on your behalf, you
-  /// must specify <code>Force</code> as <code>True</code> to delete the rule.
-  /// This parameter is ignored for rules that are not managed rules. You can
-  /// check whether a rule is a managed rule by using <code>DescribeRule</code>
-  /// or <code>ListRules</code> and checking the <code>ManagedBy</code> field of
-  /// the response.
+  /// If this is a managed rule, created by an Amazon Web Services service on
+  /// your behalf, you must specify <code>Force</code> as <code>True</code> to
+  /// delete the rule. This parameter is ignored for rules that are not managed
+  /// rules. You can check whether a rule is a managed rule by using
+  /// <code>DescribeRule</code> or <code>ListRules</code> and checking the
+  /// <code>ManagedBy</code> field of the response.
   Future<void> deleteRule({
     required String name,
     String? eventBusName,
@@ -624,6 +1032,42 @@ class EventBridge {
         if (force != null) 'Force': force,
       },
     );
+  }
+
+  /// Retrieves details about an API destination.
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the API destination to retrieve.
+  Future<DescribeApiDestinationResponse> describeApiDestination({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DescribeApiDestination'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+      },
+    );
+
+    return DescribeApiDestinationResponse.fromJson(jsonResponse.body);
   }
 
   /// Retrieves details about an archive.
@@ -663,15 +1107,107 @@ class EventBridge {
     return DescribeArchiveResponse.fromJson(jsonResponse.body);
   }
 
+  /// Retrieves details about a connection.
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the connection to retrieve.
+  Future<DescribeConnectionResponse> describeConnection({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DescribeConnection'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+      },
+    );
+
+    return DescribeConnectionResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Get the information about an existing global endpoint. For more
+  /// information about global endpoints, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html">Making
+  /// applications Regional-fault tolerant with global endpoints and event
+  /// replication</a> in the Amazon EventBridge User Guide..
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the endpoint you want to get information about. For example,
+  /// <code>"Name":"us-east-2-custom_bus_A-endpoint"</code>.
+  ///
+  /// Parameter [homeRegion] :
+  /// The primary Region of the endpoint you want to get information about. For
+  /// example <code>"HomeRegion": "us-east-1"</code>.
+  Future<DescribeEndpointResponse> describeEndpoint({
+    required String name,
+    String? homeRegion,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'homeRegion',
+      homeRegion,
+      9,
+      20,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.DescribeEndpoint'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+        if (homeRegion != null) 'HomeRegion': homeRegion,
+      },
+    );
+
+    return DescribeEndpointResponse.fromJson(jsonResponse.body);
+  }
+
   /// Displays details about an event bus in your account. This can include the
-  /// external AWS accounts that are permitted to write events to your default
-  /// event bus, and the associated policy. For custom event buses and partner
-  /// event buses, it displays the name, ARN, policy, state, and creation time.
+  /// external Amazon Web Services accounts that are permitted to write events
+  /// to your default event bus, and the associated policy. For custom event
+  /// buses and partner event buses, it displays the name, ARN, policy, state,
+  /// and creation time.
   ///
   /// To enable your account to receive events from other accounts on its
-  /// default event bus, use <a>PutPermission</a>.
+  /// default event bus, use <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutPermission.html">PutPermission</a>.
   ///
-  /// For more information about partner event buses, see <a>CreateEventBus</a>.
+  /// For more information about partner event buses, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_CreateEventBus.html">CreateEventBus</a>.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalException].
@@ -745,9 +1281,10 @@ class EventBridge {
   }
 
   /// An SaaS partner can use this operation to list details about a partner
-  /// event source that they have created. AWS customers do not use this
-  /// operation. Instead, AWS customers can use <a>DescribeEventSource</a> to
-  /// see details about a partner event source that is shared with them.
+  /// event source that they have created. Amazon Web Services customers do not
+  /// use this operation. Instead, Amazon Web Services customers can use <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DescribeEventSource.html">DescribeEventSource</a>
+  /// to see details about a partner event source that is shared with them.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalException].
@@ -833,7 +1370,8 @@ class EventBridge {
   /// Describes the specified rule.
   ///
   /// DescribeRule does not list the targets of a rule. To see the targets
-  /// associated with a rule, use <a>ListTargetsByRule</a>.
+  /// associated with a rule, use <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_ListTargetsByRule.html">ListTargetsByRule</a>.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalException].
@@ -986,6 +1524,73 @@ class EventBridge {
     );
   }
 
+  /// Retrieves a list of API destination in the account in the current Region.
+  ///
+  /// May throw [InternalException].
+  ///
+  /// Parameter [connectionArn] :
+  /// The ARN of the connection specified for the API destination.
+  ///
+  /// Parameter [limit] :
+  /// The maximum number of API destinations to include in the response.
+  ///
+  /// Parameter [namePrefix] :
+  /// A name prefix to filter results returned. Only API destinations with a
+  /// name that starts with the prefix are returned.
+  ///
+  /// Parameter [nextToken] :
+  /// The token returned by a previous call to retrieve the next set of results.
+  Future<ListApiDestinationsResponse> listApiDestinations({
+    String? connectionArn,
+    int? limit,
+    String? namePrefix,
+    String? nextToken,
+  }) async {
+    _s.validateStringLength(
+      'connectionArn',
+      connectionArn,
+      1,
+      1600,
+    );
+    _s.validateNumRange(
+      'limit',
+      limit,
+      1,
+      100,
+    );
+    _s.validateStringLength(
+      'namePrefix',
+      namePrefix,
+      1,
+      64,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      2048,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.ListApiDestinations'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (connectionArn != null) 'ConnectionArn': connectionArn,
+        if (limit != null) 'Limit': limit,
+        if (namePrefix != null) 'NamePrefix': namePrefix,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListApiDestinationsResponse.fromJson(jsonResponse.body);
+  }
+
   /// Lists your archives. You can either list all the archives or you can
   /// provide a prefix to match to the archive names. Filter parameters are
   /// exclusive.
@@ -1061,6 +1666,146 @@ class EventBridge {
     return ListArchivesResponse.fromJson(jsonResponse.body);
   }
 
+  /// Retrieves a list of connections from the account.
+  ///
+  /// May throw [InternalException].
+  ///
+  /// Parameter [connectionState] :
+  /// The state of the connection.
+  ///
+  /// Parameter [limit] :
+  /// The maximum number of connections to return.
+  ///
+  /// Parameter [namePrefix] :
+  /// A name prefix to filter results returned. Only connections with a name
+  /// that starts with the prefix are returned.
+  ///
+  /// Parameter [nextToken] :
+  /// The token returned by a previous call to retrieve the next set of results.
+  Future<ListConnectionsResponse> listConnections({
+    ConnectionState? connectionState,
+    int? limit,
+    String? namePrefix,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'limit',
+      limit,
+      1,
+      100,
+    );
+    _s.validateStringLength(
+      'namePrefix',
+      namePrefix,
+      1,
+      64,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      2048,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.ListConnections'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (connectionState != null)
+          'ConnectionState': connectionState.toValue(),
+        if (limit != null) 'Limit': limit,
+        if (namePrefix != null) 'NamePrefix': namePrefix,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListConnectionsResponse.fromJson(jsonResponse.body);
+  }
+
+  /// List the global endpoints associated with this account. For more
+  /// information about global endpoints, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html">Making
+  /// applications Regional-fault tolerant with global endpoints and event
+  /// replication</a> in the Amazon EventBridge User Guide..
+  ///
+  /// May throw [InternalException].
+  ///
+  /// Parameter [homeRegion] :
+  /// The primary Region of the endpoints associated with this account. For
+  /// example <code>"HomeRegion": "us-east-1"</code>.
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of results returned by the call.
+  ///
+  /// Parameter [namePrefix] :
+  /// A value that will return a subset of the endpoints associated with this
+  /// account. For example, <code>"NamePrefix": "ABC"</code> will return all
+  /// endpoints with "ABC" in the name.
+  ///
+  /// Parameter [nextToken] :
+  /// If <code>nextToken</code> is returned, there are more results available.
+  /// The value of nextToken is a unique pagination token for each page. Make
+  /// the call again using the returned token to retrieve the next page. Keep
+  /// all other arguments unchanged. Each pagination token expires after 24
+  /// hours. Using an expired pagination token will return an HTTP 400
+  /// InvalidToken error.
+  Future<ListEndpointsResponse> listEndpoints({
+    String? homeRegion,
+    int? maxResults,
+    String? namePrefix,
+    String? nextToken,
+  }) async {
+    _s.validateStringLength(
+      'homeRegion',
+      homeRegion,
+      9,
+      20,
+    );
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      100,
+    );
+    _s.validateStringLength(
+      'namePrefix',
+      namePrefix,
+      1,
+      64,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      2048,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.ListEndpoints'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (homeRegion != null) 'HomeRegion': homeRegion,
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (namePrefix != null) 'NamePrefix': namePrefix,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListEndpointsResponse.fromJson(jsonResponse.body);
+  }
+
   /// Lists all the event buses in your account, including the default event
   /// bus, custom event buses, and partner event buses.
   ///
@@ -1121,8 +1866,9 @@ class EventBridge {
   }
 
   /// You can use this to see all the partner event sources that have been
-  /// shared with your AWS account. For more information about partner event
-  /// sources, see <a>CreateEventBus</a>.
+  /// shared with your Amazon Web Services account. For more information about
+  /// partner event sources, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_CreateEventBus.html">CreateEventBus</a>.
   ///
   /// May throw [InternalException].
   /// May throw [OperationDisabledException].
@@ -1181,9 +1927,9 @@ class EventBridge {
     return ListEventSourcesResponse.fromJson(jsonResponse.body);
   }
 
-  /// An SaaS partner can use this operation to display the AWS account ID that
-  /// a particular partner event source name is associated with. This operation
-  /// is not used by AWS customers.
+  /// An SaaS partner can use this operation to display the Amazon Web Services
+  /// account ID that a particular partner event source name is associated with.
+  /// This operation is not used by Amazon Web Services customers.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalException].
@@ -1247,8 +1993,8 @@ class EventBridge {
   }
 
   /// An SaaS partner can use this operation to list all the partner event
-  /// source names that they have created. This operation is not used by AWS
-  /// customers.
+  /// source names that they have created. This operation is not used by Amazon
+  /// Web Services customers.
   ///
   /// May throw [InternalException].
   /// May throw [OperationDisabledException].
@@ -1316,7 +2062,7 @@ class EventBridge {
   /// May throw [InternalException].
   ///
   /// Parameter [eventSourceArn] :
-  /// The ARN of the event source associated with the replay.
+  /// The ARN of the archive from which the events are replayed.
   ///
   /// Parameter [limit] :
   /// The maximum number of replays to retrieve.
@@ -1458,7 +2204,8 @@ class EventBridge {
   /// you can provide a prefix to match to the rule names.
   ///
   /// ListRules does not list the targets of a rule. To see the targets
-  /// associated with a rule, use <a>ListTargetsByRule</a>.
+  /// associated with a rule, use <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_ListTargetsByRule.html">ListTargetsByRule</a>.
   ///
   /// May throw [InternalException].
   /// May throw [ResourceNotFoundException].
@@ -1635,6 +2382,9 @@ class EventBridge {
 
   /// Sends custom events to Amazon EventBridge so that they can be matched to
   /// rules.
+  /// <note>
+  /// PutEvents will only process nested JSON up to 1100 levels deep.
+  /// </note>
   ///
   /// May throw [InternalException].
   ///
@@ -1642,10 +2392,25 @@ class EventBridge {
   /// The entry that defines an event in your system. You can specify several
   /// parameters for the entry such as the source and type of the event,
   /// resources associated with the event, and so on.
+  ///
+  /// Parameter [endpointId] :
+  /// The URL subdomain of the endpoint. For example, if the URL for Endpoint is
+  /// abcde.veo.endpoints.event.amazonaws.com, then the EndpointId is
+  /// <code>abcde.veo</code>.
+  /// <important>
+  /// When using Java, you must include <code>auth-crt</code> on the class path.
+  /// </important>
   Future<PutEventsResponse> putEvents({
     required List<PutEventsRequestEntry> entries,
+    String? endpointId,
   }) async {
     ArgumentError.checkNotNull(entries, 'entries');
+    _s.validateStringLength(
+      'endpointId',
+      endpointId,
+      1,
+      50,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AWSEvents.PutEvents'
@@ -1658,6 +2423,7 @@ class EventBridge {
       headers: headers,
       payload: {
         'Entries': entries,
+        if (endpointId != null) 'EndpointId': endpointId,
       },
     );
 
@@ -1665,7 +2431,7 @@ class EventBridge {
   }
 
   /// This is used by SaaS partners to write events to a customer's partner
-  /// event bus. AWS customers do not use this operation.
+  /// event bus. Amazon Web Services customers do not use this operation.
   ///
   /// May throw [InternalException].
   /// May throw [OperationDisabledException].
@@ -1694,31 +2460,32 @@ class EventBridge {
     return PutPartnerEventsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Running <code>PutPermission</code> permits the specified AWS account or
-  /// AWS organization to put events to the specified <i>event bus</i>. Amazon
-  /// EventBridge (CloudWatch Events) rules in your account are triggered by
-  /// these events arriving to an event bus in your account.
+  /// Running <code>PutPermission</code> permits the specified Amazon Web
+  /// Services account or Amazon Web Services organization to put events to the
+  /// specified <i>event bus</i>. Amazon EventBridge (CloudWatch Events) rules
+  /// in your account are triggered by these events arriving to an event bus in
+  /// your account.
   ///
   /// For another account to send events to your account, that external account
   /// must have an EventBridge rule with your account's event bus as a target.
   ///
-  /// To enable multiple AWS accounts to put events to your event bus, run
-  /// <code>PutPermission</code> once for each of these accounts. Or, if all the
-  /// accounts are members of the same AWS organization, you can run
-  /// <code>PutPermission</code> once specifying <code>Principal</code> as "*"
-  /// and specifying the AWS organization ID in <code>Condition</code>, to grant
-  /// permissions to all accounts in that organization.
+  /// To enable multiple Amazon Web Services accounts to put events to your
+  /// event bus, run <code>PutPermission</code> once for each of these accounts.
+  /// Or, if all the accounts are members of the same Amazon Web Services
+  /// organization, you can run <code>PutPermission</code> once specifying
+  /// <code>Principal</code> as "*" and specifying the Amazon Web Services
+  /// organization ID in <code>Condition</code>, to grant permissions to all
+  /// accounts in that organization.
   ///
   /// If you grant permissions using an organization, then accounts in that
   /// organization must specify a <code>RoleArn</code> with proper permissions
   /// when they use <code>PutTarget</code> to add your account's event bus as a
   /// target. For more information, see <a
   /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-cross-account-event-delivery.html">Sending
-  /// and Receiving Events Between AWS Accounts</a> in the <i>Amazon EventBridge
-  /// User Guide</i>.
+  /// and Receiving Events Between Amazon Web Services Accounts</a> in the
+  /// <i>Amazon EventBridge User Guide</i>.
   ///
-  /// The permission policy on the default event bus cannot exceed 10 KB in
-  /// size.
+  /// The permission policy on the event bus cannot exceed 10 KB in size.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [PolicyLengthExceededException].
@@ -1727,19 +2494,20 @@ class EventBridge {
   /// May throw [OperationDisabledException].
   ///
   /// Parameter [action] :
-  /// The action that you are enabling the other account to perform. Currently,
-  /// this must be <code>events:PutEvents</code>.
+  /// The action that you are enabling the other account to perform.
   ///
   /// Parameter [condition] :
   /// This parameter enables you to limit the permission to accounts that
-  /// fulfill a certain condition, such as being a member of a certain AWS
-  /// organization. For more information about AWS Organizations, see <a
+  /// fulfill a certain condition, such as being a member of a certain Amazon
+  /// Web Services organization. For more information about Amazon Web Services
+  /// Organizations, see <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html">What
-  /// Is AWS Organizations</a> in the <i>AWS Organizations User Guide</i>.
+  /// Is Amazon Web Services Organizations</a> in the <i>Amazon Web Services
+  /// Organizations User Guide</i>.
   ///
-  /// If you specify <code>Condition</code> with an AWS organization ID, and
-  /// specify "*" as the value for <code>Principal</code>, you grant permission
-  /// to all the accounts in the named organization.
+  /// If you specify <code>Condition</code> with an Amazon Web Services
+  /// organization ID, and specify "*" as the value for <code>Principal</code>,
+  /// you grant permission to all the accounts in the named organization.
   ///
   /// The <code>Condition</code> is a JSON string which must contain
   /// <code>Type</code>, <code>Key</code>, and <code>Value</code> fields.
@@ -1755,9 +2523,9 @@ class EventBridge {
   /// or <code>Condition</code> parameters.
   ///
   /// Parameter [principal] :
-  /// The 12-digit AWS account ID that you are permitting to put events to your
-  /// default event bus. Specify "*" to permit any account to put events to your
-  /// default event bus.
+  /// The 12-digit Amazon Web Services account ID that you are permitting to put
+  /// events to your default event bus. Specify "*" to permit any account to put
+  /// events to your default event bus.
   ///
   /// If you specify "*" without specifying <code>Condition</code>, avoid
   /// creating rules that may match undesirable events. To create more secure
@@ -1769,8 +2537,11 @@ class EventBridge {
   /// Parameter [statementId] :
   /// An identifier string for the external account that you are granting
   /// permissions to. If you later want to revoke the permission for this
-  /// external account, specify this <code>StatementId</code> when you run
-  /// <a>RemovePermission</a>.
+  /// external account, specify this <code>StatementId</code> when you run <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_RemovePermission.html">RemovePermission</a>.
+  /// <note>
+  /// Each <code>StatementId</code> must be unique.
+  /// </note>
   Future<void> putPermission({
     String? action,
     Condition? condition,
@@ -1825,15 +2596,16 @@ class EventBridge {
   }
 
   /// Creates or updates the specified rule. Rules are enabled by default, or
-  /// based on value of the state. You can disable a rule using
-  /// <a>DisableRule</a>.
+  /// based on value of the state. You can disable a rule using <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DisableRule.html">DisableRule</a>.
   ///
   /// A single rule watches for events from a single event bus. Events generated
-  /// by AWS services go to your account's default event bus. Events generated
-  /// by SaaS partner services or applications go to the matching partner event
-  /// bus. If you have custom applications or services, you can specify whether
-  /// their events go to your default event bus or a custom event bus that you
-  /// have created. For more information, see <a>CreateEventBus</a>.
+  /// by Amazon Web Services services go to your account's default event bus.
+  /// Events generated by SaaS partner services or applications go to the
+  /// matching partner event bus. If you have custom applications or services,
+  /// you can specify whether their events go to your default event bus or a
+  /// custom event bus that you have created. For more information, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_CreateEventBus.html">CreateEventBus</a>.
   ///
   /// If you are updating an existing rule, the rule is replaced with what you
   /// specify in this <code>PutRule</code> command. If you omit arguments in
@@ -1860,12 +2632,16 @@ class EventBridge {
   ///
   /// If you are updating an existing rule, any tags you specify in the
   /// <code>PutRule</code> operation are ignored. To update the tags of an
-  /// existing rule, use <a>TagResource</a> and <a>UntagResource</a>.
+  /// existing rule, use <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_TagResource.html">TagResource</a>
+  /// and <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_UntagResource.html">UntagResource</a>.
   ///
-  /// Most services in AWS treat : or / as the same character in Amazon Resource
-  /// Names (ARNs). However, EventBridge uses an exact match in event patterns
-  /// and rules. Be sure to use the correct ARN characters when creating event
-  /// patterns so that they match the ARN syntax in the event you want to match.
+  /// Most services in Amazon Web Services treat : or / as the same character in
+  /// Amazon Resource Names (ARNs). However, EventBridge uses an exact match in
+  /// event patterns and rules. Be sure to use the correct ARN characters when
+  /// creating event patterns so that they match the ARN syntax in the event you
+  /// want to match.
   ///
   /// In EventBridge, it is possible to create rules that lead to infinite
   /// loops, where a rule is fired repeatedly. For example, a rule might detect
@@ -1903,11 +2679,17 @@ class EventBridge {
   ///
   /// Parameter [eventPattern] :
   /// The event pattern. For more information, see <a
-  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-and-event-patterns.html">Events
-  /// and Event Patterns</a> in the <i>Amazon EventBridge User Guide</i>.
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html.html">EventBridge
+  /// event patterns</a> in the <i>Amazon EventBridge User Guide</i>.
   ///
   /// Parameter [roleArn] :
   /// The Amazon Resource Name (ARN) of the IAM role associated with the rule.
+  ///
+  /// If you're setting an event bus in another account as the target and that
+  /// account granted permission to your account through an organization instead
+  /// of directly by the account ID, you must specify a <code>RoleArn</code>
+  /// with proper permissions in the <code>Target</code> structure, instead of
+  /// here in this parameter.
   ///
   /// Parameter [scheduleExpression] :
   /// The scheduling expression. For example, "cron(0 20 * * ? *)" or "rate(5
@@ -1947,6 +2729,12 @@ class EventBridge {
       eventBusName,
       1,
       1600,
+    );
+    _s.validateStringLength(
+      'eventPattern',
+      eventPattern,
+      0,
+      4096,
     );
     _s.validateStringLength(
       'roleArn',
@@ -1990,67 +2778,112 @@ class EventBridge {
   /// if they are already associated with the rule.
   ///
   /// Targets are the resources that are invoked when a rule is triggered.
-  ///
+  /// <note>
+  /// Each rule can have up to five (5) targets associated with it at one time.
+  /// </note>
   /// You can configure the following as targets for Events:
   ///
   /// <ul>
   /// <li>
-  /// EC2 instances
+  /// <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-destinations.html">API
+  /// destination</a>
   /// </li>
   /// <li>
-  /// SSM Run Command
+  /// <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-api-gateway-target.html">API
+  /// Gateway</a>
   /// </li>
   /// <li>
-  /// SSM Automation
+  /// Batch job queue
   /// </li>
   /// <li>
-  /// AWS Lambda functions
+  /// CloudWatch group
   /// </li>
   /// <li>
-  /// Data streams in Amazon Kinesis Data Streams
+  /// CodeBuild project
   /// </li>
   /// <li>
-  /// Data delivery streams in Amazon Kinesis Data Firehose
+  /// CodePipeline
   /// </li>
   /// <li>
-  /// Amazon ECS tasks
+  /// EC2 <code>CreateSnapshot</code> API call
   /// </li>
   /// <li>
-  /// AWS Step Functions state machines
+  /// EC2 Image Builder
   /// </li>
   /// <li>
-  /// AWS Batch jobs
+  /// EC2 <code>RebootInstances</code> API call
   /// </li>
   /// <li>
-  /// AWS CodeBuild projects
+  /// EC2 <code>StopInstances</code> API call
   /// </li>
   /// <li>
-  /// Pipelines in AWS CodePipeline
+  /// EC2 <code>TerminateInstances</code> API call
   /// </li>
   /// <li>
-  /// Amazon Inspector assessment templates
+  /// ECS task
   /// </li>
   /// <li>
-  /// Amazon SNS topics
+  /// <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-cross-account.html">Event
+  /// bus in a different account or Region</a>
   /// </li>
   /// <li>
-  /// Amazon SQS queues, including FIFO queues
+  /// <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-bus-to-bus.html">Event
+  /// bus in the same account and Region</a>
   /// </li>
   /// <li>
-  /// The default event bus of another AWS account
+  /// Firehose delivery stream
   /// </li>
   /// <li>
-  /// Amazon API Gateway REST APIs
+  /// Glue workflow
   /// </li>
   /// <li>
-  /// Redshift Clusters to invoke Data API ExecuteStatement on
+  /// <a
+  /// href="https://docs.aws.amazon.com/incident-manager/latest/userguide/incident-creation.html#incident-tracking-auto-eventbridge">Incident
+  /// Manager response plan</a>
+  /// </li>
+  /// <li>
+  /// Inspector assessment template
+  /// </li>
+  /// <li>
+  /// Kinesis stream
+  /// </li>
+  /// <li>
+  /// Lambda function
+  /// </li>
+  /// <li>
+  /// Redshift cluster
+  /// </li>
+  /// <li>
+  /// SageMaker Pipeline
+  /// </li>
+  /// <li>
+  /// SNS topic
+  /// </li>
+  /// <li>
+  /// SQS queue
+  /// </li>
+  /// <li>
+  /// Step Functions state machine
+  /// </li>
+  /// <li>
+  /// Systems Manager Automation
+  /// </li>
+  /// <li>
+  /// Systems Manager OpsItem
+  /// </li>
+  /// <li>
+  /// Systems Manager Run Command
   /// </li>
   /// </ul>
-  /// Creating rules with built-in targets is supported only in the AWS
-  /// Management Console. The built-in targets are <code>EC2 CreateSnapshot API
-  /// call</code>, <code>EC2 RebootInstances API call</code>, <code>EC2
-  /// StopInstances API call</code>, and <code>EC2 TerminateInstances API
-  /// call</code>.
+  /// Creating rules with built-in targets is supported only in the Amazon Web
+  /// Services Management Console. The built-in targets are <code>EC2
+  /// CreateSnapshot API call</code>, <code>EC2 RebootInstances API call</code>,
+  /// <code>EC2 StopInstances API call</code>, and <code>EC2 TerminateInstances
+  /// API call</code>.
   ///
   /// For some target types, <code>PutTargets</code> provides target-specific
   /// parameters. If the target is a Kinesis data stream, you can optionally
@@ -2060,31 +2893,31 @@ class EventBridge {
   /// <code>RunCommandParameters</code> field.
   ///
   /// To be able to make API calls against the resources that you own, Amazon
-  /// EventBridge (CloudWatch Events) needs the appropriate permissions. For AWS
-  /// Lambda and Amazon SNS resources, EventBridge relies on resource-based
-  /// policies. For EC2 instances, Kinesis data streams, AWS Step Functions
-  /// state machines and API Gateway REST APIs, EventBridge relies on IAM roles
-  /// that you specify in the <code>RoleARN</code> argument in
-  /// <code>PutTargets</code>. For more information, see <a
+  /// EventBridge needs the appropriate permissions. For Lambda and Amazon SNS
+  /// resources, EventBridge relies on resource-based policies. For EC2
+  /// instances, Kinesis Data Streams, Step Functions state machines and API
+  /// Gateway REST APIs, EventBridge relies on IAM roles that you specify in the
+  /// <code>RoleARN</code> argument in <code>PutTargets</code>. For more
+  /// information, see <a
   /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/auth-and-access-control-eventbridge.html">Authentication
   /// and Access Control</a> in the <i>Amazon EventBridge User Guide</i>.
   ///
-  /// If another AWS account is in the same region and has granted you
-  /// permission (using <code>PutPermission</code>), you can send events to that
-  /// account. Set that account's event bus as a target of the rules in your
-  /// account. To send the matched events to the other account, specify that
-  /// account's event bus as the <code>Arn</code> value when you run
-  /// <code>PutTargets</code>. If your account sends events to another account,
-  /// your account is charged for each sent event. Each event sent to another
-  /// account is charged as a custom event. The account receiving the event is
-  /// not charged. For more information, see <a
-  /// href="https://aws.amazon.com/eventbridge/pricing/">Amazon EventBridge
-  /// (CloudWatch Events) Pricing</a>.
+  /// If another Amazon Web Services account is in the same region and has
+  /// granted you permission (using <code>PutPermission</code>), you can send
+  /// events to that account. Set that account's event bus as a target of the
+  /// rules in your account. To send the matched events to the other account,
+  /// specify that account's event bus as the <code>Arn</code> value when you
+  /// run <code>PutTargets</code>. If your account sends events to another
+  /// account, your account is charged for each sent event. Each event sent to
+  /// another account is charged as a custom event. The account receiving the
+  /// event is not charged. For more information, see <a
+  /// href="http://aws.amazon.com/eventbridge/pricing/">Amazon EventBridge
+  /// Pricing</a>.
   /// <note>
   /// <code>Input</code>, <code>InputPath</code>, and
   /// <code>InputTransformer</code> are not available with
-  /// <code>PutTarget</code> if the target is an event bus of a different AWS
-  /// account.
+  /// <code>PutTarget</code> if the target is an event bus of a different Amazon
+  /// Web Services account.
   /// </note>
   /// If you are setting the event bus of another account as the target, and
   /// that account granted permission to your account through an organization
@@ -2092,11 +2925,11 @@ class EventBridge {
   /// <code>RoleArn</code> with proper permissions in the <code>Target</code>
   /// structure. For more information, see <a
   /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-cross-account-event-delivery.html">Sending
-  /// and Receiving Events Between AWS Accounts</a> in the <i>Amazon EventBridge
-  /// User Guide</i>.
+  /// and Receiving Events Between Amazon Web Services Accounts</a> in the
+  /// <i>Amazon EventBridge User Guide</i>.
   ///
-  /// For more information about enabling cross-account events, see
-  /// <a>PutPermission</a>.
+  /// For more information about enabling cross-account events, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutPermission.html">PutPermission</a>.
   ///
   /// <b>Input</b>, <b>InputPath</b>, and <b>InputTransformer</b> are mutually
   /// exclusive and optional parameters of a target. When a rule is triggered
@@ -2192,11 +3025,12 @@ class EventBridge {
     return PutTargetsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Revokes the permission of another AWS account to be able to put events to
-  /// the specified event bus. Specify the account to revoke by the
-  /// <code>StatementId</code> value that you associated with the account when
-  /// you granted it permission with <code>PutPermission</code>. You can find
-  /// the <code>StatementId</code> by using <a>DescribeEventBus</a>.
+  /// Revokes the permission of another Amazon Web Services account to be able
+  /// to put events to the specified event bus. Specify the account to revoke by
+  /// the <code>StatementId</code> value that you associated with the account
+  /// when you granted it permission with <code>PutPermission</code>. You can
+  /// find the <code>StatementId</code> by using <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_DescribeEventBus.html">DescribeEventBus</a>.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalException].
@@ -2251,7 +3085,11 @@ class EventBridge {
 
   /// Removes the specified targets from the specified rule. When the rule is
   /// triggered, those targets are no longer be invoked.
-  ///
+  /// <note>
+  /// A successful execution of <code>RemoveTargets</code> doesn't guarantee all
+  /// targets are removed from the rule, it means that the target(s) listed in
+  /// the request are removed.
+  /// </note>
   /// When you remove a target, when the associated rule triggers, removed
   /// targets might continue to be invoked. Allow a short period of time for
   /// changes to take effect.
@@ -2277,12 +3115,12 @@ class EventBridge {
   /// this, the default event bus is used.
   ///
   /// Parameter [force] :
-  /// If this is a managed rule, created by an AWS service on your behalf, you
-  /// must specify <code>Force</code> as <code>True</code> to remove targets.
-  /// This parameter is ignored for rules that are not managed rules. You can
-  /// check whether a rule is a managed rule by using <code>DescribeRule</code>
-  /// or <code>ListRules</code> and checking the <code>ManagedBy</code> field of
-  /// the response.
+  /// If this is a managed rule, created by an Amazon Web Services service on
+  /// your behalf, you must specify <code>Force</code> as <code>True</code> to
+  /// remove targets. This parameter is ignored for rules that are not managed
+  /// rules. You can check whether a rule is a managed rule by using
+  /// <code>DescribeRule</code> or <code>ListRules</code> and checking the
+  /// <code>ManagedBy</code> field of the response.
   Future<RemoveTargetsResponse> removeTargets({
     required List<String> ids,
     required String rule,
@@ -2426,8 +3264,8 @@ class EventBridge {
   /// to access or change only resources with certain tag values. In
   /// EventBridge, rules and event buses can be tagged.
   ///
-  /// Tags don't have any semantic meaning to AWS and are interpreted strictly
-  /// as strings of characters.
+  /// Tags don't have any semantic meaning to Amazon Web Services and are
+  /// interpreted strictly as strings of characters.
   ///
   /// You can use the <code>TagResource</code> action with a resource that
   /// already has tags. If you specify a new tag key, this tag is appended to
@@ -2479,16 +3317,44 @@ class EventBridge {
 
   /// Tests whether the specified event pattern matches the provided event.
   ///
-  /// Most services in AWS treat : or / as the same character in Amazon Resource
-  /// Names (ARNs). However, EventBridge uses an exact match in event patterns
-  /// and rules. Be sure to use the correct ARN characters when creating event
-  /// patterns so that they match the ARN syntax in the event you want to match.
+  /// Most services in Amazon Web Services treat : or / as the same character in
+  /// Amazon Resource Names (ARNs). However, EventBridge uses an exact match in
+  /// event patterns and rules. Be sure to use the correct ARN characters when
+  /// creating event patterns so that they match the ARN syntax in the event you
+  /// want to match.
   ///
   /// May throw [InvalidEventPatternException].
   /// May throw [InternalException].
   ///
   /// Parameter [event] :
-  /// The event, in JSON format, to test against the event pattern.
+  /// The event, in JSON format, to test against the event pattern. The JSON
+  /// must follow the format specified in <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/aws-events.html">Amazon
+  /// Web Services Events</a>, and the following fields are mandatory:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>id</code>
+  /// </li>
+  /// <li>
+  /// <code>account</code>
+  /// </li>
+  /// <li>
+  /// <code>source</code>
+  /// </li>
+  /// <li>
+  /// <code>time</code>
+  /// </li>
+  /// <li>
+  /// <code>region</code>
+  /// </li>
+  /// <li>
+  /// <code>resources</code>
+  /// </li>
+  /// <li>
+  /// <code>detail-type</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [eventPattern] :
   /// The event pattern. For more information, see <a
@@ -2500,6 +3366,13 @@ class EventBridge {
   }) async {
     ArgumentError.checkNotNull(event, 'event');
     ArgumentError.checkNotNull(eventPattern, 'eventPattern');
+    _s.validateStringLength(
+      'eventPattern',
+      eventPattern,
+      0,
+      4096,
+      isRequired: true,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AWSEvents.TestEventPattern'
@@ -2520,7 +3393,7 @@ class EventBridge {
   }
 
   /// Removes one or more tags from the specified EventBridge resource. In
-  /// Amazon EventBridge (CloudWatch Events, rules and event buses can be
+  /// Amazon EventBridge (CloudWatch Events), rules and event buses can be
   /// tagged.
   ///
   /// May throw [ResourceNotFoundException].
@@ -2563,6 +3436,96 @@ class EventBridge {
     );
   }
 
+  /// Updates an API destination.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  /// May throw [LimitExceededException].
+  ///
+  /// Parameter [name] :
+  /// The name of the API destination to update.
+  ///
+  /// Parameter [connectionArn] :
+  /// The ARN of the connection to use for the API destination.
+  ///
+  /// Parameter [description] :
+  /// The name of the API destination to update.
+  ///
+  /// Parameter [httpMethod] :
+  /// The method to use for the API destination.
+  ///
+  /// Parameter [invocationEndpoint] :
+  /// The URL to the endpoint to use for the API destination.
+  ///
+  /// Parameter [invocationRateLimitPerSecond] :
+  /// The maximum number of invocations per second to send to the API
+  /// destination.
+  Future<UpdateApiDestinationResponse> updateApiDestination({
+    required String name,
+    String? connectionArn,
+    String? description,
+    ApiDestinationHttpMethod? httpMethod,
+    String? invocationEndpoint,
+    int? invocationRateLimitPerSecond,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'connectionArn',
+      connectionArn,
+      1,
+      1600,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      512,
+    );
+    _s.validateStringLength(
+      'invocationEndpoint',
+      invocationEndpoint,
+      1,
+      2048,
+    );
+    _s.validateNumRange(
+      'invocationRateLimitPerSecond',
+      invocationRateLimitPerSecond,
+      1,
+      1152921504606846976,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.UpdateApiDestination'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+        if (connectionArn != null) 'ConnectionArn': connectionArn,
+        if (description != null) 'Description': description,
+        if (httpMethod != null) 'HttpMethod': httpMethod.toValue(),
+        if (invocationEndpoint != null)
+          'InvocationEndpoint': invocationEndpoint,
+        if (invocationRateLimitPerSecond != null)
+          'InvocationRateLimitPerSecond': invocationRateLimitPerSecond,
+      },
+    );
+
+    return UpdateApiDestinationResponse.fromJson(jsonResponse.body);
+  }
+
   /// Updates the specified archive.
   ///
   /// May throw [ConcurrentModificationException].
@@ -2602,6 +3565,12 @@ class EventBridge {
       0,
       512,
     );
+    _s.validateStringLength(
+      'eventPattern',
+      eventPattern,
+      0,
+      4096,
+    );
     _s.validateNumRange(
       'retentionDays',
       retentionDays,
@@ -2627,6 +3596,283 @@ class EventBridge {
     );
 
     return UpdateArchiveResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Updates settings for a connection.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalException].
+  /// May throw [LimitExceededException].
+  ///
+  /// Parameter [name] :
+  /// The name of the connection to update.
+  ///
+  /// Parameter [authParameters] :
+  /// The authorization parameters to use for the connection.
+  ///
+  /// Parameter [authorizationType] :
+  /// The type of authorization to use for the connection.
+  ///
+  /// Parameter [description] :
+  /// A description for the connection.
+  Future<UpdateConnectionResponse> updateConnection({
+    required String name,
+    UpdateConnectionAuthRequestParameters? authParameters,
+    ConnectionAuthorizationType? authorizationType,
+    String? description,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      512,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.UpdateConnection'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+        if (authParameters != null) 'AuthParameters': authParameters,
+        if (authorizationType != null)
+          'AuthorizationType': authorizationType.toValue(),
+        if (description != null) 'Description': description,
+      },
+    );
+
+    return UpdateConnectionResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Update an existing endpoint. For more information about global endpoints,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html">Making
+  /// applications Regional-fault tolerant with global endpoints and event
+  /// replication</a> in the Amazon EventBridge User Guide..
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ConcurrentModificationException].
+  /// May throw [InternalException].
+  ///
+  /// Parameter [name] :
+  /// The name of the endpoint you want to update.
+  ///
+  /// Parameter [description] :
+  /// A description for the endpoint.
+  ///
+  /// Parameter [eventBuses] :
+  /// Define event buses used for replication.
+  ///
+  /// Parameter [replicationConfig] :
+  /// Whether event replication was enabled or disabled by this request.
+  ///
+  /// Parameter [roleArn] :
+  /// The ARN of the role used by event replication for this request.
+  ///
+  /// Parameter [routingConfig] :
+  /// Configure the routing policy, including the health check and secondary
+  /// Region..
+  Future<UpdateEndpointResponse> updateEndpoint({
+    required String name,
+    String? description,
+    List<EndpointEventBus>? eventBuses,
+    ReplicationConfig? replicationConfig,
+    String? roleArn,
+    RoutingConfig? routingConfig,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      64,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      512,
+    );
+    _s.validateStringLength(
+      'roleArn',
+      roleArn,
+      1,
+      256,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSEvents.UpdateEndpoint'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+        if (description != null) 'Description': description,
+        if (eventBuses != null) 'EventBuses': eventBuses,
+        if (replicationConfig != null) 'ReplicationConfig': replicationConfig,
+        if (roleArn != null) 'RoleArn': roleArn,
+        if (routingConfig != null) 'RoutingConfig': routingConfig,
+      },
+    );
+
+    return UpdateEndpointResponse.fromJson(jsonResponse.body);
+  }
+}
+
+/// Contains details about an API destination.
+class ApiDestination {
+  /// The ARN of the API destination.
+  final String? apiDestinationArn;
+
+  /// The state of the API destination.
+  final ApiDestinationState? apiDestinationState;
+
+  /// The ARN of the connection specified for the API destination.
+  final String? connectionArn;
+
+  /// A time stamp for the time that the API destination was created.
+  final DateTime? creationTime;
+
+  /// The method to use to connect to the HTTP endpoint.
+  final ApiDestinationHttpMethod? httpMethod;
+
+  /// The URL to the endpoint for the API destination.
+  final String? invocationEndpoint;
+
+  /// The maximum number of invocations per second to send to the HTTP endpoint.
+  final int? invocationRateLimitPerSecond;
+
+  /// A time stamp for the time that the API destination was last modified.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the API destination.
+  final String? name;
+
+  ApiDestination({
+    this.apiDestinationArn,
+    this.apiDestinationState,
+    this.connectionArn,
+    this.creationTime,
+    this.httpMethod,
+    this.invocationEndpoint,
+    this.invocationRateLimitPerSecond,
+    this.lastModifiedTime,
+    this.name,
+  });
+  factory ApiDestination.fromJson(Map<String, dynamic> json) {
+    return ApiDestination(
+      apiDestinationArn: json['ApiDestinationArn'] as String?,
+      apiDestinationState:
+          (json['ApiDestinationState'] as String?)?.toApiDestinationState(),
+      connectionArn: json['ConnectionArn'] as String?,
+      creationTime: timeStampFromJson(json['CreationTime']),
+      httpMethod: (json['HttpMethod'] as String?)?.toApiDestinationHttpMethod(),
+      invocationEndpoint: json['InvocationEndpoint'] as String?,
+      invocationRateLimitPerSecond:
+          json['InvocationRateLimitPerSecond'] as int?,
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      name: json['Name'] as String?,
+    );
+  }
+}
+
+enum ApiDestinationHttpMethod {
+  post,
+  get,
+  head,
+  options,
+  put,
+  patch,
+  delete,
+}
+
+extension on ApiDestinationHttpMethod {
+  String toValue() {
+    switch (this) {
+      case ApiDestinationHttpMethod.post:
+        return 'POST';
+      case ApiDestinationHttpMethod.get:
+        return 'GET';
+      case ApiDestinationHttpMethod.head:
+        return 'HEAD';
+      case ApiDestinationHttpMethod.options:
+        return 'OPTIONS';
+      case ApiDestinationHttpMethod.put:
+        return 'PUT';
+      case ApiDestinationHttpMethod.patch:
+        return 'PATCH';
+      case ApiDestinationHttpMethod.delete:
+        return 'DELETE';
+    }
+  }
+}
+
+extension on String {
+  ApiDestinationHttpMethod toApiDestinationHttpMethod() {
+    switch (this) {
+      case 'POST':
+        return ApiDestinationHttpMethod.post;
+      case 'GET':
+        return ApiDestinationHttpMethod.get;
+      case 'HEAD':
+        return ApiDestinationHttpMethod.head;
+      case 'OPTIONS':
+        return ApiDestinationHttpMethod.options;
+      case 'PUT':
+        return ApiDestinationHttpMethod.put;
+      case 'PATCH':
+        return ApiDestinationHttpMethod.patch;
+      case 'DELETE':
+        return ApiDestinationHttpMethod.delete;
+    }
+    throw Exception('$this is not known in enum ApiDestinationHttpMethod');
+  }
+}
+
+enum ApiDestinationState {
+  active,
+  inactive,
+}
+
+extension on ApiDestinationState {
+  String toValue() {
+    switch (this) {
+      case ApiDestinationState.active:
+        return 'ACTIVE';
+      case ApiDestinationState.inactive:
+        return 'INACTIVE';
+    }
+  }
+}
+
+extension on String {
+  ApiDestinationState toApiDestinationState() {
+    switch (this) {
+      case 'ACTIVE':
+        return ApiDestinationState.active;
+      case 'INACTIVE':
+        return ApiDestinationState.inactive;
+    }
+    throw Exception('$this is not known in enum ApiDestinationState');
   }
 }
 
@@ -2811,7 +4057,7 @@ class AwsVpcConfiguration {
 /// The array properties for the submitted job, such as the size of the array.
 /// The array size can be between 2 and 10,000. If you specify array properties
 /// for a job, it becomes an array job. This parameter is used only if the
-/// target is an AWS Batch job.
+/// target is an Batch job.
 class BatchArrayProperties {
   /// The size of the array, if this is an array batch job. Valid values are
   /// integers between 2 and 10,000.
@@ -2834,26 +4080,26 @@ class BatchArrayProperties {
   }
 }
 
-/// The custom parameters to be used when the target is an AWS Batch job.
+/// The custom parameters to be used when the target is an Batch job.
 class BatchParameters {
-  /// The ARN or name of the job definition to use if the event target is an AWS
-  /// Batch job. This job definition must already exist.
+  /// The ARN or name of the job definition to use if the event target is an Batch
+  /// job. This job definition must already exist.
   final String jobDefinition;
 
-  /// The name to use for this execution of the job, if the target is an AWS Batch
+  /// The name to use for this execution of the job, if the target is an Batch
   /// job.
   final String jobName;
 
   /// The array properties for the submitted job, such as the size of the array.
   /// The array size can be between 2 and 10,000. If you specify array properties
   /// for a job, it becomes an array job. This parameter is used only if the
-  /// target is an AWS Batch job.
+  /// target is an Batch job.
   final BatchArrayProperties? arrayProperties;
 
-  /// The retry strategy to use for failed jobs, if the target is an AWS Batch
-  /// job. The retry strategy is the number of times to retry the failed job
-  /// execution. Valid values are 1–10. When you specify a retry strategy here, it
-  /// overrides the retry strategy defined in the job definition.
+  /// The retry strategy to use for failed jobs, if the target is an Batch job.
+  /// The retry strategy is the number of times to retry the failed job execution.
+  /// Valid values are 1–10. When you specify a retry strategy here, it overrides
+  /// the retry strategy defined in the job definition.
   final BatchRetryStrategy? retryStrategy;
 
   BatchParameters({
@@ -2891,9 +4137,9 @@ class BatchParameters {
   }
 }
 
-/// The retry strategy to use for failed jobs, if the target is an AWS Batch
-/// job. If you specify a retry strategy here, it overrides the retry strategy
-/// defined in the job definition.
+/// The retry strategy to use for failed jobs, if the target is an Batch job. If
+/// you specify a retry strategy here, it overrides the retry strategy defined
+/// in the job definition.
 class BatchRetryStrategy {
   /// The number of times to attempt to retry, if the job fails. Valid values are
   /// 1–10.
@@ -2940,12 +4186,57 @@ class CancelReplayResponse {
   }
 }
 
+/// The details of a capacity provider strategy. To learn more, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CapacityProviderStrategyItem.html">CapacityProviderStrategyItem</a>
+/// in the Amazon ECS API Reference.
+class CapacityProviderStrategyItem {
+  /// The short name of the capacity provider.
+  final String capacityProvider;
+
+  /// The base value designates how many tasks, at a minimum, to run on the
+  /// specified capacity provider. Only one capacity provider in a capacity
+  /// provider strategy can have a base defined. If no value is specified, the
+  /// default value of 0 is used.
+  final int? base;
+
+  /// The weight value designates the relative percentage of the total number of
+  /// tasks launched that should use the specified capacity provider. The weight
+  /// value is taken into consideration after the base value, if defined, is
+  /// satisfied.
+  final int? weight;
+
+  CapacityProviderStrategyItem({
+    required this.capacityProvider,
+    this.base,
+    this.weight,
+  });
+  factory CapacityProviderStrategyItem.fromJson(Map<String, dynamic> json) {
+    return CapacityProviderStrategyItem(
+      capacityProvider: json['capacityProvider'] as String,
+      base: json['base'] as int?,
+      weight: json['weight'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final capacityProvider = this.capacityProvider;
+    final base = this.base;
+    final weight = this.weight;
+    return {
+      'capacityProvider': capacityProvider,
+      if (base != null) 'base': base,
+      if (weight != null) 'weight': weight,
+    };
+  }
+}
+
 /// A JSON string which you can use to limit the event bus permissions you are
 /// granting to only accounts that fulfill the condition. Currently, the only
-/// supported condition is membership in a certain AWS organization. The string
-/// must contain <code>Type</code>, <code>Key</code>, and <code>Value</code>
-/// fields. The <code>Value</code> field specifies the ID of the AWS
-/// organization. Following is an example value for <code>Condition</code>:
+/// supported condition is membership in a certain Amazon Web Services
+/// organization. The string must contain <code>Type</code>, <code>Key</code>,
+/// and <code>Value</code> fields. The <code>Value</code> field specifies the ID
+/// of the Amazon Web Services organization. Following is an example value for
+/// <code>Condition</code>:
 ///
 /// <code>'{"Type" : "StringEquals", "Key": "aws:PrincipalOrgID", "Value":
 /// "o-1234567890"}'</code>
@@ -2979,6 +4270,506 @@ class Condition {
   }
 }
 
+/// Contains information about a connection.
+class Connection {
+  /// The authorization type specified for the connection.
+  final ConnectionAuthorizationType? authorizationType;
+
+  /// The ARN of the connection.
+  final String? connectionArn;
+
+  /// The state of the connection.
+  final ConnectionState? connectionState;
+
+  /// A time stamp for the time that the connection was created.
+  final DateTime? creationTime;
+
+  /// A time stamp for the time that the connection was last authorized.
+  final DateTime? lastAuthorizedTime;
+
+  /// A time stamp for the time that the connection was last modified.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the connection.
+  final String? name;
+
+  /// The reason that the connection is in the connection state.
+  final String? stateReason;
+
+  Connection({
+    this.authorizationType,
+    this.connectionArn,
+    this.connectionState,
+    this.creationTime,
+    this.lastAuthorizedTime,
+    this.lastModifiedTime,
+    this.name,
+    this.stateReason,
+  });
+  factory Connection.fromJson(Map<String, dynamic> json) {
+    return Connection(
+      authorizationType: (json['AuthorizationType'] as String?)
+          ?.toConnectionAuthorizationType(),
+      connectionArn: json['ConnectionArn'] as String?,
+      connectionState:
+          (json['ConnectionState'] as String?)?.toConnectionState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastAuthorizedTime: timeStampFromJson(json['LastAuthorizedTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      name: json['Name'] as String?,
+      stateReason: json['StateReason'] as String?,
+    );
+  }
+}
+
+/// Contains the authorization parameters for the connection if API Key is
+/// specified as the authorization type.
+class ConnectionApiKeyAuthResponseParameters {
+  /// The name of the header to use for the <code>APIKeyValue</code> used for
+  /// authorization.
+  final String? apiKeyName;
+
+  ConnectionApiKeyAuthResponseParameters({
+    this.apiKeyName,
+  });
+  factory ConnectionApiKeyAuthResponseParameters.fromJson(
+      Map<String, dynamic> json) {
+    return ConnectionApiKeyAuthResponseParameters(
+      apiKeyName: json['ApiKeyName'] as String?,
+    );
+  }
+}
+
+/// Contains the authorization parameters to use for the connection.
+class ConnectionAuthResponseParameters {
+  /// The API Key parameters to use for authorization.
+  final ConnectionApiKeyAuthResponseParameters? apiKeyAuthParameters;
+
+  /// The authorization parameters for Basic authorization.
+  final ConnectionBasicAuthResponseParameters? basicAuthParameters;
+
+  /// Additional parameters for the connection that are passed through with every
+  /// invocation to the HTTP endpoint.
+  final ConnectionHttpParameters? invocationHttpParameters;
+
+  /// The OAuth parameters to use for authorization.
+  final ConnectionOAuthResponseParameters? oAuthParameters;
+
+  ConnectionAuthResponseParameters({
+    this.apiKeyAuthParameters,
+    this.basicAuthParameters,
+    this.invocationHttpParameters,
+    this.oAuthParameters,
+  });
+  factory ConnectionAuthResponseParameters.fromJson(Map<String, dynamic> json) {
+    return ConnectionAuthResponseParameters(
+      apiKeyAuthParameters: json['ApiKeyAuthParameters'] != null
+          ? ConnectionApiKeyAuthResponseParameters.fromJson(
+              json['ApiKeyAuthParameters'] as Map<String, dynamic>)
+          : null,
+      basicAuthParameters: json['BasicAuthParameters'] != null
+          ? ConnectionBasicAuthResponseParameters.fromJson(
+              json['BasicAuthParameters'] as Map<String, dynamic>)
+          : null,
+      invocationHttpParameters: json['InvocationHttpParameters'] != null
+          ? ConnectionHttpParameters.fromJson(
+              json['InvocationHttpParameters'] as Map<String, dynamic>)
+          : null,
+      oAuthParameters: json['OAuthParameters'] != null
+          ? ConnectionOAuthResponseParameters.fromJson(
+              json['OAuthParameters'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+enum ConnectionAuthorizationType {
+  basic,
+  oauthClientCredentials,
+  apiKey,
+}
+
+extension on ConnectionAuthorizationType {
+  String toValue() {
+    switch (this) {
+      case ConnectionAuthorizationType.basic:
+        return 'BASIC';
+      case ConnectionAuthorizationType.oauthClientCredentials:
+        return 'OAUTH_CLIENT_CREDENTIALS';
+      case ConnectionAuthorizationType.apiKey:
+        return 'API_KEY';
+    }
+  }
+}
+
+extension on String {
+  ConnectionAuthorizationType toConnectionAuthorizationType() {
+    switch (this) {
+      case 'BASIC':
+        return ConnectionAuthorizationType.basic;
+      case 'OAUTH_CLIENT_CREDENTIALS':
+        return ConnectionAuthorizationType.oauthClientCredentials;
+      case 'API_KEY':
+        return ConnectionAuthorizationType.apiKey;
+    }
+    throw Exception('$this is not known in enum ConnectionAuthorizationType');
+  }
+}
+
+/// Contains the authorization parameters for the connection if Basic is
+/// specified as the authorization type.
+class ConnectionBasicAuthResponseParameters {
+  /// The user name to use for Basic authorization.
+  final String? username;
+
+  ConnectionBasicAuthResponseParameters({
+    this.username,
+  });
+  factory ConnectionBasicAuthResponseParameters.fromJson(
+      Map<String, dynamic> json) {
+    return ConnectionBasicAuthResponseParameters(
+      username: json['Username'] as String?,
+    );
+  }
+}
+
+/// Additional parameter included in the body. You can include up to 100
+/// additional body parameters per request. An event payload cannot exceed 64
+/// KB.
+class ConnectionBodyParameter {
+  /// Specified whether the value is secret.
+  final bool? isValueSecret;
+
+  /// The key for the parameter.
+  final String? key;
+
+  /// The value associated with the key.
+  final String? value;
+
+  ConnectionBodyParameter({
+    this.isValueSecret,
+    this.key,
+    this.value,
+  });
+  factory ConnectionBodyParameter.fromJson(Map<String, dynamic> json) {
+    return ConnectionBodyParameter(
+      isValueSecret: json['IsValueSecret'] as bool?,
+      key: json['Key'] as String?,
+      value: json['Value'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final isValueSecret = this.isValueSecret;
+    final key = this.key;
+    final value = this.value;
+    return {
+      if (isValueSecret != null) 'IsValueSecret': isValueSecret,
+      if (key != null) 'Key': key,
+      if (value != null) 'Value': value,
+    };
+  }
+}
+
+/// Additional parameter included in the header. You can include up to 100
+/// additional header parameters per request. An event payload cannot exceed 64
+/// KB.
+class ConnectionHeaderParameter {
+  /// Specified whether the value is a secret.
+  final bool? isValueSecret;
+
+  /// The key for the parameter.
+  final String? key;
+
+  /// The value associated with the key.
+  final String? value;
+
+  ConnectionHeaderParameter({
+    this.isValueSecret,
+    this.key,
+    this.value,
+  });
+  factory ConnectionHeaderParameter.fromJson(Map<String, dynamic> json) {
+    return ConnectionHeaderParameter(
+      isValueSecret: json['IsValueSecret'] as bool?,
+      key: json['Key'] as String?,
+      value: json['Value'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final isValueSecret = this.isValueSecret;
+    final key = this.key;
+    final value = this.value;
+    return {
+      if (isValueSecret != null) 'IsValueSecret': isValueSecret,
+      if (key != null) 'Key': key,
+      if (value != null) 'Value': value,
+    };
+  }
+}
+
+/// Contains additional parameters for the connection.
+class ConnectionHttpParameters {
+  /// Contains additional body string parameters for the connection.
+  final List<ConnectionBodyParameter>? bodyParameters;
+
+  /// Contains additional header parameters for the connection.
+  final List<ConnectionHeaderParameter>? headerParameters;
+
+  /// Contains additional query string parameters for the connection.
+  final List<ConnectionQueryStringParameter>? queryStringParameters;
+
+  ConnectionHttpParameters({
+    this.bodyParameters,
+    this.headerParameters,
+    this.queryStringParameters,
+  });
+  factory ConnectionHttpParameters.fromJson(Map<String, dynamic> json) {
+    return ConnectionHttpParameters(
+      bodyParameters: (json['BodyParameters'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              ConnectionBodyParameter.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      headerParameters: (json['HeaderParameters'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              ConnectionHeaderParameter.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      queryStringParameters: (json['QueryStringParameters'] as List?)
+          ?.whereNotNull()
+          .map((e) => ConnectionQueryStringParameter.fromJson(
+              e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final bodyParameters = this.bodyParameters;
+    final headerParameters = this.headerParameters;
+    final queryStringParameters = this.queryStringParameters;
+    return {
+      if (bodyParameters != null) 'BodyParameters': bodyParameters,
+      if (headerParameters != null) 'HeaderParameters': headerParameters,
+      if (queryStringParameters != null)
+        'QueryStringParameters': queryStringParameters,
+    };
+  }
+}
+
+/// Contains the client response parameters for the connection when OAuth is
+/// specified as the authorization type.
+class ConnectionOAuthClientResponseParameters {
+  /// The client ID associated with the response to the connection request.
+  final String? clientID;
+
+  ConnectionOAuthClientResponseParameters({
+    this.clientID,
+  });
+  factory ConnectionOAuthClientResponseParameters.fromJson(
+      Map<String, dynamic> json) {
+    return ConnectionOAuthClientResponseParameters(
+      clientID: json['ClientID'] as String?,
+    );
+  }
+}
+
+enum ConnectionOAuthHttpMethod {
+  get,
+  post,
+  put,
+}
+
+extension on ConnectionOAuthHttpMethod {
+  String toValue() {
+    switch (this) {
+      case ConnectionOAuthHttpMethod.get:
+        return 'GET';
+      case ConnectionOAuthHttpMethod.post:
+        return 'POST';
+      case ConnectionOAuthHttpMethod.put:
+        return 'PUT';
+    }
+  }
+}
+
+extension on String {
+  ConnectionOAuthHttpMethod toConnectionOAuthHttpMethod() {
+    switch (this) {
+      case 'GET':
+        return ConnectionOAuthHttpMethod.get;
+      case 'POST':
+        return ConnectionOAuthHttpMethod.post;
+      case 'PUT':
+        return ConnectionOAuthHttpMethod.put;
+    }
+    throw Exception('$this is not known in enum ConnectionOAuthHttpMethod');
+  }
+}
+
+/// Contains the response parameters when OAuth is specified as the
+/// authorization type.
+class ConnectionOAuthResponseParameters {
+  /// The URL to the HTTP endpoint that authorized the request.
+  final String? authorizationEndpoint;
+
+  /// A <code>ConnectionOAuthClientResponseParameters</code> object that contains
+  /// details about the client parameters returned when OAuth is specified as the
+  /// authorization type.
+  final ConnectionOAuthClientResponseParameters? clientParameters;
+
+  /// The method used to connect to the HTTP endpoint.
+  final ConnectionOAuthHttpMethod? httpMethod;
+
+  /// The additional HTTP parameters used for the OAuth authorization request.
+  final ConnectionHttpParameters? oAuthHttpParameters;
+
+  ConnectionOAuthResponseParameters({
+    this.authorizationEndpoint,
+    this.clientParameters,
+    this.httpMethod,
+    this.oAuthHttpParameters,
+  });
+  factory ConnectionOAuthResponseParameters.fromJson(
+      Map<String, dynamic> json) {
+    return ConnectionOAuthResponseParameters(
+      authorizationEndpoint: json['AuthorizationEndpoint'] as String?,
+      clientParameters: json['ClientParameters'] != null
+          ? ConnectionOAuthClientResponseParameters.fromJson(
+              json['ClientParameters'] as Map<String, dynamic>)
+          : null,
+      httpMethod:
+          (json['HttpMethod'] as String?)?.toConnectionOAuthHttpMethod(),
+      oAuthHttpParameters: json['OAuthHttpParameters'] != null
+          ? ConnectionHttpParameters.fromJson(
+              json['OAuthHttpParameters'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Additional query string parameter for the connection. You can include up to
+/// 100 additional query string parameters per request. Each additional
+/// parameter counts towards the event payload size, which cannot exceed 64 KB.
+class ConnectionQueryStringParameter {
+  /// Specifies whether the value is secret.
+  final bool? isValueSecret;
+
+  /// The key for a query string parameter.
+  final String? key;
+
+  /// The value associated with the key for the query string parameter.
+  final String? value;
+
+  ConnectionQueryStringParameter({
+    this.isValueSecret,
+    this.key,
+    this.value,
+  });
+  factory ConnectionQueryStringParameter.fromJson(Map<String, dynamic> json) {
+    return ConnectionQueryStringParameter(
+      isValueSecret: json['IsValueSecret'] as bool?,
+      key: json['Key'] as String?,
+      value: json['Value'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final isValueSecret = this.isValueSecret;
+    final key = this.key;
+    final value = this.value;
+    return {
+      if (isValueSecret != null) 'IsValueSecret': isValueSecret,
+      if (key != null) 'Key': key,
+      if (value != null) 'Value': value,
+    };
+  }
+}
+
+enum ConnectionState {
+  creating,
+  updating,
+  deleting,
+  authorized,
+  deauthorized,
+  authorizing,
+  deauthorizing,
+}
+
+extension on ConnectionState {
+  String toValue() {
+    switch (this) {
+      case ConnectionState.creating:
+        return 'CREATING';
+      case ConnectionState.updating:
+        return 'UPDATING';
+      case ConnectionState.deleting:
+        return 'DELETING';
+      case ConnectionState.authorized:
+        return 'AUTHORIZED';
+      case ConnectionState.deauthorized:
+        return 'DEAUTHORIZED';
+      case ConnectionState.authorizing:
+        return 'AUTHORIZING';
+      case ConnectionState.deauthorizing:
+        return 'DEAUTHORIZING';
+    }
+  }
+}
+
+extension on String {
+  ConnectionState toConnectionState() {
+    switch (this) {
+      case 'CREATING':
+        return ConnectionState.creating;
+      case 'UPDATING':
+        return ConnectionState.updating;
+      case 'DELETING':
+        return ConnectionState.deleting;
+      case 'AUTHORIZED':
+        return ConnectionState.authorized;
+      case 'DEAUTHORIZED':
+        return ConnectionState.deauthorized;
+      case 'AUTHORIZING':
+        return ConnectionState.authorizing;
+      case 'DEAUTHORIZING':
+        return ConnectionState.deauthorizing;
+    }
+    throw Exception('$this is not known in enum ConnectionState');
+  }
+}
+
+class CreateApiDestinationResponse {
+  /// The ARN of the API destination that was created by the request.
+  final String? apiDestinationArn;
+
+  /// The state of the API destination that was created by the request.
+  final ApiDestinationState? apiDestinationState;
+
+  /// A time stamp indicating the time that the API destination was created.
+  final DateTime? creationTime;
+
+  /// A time stamp indicating the time that the API destination was last modified.
+  final DateTime? lastModifiedTime;
+
+  CreateApiDestinationResponse({
+    this.apiDestinationArn,
+    this.apiDestinationState,
+    this.creationTime,
+    this.lastModifiedTime,
+  });
+  factory CreateApiDestinationResponse.fromJson(Map<String, dynamic> json) {
+    return CreateApiDestinationResponse(
+      apiDestinationArn: json['ApiDestinationArn'] as String?,
+      apiDestinationState:
+          (json['ApiDestinationState'] as String?)?.toApiDestinationState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+    );
+  }
+}
+
 class CreateArchiveResponse {
   /// The ARN of the archive that was created.
   final String? archiveArn;
@@ -3004,6 +4795,238 @@ class CreateArchiveResponse {
       creationTime: timeStampFromJson(json['CreationTime']),
       state: (json['State'] as String?)?.toArchiveState(),
       stateReason: json['StateReason'] as String?,
+    );
+  }
+}
+
+/// Contains the API key authorization parameters for the connection.
+class CreateConnectionApiKeyAuthRequestParameters {
+  /// The name of the API key to use for authorization.
+  final String apiKeyName;
+
+  /// The value for the API key to use for authorization.
+  final String apiKeyValue;
+
+  CreateConnectionApiKeyAuthRequestParameters({
+    required this.apiKeyName,
+    required this.apiKeyValue,
+  });
+  Map<String, dynamic> toJson() {
+    final apiKeyName = this.apiKeyName;
+    final apiKeyValue = this.apiKeyValue;
+    return {
+      'ApiKeyName': apiKeyName,
+      'ApiKeyValue': apiKeyValue,
+    };
+  }
+}
+
+/// Contains the authorization parameters for the connection.
+class CreateConnectionAuthRequestParameters {
+  /// A <code>CreateConnectionApiKeyAuthRequestParameters</code> object that
+  /// contains the API key authorization parameters to use for the connection.
+  final CreateConnectionApiKeyAuthRequestParameters? apiKeyAuthParameters;
+
+  /// A <code>CreateConnectionBasicAuthRequestParameters</code> object that
+  /// contains the Basic authorization parameters to use for the connection.
+  final CreateConnectionBasicAuthRequestParameters? basicAuthParameters;
+
+  /// A <code>ConnectionHttpParameters</code> object that contains the API key
+  /// authorization parameters to use for the connection. Note that if you include
+  /// additional parameters for the target of a rule via
+  /// <code>HttpParameters</code>, including query strings, the parameters added
+  /// for the connection take precedence.
+  final ConnectionHttpParameters? invocationHttpParameters;
+
+  /// A <code>CreateConnectionOAuthRequestParameters</code> object that contains
+  /// the OAuth authorization parameters to use for the connection.
+  final CreateConnectionOAuthRequestParameters? oAuthParameters;
+
+  CreateConnectionAuthRequestParameters({
+    this.apiKeyAuthParameters,
+    this.basicAuthParameters,
+    this.invocationHttpParameters,
+    this.oAuthParameters,
+  });
+  Map<String, dynamic> toJson() {
+    final apiKeyAuthParameters = this.apiKeyAuthParameters;
+    final basicAuthParameters = this.basicAuthParameters;
+    final invocationHttpParameters = this.invocationHttpParameters;
+    final oAuthParameters = this.oAuthParameters;
+    return {
+      if (apiKeyAuthParameters != null)
+        'ApiKeyAuthParameters': apiKeyAuthParameters,
+      if (basicAuthParameters != null)
+        'BasicAuthParameters': basicAuthParameters,
+      if (invocationHttpParameters != null)
+        'InvocationHttpParameters': invocationHttpParameters,
+      if (oAuthParameters != null) 'OAuthParameters': oAuthParameters,
+    };
+  }
+}
+
+/// Contains the Basic authorization parameters to use for the connection.
+class CreateConnectionBasicAuthRequestParameters {
+  /// The password associated with the user name to use for Basic authorization.
+  final String password;
+
+  /// The user name to use for Basic authorization.
+  final String username;
+
+  CreateConnectionBasicAuthRequestParameters({
+    required this.password,
+    required this.username,
+  });
+  Map<String, dynamic> toJson() {
+    final password = this.password;
+    final username = this.username;
+    return {
+      'Password': password,
+      'Username': username,
+    };
+  }
+}
+
+/// Contains the Basic authorization parameters to use for the connection.
+class CreateConnectionOAuthClientRequestParameters {
+  /// The client ID to use for OAuth authorization for the connection.
+  final String clientID;
+
+  /// The client secret associated with the client ID to use for OAuth
+  /// authorization for the connection.
+  final String clientSecret;
+
+  CreateConnectionOAuthClientRequestParameters({
+    required this.clientID,
+    required this.clientSecret,
+  });
+  Map<String, dynamic> toJson() {
+    final clientID = this.clientID;
+    final clientSecret = this.clientSecret;
+    return {
+      'ClientID': clientID,
+      'ClientSecret': clientSecret,
+    };
+  }
+}
+
+/// Contains the OAuth authorization parameters to use for the connection.
+class CreateConnectionOAuthRequestParameters {
+  /// The URL to the authorization endpoint when OAuth is specified as the
+  /// authorization type.
+  final String authorizationEndpoint;
+
+  /// A <code>CreateConnectionOAuthClientRequestParameters</code> object that
+  /// contains the client parameters for OAuth authorization.
+  final CreateConnectionOAuthClientRequestParameters clientParameters;
+
+  /// The method to use for the authorization request.
+  final ConnectionOAuthHttpMethod httpMethod;
+
+  /// A <code>ConnectionHttpParameters</code> object that contains details about
+  /// the additional parameters to use for the connection.
+  final ConnectionHttpParameters? oAuthHttpParameters;
+
+  CreateConnectionOAuthRequestParameters({
+    required this.authorizationEndpoint,
+    required this.clientParameters,
+    required this.httpMethod,
+    this.oAuthHttpParameters,
+  });
+  Map<String, dynamic> toJson() {
+    final authorizationEndpoint = this.authorizationEndpoint;
+    final clientParameters = this.clientParameters;
+    final httpMethod = this.httpMethod;
+    final oAuthHttpParameters = this.oAuthHttpParameters;
+    return {
+      'AuthorizationEndpoint': authorizationEndpoint,
+      'ClientParameters': clientParameters,
+      'HttpMethod': httpMethod.toValue(),
+      if (oAuthHttpParameters != null)
+        'OAuthHttpParameters': oAuthHttpParameters,
+    };
+  }
+}
+
+class CreateConnectionResponse {
+  /// The ARN of the connection that was created by the request.
+  final String? connectionArn;
+
+  /// The state of the connection that was created by the request.
+  final ConnectionState? connectionState;
+
+  /// A time stamp for the time that the connection was created.
+  final DateTime? creationTime;
+
+  /// A time stamp for the time that the connection was last updated.
+  final DateTime? lastModifiedTime;
+
+  CreateConnectionResponse({
+    this.connectionArn,
+    this.connectionState,
+    this.creationTime,
+    this.lastModifiedTime,
+  });
+  factory CreateConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return CreateConnectionResponse(
+      connectionArn: json['ConnectionArn'] as String?,
+      connectionState:
+          (json['ConnectionState'] as String?)?.toConnectionState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+    );
+  }
+}
+
+class CreateEndpointResponse {
+  /// The ARN of the endpoint that was created by this request.
+  final String? arn;
+
+  /// The event buses used by this request.
+  final List<EndpointEventBus>? eventBuses;
+
+  /// The name of the endpoint that was created by this request.
+  final String? name;
+
+  /// Whether event replication was enabled or disabled by this request.
+  final ReplicationConfig? replicationConfig;
+
+  /// The ARN of the role used by event replication for this request.
+  final String? roleArn;
+
+  /// The routing configuration defined by this request.
+  final RoutingConfig? routingConfig;
+
+  /// The state of the endpoint that was created by this request.
+  final EndpointState? state;
+
+  CreateEndpointResponse({
+    this.arn,
+    this.eventBuses,
+    this.name,
+    this.replicationConfig,
+    this.roleArn,
+    this.routingConfig,
+    this.state,
+  });
+  factory CreateEndpointResponse.fromJson(Map<String, dynamic> json) {
+    return CreateEndpointResponse(
+      arn: json['Arn'] as String?,
+      eventBuses: (json['EventBuses'] as List?)
+          ?.whereNotNull()
+          .map((e) => EndpointEventBus.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      name: json['Name'] as String?,
+      replicationConfig: json['ReplicationConfig'] != null
+          ? ReplicationConfig.fromJson(
+              json['ReplicationConfig'] as Map<String, dynamic>)
+          : null,
+      roleArn: json['RoleArn'] as String?,
+      routingConfig: json['RoutingConfig'] != null
+          ? RoutingConfig.fromJson(
+              json['RoutingConfig'] as Map<String, dynamic>)
+          : null,
+      state: (json['State'] as String?)?.toEndpointState(),
     );
   }
 }
@@ -3059,10 +5082,163 @@ class DeadLetterConfig {
   }
 }
 
+class DeauthorizeConnectionResponse {
+  /// The ARN of the connection that authorization was removed from.
+  final String? connectionArn;
+
+  /// The state of the connection.
+  final ConnectionState? connectionState;
+
+  /// A time stamp for the time that the connection was created.
+  final DateTime? creationTime;
+
+  /// A time stamp for the time that the connection was last authorized.
+  final DateTime? lastAuthorizedTime;
+
+  /// A time stamp for the time that the connection was last updated.
+  final DateTime? lastModifiedTime;
+
+  DeauthorizeConnectionResponse({
+    this.connectionArn,
+    this.connectionState,
+    this.creationTime,
+    this.lastAuthorizedTime,
+    this.lastModifiedTime,
+  });
+  factory DeauthorizeConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return DeauthorizeConnectionResponse(
+      connectionArn: json['ConnectionArn'] as String?,
+      connectionState:
+          (json['ConnectionState'] as String?)?.toConnectionState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastAuthorizedTime: timeStampFromJson(json['LastAuthorizedTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+    );
+  }
+}
+
+class DeleteApiDestinationResponse {
+  DeleteApiDestinationResponse();
+  factory DeleteApiDestinationResponse.fromJson(Map<String, dynamic> _) {
+    return DeleteApiDestinationResponse();
+  }
+}
+
 class DeleteArchiveResponse {
   DeleteArchiveResponse();
   factory DeleteArchiveResponse.fromJson(Map<String, dynamic> _) {
     return DeleteArchiveResponse();
+  }
+}
+
+class DeleteConnectionResponse {
+  /// The ARN of the connection that was deleted.
+  final String? connectionArn;
+
+  /// The state of the connection before it was deleted.
+  final ConnectionState? connectionState;
+
+  /// A time stamp for the time that the connection was created.
+  final DateTime? creationTime;
+
+  /// A time stamp for the time that the connection was last authorized before it
+  /// wa deleted.
+  final DateTime? lastAuthorizedTime;
+
+  /// A time stamp for the time that the connection was last modified before it
+  /// was deleted.
+  final DateTime? lastModifiedTime;
+
+  DeleteConnectionResponse({
+    this.connectionArn,
+    this.connectionState,
+    this.creationTime,
+    this.lastAuthorizedTime,
+    this.lastModifiedTime,
+  });
+  factory DeleteConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteConnectionResponse(
+      connectionArn: json['ConnectionArn'] as String?,
+      connectionState:
+          (json['ConnectionState'] as String?)?.toConnectionState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastAuthorizedTime: timeStampFromJson(json['LastAuthorizedTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+    );
+  }
+}
+
+class DeleteEndpointResponse {
+  DeleteEndpointResponse();
+  factory DeleteEndpointResponse.fromJson(Map<String, dynamic> _) {
+    return DeleteEndpointResponse();
+  }
+}
+
+class DescribeApiDestinationResponse {
+  /// The ARN of the API destination retrieved.
+  final String? apiDestinationArn;
+
+  /// The state of the API destination retrieved.
+  final ApiDestinationState? apiDestinationState;
+
+  /// The ARN of the connection specified for the API destination retrieved.
+  final String? connectionArn;
+
+  /// A time stamp for the time that the API destination was created.
+  final DateTime? creationTime;
+
+  /// The description for the API destination retrieved.
+  final String? description;
+
+  /// The method to use to connect to the HTTP endpoint.
+  final ApiDestinationHttpMethod? httpMethod;
+
+  /// The URL to use to connect to the HTTP endpoint.
+  final String? invocationEndpoint;
+
+  /// The maximum number of invocations per second to specified for the API
+  /// destination. Note that if you set the invocation rate maximum to a value
+  /// lower the rate necessary to send all events received on to the destination
+  /// HTTP endpoint, some events may not be delivered within the 24-hour retry
+  /// window. If you plan to set the rate lower than the rate necessary to deliver
+  /// all events, consider using a dead-letter queue to catch events that are not
+  /// delivered within 24 hours.
+  final int? invocationRateLimitPerSecond;
+
+  /// A time stamp for the time that the API destination was last modified.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the API destination retrieved.
+  final String? name;
+
+  DescribeApiDestinationResponse({
+    this.apiDestinationArn,
+    this.apiDestinationState,
+    this.connectionArn,
+    this.creationTime,
+    this.description,
+    this.httpMethod,
+    this.invocationEndpoint,
+    this.invocationRateLimitPerSecond,
+    this.lastModifiedTime,
+    this.name,
+  });
+  factory DescribeApiDestinationResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeApiDestinationResponse(
+      apiDestinationArn: json['ApiDestinationArn'] as String?,
+      apiDestinationState:
+          (json['ApiDestinationState'] as String?)?.toApiDestinationState(),
+      connectionArn: json['ConnectionArn'] as String?,
+      creationTime: timeStampFromJson(json['CreationTime']),
+      description: json['Description'] as String?,
+      httpMethod: (json['HttpMethod'] as String?)?.toApiDestinationHttpMethod(),
+      invocationEndpoint: json['InvocationEndpoint'] as String?,
+      invocationRateLimitPerSecond:
+          json['InvocationRateLimitPerSecond'] as int?,
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      name: json['Name'] as String?,
+    );
   }
 }
 
@@ -3125,6 +5301,161 @@ class DescribeArchiveResponse {
       retentionDays: json['RetentionDays'] as int?,
       sizeBytes: json['SizeBytes'] as int?,
       state: (json['State'] as String?)?.toArchiveState(),
+      stateReason: json['StateReason'] as String?,
+    );
+  }
+}
+
+class DescribeConnectionResponse {
+  /// The parameters to use for authorization for the connection.
+  final ConnectionAuthResponseParameters? authParameters;
+
+  /// The type of authorization specified for the connection.
+  final ConnectionAuthorizationType? authorizationType;
+
+  /// The ARN of the connection retrieved.
+  final String? connectionArn;
+
+  /// The state of the connection retrieved.
+  final ConnectionState? connectionState;
+
+  /// A time stamp for the time that the connection was created.
+  final DateTime? creationTime;
+
+  /// The description for the connection retrieved.
+  final String? description;
+
+  /// A time stamp for the time that the connection was last authorized.
+  final DateTime? lastAuthorizedTime;
+
+  /// A time stamp for the time that the connection was last modified.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the connection retrieved.
+  final String? name;
+
+  /// The ARN of the secret created from the authorization parameters specified
+  /// for the connection.
+  final String? secretArn;
+
+  /// The reason that the connection is in the current connection state.
+  final String? stateReason;
+
+  DescribeConnectionResponse({
+    this.authParameters,
+    this.authorizationType,
+    this.connectionArn,
+    this.connectionState,
+    this.creationTime,
+    this.description,
+    this.lastAuthorizedTime,
+    this.lastModifiedTime,
+    this.name,
+    this.secretArn,
+    this.stateReason,
+  });
+  factory DescribeConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeConnectionResponse(
+      authParameters: json['AuthParameters'] != null
+          ? ConnectionAuthResponseParameters.fromJson(
+              json['AuthParameters'] as Map<String, dynamic>)
+          : null,
+      authorizationType: (json['AuthorizationType'] as String?)
+          ?.toConnectionAuthorizationType(),
+      connectionArn: json['ConnectionArn'] as String?,
+      connectionState:
+          (json['ConnectionState'] as String?)?.toConnectionState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      description: json['Description'] as String?,
+      lastAuthorizedTime: timeStampFromJson(json['LastAuthorizedTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      name: json['Name'] as String?,
+      secretArn: json['SecretArn'] as String?,
+      stateReason: json['StateReason'] as String?,
+    );
+  }
+}
+
+class DescribeEndpointResponse {
+  /// The ARN of the endpoint you asked for information about.
+  final String? arn;
+
+  /// The time the endpoint you asked for information about was created.
+  final DateTime? creationTime;
+
+  /// The description of the endpoint you asked for information about.
+  final String? description;
+
+  /// The ID of the endpoint you asked for information about.
+  final String? endpointId;
+
+  /// The URL of the endpoint you asked for information about.
+  final String? endpointUrl;
+
+  /// The event buses being used by the endpoint you asked for information about.
+  final List<EndpointEventBus>? eventBuses;
+
+  /// The last time the endpoint you asked for information about was modified.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the endpoint you asked for information about.
+  final String? name;
+
+  /// Whether replication is enabled or disabled for the endpoint you asked for
+  /// information about.
+  final ReplicationConfig? replicationConfig;
+
+  /// The ARN of the role used by the endpoint you asked for information about.
+  final String? roleArn;
+
+  /// The routing configuration of the endpoint you asked for information about.
+  final RoutingConfig? routingConfig;
+
+  /// The current state of the endpoint you asked for information about.
+  final EndpointState? state;
+
+  /// The reason the endpoint you asked for information about is in its current
+  /// state.
+  final String? stateReason;
+
+  DescribeEndpointResponse({
+    this.arn,
+    this.creationTime,
+    this.description,
+    this.endpointId,
+    this.endpointUrl,
+    this.eventBuses,
+    this.lastModifiedTime,
+    this.name,
+    this.replicationConfig,
+    this.roleArn,
+    this.routingConfig,
+    this.state,
+    this.stateReason,
+  });
+  factory DescribeEndpointResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeEndpointResponse(
+      arn: json['Arn'] as String?,
+      creationTime: timeStampFromJson(json['CreationTime']),
+      description: json['Description'] as String?,
+      endpointId: json['EndpointId'] as String?,
+      endpointUrl: json['EndpointUrl'] as String?,
+      eventBuses: (json['EventBuses'] as List?)
+          ?.whereNotNull()
+          .map((e) => EndpointEventBus.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      name: json['Name'] as String?,
+      replicationConfig: json['ReplicationConfig'] != null
+          ? ReplicationConfig.fromJson(
+              json['ReplicationConfig'] as Map<String, dynamic>)
+          : null,
+      roleArn: json['RoleArn'] as String?,
+      routingConfig: json['RoutingConfig'] != null
+          ? RoutingConfig.fromJson(
+              json['RoutingConfig'] as Map<String, dynamic>)
+          : null,
+      state: (json['State'] as String?)?.toEndpointState(),
       stateReason: json['StateReason'] as String?,
     );
   }
@@ -3314,8 +5645,9 @@ class DescribeRuleResponse {
   /// and Event Patterns</a> in the <i>Amazon EventBridge User Guide</i>.
   final String? eventPattern;
 
-  /// If this is a managed rule, created by an AWS service on your behalf, this
-  /// field displays the principal name of the AWS service that created the rule.
+  /// If this is a managed rule, created by an Amazon Web Services service on your
+  /// behalf, this field displays the principal name of the Amazon Web Services
+  /// service that created the rule.
   final String? managedBy;
 
   /// The name of the rule.
@@ -3365,6 +5697,26 @@ class EcsParameters {
   /// task.
   final String taskDefinitionArn;
 
+  /// The capacity provider strategy to use for the task.
+  ///
+  /// If a <code>capacityProviderStrategy</code> is specified, the
+  /// <code>launchType</code> parameter must be omitted. If no
+  /// <code>capacityProviderStrategy</code> or launchType is specified, the
+  /// <code>defaultCapacityProviderStrategy</code> for the cluster is used.
+  final List<CapacityProviderStrategyItem>? capacityProviderStrategy;
+
+  /// Specifies whether to enable Amazon ECS managed tags for the task. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html">Tagging
+  /// Your Amazon ECS Resources</a> in the Amazon Elastic Container Service
+  /// Developer Guide.
+  final bool? enableECSManagedTags;
+
+  /// Whether or not to enable the execute command functionality for the
+  /// containers in this task. If true, this enables execute command functionality
+  /// on all containers in the task.
+  final bool? enableExecuteCommand;
+
   /// Specifies an ECS task group for the task. The maximum length is 255
   /// characters.
   final String? group;
@@ -3372,15 +5724,15 @@ class EcsParameters {
   /// Specifies the launch type on which your task is running. The launch type
   /// that you specify here must match one of the launch type (compatibilities) of
   /// the target task. The <code>FARGATE</code> value is supported only in the
-  /// Regions where AWS Fargate with Amazon ECS is supported. For more
-  /// information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS-Fargate.html">AWS
-  /// Fargate on Amazon ECS</a> in the <i>Amazon Elastic Container Service
-  /// Developer Guide</i>.
+  /// Regions where Fargate with Amazon ECS is supported. For more information,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS-Fargate.html">Fargate
+  /// on Amazon ECS</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
   final LaunchType? launchType;
 
-  /// Use this structure if the ECS task uses the <code>awsvpc</code> network
-  /// mode. This structure specifies the VPC subnets and security groups
+  /// Use this structure if the Amazon ECS task uses the <code>awsvpc</code>
+  /// network mode. This structure specifies the VPC subnets and security groups
   /// associated with the task, and whether a public IP address is to be used.
   /// This structure is required if <code>LaunchType</code> is
   /// <code>FARGATE</code> because the <code>awsvpc</code> mode is required for
@@ -3390,16 +5742,41 @@ class EcsParameters {
   /// does not use the <code>awsvpc</code> network mode, the task fails.
   final NetworkConfiguration? networkConfiguration;
 
+  /// An array of placement constraint objects to use for the task. You can
+  /// specify up to 10 constraints per task (including constraints in the task
+  /// definition and those specified at runtime).
+  final List<PlacementConstraint>? placementConstraints;
+
+  /// The placement strategy objects to use for the task. You can specify a
+  /// maximum of five strategy rules per task.
+  final List<PlacementStrategy>? placementStrategy;
+
   /// Specifies the platform version for the task. Specify only the numeric
   /// portion of the platform version, such as <code>1.1.0</code>.
   ///
   /// This structure is used only if <code>LaunchType</code> is
   /// <code>FARGATE</code>. For more information about valid platform versions,
   /// see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html">AWS
-  /// Fargate Platform Versions</a> in the <i>Amazon Elastic Container Service
-  /// Developer Guide</i>.
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html">Fargate
+  /// Platform Versions</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
   final String? platformVersion;
+
+  /// Specifies whether to propagate the tags from the task definition to the
+  /// task. If no value is specified, the tags are not propagated. Tags can only
+  /// be propagated to the task during task creation. To add tags to a task after
+  /// task creation, use the TagResource API action.
+  final PropagateTags? propagateTags;
+
+  /// The reference ID to use for the task.
+  final String? referenceId;
+
+  /// The metadata that you apply to the task to help you categorize and organize
+  /// them. Each tag consists of a key and an optional value, both of which you
+  /// define. To learn more, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#ECS-RunTask-request-tags">RunTask</a>
+  /// in the Amazon ECS API Reference.
+  final List<Tag>? tags;
 
   /// The number of tasks to create based on <code>TaskDefinition</code>. The
   /// default is 1.
@@ -3407,50 +5784,265 @@ class EcsParameters {
 
   EcsParameters({
     required this.taskDefinitionArn,
+    this.capacityProviderStrategy,
+    this.enableECSManagedTags,
+    this.enableExecuteCommand,
     this.group,
     this.launchType,
     this.networkConfiguration,
+    this.placementConstraints,
+    this.placementStrategy,
     this.platformVersion,
+    this.propagateTags,
+    this.referenceId,
+    this.tags,
     this.taskCount,
   });
   factory EcsParameters.fromJson(Map<String, dynamic> json) {
     return EcsParameters(
       taskDefinitionArn: json['TaskDefinitionArn'] as String,
+      capacityProviderStrategy: (json['CapacityProviderStrategy'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              CapacityProviderStrategyItem.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      enableECSManagedTags: json['EnableECSManagedTags'] as bool?,
+      enableExecuteCommand: json['EnableExecuteCommand'] as bool?,
       group: json['Group'] as String?,
       launchType: (json['LaunchType'] as String?)?.toLaunchType(),
       networkConfiguration: json['NetworkConfiguration'] != null
           ? NetworkConfiguration.fromJson(
               json['NetworkConfiguration'] as Map<String, dynamic>)
           : null,
+      placementConstraints: (json['PlacementConstraints'] as List?)
+          ?.whereNotNull()
+          .map((e) => PlacementConstraint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      placementStrategy: (json['PlacementStrategy'] as List?)
+          ?.whereNotNull()
+          .map((e) => PlacementStrategy.fromJson(e as Map<String, dynamic>))
+          .toList(),
       platformVersion: json['PlatformVersion'] as String?,
+      propagateTags: (json['PropagateTags'] as String?)?.toPropagateTags(),
+      referenceId: json['ReferenceId'] as String?,
+      tags: (json['Tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
       taskCount: json['TaskCount'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final taskDefinitionArn = this.taskDefinitionArn;
+    final capacityProviderStrategy = this.capacityProviderStrategy;
+    final enableECSManagedTags = this.enableECSManagedTags;
+    final enableExecuteCommand = this.enableExecuteCommand;
     final group = this.group;
     final launchType = this.launchType;
     final networkConfiguration = this.networkConfiguration;
+    final placementConstraints = this.placementConstraints;
+    final placementStrategy = this.placementStrategy;
     final platformVersion = this.platformVersion;
+    final propagateTags = this.propagateTags;
+    final referenceId = this.referenceId;
+    final tags = this.tags;
     final taskCount = this.taskCount;
     return {
       'TaskDefinitionArn': taskDefinitionArn,
+      if (capacityProviderStrategy != null)
+        'CapacityProviderStrategy': capacityProviderStrategy,
+      if (enableECSManagedTags != null)
+        'EnableECSManagedTags': enableECSManagedTags,
+      if (enableExecuteCommand != null)
+        'EnableExecuteCommand': enableExecuteCommand,
       if (group != null) 'Group': group,
       if (launchType != null) 'LaunchType': launchType.toValue(),
       if (networkConfiguration != null)
         'NetworkConfiguration': networkConfiguration,
+      if (placementConstraints != null)
+        'PlacementConstraints': placementConstraints,
+      if (placementStrategy != null) 'PlacementStrategy': placementStrategy,
       if (platformVersion != null) 'PlatformVersion': platformVersion,
+      if (propagateTags != null) 'PropagateTags': propagateTags.toValue(),
+      if (referenceId != null) 'ReferenceId': referenceId,
+      if (tags != null) 'Tags': tags,
       if (taskCount != null) 'TaskCount': taskCount,
     };
   }
 }
 
+/// An global endpoint used to improve your application's availability by making
+/// it regional-fault tolerant. For more information about global endpoints, see
+/// <a
+/// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-global-endpoints.html">Making
+/// applications Regional-fault tolerant with global endpoints and event
+/// replication</a> in the Amazon EventBridge User Guide..
+class Endpoint {
+  /// The ARN of the endpoint.
+  final String? arn;
+
+  /// The time the endpoint was created.
+  final DateTime? creationTime;
+
+  /// A description for the endpoint.
+  final String? description;
+
+  /// The URL subdomain of the endpoint. For example, if the URL for Endpoint is
+  /// abcde.veo.endpoints.event.amazonaws.com, then the EndpointId is
+  /// <code>abcde.veo</code>.
+  final String? endpointId;
+
+  /// The URL of the endpoint.
+  final String? endpointUrl;
+
+  /// The event buses being used by the endpoint.
+  final List<EndpointEventBus>? eventBuses;
+
+  /// The last time the endpoint was modified.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the endpoint.
+  final String? name;
+
+  /// Whether event replication was enabled or disabled for this endpoint.
+  final ReplicationConfig? replicationConfig;
+
+  /// The ARN of the role used by event replication for the endpoint.
+  final String? roleArn;
+
+  /// The routing configuration of the endpoint.
+  final RoutingConfig? routingConfig;
+
+  /// The current state of the endpoint.
+  final EndpointState? state;
+
+  /// The reason the endpoint is in its current state.
+  final String? stateReason;
+
+  Endpoint({
+    this.arn,
+    this.creationTime,
+    this.description,
+    this.endpointId,
+    this.endpointUrl,
+    this.eventBuses,
+    this.lastModifiedTime,
+    this.name,
+    this.replicationConfig,
+    this.roleArn,
+    this.routingConfig,
+    this.state,
+    this.stateReason,
+  });
+  factory Endpoint.fromJson(Map<String, dynamic> json) {
+    return Endpoint(
+      arn: json['Arn'] as String?,
+      creationTime: timeStampFromJson(json['CreationTime']),
+      description: json['Description'] as String?,
+      endpointId: json['EndpointId'] as String?,
+      endpointUrl: json['EndpointUrl'] as String?,
+      eventBuses: (json['EventBuses'] as List?)
+          ?.whereNotNull()
+          .map((e) => EndpointEventBus.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      name: json['Name'] as String?,
+      replicationConfig: json['ReplicationConfig'] != null
+          ? ReplicationConfig.fromJson(
+              json['ReplicationConfig'] as Map<String, dynamic>)
+          : null,
+      roleArn: json['RoleArn'] as String?,
+      routingConfig: json['RoutingConfig'] != null
+          ? RoutingConfig.fromJson(
+              json['RoutingConfig'] as Map<String, dynamic>)
+          : null,
+      state: (json['State'] as String?)?.toEndpointState(),
+      stateReason: json['StateReason'] as String?,
+    );
+  }
+}
+
+/// The event buses the endpoint is associated with.
+class EndpointEventBus {
+  /// The ARN of the event bus the endpoint is associated with.
+  final String eventBusArn;
+
+  EndpointEventBus({
+    required this.eventBusArn,
+  });
+  factory EndpointEventBus.fromJson(Map<String, dynamic> json) {
+    return EndpointEventBus(
+      eventBusArn: json['EventBusArn'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final eventBusArn = this.eventBusArn;
+    return {
+      'EventBusArn': eventBusArn,
+    };
+  }
+}
+
+enum EndpointState {
+  active,
+  creating,
+  updating,
+  deleting,
+  createFailed,
+  updateFailed,
+  deleteFailed,
+}
+
+extension on EndpointState {
+  String toValue() {
+    switch (this) {
+      case EndpointState.active:
+        return 'ACTIVE';
+      case EndpointState.creating:
+        return 'CREATING';
+      case EndpointState.updating:
+        return 'UPDATING';
+      case EndpointState.deleting:
+        return 'DELETING';
+      case EndpointState.createFailed:
+        return 'CREATE_FAILED';
+      case EndpointState.updateFailed:
+        return 'UPDATE_FAILED';
+      case EndpointState.deleteFailed:
+        return 'DELETE_FAILED';
+    }
+  }
+}
+
+extension on String {
+  EndpointState toEndpointState() {
+    switch (this) {
+      case 'ACTIVE':
+        return EndpointState.active;
+      case 'CREATING':
+        return EndpointState.creating;
+      case 'UPDATING':
+        return EndpointState.updating;
+      case 'DELETING':
+        return EndpointState.deleting;
+      case 'CREATE_FAILED':
+        return EndpointState.createFailed;
+      case 'UPDATE_FAILED':
+        return EndpointState.updateFailed;
+      case 'DELETE_FAILED':
+        return EndpointState.deleteFailed;
+    }
+    throw Exception('$this is not known in enum EndpointState');
+  }
+}
+
 /// An event bus receives events from a source and routes them to rules
 /// associated with that event bus. Your account's default event bus receives
-/// rules from AWS services. A custom event bus can receive rules from AWS
-/// services as well as your custom applications and services. A partner event
-/// bus receives events from an event source created by an SaaS partner. These
+/// events from Amazon Web Services services. A custom event bus can receive
+/// events from your custom applications and services. A partner event bus
+/// receives events from an event source created by an SaaS partner. These
 /// events come from the partners services or applications.
 class EventBus {
   /// The ARN of the event bus.
@@ -3459,8 +6051,8 @@ class EventBus {
   /// The name of the event bus.
   final String? name;
 
-  /// The permissions policy of the event bus, describing which other AWS accounts
-  /// can write events to this event bus.
+  /// The permissions policy of the event bus, describing which other Amazon Web
+  /// Services accounts can write events to this event bus.
   final String? policy;
 
   EventBus({
@@ -3478,8 +6070,8 @@ class EventBus {
 }
 
 /// A partner event source is created by an SaaS partner. If a customer creates
-/// a partner event bus that matches this event source, that AWS account can
-/// receive events from the partner's applications or services.
+/// a partner event bus that matches this event source, that Amazon Web Services
+/// account can receive events from the partner's applications or services.
 class EventSource {
   /// The ARN of the event source.
   final String? arn;
@@ -3490,8 +6082,8 @@ class EventSource {
   /// The date and time the event source was created.
   final DateTime? creationTime;
 
-  /// The date and time that the event source will expire, if the AWS account
-  /// doesn't create a matching event bus for it.
+  /// The date and time that the event source will expire, if the Amazon Web
+  /// Services account doesn't create a matching event bus for it.
   final DateTime? expirationTime;
 
   /// The name of the event source.
@@ -3557,19 +6149,52 @@ extension on String {
   }
 }
 
+/// The failover configuration for an endpoint. This includes what triggers
+/// failover and what happens when it's triggered.
+class FailoverConfig {
+  /// The main Region of the endpoint.
+  final Primary primary;
+
+  /// The Region that events are routed to when failover is triggered or event
+  /// replication is enabled.
+  final Secondary secondary;
+
+  FailoverConfig({
+    required this.primary,
+    required this.secondary,
+  });
+  factory FailoverConfig.fromJson(Map<String, dynamic> json) {
+    return FailoverConfig(
+      primary: Primary.fromJson(json['Primary'] as Map<String, dynamic>),
+      secondary: Secondary.fromJson(json['Secondary'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final primary = this.primary;
+    final secondary = this.secondary;
+    return {
+      'Primary': primary,
+      'Secondary': secondary,
+    };
+  }
+}
+
 /// These are custom parameter to be used when the target is an API Gateway REST
-/// APIs.
+/// APIs or EventBridge ApiDestinations. In the latter case, these are merged
+/// with any InvocationParameters specified on the Connection, with any values
+/// from the Connection taking precedence.
 class HttpParameters {
   /// The headers that need to be sent as part of request invoking the API Gateway
-  /// REST API.
+  /// REST API or EventBridge ApiDestination.
   final Map<String, String>? headerParameters;
 
-  /// The path parameter values to be used to populate API Gateway REST API path
-  /// wildcards ("*").
+  /// The path parameter values to be used to populate API Gateway REST API or
+  /// EventBridge ApiDestination path wildcards ("*").
   final List<String>? pathParameterValues;
 
   /// The query string keys/values that need to be sent as part of request
-  /// invoking the API Gateway REST API.
+  /// invoking the API Gateway REST API or EventBridge ApiDestination.
   final Map<String, String>? queryStringParameters;
 
   HttpParameters({
@@ -3620,9 +6245,6 @@ class InputTransformer {
   /// <li>
   /// The placeholder cannot be used as an object key.
   /// </li>
-  /// <li>
-  /// Object values cannot include quote marks.
-  /// </li>
   /// </ul>
   /// The following example shows the syntax for using <code>InputPathsMap</code>
   /// and <code>InputTemplate</code>.
@@ -3652,6 +6274,21 @@ class InputTransformer {
   /// \"&lt;status&gt;\""</code>
   ///
   /// <code>}</code>
+  ///
+  /// The <code>InputTemplate</code> can also be valid JSON with varibles in
+  /// quotes or out, as in the following example:
+  ///
+  /// <code> "InputTransformer":</code>
+  ///
+  /// <code>{</code>
+  ///
+  /// <code>"InputPathsMap": {"instance": "$.detail.instance","status":
+  /// "$.detail.status"},</code>
+  ///
+  /// <code>"InputTemplate": '{"myInstance": &lt;instance&gt;,"myStatus":
+  /// "&lt;instance&gt; is in state \"&lt;status&gt;\""}'</code>
+  ///
+  /// <code>}</code>
   final String inputTemplate;
 
   /// Map of JSON paths to be extracted from the event. You can then insert these
@@ -3659,10 +6296,10 @@ class InputTransformer {
   /// to be sent to the target.
   ///
   /// <code>InputPathsMap</code> is an array key-value pairs, where each value is
-  /// a valid JSON path. You can have as many as 10 key-value pairs. You must use
+  /// a valid JSON path. You can have as many as 100 key-value pairs. You must use
   /// JSON dot notation, not bracket notation.
   ///
-  /// The keys cannot start with "AWS."
+  /// The keys cannot start with "Amazon Web Services."
   final Map<String, String>? inputPathsMap;
 
   InputTransformer({
@@ -3720,6 +6357,7 @@ class KinesisParameters {
 enum LaunchType {
   ec2,
   fargate,
+  external,
 }
 
 extension on LaunchType {
@@ -3729,6 +6367,8 @@ extension on LaunchType {
         return 'EC2';
       case LaunchType.fargate:
         return 'FARGATE';
+      case LaunchType.external:
+        return 'EXTERNAL';
     }
   }
 }
@@ -3740,8 +6380,34 @@ extension on String {
         return LaunchType.ec2;
       case 'FARGATE':
         return LaunchType.fargate;
+      case 'EXTERNAL':
+        return LaunchType.external;
     }
     throw Exception('$this is not known in enum LaunchType');
+  }
+}
+
+class ListApiDestinationsResponse {
+  /// An array of <code>ApiDestination</code> objects that include information
+  /// about an API destination.
+  final List<ApiDestination>? apiDestinations;
+
+  /// A token you can use in a subsequent request to retrieve the next set of
+  /// results.
+  final String? nextToken;
+
+  ListApiDestinationsResponse({
+    this.apiDestinations,
+    this.nextToken,
+  });
+  factory ListApiDestinationsResponse.fromJson(Map<String, dynamic> json) {
+    return ListApiDestinationsResponse(
+      apiDestinations: (json['ApiDestinations'] as List?)
+          ?.whereNotNull()
+          .map((e) => ApiDestination.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
   }
 }
 
@@ -3762,6 +6428,55 @@ class ListArchivesResponse {
       archives: (json['Archives'] as List?)
           ?.whereNotNull()
           .map((e) => Archive.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class ListConnectionsResponse {
+  /// An array of connections objects that include details about the connections.
+  final List<Connection>? connections;
+
+  /// A token you can use in a subsequent request to retrieve the next set of
+  /// results.
+  final String? nextToken;
+
+  ListConnectionsResponse({
+    this.connections,
+    this.nextToken,
+  });
+  factory ListConnectionsResponse.fromJson(Map<String, dynamic> json) {
+    return ListConnectionsResponse(
+      connections: (json['Connections'] as List?)
+          ?.whereNotNull()
+          .map((e) => Connection.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class ListEndpointsResponse {
+  /// The endpoints returned by the call.
+  final List<Endpoint>? endpoints;
+
+  /// If <code>nextToken</code> is returned, there are more results available. The
+  /// value of nextToken is a unique pagination token for each page. Make the call
+  /// again using the returned token to retrieve the next page. Keep all other
+  /// arguments unchanged. Each pagination token expires after 24 hours. Using an
+  /// expired pagination token will return an HTTP 400 InvalidToken error.
+  final String? nextToken;
+
+  ListEndpointsResponse({
+    this.endpoints,
+    this.nextToken,
+  });
+  factory ListEndpointsResponse.fromJson(Map<String, dynamic> json) {
+    return ListEndpointsResponse(
+      endpoints: (json['Endpoints'] as List?)
+          ?.whereNotNull()
+          .map((e) => Endpoint.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
     );
@@ -4000,8 +6715,8 @@ class NetworkConfiguration {
 }
 
 /// A partner event source is created by an SaaS partner. If a customer creates
-/// a partner event bus that matches this event source, that AWS account can
-/// receive events from the partner's applications or services.
+/// a partner event bus that matches this event source, that Amazon Web Services
+/// account can receive events from the partner's applications or services.
 class PartnerEventSource {
   /// The ARN of the partner event source.
   final String? arn;
@@ -4021,16 +6736,18 @@ class PartnerEventSource {
   }
 }
 
-/// The AWS account that a partner event source has been offered to.
+/// The Amazon Web Services account that a partner event source has been offered
+/// to.
 class PartnerEventSourceAccount {
-  /// The AWS account ID that the partner event source was offered to.
+  /// The Amazon Web Services account ID that the partner event source was offered
+  /// to.
   final String? account;
 
   /// The date and time the event source was created.
   final DateTime? creationTime;
 
-  /// The date and time that the event source will expire, if the AWS account
-  /// doesn't create a matching event bus for it.
+  /// The date and time that the event source will expire, if the Amazon Web
+  /// Services account doesn't create a matching event bus for it.
   final DateTime? expirationTime;
 
   /// The state of the event source. If it is ACTIVE, you have already created a
@@ -4056,9 +6773,198 @@ class PartnerEventSourceAccount {
   }
 }
 
+/// An object representing a constraint on task placement. To learn more, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html">Task
+/// Placement Constraints</a> in the Amazon Elastic Container Service Developer
+/// Guide.
+class PlacementConstraint {
+  /// A cluster query language expression to apply to the constraint. You cannot
+  /// specify an expression if the constraint type is
+  /// <code>distinctInstance</code>. To learn more, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-query-language.html">Cluster
+  /// Query Language</a> in the Amazon Elastic Container Service Developer Guide.
+  final String? expression;
+
+  /// The type of constraint. Use distinctInstance to ensure that each task in a
+  /// particular group is running on a different container instance. Use memberOf
+  /// to restrict the selection to a group of valid candidates.
+  final PlacementConstraintType? type;
+
+  PlacementConstraint({
+    this.expression,
+    this.type,
+  });
+  factory PlacementConstraint.fromJson(Map<String, dynamic> json) {
+    return PlacementConstraint(
+      expression: json['expression'] as String?,
+      type: (json['type'] as String?)?.toPlacementConstraintType(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final expression = this.expression;
+    final type = this.type;
+    return {
+      if (expression != null) 'expression': expression,
+      if (type != null) 'type': type.toValue(),
+    };
+  }
+}
+
+enum PlacementConstraintType {
+  distinctInstance,
+  memberOf,
+}
+
+extension on PlacementConstraintType {
+  String toValue() {
+    switch (this) {
+      case PlacementConstraintType.distinctInstance:
+        return 'distinctInstance';
+      case PlacementConstraintType.memberOf:
+        return 'memberOf';
+    }
+  }
+}
+
+extension on String {
+  PlacementConstraintType toPlacementConstraintType() {
+    switch (this) {
+      case 'distinctInstance':
+        return PlacementConstraintType.distinctInstance;
+      case 'memberOf':
+        return PlacementConstraintType.memberOf;
+    }
+    throw Exception('$this is not known in enum PlacementConstraintType');
+  }
+}
+
+/// The task placement strategy for a task or service. To learn more, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-strategies.html">Task
+/// Placement Strategies</a> in the Amazon Elastic Container Service Service
+/// Developer Guide.
+class PlacementStrategy {
+  /// The field to apply the placement strategy against. For the spread placement
+  /// strategy, valid values are instanceId (or host, which has the same effect),
+  /// or any platform or custom attribute that is applied to a container instance,
+  /// such as attribute:ecs.availability-zone. For the binpack placement strategy,
+  /// valid values are cpu and memory. For the random placement strategy, this
+  /// field is not used.
+  final String? field;
+
+  /// The type of placement strategy. The random placement strategy randomly
+  /// places tasks on available candidates. The spread placement strategy spreads
+  /// placement across available candidates evenly based on the field parameter.
+  /// The binpack strategy places tasks on available candidates that have the
+  /// least available amount of the resource that is specified with the field
+  /// parameter. For example, if you binpack on memory, a task is placed on the
+  /// instance with the least amount of remaining memory (but still enough to run
+  /// the task).
+  final PlacementStrategyType? type;
+
+  PlacementStrategy({
+    this.field,
+    this.type,
+  });
+  factory PlacementStrategy.fromJson(Map<String, dynamic> json) {
+    return PlacementStrategy(
+      field: json['field'] as String?,
+      type: (json['type'] as String?)?.toPlacementStrategyType(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final field = this.field;
+    final type = this.type;
+    return {
+      if (field != null) 'field': field,
+      if (type != null) 'type': type.toValue(),
+    };
+  }
+}
+
+enum PlacementStrategyType {
+  random,
+  spread,
+  binpack,
+}
+
+extension on PlacementStrategyType {
+  String toValue() {
+    switch (this) {
+      case PlacementStrategyType.random:
+        return 'random';
+      case PlacementStrategyType.spread:
+        return 'spread';
+      case PlacementStrategyType.binpack:
+        return 'binpack';
+    }
+  }
+}
+
+extension on String {
+  PlacementStrategyType toPlacementStrategyType() {
+    switch (this) {
+      case 'random':
+        return PlacementStrategyType.random;
+      case 'spread':
+        return PlacementStrategyType.spread;
+      case 'binpack':
+        return PlacementStrategyType.binpack;
+    }
+    throw Exception('$this is not known in enum PlacementStrategyType');
+  }
+}
+
+/// The primary Region of the endpoint.
+class Primary {
+  /// The ARN of the health check used by the endpoint to determine whether
+  /// failover is triggered.
+  final String healthCheck;
+
+  Primary({
+    required this.healthCheck,
+  });
+  factory Primary.fromJson(Map<String, dynamic> json) {
+    return Primary(
+      healthCheck: json['HealthCheck'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final healthCheck = this.healthCheck;
+    return {
+      'HealthCheck': healthCheck,
+    };
+  }
+}
+
+enum PropagateTags {
+  taskDefinition,
+}
+
+extension on PropagateTags {
+  String toValue() {
+    switch (this) {
+      case PropagateTags.taskDefinition:
+        return 'TASK_DEFINITION';
+    }
+  }
+}
+
+extension on String {
+  PropagateTags toPropagateTags() {
+    switch (this) {
+      case 'TASK_DEFINITION':
+        return PropagateTags.taskDefinition;
+    }
+    throw Exception('$this is not known in enum PropagateTags');
+  }
+}
+
 /// Represents an event to be submitted.
 class PutEventsRequestEntry {
-  /// A valid JSON string. There is no other schema imposed. The JSON string may
+  /// A valid JSON object. There is no other schema imposed. The JSON object may
   /// contain fields and nested subobjects.
   final String? detail;
 
@@ -4068,10 +6974,17 @@ class PutEventsRequestEntry {
   /// The name or ARN of the event bus to receive the event. Only the rules that
   /// are associated with this event bus are used to match the event. If you omit
   /// this, the default event bus is used.
+  /// <note>
+  /// If you're using a global endpoint with a custom bus, you must enter the
+  /// name, not the ARN, of the event bus in either the primary or secondary
+  /// Region here and the corresponding event bus in the other Region will be
+  /// determined based on the endpoint referenced by the <code>EndpointId</code>.
+  /// </note>
   final String? eventBusName;
 
-  /// AWS resources, identified by Amazon Resource Name (ARN), which the event
-  /// primarily concerns. Any number, including zero, may be present.
+  /// Amazon Web Services resources, identified by Amazon Resource Name (ARN),
+  /// which the event primarily concerns. Any number, including zero, may be
+  /// present.
   final List<String>? resources;
 
   /// The source of the event.
@@ -4079,8 +6992,18 @@ class PutEventsRequestEntry {
 
   /// The time stamp of the event, per <a
   /// href="https://www.rfc-editor.org/rfc/rfc3339.txt">RFC3339</a>. If no time
-  /// stamp is provided, the time stamp of the <a>PutEvents</a> call is used.
+  /// stamp is provided, the time stamp of the <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html">PutEvents</a>
+  /// call is used.
   final DateTime? time;
+
+  /// An X-Ray trace header, which is an http header (X-Amzn-Trace-Id) that
+  /// contains the trace-id associated with the event.
+  ///
+  /// To learn more about X-Ray trace headers, see <a
+  /// href="https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader">Tracing
+  /// header</a> in the X-Ray Developer Guide.
+  final String? traceHeader;
 
   PutEventsRequestEntry({
     this.detail,
@@ -4089,6 +7012,7 @@ class PutEventsRequestEntry {
     this.resources,
     this.source,
     this.time,
+    this.traceHeader,
   });
   Map<String, dynamic> toJson() {
     final detail = this.detail;
@@ -4097,6 +7021,7 @@ class PutEventsRequestEntry {
     final resources = this.resources;
     final source = this.source;
     final time = this.time;
+    final traceHeader = this.traceHeader;
     return {
       if (detail != null) 'Detail': detail,
       if (detailType != null) 'DetailType': detailType,
@@ -4104,6 +7029,7 @@ class PutEventsRequestEntry {
       if (resources != null) 'Resources': resources,
       if (source != null) 'Source': source,
       if (time != null) 'Time': unixTimestampToJson(time),
+      if (traceHeader != null) 'TraceHeader': traceHeader,
     };
   }
 }
@@ -4133,7 +7059,10 @@ class PutEventsResponse {
   }
 }
 
-/// Represents an event that failed to be submitted.
+/// Represents an event that failed to be submitted. For information about the
+/// errors that are common to all actions, see <a
+/// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/CommonErrors.html">Common
+/// Errors</a>.
 class PutEventsResultEntry {
   /// The error code that indicates why the event submission failed.
   final String? errorCode;
@@ -4167,11 +7096,12 @@ class PutPartnerEventsRequestEntry {
   /// A free-form string used to decide what fields to expect in the event detail.
   final String? detailType;
 
-  /// AWS resources, identified by Amazon Resource Name (ARN), which the event
-  /// primarily concerns. Any number, including zero, may be present.
+  /// Amazon Web Services resources, identified by Amazon Resource Name (ARN),
+  /// which the event primarily concerns. Any number, including zero, may be
+  /// present.
   final List<String>? resources;
 
-  /// The event source that is generating the evntry.
+  /// The event source that is generating the entry.
   final String? source;
 
   /// The date and time of the event.
@@ -4313,9 +7243,9 @@ class PutTargetsResultEntry {
   }
 }
 
-/// These are custom parameters to be used when the target is a Redshift cluster
-/// to invoke the Redshift Data API ExecuteStatement based on EventBridge
-/// events.
+/// These are custom parameters to be used when the target is a Amazon Redshift
+/// cluster to invoke the Amazon Redshift Data API ExecuteStatement based on
+/// EventBridge events.
 class RedshiftDataParameters {
   /// The name of the database. Required when authenticating using temporary
   /// credentials.
@@ -4329,7 +7259,7 @@ class RedshiftDataParameters {
   final String? dbUser;
 
   /// The name or ARN of the secret that enables access to the database. Required
-  /// when authenticating using AWS Secrets Manager.
+  /// when authenticating using Amazon Web Services Secrets Manager.
   final String? secretManagerArn;
 
   /// The name of the SQL statement. You can name the SQL statement when you
@@ -4567,6 +7497,56 @@ extension on String {
   }
 }
 
+/// Endpoints can replicate all events to the secondary Region.
+class ReplicationConfig {
+  /// The state of event replication.
+  final ReplicationState? state;
+
+  ReplicationConfig({
+    this.state,
+  });
+  factory ReplicationConfig.fromJson(Map<String, dynamic> json) {
+    return ReplicationConfig(
+      state: (json['State'] as String?)?.toReplicationState(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final state = this.state;
+    return {
+      if (state != null) 'State': state.toValue(),
+    };
+  }
+}
+
+enum ReplicationState {
+  enabled,
+  disabled,
+}
+
+extension on ReplicationState {
+  String toValue() {
+    switch (this) {
+      case ReplicationState.enabled:
+        return 'ENABLED';
+      case ReplicationState.disabled:
+        return 'DISABLED';
+    }
+  }
+}
+
+extension on String {
+  ReplicationState toReplicationState() {
+    switch (this) {
+      case 'ENABLED':
+        return ReplicationState.enabled;
+      case 'DISABLED':
+        return ReplicationState.disabled;
+    }
+    throw Exception('$this is not known in enum ReplicationState');
+  }
+}
+
 /// A <code>RetryPolicy</code> object that includes information about the retry
 /// policy settings.
 class RetryPolicy {
@@ -4601,6 +7581,30 @@ class RetryPolicy {
   }
 }
 
+/// The routing configuration of the endpoint.
+class RoutingConfig {
+  /// The failover configuration for an endpoint. This includes what triggers
+  /// failover and what happens when it's triggered.
+  final FailoverConfig failoverConfig;
+
+  RoutingConfig({
+    required this.failoverConfig,
+  });
+  factory RoutingConfig.fromJson(Map<String, dynamic> json) {
+    return RoutingConfig(
+      failoverConfig: FailoverConfig.fromJson(
+          json['FailoverConfig'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final failoverConfig = this.failoverConfig;
+    return {
+      'FailoverConfig': failoverConfig,
+    };
+  }
+}
+
 /// Contains information about a rule in Amazon EventBridge.
 class Rule {
   /// The Amazon Resource Name (ARN) of the rule.
@@ -4618,8 +7622,9 @@ class Rule {
   /// and Event Patterns</a> in the <i>Amazon EventBridge User Guide</i>.
   final String? eventPattern;
 
-  /// If the rule was created on behalf of your account by an AWS service, this
-  /// field displays the principal name of the service that created the rule.
+  /// If the rule was created on behalf of your account by an Amazon Web Services
+  /// service, this field displays the principal name of the service that created
+  /// the rule.
   final String? managedBy;
 
   /// The name of the rule.
@@ -4627,10 +7632,18 @@ class Rule {
 
   /// The Amazon Resource Name (ARN) of the role that is used for target
   /// invocation.
+  ///
+  /// If you're setting an event bus in another account as the target and that
+  /// account granted permission to your account through an organization instead
+  /// of directly by the account ID, you must specify a <code>RoleArn</code> with
+  /// proper permissions in the <code>Target</code> structure, instead of here in
+  /// this parameter.
   final String? roleArn;
 
   /// The scheduling expression. For example, "cron(0 20 * * ? *)", "rate(5
-  /// minutes)".
+  /// minutes)". For more information, see <a
+  /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-create-rule-schedule.html">Creating
+  /// an Amazon EventBridge rule that runs on a schedule</a>.
   final String? scheduleExpression;
 
   /// The state of the rule.
@@ -4753,6 +7766,89 @@ class RunCommandTarget {
   }
 }
 
+/// Name/Value pair of a parameter to start execution of a SageMaker Model
+/// Building Pipeline.
+class SageMakerPipelineParameter {
+  /// Name of parameter to start execution of a SageMaker Model Building Pipeline.
+  final String name;
+
+  /// Value of parameter to start execution of a SageMaker Model Building
+  /// Pipeline.
+  final String value;
+
+  SageMakerPipelineParameter({
+    required this.name,
+    required this.value,
+  });
+  factory SageMakerPipelineParameter.fromJson(Map<String, dynamic> json) {
+    return SageMakerPipelineParameter(
+      name: json['Name'] as String,
+      value: json['Value'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final value = this.value;
+    return {
+      'Name': name,
+      'Value': value,
+    };
+  }
+}
+
+/// These are custom parameters to use when the target is a SageMaker Model
+/// Building Pipeline that starts based on EventBridge events.
+class SageMakerPipelineParameters {
+  /// List of Parameter names and values for SageMaker Model Building Pipeline
+  /// execution.
+  final List<SageMakerPipelineParameter>? pipelineParameterList;
+
+  SageMakerPipelineParameters({
+    this.pipelineParameterList,
+  });
+  factory SageMakerPipelineParameters.fromJson(Map<String, dynamic> json) {
+    return SageMakerPipelineParameters(
+      pipelineParameterList: (json['PipelineParameterList'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              SageMakerPipelineParameter.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final pipelineParameterList = this.pipelineParameterList;
+    return {
+      if (pipelineParameterList != null)
+        'PipelineParameterList': pipelineParameterList,
+    };
+  }
+}
+
+/// The secondary Region that processes events when failover is triggered or
+/// replication is enabled.
+class Secondary {
+  /// Defines the secondary Region.
+  final String route;
+
+  Secondary({
+    required this.route,
+  });
+  factory Secondary.fromJson(Map<String, dynamic> json) {
+    return Secondary(
+      route: json['Route'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final route = this.route;
+    return {
+      'Route': route,
+    };
+  }
+}
+
 /// This structure includes the custom parameter to be used when the target is
 /// an SQS FIFO queue.
 class SqsParameters {
@@ -4805,8 +7901,8 @@ class StartReplayResponse {
   }
 }
 
-/// A key-value pair associated with an AWS resource. In EventBridge, rules and
-/// event buses support tagging.
+/// A key-value pair associated with an Amazon Web Services resource. In
+/// EventBridge, rules and event buses support tagging.
 class Tag {
   /// A string you can use to assign a value. The combination of tag keys and
   /// values can help you organize and categorize your resources.
@@ -4844,8 +7940,8 @@ class TagResourceResponse {
 }
 
 /// Targets are the resources to be invoked when a rule is triggered. For a
-/// complete list of services and resources that can be set as a target, see
-/// <a>PutTargets</a>.
+/// complete list of services and resources that can be set as a target, see <a
+/// href="https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutTargets.html">PutTargets</a>.
 ///
 /// If you are setting the event bus of another account as the target, and that
 /// account granted permission to your account through an organization instead
@@ -4853,19 +7949,21 @@ class TagResourceResponse {
 /// with proper permissions in the <code>Target</code> structure. For more
 /// information, see <a
 /// href="https://docs.aws.amazon.com/eventbridge/latest/userguide/eventbridge-cross-account-event-delivery.html">Sending
-/// and Receiving Events Between AWS Accounts</a> in the <i>Amazon EventBridge
-/// User Guide</i>.
+/// and Receiving Events Between Amazon Web Services Accounts</a> in the
+/// <i>Amazon EventBridge User Guide</i>.
 class Target {
   /// The Amazon Resource Name (ARN) of the target.
   final String arn;
 
-  /// The ID of the target.
+  /// The ID of the target within the specified rule. Use this ID to reference the
+  /// target when updating the rule. We recommend using a memorable and unique
+  /// string.
   final String id;
 
-  /// If the event target is an AWS Batch job, this contains the job definition,
-  /// job name, and other parameters. For more information, see <a
+  /// If the event target is an Batch job, this contains the job definition, job
+  /// name, and other parameters. For more information, see <a
   /// href="https://docs.aws.amazon.com/batch/latest/userguide/jobs.html">Jobs</a>
-  /// in the <i>AWS Batch User Guide</i>.
+  /// in the <i>Batch User Guide</i>.
   final BatchParameters? batchParameters;
 
   /// The <code>DeadLetterConfig</code> that defines the target queue to send
@@ -4880,11 +7978,14 @@ class Target {
   final EcsParameters? ecsParameters;
 
   /// Contains the HTTP parameters to use when the target is a API Gateway REST
-  /// endpoint.
+  /// endpoint or EventBridge ApiDestination.
   ///
-  /// If you specify an API Gateway REST API as a target, you can use this
-  /// parameter to specify headers, path parameter, query string keys/values as
-  /// part of your target invoking request.
+  /// If you specify an API Gateway REST API or EventBridge ApiDestination as a
+  /// target, you can use this parameter to specify headers, path parameters, and
+  /// query string keys/values as part of your target invoking request. If you're
+  /// using ApiDestinations, the corresponding Connection can also have these
+  /// values configured. In case of any conflicting keys, values from the
+  /// Connection take precedence.
   final HttpParameters? httpParameters;
 
   /// Valid JSON text passed to the target. In this case, nothing from the event
@@ -4909,12 +8010,12 @@ class Target {
   /// default is to use the <code>eventId</code> as the partition key.
   final KinesisParameters? kinesisParameters;
 
-  /// Contains the Redshift Data API parameters to use when the target is a
-  /// Redshift cluster.
+  /// Contains the Amazon Redshift Data API parameters to use when the target is a
+  /// Amazon Redshift cluster.
   ///
-  /// If you specify a Redshift Cluster as a Target, you can use this to specify
-  /// parameters to invoke the Redshift Data API ExecuteStatement based on
-  /// EventBridge events.
+  /// If you specify a Amazon Redshift Cluster as a Target, you can use this to
+  /// specify parameters to invoke the Amazon Redshift Data API ExecuteStatement
+  /// based on EventBridge events.
   final RedshiftDataParameters? redshiftDataParameters;
 
   /// The <code>RetryPolicy</code> object that contains the retry policy
@@ -4929,6 +8030,14 @@ class Target {
   /// Parameters used when you are using the rule to invoke Amazon EC2 Run
   /// Command.
   final RunCommandParameters? runCommandParameters;
+
+  /// Contains the SageMaker Model Building Pipeline parameters to start execution
+  /// of a SageMaker Model Building Pipeline.
+  ///
+  /// If you specify a SageMaker Model Building Pipeline as a target, you can use
+  /// this to specify parameters to start a pipeline execution based on
+  /// EventBridge events.
+  final SageMakerPipelineParameters? sageMakerPipelineParameters;
 
   /// Contains the message group ID to use when the target is a FIFO queue.
   ///
@@ -4951,6 +8060,7 @@ class Target {
     this.retryPolicy,
     this.roleArn,
     this.runCommandParameters,
+    this.sageMakerPipelineParameters,
     this.sqsParameters,
   });
   factory Target.fromJson(Map<String, dynamic> json) {
@@ -4995,6 +8105,10 @@ class Target {
           ? RunCommandParameters.fromJson(
               json['RunCommandParameters'] as Map<String, dynamic>)
           : null,
+      sageMakerPipelineParameters: json['SageMakerPipelineParameters'] != null
+          ? SageMakerPipelineParameters.fromJson(
+              json['SageMakerPipelineParameters'] as Map<String, dynamic>)
+          : null,
       sqsParameters: json['SqsParameters'] != null
           ? SqsParameters.fromJson(
               json['SqsParameters'] as Map<String, dynamic>)
@@ -5017,6 +8131,7 @@ class Target {
     final retryPolicy = this.retryPolicy;
     final roleArn = this.roleArn;
     final runCommandParameters = this.runCommandParameters;
+    final sageMakerPipelineParameters = this.sageMakerPipelineParameters;
     final sqsParameters = this.sqsParameters;
     return {
       'Arn': arn,
@@ -5035,6 +8150,8 @@ class Target {
       if (roleArn != null) 'RoleArn': roleArn,
       if (runCommandParameters != null)
         'RunCommandParameters': runCommandParameters,
+      if (sageMakerPipelineParameters != null)
+        'SageMakerPipelineParameters': sageMakerPipelineParameters,
       if (sqsParameters != null) 'SqsParameters': sqsParameters,
     };
   }
@@ -5058,6 +8175,36 @@ class UntagResourceResponse {
   UntagResourceResponse();
   factory UntagResourceResponse.fromJson(Map<String, dynamic> _) {
     return UntagResourceResponse();
+  }
+}
+
+class UpdateApiDestinationResponse {
+  /// The ARN of the API destination that was updated.
+  final String? apiDestinationArn;
+
+  /// The state of the API destination that was updated.
+  final ApiDestinationState? apiDestinationState;
+
+  /// A time stamp for the time that the API destination was created.
+  final DateTime? creationTime;
+
+  /// A time stamp for the time that the API destination was last modified.
+  final DateTime? lastModifiedTime;
+
+  UpdateApiDestinationResponse({
+    this.apiDestinationArn,
+    this.apiDestinationState,
+    this.creationTime,
+    this.lastModifiedTime,
+  });
+  factory UpdateApiDestinationResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateApiDestinationResponse(
+      apiDestinationArn: json['ApiDestinationArn'] as String?,
+      apiDestinationState:
+          (json['ApiDestinationState'] as String?)?.toApiDestinationState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+    );
   }
 }
 
@@ -5086,6 +8233,255 @@ class UpdateArchiveResponse {
       creationTime: timeStampFromJson(json['CreationTime']),
       state: (json['State'] as String?)?.toArchiveState(),
       stateReason: json['StateReason'] as String?,
+    );
+  }
+}
+
+/// Contains the API key authorization parameters to use to update the
+/// connection.
+class UpdateConnectionApiKeyAuthRequestParameters {
+  /// The name of the API key to use for authorization.
+  final String? apiKeyName;
+
+  /// The value associated with teh API key to use for authorization.
+  final String? apiKeyValue;
+
+  UpdateConnectionApiKeyAuthRequestParameters({
+    this.apiKeyName,
+    this.apiKeyValue,
+  });
+  Map<String, dynamic> toJson() {
+    final apiKeyName = this.apiKeyName;
+    final apiKeyValue = this.apiKeyValue;
+    return {
+      if (apiKeyName != null) 'ApiKeyName': apiKeyName,
+      if (apiKeyValue != null) 'ApiKeyValue': apiKeyValue,
+    };
+  }
+}
+
+/// Contains the additional parameters to use for the connection.
+class UpdateConnectionAuthRequestParameters {
+  /// A <code>UpdateConnectionApiKeyAuthRequestParameters</code> object that
+  /// contains the authorization parameters for API key authorization.
+  final UpdateConnectionApiKeyAuthRequestParameters? apiKeyAuthParameters;
+
+  /// A <code>UpdateConnectionBasicAuthRequestParameters</code> object that
+  /// contains the authorization parameters for Basic authorization.
+  final UpdateConnectionBasicAuthRequestParameters? basicAuthParameters;
+
+  /// A <code>ConnectionHttpParameters</code> object that contains the additional
+  /// parameters to use for the connection.
+  final ConnectionHttpParameters? invocationHttpParameters;
+
+  /// A <code>UpdateConnectionOAuthRequestParameters</code> object that contains
+  /// the authorization parameters for OAuth authorization.
+  final UpdateConnectionOAuthRequestParameters? oAuthParameters;
+
+  UpdateConnectionAuthRequestParameters({
+    this.apiKeyAuthParameters,
+    this.basicAuthParameters,
+    this.invocationHttpParameters,
+    this.oAuthParameters,
+  });
+  Map<String, dynamic> toJson() {
+    final apiKeyAuthParameters = this.apiKeyAuthParameters;
+    final basicAuthParameters = this.basicAuthParameters;
+    final invocationHttpParameters = this.invocationHttpParameters;
+    final oAuthParameters = this.oAuthParameters;
+    return {
+      if (apiKeyAuthParameters != null)
+        'ApiKeyAuthParameters': apiKeyAuthParameters,
+      if (basicAuthParameters != null)
+        'BasicAuthParameters': basicAuthParameters,
+      if (invocationHttpParameters != null)
+        'InvocationHttpParameters': invocationHttpParameters,
+      if (oAuthParameters != null) 'OAuthParameters': oAuthParameters,
+    };
+  }
+}
+
+/// Contains the Basic authorization parameters for the connection.
+class UpdateConnectionBasicAuthRequestParameters {
+  /// The password associated with the user name to use for Basic authorization.
+  final String? password;
+
+  /// The user name to use for Basic authorization.
+  final String? username;
+
+  UpdateConnectionBasicAuthRequestParameters({
+    this.password,
+    this.username,
+  });
+  Map<String, dynamic> toJson() {
+    final password = this.password;
+    final username = this.username;
+    return {
+      if (password != null) 'Password': password,
+      if (username != null) 'Username': username,
+    };
+  }
+}
+
+/// Contains the OAuth authorization parameters to use for the connection.
+class UpdateConnectionOAuthClientRequestParameters {
+  /// The client ID to use for OAuth authorization.
+  final String? clientID;
+
+  /// The client secret assciated with the client ID to use for OAuth
+  /// authorization.
+  final String? clientSecret;
+
+  UpdateConnectionOAuthClientRequestParameters({
+    this.clientID,
+    this.clientSecret,
+  });
+  Map<String, dynamic> toJson() {
+    final clientID = this.clientID;
+    final clientSecret = this.clientSecret;
+    return {
+      if (clientID != null) 'ClientID': clientID,
+      if (clientSecret != null) 'ClientSecret': clientSecret,
+    };
+  }
+}
+
+/// Contains the OAuth request parameters to use for the connection.
+class UpdateConnectionOAuthRequestParameters {
+  /// The URL to the authorization endpoint when OAuth is specified as the
+  /// authorization type.
+  final String? authorizationEndpoint;
+
+  /// A <code>UpdateConnectionOAuthClientRequestParameters</code> object that
+  /// contains the client parameters to use for the connection when OAuth is
+  /// specified as the authorization type.
+  final UpdateConnectionOAuthClientRequestParameters? clientParameters;
+
+  /// The method used to connect to the HTTP endpoint.
+  final ConnectionOAuthHttpMethod? httpMethod;
+
+  /// The additional HTTP parameters used for the OAuth authorization request.
+  final ConnectionHttpParameters? oAuthHttpParameters;
+
+  UpdateConnectionOAuthRequestParameters({
+    this.authorizationEndpoint,
+    this.clientParameters,
+    this.httpMethod,
+    this.oAuthHttpParameters,
+  });
+  Map<String, dynamic> toJson() {
+    final authorizationEndpoint = this.authorizationEndpoint;
+    final clientParameters = this.clientParameters;
+    final httpMethod = this.httpMethod;
+    final oAuthHttpParameters = this.oAuthHttpParameters;
+    return {
+      if (authorizationEndpoint != null)
+        'AuthorizationEndpoint': authorizationEndpoint,
+      if (clientParameters != null) 'ClientParameters': clientParameters,
+      if (httpMethod != null) 'HttpMethod': httpMethod.toValue(),
+      if (oAuthHttpParameters != null)
+        'OAuthHttpParameters': oAuthHttpParameters,
+    };
+  }
+}
+
+class UpdateConnectionResponse {
+  /// The ARN of the connection that was updated.
+  final String? connectionArn;
+
+  /// The state of the connection that was updated.
+  final ConnectionState? connectionState;
+
+  /// A time stamp for the time that the connection was created.
+  final DateTime? creationTime;
+
+  /// A time stamp for the time that the connection was last authorized.
+  final DateTime? lastAuthorizedTime;
+
+  /// A time stamp for the time that the connection was last modified.
+  final DateTime? lastModifiedTime;
+
+  UpdateConnectionResponse({
+    this.connectionArn,
+    this.connectionState,
+    this.creationTime,
+    this.lastAuthorizedTime,
+    this.lastModifiedTime,
+  });
+  factory UpdateConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateConnectionResponse(
+      connectionArn: json['ConnectionArn'] as String?,
+      connectionState:
+          (json['ConnectionState'] as String?)?.toConnectionState(),
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastAuthorizedTime: timeStampFromJson(json['LastAuthorizedTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+    );
+  }
+}
+
+class UpdateEndpointResponse {
+  /// The ARN of the endpoint you updated in this request.
+  final String? arn;
+
+  /// The ID of the endpoint you updated in this request.
+  final String? endpointId;
+
+  /// The URL of the endpoint you updated in this request.
+  final String? endpointUrl;
+
+  /// The event buses used for replication for the endpoint you updated in this
+  /// request.
+  final List<EndpointEventBus>? eventBuses;
+
+  /// The name of the endpoint you updated in this request.
+  final String? name;
+
+  /// Whether event replication was enabled or disabled for the endpoint you
+  /// updated in this request.
+  final ReplicationConfig? replicationConfig;
+
+  /// The ARN of the role used by event replication for the endpoint you updated
+  /// in this request.
+  final String? roleArn;
+
+  /// The routing configuration you updated in this request.
+  final RoutingConfig? routingConfig;
+
+  /// The state of the endpoint you updated in this request.
+  final EndpointState? state;
+
+  UpdateEndpointResponse({
+    this.arn,
+    this.endpointId,
+    this.endpointUrl,
+    this.eventBuses,
+    this.name,
+    this.replicationConfig,
+    this.roleArn,
+    this.routingConfig,
+    this.state,
+  });
+  factory UpdateEndpointResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateEndpointResponse(
+      arn: json['Arn'] as String?,
+      endpointId: json['EndpointId'] as String?,
+      endpointUrl: json['EndpointUrl'] as String?,
+      eventBuses: (json['EventBuses'] as List?)
+          ?.whereNotNull()
+          .map((e) => EndpointEventBus.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      name: json['Name'] as String?,
+      replicationConfig: json['ReplicationConfig'] != null
+          ? ReplicationConfig.fromJson(
+              json['ReplicationConfig'] as Map<String, dynamic>)
+          : null,
+      roleArn: json['RoleArn'] as String?,
+      routingConfig: json['RoutingConfig'] != null
+          ? RoutingConfig.fromJson(
+              json['RoutingConfig'] as Map<String, dynamic>)
+          : null,
+      state: (json['State'] as String?)?.toEndpointState(),
     );
   }
 }

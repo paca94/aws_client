@@ -894,26 +894,37 @@ class Channel {
 class CmafEncryption {
   final SpekeKeyProvider spekeKeyProvider;
 
+  /// An optional 128-bit, 16-byte hex value represented by a 32-character string,
+  /// used in conjunction with the key for encrypting blocks. If you don't specify
+  /// a value, then MediaPackage creates the constant initialization vector (IV).
+  final String? constantInitializationVector;
+
   /// Time (in seconds) between each encryption key rotation.
   final int? keyRotationIntervalSeconds;
 
   CmafEncryption({
     required this.spekeKeyProvider,
+    this.constantInitializationVector,
     this.keyRotationIntervalSeconds,
   });
   factory CmafEncryption.fromJson(Map<String, dynamic> json) {
     return CmafEncryption(
       spekeKeyProvider: SpekeKeyProvider.fromJson(
           json['spekeKeyProvider'] as Map<String, dynamic>),
+      constantInitializationVector:
+          json['constantInitializationVector'] as String?,
       keyRotationIntervalSeconds: json['keyRotationIntervalSeconds'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final spekeKeyProvider = this.spekeKeyProvider;
+    final constantInitializationVector = this.constantInitializationVector;
     final keyRotationIntervalSeconds = this.keyRotationIntervalSeconds;
     return {
       'spekeKeyProvider': spekeKeyProvider,
+      if (constantInitializationVector != null)
+        'constantInitializationVector': constantInitializationVector,
       if (keyRotationIntervalSeconds != null)
         'keyRotationIntervalSeconds': keyRotationIntervalSeconds,
     };
@@ -1291,6 +1302,9 @@ class DashPackage {
   final AdsOnDeliveryRestrictions? adsOnDeliveryRestrictions;
   final DashEncryption? encryption;
 
+  /// When enabled, an I-Frame only stream will be included in the output.
+  final bool? includeIframeOnlyStream;
+
   /// Determines the position of some tags in the Media Presentation Description
   /// (MPD).  When set to FULL, elements like SegmentTemplate and
   /// ContentProtection are included in each Representation.  When set to COMPACT,
@@ -1318,7 +1332,8 @@ class DashPackage {
   final List<PeriodTriggersElement>? periodTriggers;
 
   /// The Dynamic Adaptive Streaming over HTTP (DASH) profile type.  When set to
-  /// "HBBTV_1_5", HbbTV 1.5 compliant output is enabled.
+  /// "HBBTV_1_5", HbbTV 1.5 compliant output is enabled. When set to
+  /// "DVB-DASH_2014", DVB-DASH 2014 compliant output is enabled.
   final Profile? profile;
 
   /// Duration (in seconds) of each segment. Actual segments will be
@@ -1342,13 +1357,14 @@ class DashPackage {
   final UtcTiming? utcTiming;
 
   /// Specifies the value attribute of the UTCTiming field when utcTiming is set
-  /// to HTTP-ISO or HTTP-HEAD
+  /// to HTTP-ISO, HTTP-HEAD or HTTP-XSDATE
   final String? utcTimingUri;
 
   DashPackage({
     this.adTriggers,
     this.adsOnDeliveryRestrictions,
     this.encryption,
+    this.includeIframeOnlyStream,
     this.manifestLayout,
     this.manifestWindowSeconds,
     this.minBufferTimeSeconds,
@@ -1373,6 +1389,7 @@ class DashPackage {
       encryption: json['encryption'] != null
           ? DashEncryption.fromJson(json['encryption'] as Map<String, dynamic>)
           : null,
+      includeIframeOnlyStream: json['includeIframeOnlyStream'] as bool?,
       manifestLayout: (json['manifestLayout'] as String?)?.toManifestLayout(),
       manifestWindowSeconds: json['manifestWindowSeconds'] as int?,
       minBufferTimeSeconds: json['minBufferTimeSeconds'] as int?,
@@ -1400,6 +1417,7 @@ class DashPackage {
     final adTriggers = this.adTriggers;
     final adsOnDeliveryRestrictions = this.adsOnDeliveryRestrictions;
     final encryption = this.encryption;
+    final includeIframeOnlyStream = this.includeIframeOnlyStream;
     final manifestLayout = this.manifestLayout;
     final manifestWindowSeconds = this.manifestWindowSeconds;
     final minBufferTimeSeconds = this.minBufferTimeSeconds;
@@ -1419,6 +1437,8 @@ class DashPackage {
       if (adsOnDeliveryRestrictions != null)
         'adsOnDeliveryRestrictions': adsOnDeliveryRestrictions.toValue(),
       if (encryption != null) 'encryption': encryption,
+      if (includeIframeOnlyStream != null)
+        'includeIframeOnlyStream': includeIframeOnlyStream,
       if (manifestLayout != null) 'manifestLayout': manifestLayout.toValue(),
       if (manifestWindowSeconds != null)
         'manifestWindowSeconds': manifestWindowSeconds,
@@ -1682,6 +1702,48 @@ class EgressAccessLogs {
     final logGroupName = this.logGroupName;
     return {
       if (logGroupName != null) 'logGroupName': logGroupName,
+    };
+  }
+}
+
+/// Use encryptionContractConfiguration to configure one or more content
+/// encryption keys for your endpoints that use SPEKE 2.0.
+/// The encryption contract defines which content keys are used to encrypt the
+/// audio and video tracks in your stream.
+/// To configure the encryption contract, specify which audio and video
+/// encryption presets to use.
+/// Note the following considerations when using
+/// encryptionContractConfiguration:
+/// encryptionContractConfiguration can be used for DASH or CMAF endpoints that
+/// use SPEKE 2.0. SPEKE 2.0 relies on the CPIX 2.3 specification.
+/// You must disable key rotation for this endpoint by setting
+/// keyRotationIntervalSeconds to 0.
+class EncryptionContractConfiguration {
+  /// A collection of audio encryption presets.
+  final PresetSpeke20Audio presetSpeke20Audio;
+
+  /// A collection of video encryption presets.
+  final PresetSpeke20Video presetSpeke20Video;
+
+  EncryptionContractConfiguration({
+    required this.presetSpeke20Audio,
+    required this.presetSpeke20Video,
+  });
+  factory EncryptionContractConfiguration.fromJson(Map<String, dynamic> json) {
+    return EncryptionContractConfiguration(
+      presetSpeke20Audio:
+          (json['presetSpeke20Audio'] as String).toPresetSpeke20Audio(),
+      presetSpeke20Video:
+          (json['presetSpeke20Video'] as String).toPresetSpeke20Video(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final presetSpeke20Audio = this.presetSpeke20Audio;
+    final presetSpeke20Video = this.presetSpeke20Video;
+    return {
+      'presetSpeke20Audio': presetSpeke20Audio.toValue(),
+      'presetSpeke20Video': presetSpeke20Video.toValue(),
     };
   }
 }
@@ -2038,6 +2100,10 @@ class HlsPackage {
   final AdsOnDeliveryRestrictions? adsOnDeliveryRestrictions;
   final HlsEncryption? encryption;
 
+  /// When enabled, MediaPackage passes through digital video broadcasting (DVB)
+  /// subtitles into the output.
+  final bool? includeDvbSubtitles;
+
   /// When enabled, an I-Frame only stream will be included in the output.
   final bool? includeIframeOnlyStream;
 
@@ -2076,6 +2142,7 @@ class HlsPackage {
     this.adTriggers,
     this.adsOnDeliveryRestrictions,
     this.encryption,
+    this.includeDvbSubtitles,
     this.includeIframeOnlyStream,
     this.playlistType,
     this.playlistWindowSeconds,
@@ -2096,6 +2163,7 @@ class HlsPackage {
       encryption: json['encryption'] != null
           ? HlsEncryption.fromJson(json['encryption'] as Map<String, dynamic>)
           : null,
+      includeDvbSubtitles: json['includeDvbSubtitles'] as bool?,
       includeIframeOnlyStream: json['includeIframeOnlyStream'] as bool?,
       playlistType: (json['playlistType'] as String?)?.toPlaylistType(),
       playlistWindowSeconds: json['playlistWindowSeconds'] as int?,
@@ -2115,6 +2183,7 @@ class HlsPackage {
     final adTriggers = this.adTriggers;
     final adsOnDeliveryRestrictions = this.adsOnDeliveryRestrictions;
     final encryption = this.encryption;
+    final includeDvbSubtitles = this.includeDvbSubtitles;
     final includeIframeOnlyStream = this.includeIframeOnlyStream;
     final playlistType = this.playlistType;
     final playlistWindowSeconds = this.playlistWindowSeconds;
@@ -2129,6 +2198,8 @@ class HlsPackage {
       if (adsOnDeliveryRestrictions != null)
         'adsOnDeliveryRestrictions': adsOnDeliveryRestrictions.toValue(),
       if (encryption != null) 'encryption': encryption,
+      if (includeDvbSubtitles != null)
+        'includeDvbSubtitles': includeDvbSubtitles,
       if (includeIframeOnlyStream != null)
         'includeIframeOnlyStream': includeIframeOnlyStream,
       if (playlistType != null) 'playlistType': playlistType.toValue(),
@@ -2541,9 +2612,122 @@ extension on String {
   }
 }
 
+enum PresetSpeke20Audio {
+  presetAudio_1,
+  presetAudio_2,
+  presetAudio_3,
+  shared,
+  unencrypted,
+}
+
+extension on PresetSpeke20Audio {
+  String toValue() {
+    switch (this) {
+      case PresetSpeke20Audio.presetAudio_1:
+        return 'PRESET-AUDIO-1';
+      case PresetSpeke20Audio.presetAudio_2:
+        return 'PRESET-AUDIO-2';
+      case PresetSpeke20Audio.presetAudio_3:
+        return 'PRESET-AUDIO-3';
+      case PresetSpeke20Audio.shared:
+        return 'SHARED';
+      case PresetSpeke20Audio.unencrypted:
+        return 'UNENCRYPTED';
+    }
+  }
+}
+
+extension on String {
+  PresetSpeke20Audio toPresetSpeke20Audio() {
+    switch (this) {
+      case 'PRESET-AUDIO-1':
+        return PresetSpeke20Audio.presetAudio_1;
+      case 'PRESET-AUDIO-2':
+        return PresetSpeke20Audio.presetAudio_2;
+      case 'PRESET-AUDIO-3':
+        return PresetSpeke20Audio.presetAudio_3;
+      case 'SHARED':
+        return PresetSpeke20Audio.shared;
+      case 'UNENCRYPTED':
+        return PresetSpeke20Audio.unencrypted;
+    }
+    throw Exception('$this is not known in enum PresetSpeke20Audio');
+  }
+}
+
+enum PresetSpeke20Video {
+  presetVideo_1,
+  presetVideo_2,
+  presetVideo_3,
+  presetVideo_4,
+  presetVideo_5,
+  presetVideo_6,
+  presetVideo_7,
+  presetVideo_8,
+  shared,
+  unencrypted,
+}
+
+extension on PresetSpeke20Video {
+  String toValue() {
+    switch (this) {
+      case PresetSpeke20Video.presetVideo_1:
+        return 'PRESET-VIDEO-1';
+      case PresetSpeke20Video.presetVideo_2:
+        return 'PRESET-VIDEO-2';
+      case PresetSpeke20Video.presetVideo_3:
+        return 'PRESET-VIDEO-3';
+      case PresetSpeke20Video.presetVideo_4:
+        return 'PRESET-VIDEO-4';
+      case PresetSpeke20Video.presetVideo_5:
+        return 'PRESET-VIDEO-5';
+      case PresetSpeke20Video.presetVideo_6:
+        return 'PRESET-VIDEO-6';
+      case PresetSpeke20Video.presetVideo_7:
+        return 'PRESET-VIDEO-7';
+      case PresetSpeke20Video.presetVideo_8:
+        return 'PRESET-VIDEO-8';
+      case PresetSpeke20Video.shared:
+        return 'SHARED';
+      case PresetSpeke20Video.unencrypted:
+        return 'UNENCRYPTED';
+    }
+  }
+}
+
+extension on String {
+  PresetSpeke20Video toPresetSpeke20Video() {
+    switch (this) {
+      case 'PRESET-VIDEO-1':
+        return PresetSpeke20Video.presetVideo_1;
+      case 'PRESET-VIDEO-2':
+        return PresetSpeke20Video.presetVideo_2;
+      case 'PRESET-VIDEO-3':
+        return PresetSpeke20Video.presetVideo_3;
+      case 'PRESET-VIDEO-4':
+        return PresetSpeke20Video.presetVideo_4;
+      case 'PRESET-VIDEO-5':
+        return PresetSpeke20Video.presetVideo_5;
+      case 'PRESET-VIDEO-6':
+        return PresetSpeke20Video.presetVideo_6;
+      case 'PRESET-VIDEO-7':
+        return PresetSpeke20Video.presetVideo_7;
+      case 'PRESET-VIDEO-8':
+        return PresetSpeke20Video.presetVideo_8;
+      case 'SHARED':
+        return PresetSpeke20Video.shared;
+      case 'UNENCRYPTED':
+        return PresetSpeke20Video.unencrypted;
+    }
+    throw Exception('$this is not known in enum PresetSpeke20Video');
+  }
+}
+
 enum Profile {
   none,
   hbbtv_1_5,
+  hybridcast,
+  dvbDash_2014,
 }
 
 extension on Profile {
@@ -2553,6 +2737,10 @@ extension on Profile {
         return 'NONE';
       case Profile.hbbtv_1_5:
         return 'HBBTV_1_5';
+      case Profile.hybridcast:
+        return 'HYBRIDCAST';
+      case Profile.dvbDash_2014:
+        return 'DVB_DASH_2014';
     }
   }
 }
@@ -2564,6 +2752,10 @@ extension on String {
         return Profile.none;
       case 'HBBTV_1_5':
         return Profile.hbbtv_1_5;
+      case 'HYBRIDCAST':
+        return Profile.hybridcast;
+      case 'DVB_DASH_2014':
+        return Profile.dvbDash_2014;
     }
     throw Exception('$this is not known in enum Profile');
   }
@@ -2752,6 +2944,7 @@ class SpekeKeyProvider {
   /// that MediaPackage will use for enforcing secure end-to-end data
   /// transfer with the key provider service.
   final String? certificateArn;
+  final EncryptionContractConfiguration? encryptionContractConfiguration;
 
   SpekeKeyProvider({
     required this.resourceId,
@@ -2759,6 +2952,7 @@ class SpekeKeyProvider {
     required this.systemIds,
     required this.url,
     this.certificateArn,
+    this.encryptionContractConfiguration,
   });
   factory SpekeKeyProvider.fromJson(Map<String, dynamic> json) {
     return SpekeKeyProvider(
@@ -2770,6 +2964,12 @@ class SpekeKeyProvider {
           .toList(),
       url: json['url'] as String,
       certificateArn: json['certificateArn'] as String?,
+      encryptionContractConfiguration:
+          json['encryptionContractConfiguration'] != null
+              ? EncryptionContractConfiguration.fromJson(
+                  json['encryptionContractConfiguration']
+                      as Map<String, dynamic>)
+              : null,
     );
   }
 
@@ -2779,12 +2979,16 @@ class SpekeKeyProvider {
     final systemIds = this.systemIds;
     final url = this.url;
     final certificateArn = this.certificateArn;
+    final encryptionContractConfiguration =
+        this.encryptionContractConfiguration;
     return {
       'resourceId': resourceId,
       'roleArn': roleArn,
       'systemIds': systemIds,
       'url': url,
       if (certificateArn != null) 'certificateArn': certificateArn,
+      if (encryptionContractConfiguration != null)
+        'encryptionContractConfiguration': encryptionContractConfiguration,
     };
   }
 }
@@ -3044,6 +3248,7 @@ enum UtcTiming {
   none,
   httpHead,
   httpIso,
+  httpXsdate,
 }
 
 extension on UtcTiming {
@@ -3055,6 +3260,8 @@ extension on UtcTiming {
         return 'HTTP-HEAD';
       case UtcTiming.httpIso:
         return 'HTTP-ISO';
+      case UtcTiming.httpXsdate:
+        return 'HTTP-XSDATE';
     }
   }
 }
@@ -3068,6 +3275,8 @@ extension on String {
         return UtcTiming.httpHead;
       case 'HTTP-ISO':
         return UtcTiming.httpIso;
+      case 'HTTP-XSDATE':
+        return UtcTiming.httpXsdate;
     }
     throw Exception('$this is not known in enum UtcTiming');
   }

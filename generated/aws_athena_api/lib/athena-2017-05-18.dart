@@ -34,7 +34,7 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 /// href="https://docs.aws.amazon.com/athena/latest/ug/connect-with-jdbc.html">Accessing
 /// Amazon Athena with JDBC</a>.
 ///
-/// For code samples using the AWS SDK for Java, see <a
+/// For code samples using the Amazon Web Services SDK for Java, see <a
 /// href="https://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
 /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
 class Athena {
@@ -103,6 +103,47 @@ class Athena {
     return BatchGetNamedQueryOutput.fromJson(jsonResponse.body);
   }
 
+  /// Returns the details of a single prepared statement or a list of up to 256
+  /// prepared statements for the array of prepared statement names that you
+  /// provide. Requires you to have access to the workgroup to which the
+  /// prepared statements belong. If a prepared statement cannot be retrieved
+  /// for the name specified, the statement is listed in
+  /// <code>UnprocessedPreparedStatementNames</code>.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  ///
+  /// Parameter [preparedStatementNames] :
+  /// A list of prepared statement names to return.
+  ///
+  /// Parameter [workGroup] :
+  /// The name of the workgroup to which the prepared statements belong.
+  Future<BatchGetPreparedStatementOutput> batchGetPreparedStatement({
+    required List<String> preparedStatementNames,
+    required String workGroup,
+  }) async {
+    ArgumentError.checkNotNull(
+        preparedStatementNames, 'preparedStatementNames');
+    ArgumentError.checkNotNull(workGroup, 'workGroup');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.BatchGetPreparedStatement'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'PreparedStatementNames': preparedStatementNames,
+        'WorkGroup': workGroup,
+      },
+    );
+
+    return BatchGetPreparedStatementOutput.fromJson(jsonResponse.body);
+  }
+
   /// Returns the details of a single query execution or a list of up to 50
   /// query executions, which you provide as an array of query execution ID
   /// strings. Requires you to have access to the workgroup in which the queries
@@ -139,20 +180,22 @@ class Athena {
   }
 
   /// Creates (registers) a data catalog with the specified name and properties.
-  /// Catalogs created are visible to all users of the same AWS account.
+  /// Catalogs created are visible to all users of the same Amazon Web Services
+  /// account.
   ///
   /// May throw [InternalServerException].
   /// May throw [InvalidRequestException].
   ///
   /// Parameter [name] :
   /// The name of the data catalog to create. The catalog name must be unique
-  /// for the AWS account and can use a maximum of 128 alphanumeric, underscore,
-  /// at sign, or hyphen characters.
+  /// for the Amazon Web Services account and can use a maximum of 127
+  /// alphanumeric, underscore, at sign, or hyphen characters. The remainder of
+  /// the length constraint of 256 is reserved for use by Athena.
   ///
   /// Parameter [type] :
   /// The type of data catalog to create: <code>LAMBDA</code> for a federated
-  /// catalog, <code>GLUE</code> for AWS Glue Catalog, or <code>HIVE</code> for
-  /// an external hive metastore.
+  /// catalog, <code>HIVE</code> for an external hive metastore, or
+  /// <code>GLUE</code> for an Glue Data Catalog.
   ///
   /// Parameter [description] :
   /// A description of the data catalog to be created.
@@ -192,8 +235,27 @@ class Athena {
   /// </li>
   /// </ul> </li>
   /// <li>
-  /// The <code>GLUE</code> type has no parameters.
+  /// The <code>GLUE</code> type takes a catalog ID parameter and is required.
+  /// The <code> <i>catalog_id</i> </code> is the account ID of the Amazon Web
+  /// Services account to which the Glue Data Catalog belongs.
+  ///
+  /// <code>catalog-id=<i>catalog_id</i> </code>
+  ///
+  /// <ul>
+  /// <li>
+  /// The <code>GLUE</code> data catalog type also applies to the default
+  /// <code>AwsDataCatalog</code> that already exists in your account, of which
+  /// you can have only one and cannot modify.
   /// </li>
+  /// <li>
+  /// Queries that specify a Glue Data Catalog other than the default
+  /// <code>AwsDataCatalog</code> must be run on Athena engine version 2.
+  /// </li>
+  /// <li>
+  /// In Regions where Athena engine version 2 is not available, creating new
+  /// Glue data catalogs results in an <code>INVALID_INPUT</code> error.
+  /// </li>
+  /// </ul> </li>
   /// </ul>
   ///
   /// Parameter [tags] :
@@ -243,7 +305,7 @@ class Athena {
   /// Creates a named query in the specified workgroup. Requires that you have
   /// access to the workgroup.
   ///
-  /// For code samples using the AWS SDK for Java, see <a
+  /// For code samples using the Amazon Web Services SDK for Java, see <a
   /// href="http://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
   /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
   ///
@@ -266,10 +328,10 @@ class Athena {
   /// returned and another query is not created. If a parameter has changed, for
   /// example, the <code>QueryString</code>, an error is returned.
   /// <important>
-  /// This token is listed as not required because AWS SDKs (for example the AWS
-  /// SDK for Java) auto-generate the token for users. If you are not using the
-  /// AWS SDK or the AWS CLI, you must provide this token or the action will
-  /// fail.
+  /// This token is listed as not required because Amazon Web Services SDKs (for
+  /// example the Amazon Web Services SDK for Java) auto-generate the token for
+  /// users. If you are not using the Amazon Web Services SDK or the Amazon Web
+  /// Services CLI, you must provide this token or the action will fail.
   /// </important>
   ///
   /// Parameter [description] :
@@ -345,6 +407,70 @@ class Athena {
     return CreateNamedQueryOutput.fromJson(jsonResponse.body);
   }
 
+  /// Creates a prepared statement for use with SQL queries in Athena.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  ///
+  /// Parameter [queryStatement] :
+  /// The query string for the prepared statement.
+  ///
+  /// Parameter [statementName] :
+  /// The name of the prepared statement.
+  ///
+  /// Parameter [workGroup] :
+  /// The name of the workgroup to which the prepared statement belongs.
+  ///
+  /// Parameter [description] :
+  /// The description of the prepared statement.
+  Future<void> createPreparedStatement({
+    required String queryStatement,
+    required String statementName,
+    required String workGroup,
+    String? description,
+  }) async {
+    ArgumentError.checkNotNull(queryStatement, 'queryStatement');
+    _s.validateStringLength(
+      'queryStatement',
+      queryStatement,
+      1,
+      262144,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(statementName, 'statementName');
+    _s.validateStringLength(
+      'statementName',
+      statementName,
+      1,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(workGroup, 'workGroup');
+    _s.validateStringLength(
+      'description',
+      description,
+      1,
+      1024,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.CreatePreparedStatement'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'QueryStatement': queryStatement,
+        'StatementName': statementName,
+        'WorkGroup': workGroup,
+        if (description != null) 'Description': description,
+      },
+    );
+  }
+
   /// Creates a workgroup with the specified name.
   ///
   /// May throw [InternalServerException].
@@ -359,8 +485,8 @@ class Athena {
   /// used for encrypting query results, whether the Amazon CloudWatch Metrics
   /// are enabled for the workgroup, the limit for the amount of bytes scanned
   /// (cutoff) per query, if it is specified, and whether workgroup's settings
-  /// (specified with EnforceWorkGroupConfiguration) in the
-  /// WorkGroupConfiguration override client-side settings. See
+  /// (specified with <code>EnforceWorkGroupConfiguration</code>) in the
+  /// <code>WorkGroupConfiguration</code> override client-side settings. See
   /// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
   ///
   /// Parameter [description] :
@@ -437,7 +563,7 @@ class Athena {
   /// Deletes the named query if you have access to the workgroup in which the
   /// query was saved.
   ///
-  /// For code samples using the AWS SDK for Java, see <a
+  /// For code samples using the Amazon Web Services SDK for Java, see <a
   /// href="http://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
   /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
   ///
@@ -449,6 +575,12 @@ class Athena {
   Future<void> deleteNamedQuery({
     String? namedQueryId,
   }) async {
+    _s.validateStringLength(
+      'namedQueryId',
+      namedQueryId,
+      1,
+      128,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AmazonAthena.DeleteNamedQuery'
@@ -465,6 +597,48 @@ class Athena {
     );
   }
 
+  /// Deletes the prepared statement with the specified name from the specified
+  /// workgroup.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [statementName] :
+  /// The name of the prepared statement to delete.
+  ///
+  /// Parameter [workGroup] :
+  /// The workgroup to which the statement to be deleted belongs.
+  Future<void> deletePreparedStatement({
+    required String statementName,
+    required String workGroup,
+  }) async {
+    ArgumentError.checkNotNull(statementName, 'statementName');
+    _s.validateStringLength(
+      'statementName',
+      statementName,
+      1,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(workGroup, 'workGroup');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.DeletePreparedStatement'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'StatementName': statementName,
+        'WorkGroup': workGroup,
+      },
+    );
+  }
+
   /// Deletes the workgroup with the specified name. The primary workgroup
   /// cannot be deleted.
   ///
@@ -476,7 +650,7 @@ class Athena {
   ///
   /// Parameter [recursiveDeleteOption] :
   /// The option to delete the workgroup and its contents even if the workgroup
-  /// contains any named queries.
+  /// contains any named queries or query executions.
   Future<void> deleteWorkGroup({
     required String workGroup,
     bool? recursiveDeleteOption,
@@ -536,7 +710,7 @@ class Athena {
     return GetDataCatalogOutput.fromJson(jsonResponse.body);
   }
 
-  /// Returns a database object for the specfied database and data catalog.
+  /// Returns a database object for the specified database and data catalog.
   ///
   /// May throw [InternalServerException].
   /// May throw [InvalidRequestException].
@@ -598,6 +772,13 @@ class Athena {
     required String namedQueryId,
   }) async {
     ArgumentError.checkNotNull(namedQueryId, 'namedQueryId');
+    _s.validateStringLength(
+      'namedQueryId',
+      namedQueryId,
+      1,
+      128,
+      isRequired: true,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AmazonAthena.GetNamedQuery'
@@ -616,6 +797,50 @@ class Athena {
     return GetNamedQueryOutput.fromJson(jsonResponse.body);
   }
 
+  /// Retrieves the prepared statement with the specified name from the
+  /// specified workgroup.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [statementName] :
+  /// The name of the prepared statement to retrieve.
+  ///
+  /// Parameter [workGroup] :
+  /// The workgroup to which the statement to be retrieved belongs.
+  Future<GetPreparedStatementOutput> getPreparedStatement({
+    required String statementName,
+    required String workGroup,
+  }) async {
+    ArgumentError.checkNotNull(statementName, 'statementName');
+    _s.validateStringLength(
+      'statementName',
+      statementName,
+      1,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(workGroup, 'workGroup');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.GetPreparedStatement'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'StatementName': statementName,
+        'WorkGroup': workGroup,
+      },
+    );
+
+    return GetPreparedStatementOutput.fromJson(jsonResponse.body);
+  }
+
   /// Returns information about a single execution of a query if you have access
   /// to the workgroup in which the query ran. Each time a query executes,
   /// information about the query execution is saved with a unique ID.
@@ -629,6 +854,13 @@ class Athena {
     required String queryExecutionId,
   }) async {
     ArgumentError.checkNotNull(queryExecutionId, 'queryExecutionId');
+    _s.validateStringLength(
+      'queryExecutionId',
+      queryExecutionId,
+      1,
+      128,
+      isRequired: true,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AmazonAthena.GetQueryExecution'
@@ -686,6 +918,13 @@ class Athena {
     String? nextToken,
   }) async {
     ArgumentError.checkNotNull(queryExecutionId, 'queryExecutionId');
+    _s.validateStringLength(
+      'queryExecutionId',
+      queryExecutionId,
+      1,
+      128,
+      isRequired: true,
+    );
     _s.validateNumRange(
       'maxResults',
       maxResults,
@@ -716,6 +955,45 @@ class Athena {
     );
 
     return GetQueryResultsOutput.fromJson(jsonResponse.body);
+  }
+
+  /// Returns query execution runtime statistics related to a single execution
+  /// of a query if you have access to the workgroup in which the query ran. The
+  /// query execution runtime statistics is returned only when
+  /// <a>QueryExecutionStatus$State</a> is in a SUCCEEDED or FAILED state.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  ///
+  /// Parameter [queryExecutionId] :
+  /// The unique ID of the query execution.
+  Future<GetQueryRuntimeStatisticsOutput> getQueryRuntimeStatistics({
+    required String queryExecutionId,
+  }) async {
+    ArgumentError.checkNotNull(queryExecutionId, 'queryExecutionId');
+    _s.validateStringLength(
+      'queryExecutionId',
+      queryExecutionId,
+      1,
+      128,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.GetQueryRuntimeStatistics'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'QueryExecutionId': queryExecutionId,
+      },
+    );
+
+    return GetQueryRuntimeStatisticsOutput.fromJson(jsonResponse.body);
   }
 
   /// Returns table metadata for the specified catalog, database, and table.
@@ -811,7 +1089,7 @@ class Athena {
     return GetWorkGroupOutput.fromJson(jsonResponse.body);
   }
 
-  /// Lists the data catalogs in the current AWS account.
+  /// Lists the data catalogs in the current Amazon Web Services account.
   ///
   /// May throw [InternalServerException].
   /// May throw [InvalidRequestException].
@@ -921,12 +1199,61 @@ class Athena {
     return ListDatabasesOutput.fromJson(jsonResponse.body);
   }
 
+  /// Returns a list of engine versions that are available to choose from,
+  /// including the Auto option.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of engine versions to return in this request.
+  ///
+  /// Parameter [nextToken] :
+  /// A token generated by the Athena service that specifies where to continue
+  /// pagination if a previous request was truncated. To obtain the next set of
+  /// pages, pass in the <code>NextToken</code> from the response object of the
+  /// previous page call.
+  Future<ListEngineVersionsOutput> listEngineVersions({
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      10,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      1024,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.ListEngineVersions'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListEngineVersionsOutput.fromJson(jsonResponse.body);
+  }
+
   /// Provides a list of available query IDs only for queries saved in the
   /// specified workgroup. Requires that you have access to the specified
   /// workgroup. If a workgroup is not specified, lists the saved queries for
   /// the primary workgroup.
   ///
-  /// For code samples using the AWS SDK for Java, see <a
+  /// For code samples using the Amazon Web Services SDK for Java, see <a
   /// href="http://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
   /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
   ///
@@ -983,12 +1310,66 @@ class Athena {
     return ListNamedQueriesOutput.fromJson(jsonResponse.body);
   }
 
+  /// Lists the prepared statements in the specified workgroup.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  ///
+  /// Parameter [workGroup] :
+  /// The workgroup to list the prepared statements for.
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of results to return in this request.
+  ///
+  /// Parameter [nextToken] :
+  /// A token generated by the Athena service that specifies where to continue
+  /// pagination if a previous request was truncated. To obtain the next set of
+  /// pages, pass in the <code>NextToken</code> from the response object of the
+  /// previous page call.
+  Future<ListPreparedStatementsOutput> listPreparedStatements({
+    required String workGroup,
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    ArgumentError.checkNotNull(workGroup, 'workGroup');
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      50,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      1024,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.ListPreparedStatements'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'WorkGroup': workGroup,
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListPreparedStatementsOutput.fromJson(jsonResponse.body);
+  }
+
   /// Provides a list of available query execution IDs for the queries in the
   /// specified workgroup. If a workgroup is not specified, returns a list of
   /// query execution IDs for the primary workgroup. Requires you to have access
   /// to the workgroup in which the queries ran.
   ///
-  /// For code samples using the AWS SDK for Java, see <a
+  /// For code samples using the Amazon Web Services SDK for Java, see <a
   /// href="http://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
   /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
   ///
@@ -1246,8 +1627,8 @@ class Athena {
   /// Runs the SQL query statements contained in the <code>Query</code>.
   /// Requires you to have access to the workgroup in which the query ran.
   /// Running queries against an external catalog requires <a>GetDataCatalog</a>
-  /// permission to the catalog. For code samples using the AWS SDK for Java,
-  /// see <a
+  /// permission to the catalog. For code samples using the Amazon Web Services
+  /// SDK for Java, see <a
   /// href="http://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
   /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
   ///
@@ -1265,11 +1646,16 @@ class Athena {
   /// returned and another query is not created. If a parameter has changed, for
   /// example, the <code>QueryString</code>, an error is returned.
   /// <important>
-  /// This token is listed as not required because AWS SDKs (for example the AWS
-  /// SDK for Java) auto-generate the token for users. If you are not using the
-  /// AWS SDK or the AWS CLI, you must provide this token or the action will
-  /// fail.
+  /// This token is listed as not required because Amazon Web Services SDKs (for
+  /// example the Amazon Web Services SDK for Java) auto-generate the token for
+  /// users. If you are not using the Amazon Web Services SDK or the Amazon Web
+  /// Services CLI, you must provide this token or the action will fail.
   /// </important>
+  ///
+  /// Parameter [executionParameters] :
+  /// A list of values for the parameters in a query. The values are applied
+  /// sequentially to the parameters in the query in the order in which the
+  /// parameters occur.
   ///
   /// Parameter [queryExecutionContext] :
   /// The database within which the query executes.
@@ -1287,6 +1673,7 @@ class Athena {
   Future<StartQueryExecutionOutput> startQueryExecution({
     required String queryString,
     String? clientRequestToken,
+    List<String>? executionParameters,
     QueryExecutionContext? queryExecutionContext,
     ResultConfiguration? resultConfiguration,
     String? workGroup,
@@ -1319,6 +1706,8 @@ class Athena {
         'QueryString': queryString,
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (executionParameters != null)
+          'ExecutionParameters': executionParameters,
         if (queryExecutionContext != null)
           'QueryExecutionContext': queryExecutionContext,
         if (resultConfiguration != null)
@@ -1333,7 +1722,7 @@ class Athena {
   /// Stops a query execution. Requires you to have access to the workgroup in
   /// which the query ran.
   ///
-  /// For code samples using the AWS SDK for Java, see <a
+  /// For code samples using the Amazon Web Services SDK for Java, see <a
   /// href="http://docs.aws.amazon.com/athena/latest/ug/code-samples.html">Examples
   /// and Code Samples</a> in the <i>Amazon Athena User Guide</i>.
   ///
@@ -1345,6 +1734,12 @@ class Athena {
   Future<void> stopQueryExecution({
     String? queryExecutionId,
   }) async {
+    _s.validateStringLength(
+      'queryExecutionId',
+      queryExecutionId,
+      1,
+      128,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'AmazonAthena.StopQueryExecution'
@@ -1466,13 +1861,14 @@ class Athena {
   ///
   /// Parameter [name] :
   /// The name of the data catalog to update. The catalog name must be unique
-  /// for the AWS account and can use a maximum of 128 alphanumeric, underscore,
-  /// at sign, or hyphen characters.
+  /// for the Amazon Web Services account and can use a maximum of 127
+  /// alphanumeric, underscore, at sign, or hyphen characters. The remainder of
+  /// the length constraint of 256 is reserved for use by Athena.
   ///
   /// Parameter [type] :
   /// Specifies the type of data catalog to update. Specify <code>LAMBDA</code>
-  /// for a federated catalog, <code>GLUE</code> for AWS Glue Catalog, or
-  /// <code>HIVE</code> for an external hive metastore.
+  /// for a federated catalog, <code>HIVE</code> for an external hive metastore,
+  /// or <code>GLUE</code> for an Glue Data Catalog.
   ///
   /// Parameter [description] :
   /// New or modified text that describes the data catalog.
@@ -1511,9 +1907,6 @@ class Athena {
   /// <code>function=<i>lambda_arn</i> </code>
   /// </li>
   /// </ul> </li>
-  /// <li>
-  /// The <code>GLUE</code> type has no parameters.
-  /// </li>
   /// </ul>
   Future<void> updateDataCatalog({
     required String name,
@@ -1551,6 +1944,143 @@ class Athena {
         'Type': type.toValue(),
         if (description != null) 'Description': description,
         if (parameters != null) 'Parameters': parameters,
+      },
+    );
+  }
+
+  /// Updates a <a>NamedQuery</a> object. The database or workgroup cannot be
+  /// updated.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  ///
+  /// Parameter [name] :
+  /// The name of the query.
+  ///
+  /// Parameter [namedQueryId] :
+  /// The unique identifier (UUID) of the query.
+  ///
+  /// Parameter [queryString] :
+  /// The contents of the query with all query statements.
+  ///
+  /// Parameter [description] :
+  /// The query description.
+  Future<void> updateNamedQuery({
+    required String name,
+    required String namedQueryId,
+    required String queryString,
+    String? description,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      128,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(namedQueryId, 'namedQueryId');
+    _s.validateStringLength(
+      'namedQueryId',
+      namedQueryId,
+      1,
+      128,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(queryString, 'queryString');
+    _s.validateStringLength(
+      'queryString',
+      queryString,
+      1,
+      262144,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      0,
+      1024,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.UpdateNamedQuery'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+        'NamedQueryId': namedQueryId,
+        'QueryString': queryString,
+        if (description != null) 'Description': description,
+      },
+    );
+  }
+
+  /// Updates a prepared statement.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  ///
+  /// Parameter [queryStatement] :
+  /// The query string for the prepared statement.
+  ///
+  /// Parameter [statementName] :
+  /// The name of the prepared statement.
+  ///
+  /// Parameter [workGroup] :
+  /// The workgroup for the prepared statement.
+  ///
+  /// Parameter [description] :
+  /// The description of the prepared statement.
+  Future<void> updatePreparedStatement({
+    required String queryStatement,
+    required String statementName,
+    required String workGroup,
+    String? description,
+  }) async {
+    ArgumentError.checkNotNull(queryStatement, 'queryStatement');
+    _s.validateStringLength(
+      'queryStatement',
+      queryStatement,
+      1,
+      262144,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(statementName, 'statementName');
+    _s.validateStringLength(
+      'statementName',
+      statementName,
+      1,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(workGroup, 'workGroup');
+    _s.validateStringLength(
+      'description',
+      description,
+      1,
+      1024,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonAthena.UpdatePreparedStatement'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'QueryStatement': queryStatement,
+        'StatementName': statementName,
+        'WorkGroup': workGroup,
+        if (description != null) 'Description': description,
       },
     );
   }
@@ -1606,6 +2136,85 @@ class Athena {
   }
 }
 
+/// Indicates that an Amazon S3 canned ACL should be set to control ownership of
+/// stored query results. When Athena stores query results in Amazon S3, the
+/// canned ACL is set with the <code>x-amz-acl</code> request header. For more
+/// information about S3 Object Ownership, see <a
+/// href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html#object-ownership-overview">Object
+/// Ownership settings</a> in the <i>Amazon S3 User Guide</i>.
+class AclConfiguration {
+  /// The Amazon S3 canned ACL that Athena should specify when storing query
+  /// results. Currently the only supported canned ACL is
+  /// <code>BUCKET_OWNER_FULL_CONTROL</code>. If a query runs in a workgroup and
+  /// the workgroup overrides client-side settings, then the Amazon S3 canned ACL
+  /// specified in the workgroup's settings is used for all queries that run in
+  /// the workgroup. For more information about Amazon S3 canned ACLs, see <a
+  /// href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl">Canned
+  /// ACL</a> in the <i>Amazon S3 User Guide</i>.
+  final S3AclOption s3AclOption;
+
+  AclConfiguration({
+    required this.s3AclOption,
+  });
+  factory AclConfiguration.fromJson(Map<String, dynamic> json) {
+    return AclConfiguration(
+      s3AclOption: (json['S3AclOption'] as String).toS3AclOption(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final s3AclOption = this.s3AclOption;
+    return {
+      'S3AclOption': s3AclOption.toValue(),
+    };
+  }
+}
+
+/// Provides information about an Athena query error. The
+/// <code>AthenaError</code> feature provides standardized error information to
+/// help you understand failed queries and take steps after a query failure
+/// occurs. <code>AthenaError</code> includes an <code>ErrorCategory</code>
+/// field that specifies whether the cause of the failed query is due to system
+/// error, user error, or other error.
+class AthenaError {
+  /// An integer value that specifies the category of a query failure error. The
+  /// following list shows the category for each integer value.
+  ///
+  /// <b>1</b> - System
+  ///
+  /// <b>2</b> - User
+  ///
+  /// <b>3</b> - Other
+  final int? errorCategory;
+
+  /// Contains a short description of the error that occurred.
+  final String? errorMessage;
+
+  /// An integer value that provides specific information about an Athena query
+  /// error. For the meaning of specific values, see the <a
+  /// href="https://docs.aws.amazon.com/athena/latest/ug/error-reference.html#error-reference-error-type-reference">Error
+  /// Type Reference</a> in the <i>Amazon Athena User Guide</i>.
+  final int? errorType;
+
+  /// True if the query might succeed if resubmitted.
+  final bool? retryable;
+
+  AthenaError({
+    this.errorCategory,
+    this.errorMessage,
+    this.errorType,
+    this.retryable,
+  });
+  factory AthenaError.fromJson(Map<String, dynamic> json) {
+    return AthenaError(
+      errorCategory: json['ErrorCategory'] as int?,
+      errorMessage: json['ErrorMessage'] as String?,
+      errorType: json['ErrorType'] as int?,
+      retryable: json['Retryable'] as bool?,
+    );
+  }
+}
+
 class BatchGetNamedQueryOutput {
   /// Information about the named query IDs submitted.
   final List<NamedQuery>? namedQueries;
@@ -1628,6 +2237,35 @@ class BatchGetNamedQueryOutput {
           .map((e) =>
               UnprocessedNamedQueryId.fromJson(e as Map<String, dynamic>))
           .toList(),
+    );
+  }
+}
+
+class BatchGetPreparedStatementOutput {
+  /// The list of prepared statements returned.
+  final List<PreparedStatement>? preparedStatements;
+
+  /// A list of one or more prepared statements that were requested but could not
+  /// be returned.
+  final List<UnprocessedPreparedStatementName>?
+      unprocessedPreparedStatementNames;
+
+  BatchGetPreparedStatementOutput({
+    this.preparedStatements,
+    this.unprocessedPreparedStatementNames,
+  });
+  factory BatchGetPreparedStatementOutput.fromJson(Map<String, dynamic> json) {
+    return BatchGetPreparedStatementOutput(
+      preparedStatements: (json['PreparedStatements'] as List?)
+          ?.whereNotNull()
+          .map((e) => PreparedStatement.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      unprocessedPreparedStatementNames:
+          (json['UnprocessedPreparedStatementNames'] as List?)
+              ?.whereNotNull()
+              .map((e) => UnprocessedPreparedStatementName.fromJson(
+                  e as Map<String, dynamic>))
+              .toList(),
     );
   }
 }
@@ -1800,6 +2438,13 @@ class CreateNamedQueryOutput {
   }
 }
 
+class CreatePreparedStatementOutput {
+  CreatePreparedStatementOutput();
+  factory CreatePreparedStatementOutput.fromJson(Map<String, dynamic> _) {
+    return CreatePreparedStatementOutput();
+  }
+}
+
 class CreateWorkGroupOutput {
   CreateWorkGroupOutput();
   factory CreateWorkGroupOutput.fromJson(Map<String, dynamic> _) {
@@ -1807,16 +2452,17 @@ class CreateWorkGroupOutput {
   }
 }
 
-/// Contains information about a data catalog in an AWS account.
+/// Contains information about a data catalog in an Amazon Web Services account.
 class DataCatalog {
-  /// The name of the data catalog. The catalog name must be unique for the AWS
-  /// account and can use a maximum of 128 alphanumeric, underscore, at sign, or
-  /// hyphen characters.
+  /// The name of the data catalog. The catalog name must be unique for the Amazon
+  /// Web Services account and can use a maximum of 127 alphanumeric, underscore,
+  /// at sign, or hyphen characters. The remainder of the length constraint of 256
+  /// is reserved for use by Athena.
   final String name;
 
-  /// The type of data catalog: <code>LAMBDA</code> for a federated catalog,
-  /// <code>GLUE</code> for AWS Glue Catalog, or <code>HIVE</code> for an external
-  /// hive metastore.
+  /// The type of data catalog to create: <code>LAMBDA</code> for a federated
+  /// catalog, <code>HIVE</code> for an external hive metastore, or
+  /// <code>GLUE</code> for an Glue Data Catalog.
   final DataCatalogType type;
 
   /// An optional description of the data catalog.
@@ -1856,8 +2502,23 @@ class DataCatalog {
   /// </li>
   /// </ul> </li>
   /// <li>
-  /// The <code>GLUE</code> type has no parameters.
+  /// The <code>GLUE</code> type takes a catalog ID parameter and is required. The
+  /// <code> <i>catalog_id</i> </code> is the account ID of the Amazon Web
+  /// Services account to which the Glue catalog belongs.
+  ///
+  /// <code>catalog-id=<i>catalog_id</i> </code>
+  ///
+  /// <ul>
+  /// <li>
+  /// The <code>GLUE</code> data catalog type also applies to the default
+  /// <code>AwsDataCatalog</code> that already exists in your account, of which
+  /// you can have only one and cannot modify.
   /// </li>
+  /// <li>
+  /// Queries that specify a Glue Data Catalog other than the default
+  /// <code>AwsDataCatalog</code> must be run on Athena engine version 2.
+  /// </li>
+  /// </ul> </li>
   /// </ul>
   final Map<String, String>? parameters;
 
@@ -1881,7 +2542,10 @@ class DataCatalog {
 /// The summary information for the data catalog, which includes its name and
 /// type.
 class DataCatalogSummary {
-  /// The name of the data catalog.
+  /// The name of the data catalog. The catalog name is unique for the Amazon Web
+  /// Services account and can use a maximum of 127 alphanumeric, underscore, at
+  /// sign, or hyphen characters. The remainder of the length constraint of 256 is
+  /// reserved for use by Athena.
   final String? catalogName;
 
   /// The data catalog type.
@@ -1987,6 +2651,13 @@ class DeleteNamedQueryOutput {
   }
 }
 
+class DeletePreparedStatementOutput {
+  DeletePreparedStatementOutput();
+  factory DeletePreparedStatementOutput.fromJson(Map<String, dynamic> _) {
+    return DeletePreparedStatementOutput();
+  }
+}
+
 class DeleteWorkGroupOutput {
   DeleteWorkGroupOutput();
   factory DeleteWorkGroupOutput.fromJson(Map<String, dynamic> _) {
@@ -1995,13 +2666,13 @@ class DeleteWorkGroupOutput {
 }
 
 /// If query results are encrypted in Amazon S3, indicates the encryption option
-/// used (for example, <code>SSE-KMS</code> or <code>CSE-KMS</code>) and key
+/// used (for example, <code>SSE_KMS</code> or <code>CSE_KMS</code>) and key
 /// information.
 class EncryptionConfiguration {
   /// Indicates whether Amazon S3 server-side encryption with Amazon S3-managed
-  /// keys (<code>SSE-S3</code>), server-side encryption with KMS-managed keys
-  /// (<code>SSE-KMS</code>), or client-side encryption with KMS-managed keys
-  /// (CSE-KMS) is used.
+  /// keys (<code>SSE_S3</code>), server-side encryption with KMS-managed keys
+  /// (<code>SSE_KMS</code>), or client-side encryption with KMS-managed keys
+  /// (<code>CSE_KMS</code>) is used.
   ///
   /// If a query runs in a workgroup and the workgroup overrides client-side
   /// settings, then the workgroup's setting for encryption is used. It specifies
@@ -2009,7 +2680,7 @@ class EncryptionConfiguration {
   /// workgroup.
   final EncryptionOption encryptionOption;
 
-  /// For <code>SSE-KMS</code> and <code>CSE-KMS</code>, this is the KMS key ARN
+  /// For <code>SSE_KMS</code> and <code>CSE_KMS</code>, this is the KMS key ARN
   /// or ID.
   final String? kmsKey;
 
@@ -2068,6 +2739,45 @@ extension on String {
   }
 }
 
+/// The Athena engine version for running queries.
+class EngineVersion {
+  /// Read only. The engine version on which the query runs. If the user requests
+  /// a valid engine version other than Auto, the effective engine version is the
+  /// same as the engine version that the user requested. If the user requests
+  /// Auto, the effective engine version is chosen by Athena. When a request to
+  /// update the engine version is made by a <code>CreateWorkGroup</code> or
+  /// <code>UpdateWorkGroup</code> operation, the
+  /// <code>EffectiveEngineVersion</code> field is ignored.
+  final String? effectiveEngineVersion;
+
+  /// The engine version requested by the user. Possible values are determined by
+  /// the output of <code>ListEngineVersions</code>, including Auto. The default
+  /// is Auto.
+  final String? selectedEngineVersion;
+
+  EngineVersion({
+    this.effectiveEngineVersion,
+    this.selectedEngineVersion,
+  });
+  factory EngineVersion.fromJson(Map<String, dynamic> json) {
+    return EngineVersion(
+      effectiveEngineVersion: json['EffectiveEngineVersion'] as String?,
+      selectedEngineVersion: json['SelectedEngineVersion'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final effectiveEngineVersion = this.effectiveEngineVersion;
+    final selectedEngineVersion = this.selectedEngineVersion;
+    return {
+      if (effectiveEngineVersion != null)
+        'EffectiveEngineVersion': effectiveEngineVersion,
+      if (selectedEngineVersion != null)
+        'SelectedEngineVersion': selectedEngineVersion,
+    };
+  }
+}
+
 class GetDataCatalogOutput {
   /// The data catalog returned.
   final DataCatalog? dataCatalog;
@@ -2116,6 +2826,23 @@ class GetNamedQueryOutput {
   }
 }
 
+class GetPreparedStatementOutput {
+  /// The name of the prepared statement that was retrieved.
+  final PreparedStatement? preparedStatement;
+
+  GetPreparedStatementOutput({
+    this.preparedStatement,
+  });
+  factory GetPreparedStatementOutput.fromJson(Map<String, dynamic> json) {
+    return GetPreparedStatementOutput(
+      preparedStatement: json['PreparedStatement'] != null
+          ? PreparedStatement.fromJson(
+              json['PreparedStatement'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 class GetQueryExecutionOutput {
   /// Information about the query execution.
   final QueryExecution? queryExecution;
@@ -2143,7 +2870,8 @@ class GetQueryResultsOutput {
   /// The results of the query execution.
   final ResultSet? resultSet;
 
-  /// The number of rows inserted with a CREATE TABLE AS SELECT statement.
+  /// The number of rows inserted with a <code>CREATE TABLE AS SELECT</code>
+  /// statement.
   final int? updateCount;
 
   GetQueryResultsOutput({
@@ -2158,6 +2886,23 @@ class GetQueryResultsOutput {
           ? ResultSet.fromJson(json['ResultSet'] as Map<String, dynamic>)
           : null,
       updateCount: json['UpdateCount'] as int?,
+    );
+  }
+}
+
+class GetQueryRuntimeStatisticsOutput {
+  /// Runtime statistics about the query execution.
+  final QueryRuntimeStatistics? queryRuntimeStatistics;
+
+  GetQueryRuntimeStatisticsOutput({
+    this.queryRuntimeStatistics,
+  });
+  factory GetQueryRuntimeStatisticsOutput.fromJson(Map<String, dynamic> json) {
+    return GetQueryRuntimeStatisticsOutput(
+      queryRuntimeStatistics: json['QueryRuntimeStatistics'] != null
+          ? QueryRuntimeStatistics.fromJson(
+              json['QueryRuntimeStatistics'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -2245,6 +2990,31 @@ class ListDatabasesOutput {
   }
 }
 
+class ListEngineVersionsOutput {
+  /// A list of engine versions that are available to choose from.
+  final List<EngineVersion>? engineVersions;
+
+  /// A token generated by the Athena service that specifies where to continue
+  /// pagination if a previous request was truncated. To obtain the next set of
+  /// pages, pass in the <code>NextToken</code> from the response object of the
+  /// previous page call.
+  final String? nextToken;
+
+  ListEngineVersionsOutput({
+    this.engineVersions,
+    this.nextToken,
+  });
+  factory ListEngineVersionsOutput.fromJson(Map<String, dynamic> json) {
+    return ListEngineVersionsOutput(
+      engineVersions: (json['EngineVersions'] as List?)
+          ?.whereNotNull()
+          .map((e) => EngineVersion.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
 class ListNamedQueriesOutput {
   /// The list of unique query IDs.
   final List<String>? namedQueryIds;
@@ -2266,6 +3036,32 @@ class ListNamedQueriesOutput {
           .map((e) => e as String)
           .toList(),
       nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class ListPreparedStatementsOutput {
+  /// A token generated by the Athena service that specifies where to continue
+  /// pagination if a previous request was truncated. To obtain the next set of
+  /// pages, pass in the <code>NextToken</code> from the response object of the
+  /// previous page call.
+  final String? nextToken;
+
+  /// The list of prepared statements for the workgroup.
+  final List<PreparedStatementSummary>? preparedStatements;
+
+  ListPreparedStatementsOutput({
+    this.nextToken,
+    this.preparedStatements,
+  });
+  factory ListPreparedStatementsOutput.fromJson(Map<String, dynamic> json) {
+    return ListPreparedStatementsOutput(
+      nextToken: json['NextToken'] as String?,
+      preparedStatements: (json['PreparedStatements'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              PreparedStatementSummary.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -2346,8 +3142,8 @@ class ListWorkGroupsOutput {
   /// previous page call.
   final String? nextToken;
 
-  /// The list of workgroups, including their names, descriptions, creation times,
-  /// and states.
+  /// A list of <a>WorkGroupSummary</a> objects that include the names,
+  /// descriptions, creation times, and states for each workgroup.
   final List<WorkGroupSummary>? workGroups;
 
   ListWorkGroupsOutput({
@@ -2365,8 +3161,8 @@ class ListWorkGroupsOutput {
   }
 }
 
-/// A query, where <code>QueryString</code> is the list of SQL query statements
-/// that comprise the query.
+/// A query, where <code>QueryString</code> contains the SQL statements that
+/// make up the query.
 class NamedQuery {
   /// The database to which the query belongs.
   final String database;
@@ -2374,7 +3170,7 @@ class NamedQuery {
   /// The query name.
   final String name;
 
-  /// The SQL query statements that comprise the query.
+  /// The SQL statements that make up the query.
   final String queryString;
 
   /// The query description.
@@ -2406,8 +3202,71 @@ class NamedQuery {
   }
 }
 
+/// A prepared SQL statement for use with Athena.
+class PreparedStatement {
+  /// The description of the prepared statement.
+  final String? description;
+
+  /// The last modified time of the prepared statement.
+  final DateTime? lastModifiedTime;
+
+  /// The query string for the prepared statement.
+  final String? queryStatement;
+
+  /// The name of the prepared statement.
+  final String? statementName;
+
+  /// The name of the workgroup to which the prepared statement belongs.
+  final String? workGroupName;
+
+  PreparedStatement({
+    this.description,
+    this.lastModifiedTime,
+    this.queryStatement,
+    this.statementName,
+    this.workGroupName,
+  });
+  factory PreparedStatement.fromJson(Map<String, dynamic> json) {
+    return PreparedStatement(
+      description: json['Description'] as String?,
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      queryStatement: json['QueryStatement'] as String?,
+      statementName: json['StatementName'] as String?,
+      workGroupName: json['WorkGroupName'] as String?,
+    );
+  }
+}
+
+/// The name and last modified time of the prepared statement.
+class PreparedStatementSummary {
+  /// The last modified time of the prepared statement.
+  final DateTime? lastModifiedTime;
+
+  /// The name of the prepared statement.
+  final String? statementName;
+
+  PreparedStatementSummary({
+    this.lastModifiedTime,
+    this.statementName,
+  });
+  factory PreparedStatementSummary.fromJson(Map<String, dynamic> json) {
+    return PreparedStatementSummary(
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      statementName: json['StatementName'] as String?,
+    );
+  }
+}
+
 /// Information about a single instance of a query execution.
 class QueryExecution {
+  /// The engine version that executed the query.
+  final EngineVersion? engineVersion;
+
+  /// A list of values for the parameters in a query. The values are applied
+  /// sequentially to the parameters in the query in the order in which the
+  /// parameters occur.
+  final List<String>? executionParameters;
+
   /// The SQL query statements which the query execution ran.
   final String? query;
 
@@ -2428,7 +3287,7 @@ class QueryExecution {
   /// query statements. <code>DML</code> indicates DML (Data Manipulation
   /// Language) query statements, such as <code>CREATE TABLE AS SELECT</code>.
   /// <code>UTILITY</code> indicates query statements other than DDL and DML, such
-  /// as <code>SHOW CREATE TABLE</code>, or <code>DESCRIBE &lt;table&gt;</code>.
+  /// as <code>SHOW CREATE TABLE</code>, or <code>DESCRIBE TABLE</code>.
   final StatementType? statementType;
 
   /// Query execution statistics, such as the amount of data scanned, the amount
@@ -2444,6 +3303,8 @@ class QueryExecution {
   final String? workGroup;
 
   QueryExecution({
+    this.engineVersion,
+    this.executionParameters,
     this.query,
     this.queryExecutionContext,
     this.queryExecutionId,
@@ -2455,6 +3316,14 @@ class QueryExecution {
   });
   factory QueryExecution.fromJson(Map<String, dynamic> json) {
     return QueryExecution(
+      engineVersion: json['EngineVersion'] != null
+          ? EngineVersion.fromJson(
+              json['EngineVersion'] as Map<String, dynamic>)
+          : null,
+      executionParameters: (json['ExecutionParameters'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       query: json['Query'] as String?,
       queryExecutionContext: json['QueryExecutionContext'] != null
           ? QueryExecutionContext.fromJson(
@@ -2484,7 +3353,8 @@ class QueryExecutionContext {
   /// The name of the data catalog used in the query execution.
   final String? catalog;
 
-  /// The name of the database used in the query execution.
+  /// The name of the database used in the query execution. The database must
+  /// exist in the catalog.
   final String? database;
 
   QueryExecutionContext({
@@ -2615,6 +3485,9 @@ class QueryExecutionStatistics {
 /// The completion date, current state, submission time, and state change reason
 /// (if applicable) for the query execution.
 class QueryExecutionStatus {
+  /// Provides information about an Athena query error.
+  final AthenaError? athenaError;
+
   /// The date and time that the query completed.
   final DateTime? completionDateTime;
 
@@ -2639,6 +3512,7 @@ class QueryExecutionStatus {
   final DateTime? submissionDateTime;
 
   QueryExecutionStatus({
+    this.athenaError,
     this.completionDateTime,
     this.state,
     this.stateChangeReason,
@@ -2646,10 +3520,222 @@ class QueryExecutionStatus {
   });
   factory QueryExecutionStatus.fromJson(Map<String, dynamic> json) {
     return QueryExecutionStatus(
+      athenaError: json['AthenaError'] != null
+          ? AthenaError.fromJson(json['AthenaError'] as Map<String, dynamic>)
+          : null,
       completionDateTime: timeStampFromJson(json['CompletionDateTime']),
       state: (json['State'] as String?)?.toQueryExecutionState(),
       stateChangeReason: json['StateChangeReason'] as String?,
       submissionDateTime: timeStampFromJson(json['SubmissionDateTime']),
+    );
+  }
+}
+
+/// The query execution timeline, statistics on input and output rows and bytes,
+/// and the different query stages that form the query execution plan.
+class QueryRuntimeStatistics {
+  /// Stage statistics such as input and output rows and bytes, execution time,
+  /// and stage state. This information also includes substages and the query
+  /// stage plan.
+  final QueryStage? outputStage;
+  final QueryRuntimeStatisticsRows? rows;
+  final QueryRuntimeStatisticsTimeline? timeline;
+
+  QueryRuntimeStatistics({
+    this.outputStage,
+    this.rows,
+    this.timeline,
+  });
+  factory QueryRuntimeStatistics.fromJson(Map<String, dynamic> json) {
+    return QueryRuntimeStatistics(
+      outputStage: json['OutputStage'] != null
+          ? QueryStage.fromJson(json['OutputStage'] as Map<String, dynamic>)
+          : null,
+      rows: json['Rows'] != null
+          ? QueryRuntimeStatisticsRows.fromJson(
+              json['Rows'] as Map<String, dynamic>)
+          : null,
+      timeline: json['Timeline'] != null
+          ? QueryRuntimeStatisticsTimeline.fromJson(
+              json['Timeline'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Statistics such as input rows and bytes read by the query, rows and bytes
+/// output by the query, and the number of rows written by the query.
+class QueryRuntimeStatisticsRows {
+  /// The number of bytes read to execute the query.
+  final int? inputBytes;
+
+  /// The number of rows read to execute the query.
+  final int? inputRows;
+
+  /// The number of bytes returned by the query.
+  final int? outputBytes;
+
+  /// The number of rows returned by the query.
+  final int? outputRows;
+
+  QueryRuntimeStatisticsRows({
+    this.inputBytes,
+    this.inputRows,
+    this.outputBytes,
+    this.outputRows,
+  });
+  factory QueryRuntimeStatisticsRows.fromJson(Map<String, dynamic> json) {
+    return QueryRuntimeStatisticsRows(
+      inputBytes: json['InputBytes'] as int?,
+      inputRows: json['InputRows'] as int?,
+      outputBytes: json['OutputBytes'] as int?,
+      outputRows: json['OutputRows'] as int?,
+    );
+  }
+}
+
+/// Timeline statistics such as query queue time, planning time, execution time,
+/// service processing time, and total execution time.
+class QueryRuntimeStatisticsTimeline {
+  /// The number of milliseconds that the query took to execute.
+  final int? engineExecutionTimeInMillis;
+
+  /// The number of milliseconds that Athena took to plan the query processing
+  /// flow. This includes the time spent retrieving table partitions from the data
+  /// source. Note that because the query engine performs the query planning,
+  /// query planning time is a subset of engine processing time.
+  final int? queryPlanningTimeInMillis;
+
+  /// The number of milliseconds that the query was in your query queue waiting
+  /// for resources. Note that if transient errors occur, Athena might
+  /// automatically add the query back to the queue.
+  final int? queryQueueTimeInMillis;
+
+  /// The number of milliseconds that Athena took to finalize and publish the
+  /// query results after the query engine finished running the query.
+  final int? serviceProcessingTimeInMillis;
+
+  /// The number of milliseconds that Athena took to run the query.
+  final int? totalExecutionTimeInMillis;
+
+  QueryRuntimeStatisticsTimeline({
+    this.engineExecutionTimeInMillis,
+    this.queryPlanningTimeInMillis,
+    this.queryQueueTimeInMillis,
+    this.serviceProcessingTimeInMillis,
+    this.totalExecutionTimeInMillis,
+  });
+  factory QueryRuntimeStatisticsTimeline.fromJson(Map<String, dynamic> json) {
+    return QueryRuntimeStatisticsTimeline(
+      engineExecutionTimeInMillis: json['EngineExecutionTimeInMillis'] as int?,
+      queryPlanningTimeInMillis: json['QueryPlanningTimeInMillis'] as int?,
+      queryQueueTimeInMillis: json['QueryQueueTimeInMillis'] as int?,
+      serviceProcessingTimeInMillis:
+          json['ServiceProcessingTimeInMillis'] as int?,
+      totalExecutionTimeInMillis: json['TotalExecutionTimeInMillis'] as int?,
+    );
+  }
+}
+
+/// Stage statistics such as input and output rows and bytes, execution time and
+/// stage state. This information also includes substages and the query stage
+/// plan.
+class QueryStage {
+  /// Time taken to execute this stage.
+  final int? executionTime;
+
+  /// The number of bytes input into the stage for execution.
+  final int? inputBytes;
+
+  /// The number of rows input into the stage for execution.
+  final int? inputRows;
+
+  /// The number of bytes output from the stage after execution.
+  final int? outputBytes;
+
+  /// The number of rows output from the stage after execution.
+  final int? outputRows;
+
+  /// Stage plan information such as name, identifier, sub plans, and source
+  /// stages.
+  final QueryStagePlanNode? queryStagePlan;
+
+  /// The identifier for a stage.
+  final int? stageId;
+
+  /// State of the stage after query execution.
+  final String? state;
+
+  /// List of sub query stages that form this stage execution plan.
+  final List<QueryStage>? subStages;
+
+  QueryStage({
+    this.executionTime,
+    this.inputBytes,
+    this.inputRows,
+    this.outputBytes,
+    this.outputRows,
+    this.queryStagePlan,
+    this.stageId,
+    this.state,
+    this.subStages,
+  });
+  factory QueryStage.fromJson(Map<String, dynamic> json) {
+    return QueryStage(
+      executionTime: json['ExecutionTime'] as int?,
+      inputBytes: json['InputBytes'] as int?,
+      inputRows: json['InputRows'] as int?,
+      outputBytes: json['OutputBytes'] as int?,
+      outputRows: json['OutputRows'] as int?,
+      queryStagePlan: json['QueryStagePlan'] != null
+          ? QueryStagePlanNode.fromJson(
+              json['QueryStagePlan'] as Map<String, dynamic>)
+          : null,
+      stageId: json['StageId'] as int?,
+      state: json['State'] as String?,
+      subStages: (json['SubStages'] as List?)
+          ?.whereNotNull()
+          .map((e) => QueryStage.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+/// Stage plan information such as name, identifier, sub plans, and remote
+/// sources.
+class QueryStagePlanNode {
+  /// Stage plan information such as name, identifier, sub plans, and remote
+  /// sources of child plan nodes/
+  final List<QueryStagePlanNode>? children;
+
+  /// Information about the operation this query stage plan node is performing.
+  final String? identifier;
+
+  /// Name of the query stage plan that describes the operation this stage is
+  /// performing as part of query execution.
+  final String? name;
+
+  /// Source plan node IDs.
+  final List<String>? remoteSources;
+
+  QueryStagePlanNode({
+    this.children,
+    this.identifier,
+    this.name,
+    this.remoteSources,
+  });
+  factory QueryStagePlanNode.fromJson(Map<String, dynamic> json) {
+    return QueryStagePlanNode(
+      children: (json['Children'] as List?)
+          ?.whereNotNull()
+          .map((e) => QueryStagePlanNode.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      identifier: json['Identifier'] as String?,
+      name: json['Name'] as String?,
+      remoteSources: (json['RemoteSources'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
     );
   }
 }
@@ -2659,8 +3745,20 @@ class QueryExecutionStatus {
 /// settings". If workgroup settings override client-side settings, then the
 /// query uses the workgroup settings.
 class ResultConfiguration {
+  /// Indicates that an Amazon S3 canned ACL should be set to control ownership of
+  /// stored query results. Currently the only supported canned ACL is
+  /// <code>BUCKET_OWNER_FULL_CONTROL</code>. This is a client-side setting. If
+  /// workgroup settings override client-side settings, then the query uses the
+  /// ACL configuration that is specified for the workgroup, and also uses the
+  /// location for storing query results specified in the workgroup. For more
+  /// information, see <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>
+  /// and <a
+  /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
+  /// Settings Override Client-Side Settings</a>.
+  final AclConfiguration? aclConfiguration;
+
   /// If query results are encrypted in Amazon S3, indicates the encryption option
-  /// used (for example, <code>SSE-KMS</code> or <code>CSE-KMS</code>) and key
+  /// used (for example, <code>SSE_KMS</code> or <code>CSE_KMS</code>) and key
   /// information. This is a client-side setting. If workgroup settings override
   /// client-side settings, then the query uses the encryption configuration that
   /// is specified for the workgroup, and also uses the location for storing query
@@ -2669,6 +3767,23 @@ class ResultConfiguration {
   /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
   /// Settings Override Client-Side Settings</a>.
   final EncryptionConfiguration? encryptionConfiguration;
+
+  /// The Amazon Web Services account ID that you expect to be the owner of the
+  /// Amazon S3 bucket specified by <a>ResultConfiguration$OutputLocation</a>. If
+  /// set, Athena uses the value for <code>ExpectedBucketOwner</code> when it
+  /// makes Amazon S3 calls to your specified output location. If the
+  /// <code>ExpectedBucketOwner</code> Amazon Web Services account ID does not
+  /// match the actual owner of the Amazon S3 bucket, the call fails with a
+  /// permissions error.
+  ///
+  /// This is a client-side setting. If workgroup settings override client-side
+  /// settings, then the query uses the <code>ExpectedBucketOwner</code> setting
+  /// that is specified for the workgroup, and also uses the location for storing
+  /// query results specified in the workgroup. See
+  /// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a> and <a
+  /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
+  /// Settings Override Client-Side Settings</a>.
+  final String? expectedBucketOwner;
 
   /// The location in Amazon S3 where your query results are stored, such as
   /// <code>s3://path/to/query/bucket/</code>. To run the query, you must specify
@@ -2683,25 +3798,37 @@ class ResultConfiguration {
   final String? outputLocation;
 
   ResultConfiguration({
+    this.aclConfiguration,
     this.encryptionConfiguration,
+    this.expectedBucketOwner,
     this.outputLocation,
   });
   factory ResultConfiguration.fromJson(Map<String, dynamic> json) {
     return ResultConfiguration(
+      aclConfiguration: json['AclConfiguration'] != null
+          ? AclConfiguration.fromJson(
+              json['AclConfiguration'] as Map<String, dynamic>)
+          : null,
       encryptionConfiguration: json['EncryptionConfiguration'] != null
           ? EncryptionConfiguration.fromJson(
               json['EncryptionConfiguration'] as Map<String, dynamic>)
           : null,
+      expectedBucketOwner: json['ExpectedBucketOwner'] as String?,
       outputLocation: json['OutputLocation'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final aclConfiguration = this.aclConfiguration;
     final encryptionConfiguration = this.encryptionConfiguration;
+    final expectedBucketOwner = this.expectedBucketOwner;
     final outputLocation = this.outputLocation;
     return {
+      if (aclConfiguration != null) 'AclConfiguration': aclConfiguration,
       if (encryptionConfiguration != null)
         'EncryptionConfiguration': encryptionConfiguration,
+      if (expectedBucketOwner != null)
+        'ExpectedBucketOwner': expectedBucketOwner,
       if (outputLocation != null) 'OutputLocation': outputLocation,
     };
   }
@@ -2710,8 +3837,28 @@ class ResultConfiguration {
 /// The information about the updates in the query results, such as output
 /// location and encryption configuration for the query results.
 class ResultConfigurationUpdates {
+  /// The ACL configuration for the query results.
+  final AclConfiguration? aclConfiguration;
+
   /// The encryption configuration for the query results.
   final EncryptionConfiguration? encryptionConfiguration;
+
+  /// The Amazon Web Services account ID that you expect to be the owner of the
+  /// Amazon S3 bucket specified by <a>ResultConfiguration$OutputLocation</a>. If
+  /// set, Athena uses the value for <code>ExpectedBucketOwner</code> when it
+  /// makes Amazon S3 calls to your specified output location. If the
+  /// <code>ExpectedBucketOwner</code> Amazon Web Services account ID does not
+  /// match the actual owner of the Amazon S3 bucket, the call fails with a
+  /// permissions error.
+  ///
+  /// If workgroup settings override client-side settings, then the query uses the
+  /// <code>ExpectedBucketOwner</code> setting that is specified for the
+  /// workgroup, and also uses the location for storing query results specified in
+  /// the workgroup. See
+  /// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a> and <a
+  /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
+  /// Settings Override Client-Side Settings</a>.
+  final String? expectedBucketOwner;
 
   /// The location in Amazon S3 where your query results are stored, such as
   /// <code>s3://path/to/query/bucket/</code>. For more information, see <a
@@ -2719,57 +3866,96 @@ class ResultConfigurationUpdates {
   /// Results</a> If workgroup settings override client-side settings, then the
   /// query uses the location for the query results and the encryption
   /// configuration that are specified for the workgroup. The "workgroup settings
-  /// override" is specified in EnforceWorkGroupConfiguration (true/false) in the
-  /// WorkGroupConfiguration. See
+  /// override" is specified in <code>EnforceWorkGroupConfiguration</code>
+  /// (true/false) in the <code>WorkGroupConfiguration</code>. See
   /// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
   final String? outputLocation;
+
+  /// If set to <code>true</code>, indicates that the previously-specified ACL
+  /// configuration for queries in this workgroup should be ignored and set to
+  /// null. If set to <code>false</code> or not set, and a value is present in the
+  /// <code>AclConfiguration</code> of <code>ResultConfigurationUpdates</code>,
+  /// the <code>AclConfiguration</code> in the workgroup's
+  /// <code>ResultConfiguration</code> is updated with the new value. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
+  /// Settings Override Client-Side Settings</a>.
+  final bool? removeAclConfiguration;
 
   /// If set to "true", indicates that the previously-specified encryption
   /// configuration (also known as the client-side setting) for queries in this
   /// workgroup should be ignored and set to null. If set to "false" or not set,
-  /// and a value is present in the EncryptionConfiguration in
-  /// ResultConfigurationUpdates (the client-side setting), the
-  /// EncryptionConfiguration in the workgroup's ResultConfiguration will be
-  /// updated with the new value. For more information, see <a
+  /// and a value is present in the <code>EncryptionConfiguration</code> in
+  /// <code>ResultConfigurationUpdates</code> (the client-side setting), the
+  /// <code>EncryptionConfiguration</code> in the workgroup's
+  /// <code>ResultConfiguration</code> will be updated with the new value. For
+  /// more information, see <a
   /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
   /// Settings Override Client-Side Settings</a>.
   final bool? removeEncryptionConfiguration;
 
+  /// If set to "true", removes the Amazon Web Services account ID previously
+  /// specified for <a>ResultConfiguration$ExpectedBucketOwner</a>. If set to
+  /// "false" or not set, and a value is present in the
+  /// <code>ExpectedBucketOwner</code> in <code>ResultConfigurationUpdates</code>
+  /// (the client-side setting), the <code>ExpectedBucketOwner</code> in the
+  /// workgroup's <code>ResultConfiguration</code> is updated with the new value.
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
+  /// Settings Override Client-Side Settings</a>.
+  final bool? removeExpectedBucketOwner;
+
   /// If set to "true", indicates that the previously-specified query results
   /// location (also known as a client-side setting) for queries in this workgroup
   /// should be ignored and set to null. If set to "false" or not set, and a value
-  /// is present in the OutputLocation in ResultConfigurationUpdates (the
-  /// client-side setting), the OutputLocation in the workgroup's
-  /// ResultConfiguration will be updated with the new value. For more
-  /// information, see <a
+  /// is present in the <code>OutputLocation</code> in
+  /// <code>ResultConfigurationUpdates</code> (the client-side setting), the
+  /// <code>OutputLocation</code> in the workgroup's
+  /// <code>ResultConfiguration</code> will be updated with the new value. For
+  /// more information, see <a
   /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
   /// Settings Override Client-Side Settings</a>.
   final bool? removeOutputLocation;
 
   ResultConfigurationUpdates({
+    this.aclConfiguration,
     this.encryptionConfiguration,
+    this.expectedBucketOwner,
     this.outputLocation,
+    this.removeAclConfiguration,
     this.removeEncryptionConfiguration,
+    this.removeExpectedBucketOwner,
     this.removeOutputLocation,
   });
   Map<String, dynamic> toJson() {
+    final aclConfiguration = this.aclConfiguration;
     final encryptionConfiguration = this.encryptionConfiguration;
+    final expectedBucketOwner = this.expectedBucketOwner;
     final outputLocation = this.outputLocation;
+    final removeAclConfiguration = this.removeAclConfiguration;
     final removeEncryptionConfiguration = this.removeEncryptionConfiguration;
+    final removeExpectedBucketOwner = this.removeExpectedBucketOwner;
     final removeOutputLocation = this.removeOutputLocation;
     return {
+      if (aclConfiguration != null) 'AclConfiguration': aclConfiguration,
       if (encryptionConfiguration != null)
         'EncryptionConfiguration': encryptionConfiguration,
+      if (expectedBucketOwner != null)
+        'ExpectedBucketOwner': expectedBucketOwner,
       if (outputLocation != null) 'OutputLocation': outputLocation,
+      if (removeAclConfiguration != null)
+        'RemoveAclConfiguration': removeAclConfiguration,
       if (removeEncryptionConfiguration != null)
         'RemoveEncryptionConfiguration': removeEncryptionConfiguration,
+      if (removeExpectedBucketOwner != null)
+        'RemoveExpectedBucketOwner': removeExpectedBucketOwner,
       if (removeOutputLocation != null)
         'RemoveOutputLocation': removeOutputLocation,
     };
   }
 }
 
-/// The metadata and rows that comprise a query result set. The metadata
+/// The metadata and rows that make up a query result set. The metadata
 /// describes the column structure and data types. To return a
 /// <code>ResultSet</code> object, use <a>GetQueryResults</a>.
 class ResultSet {
@@ -2818,7 +4004,7 @@ class ResultSetMetadata {
   }
 }
 
-/// The rows that comprise a query result table.
+/// The rows that make up a query result table.
 class Row {
   /// The data that populates a row in a query result table.
   final List<Datum>? data;
@@ -2833,6 +4019,29 @@ class Row {
           .map((e) => Datum.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
+  }
+}
+
+enum S3AclOption {
+  bucketOwnerFullControl,
+}
+
+extension on S3AclOption {
+  String toValue() {
+    switch (this) {
+      case S3AclOption.bucketOwnerFullControl:
+        return 'BUCKET_OWNER_FULL_CONTROL';
+    }
+  }
+}
+
+extension on String {
+  S3AclOption toS3AclOption() {
+    switch (this) {
+      case 'BUCKET_OWNER_FULL_CONTROL':
+        return S3AclOption.bucketOwnerFullControl;
+    }
+    throw Exception('$this is not known in enum S3AclOption');
   }
 }
 
@@ -3022,6 +4231,47 @@ class UnprocessedNamedQueryId {
   }
 }
 
+/// The name of a prepared statement that could not be returned.
+class UnprocessedPreparedStatementName {
+  /// The error code returned when the request for the prepared statement failed.
+  final String? errorCode;
+
+  /// The error message containing the reason why the prepared statement could not
+  /// be returned. The following error messages are possible:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>INVALID_INPUT</code> - The name of the prepared statement that was
+  /// provided is not valid (for example, the name is too long).
+  /// </li>
+  /// <li>
+  /// <code>STATEMENT_NOT_FOUND</code> - A prepared statement with the name
+  /// provided could not be found.
+  /// </li>
+  /// <li>
+  /// <code>UNAUTHORIZED</code> - The requester does not have permission to access
+  /// the workgroup that contains the prepared statement.
+  /// </li>
+  /// </ul>
+  final String? errorMessage;
+
+  /// The name of a prepared statement that could not be returned due to an error.
+  final String? statementName;
+
+  UnprocessedPreparedStatementName({
+    this.errorCode,
+    this.errorMessage,
+    this.statementName,
+  });
+  factory UnprocessedPreparedStatementName.fromJson(Map<String, dynamic> json) {
+    return UnprocessedPreparedStatementName(
+      errorCode: json['ErrorCode'] as String?,
+      errorMessage: json['ErrorMessage'] as String?,
+      statementName: json['StatementName'] as String?,
+    );
+  }
+}
+
 /// Describes a query execution that failed to process.
 class UnprocessedQueryExecutionId {
   /// The error code returned when the query execution failed to process, if
@@ -3063,6 +4313,20 @@ class UpdateDataCatalogOutput {
   }
 }
 
+class UpdateNamedQueryOutput {
+  UpdateNamedQueryOutput();
+  factory UpdateNamedQueryOutput.fromJson(Map<String, dynamic> _) {
+    return UpdateNamedQueryOutput();
+  }
+}
+
+class UpdatePreparedStatementOutput {
+  UpdatePreparedStatementOutput();
+  factory UpdatePreparedStatementOutput.fromJson(Map<String, dynamic> _) {
+    return UpdatePreparedStatementOutput();
+  }
+}
+
 class UpdateWorkGroupOutput {
   UpdateWorkGroupOutput();
   factory UpdateWorkGroupOutput.fromJson(Map<String, dynamic> _) {
@@ -3077,8 +4341,8 @@ class UpdateWorkGroupOutput {
 /// and the encryption configuration (known as workgroup settings), to enable
 /// sending query metrics to Amazon CloudWatch, and to establish per-query data
 /// usage control limits for all queries in a workgroup. The workgroup settings
-/// override is specified in EnforceWorkGroupConfiguration (true/false) in the
-/// WorkGroupConfiguration. See
+/// override is specified in <code>EnforceWorkGroupConfiguration</code>
+/// (true/false) in the <code>WorkGroupConfiguration</code>. See
 /// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
 class WorkGroup {
   /// The workgroup name.
@@ -3090,8 +4354,9 @@ class WorkGroup {
   /// workgroup; whether workgroup settings override client-side settings; and the
   /// data usage limits for the amount of data scanned per query or per workgroup.
   /// The workgroup settings override is specified in
-  /// EnforceWorkGroupConfiguration (true/false) in the WorkGroupConfiguration.
-  /// See <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
+  /// <code>EnforceWorkGroupConfiguration</code> (true/false) in the
+  /// <code>WorkGroupConfiguration</code>. See
+  /// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
   final WorkGroupConfiguration? configuration;
 
   /// The date and time the workgroup was created.
@@ -3130,8 +4395,9 @@ class WorkGroup {
 /// workgroup and whether workgroup settings override query settings, and the
 /// data usage limits for the amount of data scanned per query or per workgroup.
 /// The workgroup settings override is specified in
-/// EnforceWorkGroupConfiguration (true/false) in the WorkGroupConfiguration.
-/// See <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
+/// <code>EnforceWorkGroupConfiguration</code> (true/false) in the
+/// <code>WorkGroupConfiguration</code>. See
+/// <a>WorkGroupConfiguration$EnforceWorkGroupConfiguration</a>.
 class WorkGroupConfiguration {
   /// The upper data usage limit (cutoff) for the amount of bytes a single query
   /// in a workgroup is allowed to scan.
@@ -3143,6 +4409,11 @@ class WorkGroupConfiguration {
   /// href="https://docs.aws.amazon.com/athena/latest/ug/workgroups-settings-override.html">Workgroup
   /// Settings Override Client-Side Settings</a>.
   final bool? enforceWorkGroupConfiguration;
+
+  /// The engine version that all queries running on the workgroup use. Queries on
+  /// the <code>AmazonAthenaPreviewFunctionality</code> workgroup run on the
+  /// preview engine regardless of this setting.
+  final EngineVersion? engineVersion;
 
   /// Indicates that the Amazon CloudWatch metrics are enabled for the workgroup.
   final bool? publishCloudWatchMetricsEnabled;
@@ -3173,6 +4444,7 @@ class WorkGroupConfiguration {
   WorkGroupConfiguration({
     this.bytesScannedCutoffPerQuery,
     this.enforceWorkGroupConfiguration,
+    this.engineVersion,
     this.publishCloudWatchMetricsEnabled,
     this.requesterPaysEnabled,
     this.resultConfiguration,
@@ -3182,6 +4454,10 @@ class WorkGroupConfiguration {
       bytesScannedCutoffPerQuery: json['BytesScannedCutoffPerQuery'] as int?,
       enforceWorkGroupConfiguration:
           json['EnforceWorkGroupConfiguration'] as bool?,
+      engineVersion: json['EngineVersion'] != null
+          ? EngineVersion.fromJson(
+              json['EngineVersion'] as Map<String, dynamic>)
+          : null,
       publishCloudWatchMetricsEnabled:
           json['PublishCloudWatchMetricsEnabled'] as bool?,
       requesterPaysEnabled: json['RequesterPaysEnabled'] as bool?,
@@ -3195,6 +4471,7 @@ class WorkGroupConfiguration {
   Map<String, dynamic> toJson() {
     final bytesScannedCutoffPerQuery = this.bytesScannedCutoffPerQuery;
     final enforceWorkGroupConfiguration = this.enforceWorkGroupConfiguration;
+    final engineVersion = this.engineVersion;
     final publishCloudWatchMetricsEnabled =
         this.publishCloudWatchMetricsEnabled;
     final requesterPaysEnabled = this.requesterPaysEnabled;
@@ -3204,6 +4481,7 @@ class WorkGroupConfiguration {
         'BytesScannedCutoffPerQuery': bytesScannedCutoffPerQuery,
       if (enforceWorkGroupConfiguration != null)
         'EnforceWorkGroupConfiguration': enforceWorkGroupConfiguration,
+      if (engineVersion != null) 'EngineVersion': engineVersion,
       if (publishCloudWatchMetricsEnabled != null)
         'PublishCloudWatchMetricsEnabled': publishCloudWatchMetricsEnabled,
       if (requesterPaysEnabled != null)
@@ -3232,6 +4510,13 @@ class WorkGroupConfigurationUpdates {
   /// Settings Override Client-Side Settings</a>.
   final bool? enforceWorkGroupConfiguration;
 
+  /// The engine version requested when a workgroup is updated. After the update,
+  /// all queries on the workgroup run on the requested engine version. If no
+  /// value was previously set, the default is Auto. Queries on the
+  /// <code>AmazonAthenaPreviewFunctionality</code> workgroup run on the preview
+  /// engine regardless of this setting.
+  final EngineVersion? engineVersion;
+
   /// Indicates whether this workgroup enables publishing metrics to Amazon
   /// CloudWatch.
   final bool? publishCloudWatchMetricsEnabled;
@@ -3259,6 +4544,7 @@ class WorkGroupConfigurationUpdates {
   WorkGroupConfigurationUpdates({
     this.bytesScannedCutoffPerQuery,
     this.enforceWorkGroupConfiguration,
+    this.engineVersion,
     this.publishCloudWatchMetricsEnabled,
     this.removeBytesScannedCutoffPerQuery,
     this.requesterPaysEnabled,
@@ -3267,6 +4553,7 @@ class WorkGroupConfigurationUpdates {
   Map<String, dynamic> toJson() {
     final bytesScannedCutoffPerQuery = this.bytesScannedCutoffPerQuery;
     final enforceWorkGroupConfiguration = this.enforceWorkGroupConfiguration;
+    final engineVersion = this.engineVersion;
     final publishCloudWatchMetricsEnabled =
         this.publishCloudWatchMetricsEnabled;
     final removeBytesScannedCutoffPerQuery =
@@ -3278,6 +4565,7 @@ class WorkGroupConfigurationUpdates {
         'BytesScannedCutoffPerQuery': bytesScannedCutoffPerQuery,
       if (enforceWorkGroupConfiguration != null)
         'EnforceWorkGroupConfiguration': enforceWorkGroupConfiguration,
+      if (engineVersion != null) 'EngineVersion': engineVersion,
       if (publishCloudWatchMetricsEnabled != null)
         'PublishCloudWatchMetricsEnabled': publishCloudWatchMetricsEnabled,
       if (removeBytesScannedCutoffPerQuery != null)
@@ -3327,6 +4615,11 @@ class WorkGroupSummary {
   /// The workgroup description.
   final String? description;
 
+  /// The engine version setting for all queries on the workgroup. Queries on the
+  /// <code>AmazonAthenaPreviewFunctionality</code> workgroup run on the preview
+  /// engine regardless of this setting.
+  final EngineVersion? engineVersion;
+
   /// The name of the workgroup.
   final String? name;
 
@@ -3336,6 +4629,7 @@ class WorkGroupSummary {
   WorkGroupSummary({
     this.creationTime,
     this.description,
+    this.engineVersion,
     this.name,
     this.state,
   });
@@ -3343,6 +4637,10 @@ class WorkGroupSummary {
     return WorkGroupSummary(
       creationTime: timeStampFromJson(json['CreationTime']),
       description: json['Description'] as String?,
+      engineVersion: json['EngineVersion'] != null
+          ? EngineVersion.fromJson(
+              json['EngineVersion'] as Map<String, dynamic>)
+          : null,
       name: json['Name'] as String?,
       state: (json['State'] as String?)?.toWorkGroupState(),
     );

@@ -4705,9 +4705,16 @@ class BatchListObjectParentPathsResponse {
   }
 }
 
+/// Lists parent objects that are associated with a given object in pagination
+/// fashion.
 class BatchListObjectParents {
   final ObjectReference objectReference;
+
+  /// The maximum number of items to be retrieved in a single call. This is an
+  /// approximate number.
   final int? maxResults;
+
+  /// The pagination token.
   final String? nextToken;
 
   BatchListObjectParents({
@@ -4727,8 +4734,12 @@ class BatchListObjectParents {
   }
 }
 
+/// Represents the output of a <a>ListObjectParents</a> response operation.
 class BatchListObjectParentsResponse {
+  /// The pagination token.
   final String? nextToken;
+
+  /// Returns a list of parent reference and LinkName Tuples.
   final List<ObjectIdentifierAndLinkNameTuple>? parentLinks;
 
   BatchListObjectParentsResponse({
@@ -5124,6 +5135,9 @@ class BatchReadOperation {
   /// href="https://docs.aws.amazon.com/clouddirectory/latest/developerguide/key_concepts_directorystructure.html">Directory
   /// Structure</a>.
   final BatchListObjectParentPaths? listObjectParentPaths;
+
+  /// Lists parent objects that are associated with a given object in pagination
+  /// fashion.
   final BatchListObjectParents? listObjectParents;
 
   /// Returns policies attached to an object in pagination fashion.
@@ -5290,6 +5304,8 @@ class BatchReadSuccessfulResponse {
   /// href="https://docs.aws.amazon.com/clouddirectory/latest/developerguide/key_concepts_directorystructure.html">Directory
   /// Structure</a>.
   final BatchListObjectParentPathsResponse? listObjectParentPaths;
+
+  /// The list of parent objects to retrieve.
   final BatchListObjectParentsResponse? listObjectParents;
 
   /// Returns policies attached to an object in pagination fashion.
@@ -7142,7 +7158,9 @@ class ObjectReference {
   /// <i>$ObjectIdentifier</i> - An object identifier is an opaque string provided
   /// by Amazon Cloud Directory. When creating objects, the system will provide
   /// you with the identifier of the created object. An object’s identifier is
-  /// immutable and no two objects will ever share the same object identifier
+  /// immutable and no two objects will ever share the same object identifier. To
+  /// identify an object with ObjectIdentifier, the ObjectIdentifier must be
+  /// wrapped in double quotes.
   /// </li>
   /// <li>
   /// <i>/some/path</i> - Identifies the object based on path
@@ -7466,13 +7484,14 @@ extension on String {
 
 /// A facet.
 class SchemaFacet {
-  /// The name of the facet.
+  /// The name of the facet. If this value is set, SchemaArn must also be set.
   final String? facetName;
 
   /// The ARN of the schema that contains the facet with no minor component. See
   /// <a>arns</a> and <a
   /// href="https://docs.aws.amazon.com/clouddirectory/latest/developerguide/schemas_inplaceschemaupgrade.html">In-Place
-  /// Schema Upgrade</a> for a description of when to provide minor versions.
+  /// Schema Upgrade</a> for a description of when to provide minor versions. If
+  /// this value is set, FacetName must also be set.
   final String? schemaArn;
 
   SchemaFacet({

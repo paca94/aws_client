@@ -20,24 +20,27 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// This section provides documentation for the Amazon CodeGuru Profiler API
 /// operations.
-/// <pre><code> &lt;p&gt;Amazon CodeGuru Profiler collects runtime performance
-/// data from your live applications, and provides recommendations that can help
-/// you fine-tune your application performance. Using machine learning
-/// algorithms, CodeGuru Profiler can help you find your most expensive lines of
-/// code and suggest ways you can improve efficiency and remove CPU bottlenecks.
-/// &lt;/p&gt; &lt;p&gt;Amazon CodeGuru Profiler provides different
-/// visualizations of profiling data to help you identify what code is running
-/// on the CPU, see how much time is consumed, and suggest ways to reduce CPU
-/// utilization. &lt;/p&gt; &lt;note&gt; &lt;p&gt;Amazon CodeGuru Profiler
-/// currently supports applications written in all Java virtual machine (JVM)
-/// languages. While CodeGuru Profiler supports both visualizations and
-/// recommendations for applications written in Java, it can also generate
-/// visualizations and a subset of recommendations for applications written in
-/// other JVM languages.&lt;/p&gt; &lt;/note&gt; &lt;p&gt; For more information,
-/// see &lt;a
-/// href=&quot;https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html&quot;&gt;What
-/// is Amazon CodeGuru Profiler&lt;/a&gt; in the &lt;i&gt;Amazon CodeGuru
-/// Profiler User Guide&lt;/i&gt;. &lt;/p&gt; </code></pre>
+///
+/// Amazon CodeGuru Profiler collects runtime performance data from your live
+/// applications, and provides recommendations that can help you fine-tune your
+/// application performance. Using machine learning algorithms, CodeGuru
+/// Profiler can help you find your most expensive lines of code and suggest
+/// ways you can improve efficiency and remove CPU bottlenecks.
+///
+/// Amazon CodeGuru Profiler provides different visualizations of profiling data
+/// to help you identify what code is running on the CPU, see how much time is
+/// consumed, and suggest ways to reduce CPU utilization.
+/// <note>
+/// Amazon CodeGuru Profiler currently supports applications written in all Java
+/// virtual machine (JVM) languages and Python. While CodeGuru Profiler supports
+/// both visualizations and recommendations for applications written in Java, it
+/// can also generate visualizations and a subset of recommendations for
+/// applications written in other JVM languages and Python.
+/// </note>
+/// For more information, see <a
+/// href="https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html">What
+/// is Amazon CodeGuru Profiler</a> in the <i>Amazon CodeGuru Profiler User
+/// Guide</i>.
 class CodeGuruProfiler {
   final _s.RestJsonProtocol _protocol;
   CodeGuruProfiler({
@@ -206,7 +209,7 @@ class CodeGuruProfiler {
 
   /// Used by profiler agents to report their current state and to receive
   /// remote configuration updates. For example, <code>ConfigureAgent</code> can
-  /// be used to tell and agent whether to profile or not and for how long to
+  /// be used to tell an agent whether to profile or not and for how long to
   /// return profiling data.
   ///
   /// May throw [InternalServerException].
@@ -377,6 +380,7 @@ class CodeGuruProfiler {
   /// Deletes a profiling group.
   ///
   /// May throw [InternalServerException].
+  /// May throw [ConflictException].
   /// May throw [ValidationException].
   /// May throw [ThrottlingException].
   /// May throw [ResourceNotFoundException].
@@ -1647,26 +1651,26 @@ class AgentOrchestrationConfig {
 }
 
 enum AgentParameterField {
-  maxStackDepth,
-  memoryUsageLimitPercent,
-  minimumTimeForReportingInMilliseconds,
-  reportingIntervalInMilliseconds,
   samplingIntervalInMilliseconds,
+  reportingIntervalInMilliseconds,
+  minimumTimeForReportingInMilliseconds,
+  memoryUsageLimitPercent,
+  maxStackDepth,
 }
 
 extension on AgentParameterField {
   String toValue() {
     switch (this) {
-      case AgentParameterField.maxStackDepth:
-        return 'MaxStackDepth';
-      case AgentParameterField.memoryUsageLimitPercent:
-        return 'MemoryUsageLimitPercent';
-      case AgentParameterField.minimumTimeForReportingInMilliseconds:
-        return 'MinimumTimeForReportingInMilliseconds';
-      case AgentParameterField.reportingIntervalInMilliseconds:
-        return 'ReportingIntervalInMilliseconds';
       case AgentParameterField.samplingIntervalInMilliseconds:
         return 'SamplingIntervalInMilliseconds';
+      case AgentParameterField.reportingIntervalInMilliseconds:
+        return 'ReportingIntervalInMilliseconds';
+      case AgentParameterField.minimumTimeForReportingInMilliseconds:
+        return 'MinimumTimeForReportingInMilliseconds';
+      case AgentParameterField.memoryUsageLimitPercent:
+        return 'MemoryUsageLimitPercent';
+      case AgentParameterField.maxStackDepth:
+        return 'MaxStackDepth';
     }
   }
 }
@@ -1674,16 +1678,16 @@ extension on AgentParameterField {
 extension on String {
   AgentParameterField toAgentParameterField() {
     switch (this) {
-      case 'MaxStackDepth':
-        return AgentParameterField.maxStackDepth;
-      case 'MemoryUsageLimitPercent':
-        return AgentParameterField.memoryUsageLimitPercent;
-      case 'MinimumTimeForReportingInMilliseconds':
-        return AgentParameterField.minimumTimeForReportingInMilliseconds;
-      case 'ReportingIntervalInMilliseconds':
-        return AgentParameterField.reportingIntervalInMilliseconds;
       case 'SamplingIntervalInMilliseconds':
         return AgentParameterField.samplingIntervalInMilliseconds;
+      case 'ReportingIntervalInMilliseconds':
+        return AgentParameterField.reportingIntervalInMilliseconds;
+      case 'MinimumTimeForReportingInMilliseconds':
+        return AgentParameterField.minimumTimeForReportingInMilliseconds;
+      case 'MemoryUsageLimitPercent':
+        return AgentParameterField.memoryUsageLimitPercent;
+      case 'MaxStackDepth':
+        return AgentParameterField.maxStackDepth;
     }
     throw Exception('$this is not known in enum AgentParameterField');
   }
@@ -1736,20 +1740,20 @@ class AggregatedProfileTime {
 }
 
 enum AggregationPeriod {
-  p1d,
-  pt1h,
   pt5m,
+  pt1h,
+  p1d,
 }
 
 extension on AggregationPeriod {
   String toValue() {
     switch (this) {
-      case AggregationPeriod.p1d:
-        return 'P1D';
-      case AggregationPeriod.pt1h:
-        return 'PT1H';
       case AggregationPeriod.pt5m:
         return 'PT5M';
+      case AggregationPeriod.pt1h:
+        return 'PT1H';
+      case AggregationPeriod.p1d:
+        return 'P1D';
     }
   }
 }
@@ -1757,12 +1761,12 @@ extension on AggregationPeriod {
 extension on String {
   AggregationPeriod toAggregationPeriod() {
     switch (this) {
-      case 'P1D':
-        return AggregationPeriod.p1d;
-      case 'PT1H':
-        return AggregationPeriod.pt1h;
       case 'PT5M':
         return AggregationPeriod.pt5m;
+      case 'PT1H':
+        return AggregationPeriod.pt1h;
+      case 'P1D':
+        return AggregationPeriod.p1d;
     }
     throw Exception('$this is not known in enum AggregationPeriod');
   }
@@ -1965,17 +1969,17 @@ class Channel {
 }
 
 enum ComputePlatform {
-  awsLambda,
   $default,
+  awsLambda,
 }
 
 extension on ComputePlatform {
   String toValue() {
     switch (this) {
-      case ComputePlatform.awsLambda:
-        return 'AWSLambda';
       case ComputePlatform.$default:
         return 'Default';
+      case ComputePlatform.awsLambda:
+        return 'AWSLambda';
     }
   }
 }
@@ -1983,10 +1987,10 @@ extension on ComputePlatform {
 extension on String {
   ComputePlatform toComputePlatform() {
     switch (this) {
-      case 'AWSLambda':
-        return ComputePlatform.awsLambda;
       case 'Default':
         return ComputePlatform.$default;
+      case 'AWSLambda':
+        return ComputePlatform.awsLambda;
     }
     throw Exception('$this is not known in enum ComputePlatform');
   }
@@ -2063,17 +2067,17 @@ extension on String {
 }
 
 enum FeedbackType {
-  negative,
   positive,
+  negative,
 }
 
 extension on FeedbackType {
   String toValue() {
     switch (this) {
-      case FeedbackType.negative:
-        return 'Negative';
       case FeedbackType.positive:
         return 'Positive';
+      case FeedbackType.negative:
+        return 'Negative';
     }
   }
 }
@@ -2081,10 +2085,10 @@ extension on FeedbackType {
 extension on String {
   FeedbackType toFeedbackType() {
     switch (this) {
-      case 'Negative':
-        return FeedbackType.negative;
       case 'Positive':
         return FeedbackType.positive;
+      case 'Negative':
+        return FeedbackType.negative;
     }
     throw Exception('$this is not known in enum FeedbackType');
   }
@@ -2481,38 +2485,38 @@ class Match {
 }
 
 enum MetadataField {
+  computePlatform,
   agentId,
   awsRequestId,
-  computePlatform,
   executionEnvironment,
   lambdaFunctionArn,
   lambdaMemoryLimitInMB,
-  lambdaPreviousExecutionTimeInMilliseconds,
   lambdaRemainingTimeInMilliseconds,
   lambdaTimeGapBetweenInvokesInMilliseconds,
+  lambdaPreviousExecutionTimeInMilliseconds,
 }
 
 extension on MetadataField {
   String toValue() {
     switch (this) {
+      case MetadataField.computePlatform:
+        return 'ComputePlatform';
       case MetadataField.agentId:
         return 'AgentId';
       case MetadataField.awsRequestId:
         return 'AwsRequestId';
-      case MetadataField.computePlatform:
-        return 'ComputePlatform';
       case MetadataField.executionEnvironment:
         return 'ExecutionEnvironment';
       case MetadataField.lambdaFunctionArn:
         return 'LambdaFunctionArn';
       case MetadataField.lambdaMemoryLimitInMB:
         return 'LambdaMemoryLimitInMB';
-      case MetadataField.lambdaPreviousExecutionTimeInMilliseconds:
-        return 'LambdaPreviousExecutionTimeInMilliseconds';
       case MetadataField.lambdaRemainingTimeInMilliseconds:
         return 'LambdaRemainingTimeInMilliseconds';
       case MetadataField.lambdaTimeGapBetweenInvokesInMilliseconds:
         return 'LambdaTimeGapBetweenInvokesInMilliseconds';
+      case MetadataField.lambdaPreviousExecutionTimeInMilliseconds:
+        return 'LambdaPreviousExecutionTimeInMilliseconds';
     }
   }
 }
@@ -2520,24 +2524,24 @@ extension on MetadataField {
 extension on String {
   MetadataField toMetadataField() {
     switch (this) {
+      case 'ComputePlatform':
+        return MetadataField.computePlatform;
       case 'AgentId':
         return MetadataField.agentId;
       case 'AwsRequestId':
         return MetadataField.awsRequestId;
-      case 'ComputePlatform':
-        return MetadataField.computePlatform;
       case 'ExecutionEnvironment':
         return MetadataField.executionEnvironment;
       case 'LambdaFunctionArn':
         return MetadataField.lambdaFunctionArn;
       case 'LambdaMemoryLimitInMB':
         return MetadataField.lambdaMemoryLimitInMB;
-      case 'LambdaPreviousExecutionTimeInMilliseconds':
-        return MetadataField.lambdaPreviousExecutionTimeInMilliseconds;
       case 'LambdaRemainingTimeInMilliseconds':
         return MetadataField.lambdaRemainingTimeInMilliseconds;
       case 'LambdaTimeGapBetweenInvokesInMilliseconds':
         return MetadataField.lambdaTimeGapBetweenInvokesInMilliseconds;
+      case 'LambdaPreviousExecutionTimeInMilliseconds':
+        return MetadataField.lambdaPreviousExecutionTimeInMilliseconds;
     }
     throw Exception('$this is not known in enum MetadataField');
   }
@@ -2623,17 +2627,17 @@ class NotificationConfiguration {
 }
 
 enum OrderBy {
-  timestampAscending,
   timestampDescending,
+  timestampAscending,
 }
 
 extension on OrderBy {
   String toValue() {
     switch (this) {
-      case OrderBy.timestampAscending:
-        return 'TimestampAscending';
       case OrderBy.timestampDescending:
         return 'TimestampDescending';
+      case OrderBy.timestampAscending:
+        return 'TimestampAscending';
     }
   }
 }
@@ -2641,10 +2645,10 @@ extension on OrderBy {
 extension on String {
   OrderBy toOrderBy() {
     switch (this) {
-      case 'TimestampAscending':
-        return OrderBy.timestampAscending;
       case 'TimestampDescending':
         return OrderBy.timestampDescending;
+      case 'TimestampAscending':
+        return OrderBy.timestampAscending;
     }
     throw Exception('$this is not known in enum OrderBy');
   }

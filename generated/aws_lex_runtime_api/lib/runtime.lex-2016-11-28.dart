@@ -476,6 +476,10 @@ class LexRuntimeService {
       dialogState: _s
           .extractHeaderStringValue(response.headers, 'x-amz-lex-dialog-state')
           ?.toDialogState(),
+      encodedInputTranscript: _s.extractHeaderStringValue(
+          response.headers, 'x-amz-lex-encoded-input-transcript'),
+      encodedMessage: _s.extractHeaderStringValue(
+          response.headers, 'x-amz-lex-encoded-message'),
       inputTranscript: _s.extractHeaderStringValue(
           response.headers, 'x-amz-lex-input-transcript'),
       intentName: _s.extractHeaderStringValue(
@@ -852,6 +856,8 @@ class LexRuntimeService {
       dialogState: _s
           .extractHeaderStringValue(response.headers, 'x-amz-lex-dialog-state')
           ?.toDialogState(),
+      encodedMessage: _s.extractHeaderStringValue(
+          response.headers, 'x-amz-lex-encoded-message'),
       intentName: _s.extractHeaderStringValue(
           response.headers, 'x-amz-lex-intent-name'),
       message:
@@ -1685,6 +1691,47 @@ class PostContentResponse {
 
   /// The text used to process the request.
   ///
+  /// If the input was an audio stream, the <code>encodedInputTranscript</code>
+  /// field contains the text extracted from the audio stream. This is the text
+  /// that is actually processed to recognize intents and slot values. You can use
+  /// this information to determine if Amazon Lex is correctly processing the
+  /// audio that you send.
+  ///
+  /// The <code>encodedInputTranscript</code> field is base-64 encoded. You must
+  /// decode the field before you can use the value.
+  final String? encodedInputTranscript;
+
+  /// The message to convey to the user. The message can come from the bot's
+  /// configuration or from a Lambda function.
+  ///
+  /// If the intent is not configured with a Lambda function, or if the Lambda
+  /// function returned <code>Delegate</code> as the
+  /// <code>dialogAction.type</code> in its response, Amazon Lex decides on the
+  /// next course of action and selects an appropriate message from the bot's
+  /// configuration based on the current interaction context. For example, if
+  /// Amazon Lex isn't able to understand user input, it uses a clarification
+  /// prompt message.
+  ///
+  /// When you create an intent you can assign messages to groups. When messages
+  /// are assigned to groups Amazon Lex returns one message from each group in the
+  /// response. The message field is an escaped JSON string containing the
+  /// messages. For more information about the structure of the JSON string
+  /// returned, see <a>msg-prompts-formats</a>.
+  ///
+  /// If the Lambda function returns a message, Amazon Lex passes it to the client
+  /// in its response.
+  ///
+  /// The <code>encodedMessage</code> field is base-64 encoded. You must decode
+  /// the field before you can use the value.
+  final String? encodedMessage;
+
+  /// The text used to process the request.
+  ///
+  /// You can use this field only in the de-DE, en-AU, en-GB, en-US, es-419,
+  /// es-ES, es-US, fr-CA, fr-FR, and it-IT locales. In all other locales, the
+  /// <code>inputTranscript</code> field is null. You should use the
+  /// <code>encodedInputTranscript</code> field instead.
+  ///
   /// If the input was an audio stream, the <code>inputTranscript</code> field
   /// contains the text extracted from the audio stream. This is the text that is
   /// actually processed to recognize intents and slot values. You can use this
@@ -1695,6 +1742,11 @@ class PostContentResponse {
   /// Current user intent that Amazon Lex is aware of.
   final String? intentName;
 
+  /// You can only use this field in the de-DE, en-AU, en-GB, en-US, es-419,
+  /// es-ES, es-US, fr-CA, fr-FR, and it-IT locales. In all other locales, the
+  /// <code>message</code> field is null. You should use the
+  /// <code>encodedMessage</code> field instead.
+  ///
   /// The message to convey to the user. The message can come from the bot's
   /// configuration or from a Lambda function.
   ///
@@ -1784,6 +1836,8 @@ class PostContentResponse {
     this.botVersion,
     this.contentType,
     this.dialogState,
+    this.encodedInputTranscript,
+    this.encodedMessage,
     this.inputTranscript,
     this.intentName,
     this.message,
@@ -2090,10 +2144,21 @@ class PutSessionResponse {
   /// </ul>
   final DialogState? dialogState;
 
+  /// The next message that should be presented to the user.
+  ///
+  /// The <code>encodedMessage</code> field is base-64 encoded. You must decode
+  /// the field before you can use the value.
+  final String? encodedMessage;
+
   /// The name of the current intent.
   final String? intentName;
 
   /// The next message that should be presented to the user.
+  ///
+  /// You can only use this field in the de-DE, en-AU, en-GB, en-US, es-419,
+  /// es-ES, es-US, fr-CA, fr-FR, and it-IT locales. In all other locales, the
+  /// <code>message</code> field is null. You should use the
+  /// <code>encodedMessage</code> field instead.
   final String? message;
 
   /// The format of the response message. One of the following values:
@@ -2147,6 +2212,7 @@ class PutSessionResponse {
     this.audioStream,
     this.contentType,
     this.dialogState,
+    this.encodedMessage,
     this.intentName,
     this.message,
     this.messageFormat,

@@ -21,9 +21,9 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 /// This is documentation for <b>AWS CloudHSM Classic</b>. For more information,
 /// see <a href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM
 /// Classic FAQs</a>, the <a
-/// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
+/// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
 /// Classic User Guide</a>, and the <a
-/// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+/// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
 /// CloudHSM Classic API Reference</a>.
 class CloudHSM {
   final _s.JsonProtocol _protocol;
@@ -57,16 +57,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Adds or overwrites one or more tags for the specified AWS CloudHSM
@@ -113,16 +113,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Creates a high-availability partition group. A high-availability partition
@@ -160,16 +160,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Creates an uninitialized HSM instance.
@@ -260,16 +260,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Creates an HSM client.
@@ -319,16 +319,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Deletes a high-availability partition group.
@@ -365,16 +365,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Deletes an HSM. After completion, this operation cannot be undone and your
@@ -412,16 +412,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Deletes a client.
@@ -458,16 +458,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Retrieves information about a high-availability partition group.
@@ -504,16 +504,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Retrieves information about an HSM. You can identify the HSM by its ARN or
@@ -557,16 +557,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Retrieves information about an HSM client.
@@ -608,16 +608,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Gets the configuration files necessary to connect to all high availability
@@ -668,16 +668,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Lists the Availability Zones that have available AWS CloudHSM capacity.
@@ -705,16 +705,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Lists the high-availability partition groups for the account.
@@ -757,16 +757,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Retrieves the identifiers of all of the HSMs provisioned for the current
@@ -810,16 +810,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Lists all of the clients.
@@ -862,16 +862,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Returns a list of all tags for the specified AWS CloudHSM resource.
@@ -908,16 +908,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Modifies an existing high-availability partition group.
@@ -966,16 +966,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Modifies an HSM.
@@ -1051,16 +1051,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Modifies the certificate used by the client.
@@ -1111,16 +1111,16 @@ class CloudHSM {
   /// information, see <a
   /// href="http://aws.amazon.com/cloudhsm/faqs-classic/">AWS CloudHSM Classic
   /// FAQs</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS CloudHSM
-  /// Classic User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/userguide/">AWS
+  /// CloudHSM Classic User Guide</a>, and the <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/classic/APIReference/">AWS
   /// CloudHSM Classic API Reference</a>.
   ///
   /// <b>For information about the current version of AWS CloudHSM</b>, see <a
   /// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a>, the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
   /// User Guide</a>, and the <a
-  /// href="http://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/APIReference/">AWS
   /// CloudHSM API Reference</a>.
   ///
   /// Removes one or more tags from the specified AWS CloudHSM resource.
@@ -1208,14 +1208,6 @@ extension on String {
   }
 }
 
-/// Indicates that an internal error occurred.
-class CloudHsmInternalException implements _s.AwsException {
-  CloudHsmInternalException();
-  factory CloudHsmInternalException.fromJson(Map<String, dynamic> _) {
-    return CloudHsmInternalException();
-  }
-}
-
 enum CloudHsmObjectState {
   ready,
   updating,
@@ -1246,26 +1238,6 @@ extension on String {
         return CloudHsmObjectState.degraded;
     }
     throw Exception('$this is not known in enum CloudHsmObjectState');
-  }
-}
-
-/// Indicates that an exception occurred in the AWS CloudHSM service.
-class CloudHsmServiceException implements _s.AwsException {
-  /// Additional information about the error.
-  final String? message;
-
-  /// Indicates if the action can be retried.
-  final bool? retryable;
-
-  CloudHsmServiceException({
-    this.message,
-    this.retryable,
-  });
-  factory CloudHsmServiceException.fromJson(Map<String, dynamic> json) {
-    return CloudHsmServiceException(
-      message: json['message'] as String?,
-      retryable: json['retryable'] as bool?,
-    );
   }
 }
 
@@ -1654,14 +1626,6 @@ extension on String {
   }
 }
 
-/// Indicates that one or more of the request parameters are not valid.
-class InvalidRequestException implements _s.AwsException {
-  InvalidRequestException();
-  factory InvalidRequestException.fromJson(Map<String, dynamic> _) {
-    return InvalidRequestException();
-  }
-}
-
 class ListAvailableZonesResponse {
   /// The list of Availability Zones that have available AWS CloudHSM capacity.
   final List<String>? aZList;
@@ -1886,9 +1850,26 @@ class Tag {
   }
 }
 
+class CloudHsmInternalException extends _s.GenericAwsException {
+  CloudHsmInternalException({String? type, String? message})
+      : super(type: type, code: 'CloudHsmInternalException', message: message);
+}
+
+class CloudHsmServiceException extends _s.GenericAwsException {
+  CloudHsmServiceException({String? type, String? message})
+      : super(type: type, code: 'CloudHsmServiceException', message: message);
+}
+
+class InvalidRequestException extends _s.GenericAwsException {
+  InvalidRequestException({String? type, String? message})
+      : super(type: type, code: 'InvalidRequestException', message: message);
+}
+
 final _exceptionFns = <String, _s.AwsExceptionFn>{
-  'CloudHsmInternalException': (type, message) => CloudHsmInternalException(),
+  'CloudHsmInternalException': (type, message) =>
+      CloudHsmInternalException(type: type, message: message),
   'CloudHsmServiceException': (type, message) =>
-      CloudHsmServiceException(message: message),
-  'InvalidRequestException': (type, message) => InvalidRequestException(),
+      CloudHsmServiceException(type: type, message: message),
+  'InvalidRequestException': (type, message) =>
+      InvalidRequestException(type: type, message: message),
 };

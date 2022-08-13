@@ -18,10 +18,11 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// EC2 Image Builder is a fully managed AWS service that makes it easier to
-/// automate the creation, management, and deployment of customized, secure, and
-/// up-to-date "golden" server images that are pre-installed and pre-configured
-/// with software and settings to meet specific IT standards.
+/// EC2 Image Builder is a fully managed Amazon Web Services service that makes
+/// it easier to automate the creation, management, and deployment of
+/// customized, secure, and up-to-date "golden" server images that are
+/// pre-installed and pre-configured with software and settings to meet specific
+/// IT standards.
 class Imagebuilder {
   final _s.RestJsonProtocol _protocol;
   Imagebuilder({
@@ -68,7 +69,10 @@ class Imagebuilder {
   /// cancel.
   ///
   /// Parameter [clientToken] :
-  /// The idempotency token used to make this request idempotent.
+  /// Unique, case-sensitive identifier you provide to ensure idempotency of the
+  /// request. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html">Ensuring
+  /// idempotency</a> in the <i>Amazon EC2 API Reference</i>.
   Future<CancelImageCreationResponse> cancelImageCreation({
     required String imageBuildVersionArn,
     String? clientToken,
@@ -94,7 +98,18 @@ class Imagebuilder {
   }
 
   /// Creates a new component that can be used to build, validate, test, and
-  /// assess your image.
+  /// assess your image. The component is based on a YAML document that you
+  /// specify using exactly one of the following methods:
+  ///
+  /// <ul>
+  /// <li>
+  /// Inline, using the <code>data</code> property in the request body.
+  /// </li>
+  /// <li>
+  /// A URL that points to a YAML document file stored in Amazon S3, using the
+  /// <code>uri</code> property in the request body.
+  /// </li>
+  /// </ul>
   ///
   /// May throw [ServiceException].
   /// May throw [ClientException].
@@ -116,8 +131,22 @@ class Imagebuilder {
   ///
   /// Parameter [semanticVersion] :
   /// The semantic version of the component. This version follows the semantic
-  /// version syntax. For example, major.minor.patch. This could be versioned
-  /// like software (2.0.1) or like a date (2019.12.01).
+  /// version syntax.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or
+  /// 1073741823 for each node. Image Builder automatically assigns the build
+  /// number to the fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example,
+  /// you might choose a software version pattern, such as 1.0.0, or a date,
+  /// such as 2021.01.01.
+  /// </note>
   ///
   /// Parameter [changeDescription] :
   /// The change description of the component. Describes what change has been
@@ -128,9 +157,10 @@ class Imagebuilder {
   /// The idempotency token of the component.
   ///
   /// Parameter [data] :
-  /// The data of the component. Used to specify the data inline. Either
-  /// <code>data</code> or <code>uri</code> can be used to specify the data
-  /// within the component.
+  /// Component <code>data</code> contains inline YAML document content for the
+  /// component. Alternatively, you can specify the <code>uri</code> of a YAML
+  /// document file stored in Amazon S3. However, you cannot specify both
+  /// properties.
   ///
   /// Parameter [description] :
   /// The description of the component. Describes the contents of the component.
@@ -140,17 +170,20 @@ class Imagebuilder {
   ///
   /// Parameter [supportedOsVersions] :
   /// The operating system (OS) version supported by the component. If the OS
-  /// information is available, a prefix match is performed against the parent
+  /// information is available, a prefix match is performed against the base
   /// image OS version during image recipe creation.
   ///
   /// Parameter [tags] :
   /// The tags of the component.
   ///
   /// Parameter [uri] :
-  /// The uri of the component. Must be an S3 URL and the requester must have
-  /// permission to access the S3 bucket. If you use S3, you can specify
-  /// component content up to your service quota. Either <code>data</code> or
-  /// <code>uri</code> can be used to specify the data within the component.
+  /// The <code>uri</code> of a YAML component document file. This must be an S3
+  /// URL (<code>s3://bucket/key</code>), and the requester must have permission
+  /// to access the S3 bucket it points to. If you use Amazon S3, you can
+  /// specify component content up to your service quota.
+  ///
+  /// Alternatively, you can specify the YAML document inline, using the
+  /// component <code>data</code> property. You cannot specify both properties.
   Future<CreateComponentResponse> createComponent({
     required String name,
     required Platform platform,
@@ -241,18 +274,30 @@ class Imagebuilder {
   /// Parameter [containerType] :
   /// The type of container to create.
   ///
-  /// Parameter [dockerfileTemplateData] :
-  /// The Dockerfile template used to build your image as an inline data blob.
-  ///
   /// Parameter [name] :
   /// The name of the container recipe.
   ///
   /// Parameter [parentImage] :
-  /// The source image for the container recipe.
+  /// The base image for the container recipe.
   ///
   /// Parameter [semanticVersion] :
-  /// The semantic version of the container recipe
-  /// (&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;).
+  /// The semantic version of the container recipe. This version follows the
+  /// semantic version syntax.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or
+  /// 1073741823 for each node. Image Builder automatically assigns the build
+  /// number to the fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example,
+  /// you might choose a software version pattern, such as 1.0.0, or a date,
+  /// such as 2021.01.01.
+  /// </note>
   ///
   /// Parameter [targetRepository] :
   /// The destination repository for the container image.
@@ -263,19 +308,25 @@ class Imagebuilder {
   /// Parameter [description] :
   /// The description of the container recipe.
   ///
+  /// Parameter [dockerfileTemplateData] :
+  /// The Dockerfile template used to build your image as an inline data blob.
+  ///
   /// Parameter [dockerfileTemplateUri] :
-  /// The S3 URI for the Dockerfile that will be used to build your container
-  /// image.
+  /// The Amazon S3 URI for the Dockerfile that will be used to build your
+  /// container image.
   ///
   /// Parameter [imageOsVersionOverride] :
-  /// Specifies the operating system version for the source image.
+  /// Specifies the operating system version for the base image.
+  ///
+  /// Parameter [instanceConfiguration] :
+  /// A group of options that can be used to configure an instance for building
+  /// and testing container images.
   ///
   /// Parameter [kmsKeyId] :
   /// Identifies which KMS key is used to encrypt the container image.
   ///
   /// Parameter [platformOverride] :
-  /// Specifies the operating system platform when you use a custom source
-  /// image.
+  /// Specifies the operating system platform when you use a custom base image.
   ///
   /// Parameter [tags] :
   /// Tags that are attached to the container recipe.
@@ -285,15 +336,16 @@ class Imagebuilder {
   Future<CreateContainerRecipeResponse> createContainerRecipe({
     required List<ComponentConfiguration> components,
     required ContainerType containerType,
-    required String dockerfileTemplateData,
     required String name,
     required String parentImage,
     required String semanticVersion,
     required TargetContainerRepository targetRepository,
     String? clientToken,
     String? description,
+    String? dockerfileTemplateData,
     String? dockerfileTemplateUri,
     String? imageOsVersionOverride,
+    InstanceConfiguration? instanceConfiguration,
     String? kmsKeyId,
     Platform? platformOverride,
     Map<String, String>? tags,
@@ -301,15 +353,6 @@ class Imagebuilder {
   }) async {
     ArgumentError.checkNotNull(components, 'components');
     ArgumentError.checkNotNull(containerType, 'containerType');
-    ArgumentError.checkNotNull(
-        dockerfileTemplateData, 'dockerfileTemplateData');
-    _s.validateStringLength(
-      'dockerfileTemplateData',
-      dockerfileTemplateData,
-      1,
-      16000,
-      isRequired: true,
-    );
     ArgumentError.checkNotNull(name, 'name');
     ArgumentError.checkNotNull(parentImage, 'parentImage');
     _s.validateStringLength(
@@ -334,6 +377,12 @@ class Imagebuilder {
       1024,
     );
     _s.validateStringLength(
+      'dockerfileTemplateData',
+      dockerfileTemplateData,
+      1,
+      16000,
+    );
+    _s.validateStringLength(
       'imageOsVersionOverride',
       imageOsVersionOverride,
       1,
@@ -354,17 +403,20 @@ class Imagebuilder {
     final $payload = <String, dynamic>{
       'components': components,
       'containerType': containerType.toValue(),
-      'dockerfileTemplateData': dockerfileTemplateData,
       'name': name,
       'parentImage': parentImage,
       'semanticVersion': semanticVersion,
       'targetRepository': targetRepository,
       'clientToken': clientToken ?? _s.generateIdempotencyToken(),
       if (description != null) 'description': description,
+      if (dockerfileTemplateData != null)
+        'dockerfileTemplateData': dockerfileTemplateData,
       if (dockerfileTemplateUri != null)
         'dockerfileTemplateUri': dockerfileTemplateUri,
       if (imageOsVersionOverride != null)
         'imageOsVersionOverride': imageOsVersionOverride,
+      if (instanceConfiguration != null)
+        'instanceConfiguration': instanceConfiguration,
       if (kmsKeyId != null) 'kmsKeyId': kmsKeyId,
       if (platformOverride != null)
         'platformOverride': platformOverride.toValue(),
@@ -449,7 +501,8 @@ class Imagebuilder {
 
   /// Creates a new image. This request will create a new image along with all
   /// of the configured output resources defined in the distribution
-  /// configuration.
+  /// configuration. You must specify exactly one recipe for your image, using
+  /// either a ContainerRecipeArn or an ImageRecipeArn.
   ///
   /// May throw [ServiceException].
   /// May throw [ClientException].
@@ -664,17 +717,36 @@ class Imagebuilder {
   /// The name of the image recipe.
   ///
   /// Parameter [parentImage] :
-  /// The parent image of the image recipe. The value of the string can be the
-  /// ARN of the parent image or an AMI ID. The format for the ARN follows this
+  /// The base image of the image recipe. The value of the string can be the ARN
+  /// of the base image or an AMI ID. The format for the ARN follows this
   /// example:
-  /// <code>arn:aws:imagebuilder:us-west-2:aws:image/windows-server-2016-english-full-base-x86/xxxx.x.x</code>.
+  /// <code>arn:aws:imagebuilder:us-west-2:aws:image/windows-server-2016-english-full-base-x86/x.x.x</code>.
   /// You can provide the specific version that you want to use, or you can use
   /// a wildcard in all of the fields. If you enter an AMI ID for the string
   /// value, you must have access to the AMI, and the AMI must be in the same
   /// Region in which you are using Image Builder.
   ///
   /// Parameter [semanticVersion] :
-  /// The semantic version of the image recipe.
+  /// The semantic version of the image recipe. This version follows the
+  /// semantic version syntax.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or
+  /// 1073741823 for each node. Image Builder automatically assigns the build
+  /// number to the fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example,
+  /// you might choose a software version pattern, such as 1.0.0, or a date,
+  /// such as 2021.01.01.
+  /// </note>
+  ///
+  /// Parameter [additionalInstanceConfiguration] :
+  /// Specify additional settings and launch scripts for your build instances.
   ///
   /// Parameter [blockDeviceMappings] :
   /// The block device mappings of the image recipe.
@@ -689,12 +761,13 @@ class Imagebuilder {
   /// The tags of the image recipe.
   ///
   /// Parameter [workingDirectory] :
-  /// The working directory to be used during build and test workflows.
+  /// The working directory used during build and test workflows.
   Future<CreateImageRecipeResponse> createImageRecipe({
     required List<ComponentConfiguration> components,
     required String name,
     required String parentImage,
     required String semanticVersion,
+    AdditionalInstanceConfiguration? additionalInstanceConfiguration,
     List<InstanceBlockDeviceMapping>? blockDeviceMappings,
     String? clientToken,
     String? description,
@@ -735,6 +808,8 @@ class Imagebuilder {
       'name': name,
       'parentImage': parentImage,
       'semanticVersion': semanticVersion,
+      if (additionalInstanceConfiguration != null)
+        'additionalInstanceConfiguration': additionalInstanceConfiguration,
       if (blockDeviceMappings != null)
         'blockDeviceMappings': blockDeviceMappings,
       'clientToken': clientToken ?? _s.generateIdempotencyToken(),
@@ -768,7 +843,7 @@ class Imagebuilder {
   ///
   /// Parameter [instanceProfileName] :
   /// The instance profile to associate with the instance used to customize your
-  /// EC2 AMI.
+  /// Amazon EC2 AMI.
   ///
   /// Parameter [name] :
   /// The name of the infrastructure configuration.
@@ -779,13 +854,17 @@ class Imagebuilder {
   /// Parameter [description] :
   /// The description of the infrastructure configuration.
   ///
+  /// Parameter [instanceMetadataOptions] :
+  /// The instance metadata options that you can set for the HTTP requests that
+  /// pipeline builds use to launch EC2 build and test instances.
+  ///
   /// Parameter [instanceTypes] :
   /// The instance types of the infrastructure configuration. You can specify
   /// one or more instance types to use for this build. The service will pick
   /// one of these instance types based on availability.
   ///
   /// Parameter [keyPair] :
-  /// The key pair of the infrastructure configuration. This can be used to log
+  /// The key pair of the infrastructure configuration. You can use this to log
   /// on to and debug the instance used to create your image.
   ///
   /// Parameter [logging] :
@@ -796,14 +875,21 @@ class Imagebuilder {
   ///
   /// Parameter [securityGroupIds] :
   /// The security group IDs to associate with the instance used to customize
-  /// your EC2 AMI.
+  /// your Amazon EC2 AMI.
   ///
   /// Parameter [snsTopicArn] :
-  /// The SNS topic on which to send image build events.
+  /// The Amazon Resource Name (ARN) for the SNS topic to which we send image
+  /// build event notifications.
+  /// <note>
+  /// EC2 Image Builder is unable to send notifications to SNS topics that are
+  /// encrypted using keys from other accounts. The key that is used to encrypt
+  /// the SNS topic must reside in the account that the Image Builder service
+  /// runs under.
+  /// </note>
   ///
   /// Parameter [subnetId] :
-  /// The subnet ID in which to place the instance used to customize your EC2
-  /// AMI.
+  /// The subnet ID in which to place the instance used to customize your Amazon
+  /// EC2 AMI.
   ///
   /// Parameter [tags] :
   /// The tags of the infrastructure configuration.
@@ -819,6 +905,7 @@ class Imagebuilder {
     required String name,
     String? clientToken,
     String? description,
+    InstanceMetadataOptions? instanceMetadataOptions,
     List<String>? instanceTypes,
     String? keyPair,
     Logging? logging,
@@ -834,7 +921,7 @@ class Imagebuilder {
       'instanceProfileName',
       instanceProfileName,
       1,
-      1024,
+      256,
       isRequired: true,
     );
     ArgumentError.checkNotNull(name, 'name');
@@ -867,6 +954,8 @@ class Imagebuilder {
       'name': name,
       'clientToken': clientToken ?? _s.generateIdempotencyToken(),
       if (description != null) 'description': description,
+      if (instanceMetadataOptions != null)
+        'instanceMetadataOptions': instanceMetadataOptions,
       if (instanceTypes != null) 'instanceTypes': instanceTypes,
       if (keyPair != null) 'keyPair': keyPair,
       if (logging != null) 'logging': logging,
@@ -978,7 +1067,28 @@ class Imagebuilder {
     return DeleteDistributionConfigurationResponse.fromJson(response);
   }
 
-  /// Deletes an image.
+  /// Deletes an Image Builder image resource. This does not delete any EC2 AMIs
+  /// or ECR container images that are created during the image build process.
+  /// You must clean those up separately, using the appropriate Amazon EC2 or
+  /// Amazon ECR console actions, or API or CLI commands.
+  ///
+  /// <ul>
+  /// <li>
+  /// To deregister an EC2 Linux AMI, see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/deregister-ami.html">Deregister
+  /// your Linux AMI</a> in the <i> <i>Amazon EC2 User Guide</i> </i>.
+  /// </li>
+  /// <li>
+  /// To deregister an EC2 Windows AMI, see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/deregister-ami.html">Deregister
+  /// your Windows AMI</a> in the <i> <i>Amazon EC2 Windows Guide</i> </i>.
+  /// </li>
+  /// <li>
+  /// To delete a container image from Amazon ECR, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/delete_image.html">Deleting
+  /// an image</a> in the <i>Amazon ECR User Guide</i>.
+  /// </li>
+  /// </ul>
   ///
   /// May throw [ServiceException].
   /// May throw [ClientException].
@@ -989,7 +1099,8 @@ class Imagebuilder {
   /// May throw [ResourceDependencyException].
   ///
   /// Parameter [imageBuildVersionArn] :
-  /// The Amazon Resource Name (ARN) of the image to delete.
+  /// The Amazon Resource Name (ARN) of the Image Builder image resource to
+  /// delete.
   Future<DeleteImageResponse> deleteImage({
     required String imageBuildVersionArn,
   }) async {
@@ -1442,12 +1553,22 @@ class Imagebuilder {
   ///
   /// Parameter [semanticVersion] :
   /// The semantic version of the component. This version follows the semantic
-  /// version syntax. For example, major.minor.patch. This could be versioned
-  /// like software (2.0.1) or like a date (2019.12.01).
+  /// version syntax.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to
+  /// use wildcards (x) to specify the most recent versions or nodes when
+  /// selecting the base image or components for your recipe. When you use a
+  /// wildcard in any node, all nodes to the right of the first wildcard must
+  /// also be wildcards.
+  /// </note>
   ///
   /// Parameter [type] :
   /// The type of the component denotes whether the component is used to build
-  /// the image or only to test it.
+  /// the image, or only to test it.
   ///
   /// Parameter [changeDescription] :
   /// The change description of the component. Describes what change has been
@@ -1472,10 +1593,11 @@ class Imagebuilder {
   /// The tags of the component.
   ///
   /// Parameter [uri] :
-  /// The uri of the component. Must be an S3 URL and the requester must have
-  /// permission to access the S3 bucket. If you use S3, you can specify
-  /// component content up to your service quota. Either <code>data</code> or
-  /// <code>uri</code> can be used to specify the data within the component.
+  /// The uri of the component. Must be an Amazon S3 URL and the requester must
+  /// have permission to access the Amazon S3 bucket. If you use Amazon S3, you
+  /// can specify component content up to your service quota. Either
+  /// <code>data</code> or <code>uri</code> can be used to specify the data
+  /// within the component.
   Future<ImportComponentResponse> importComponent({
     required ComponentFormat format,
     required String name,
@@ -1548,8 +1670,145 @@ class Imagebuilder {
     return ImportComponentResponse.fromJson(response);
   }
 
+  /// When you export your virtual machine (VM) from its virtualization
+  /// environment, that process creates a set of one or more disk container
+  /// files that act as snapshots of your VM’s environment, settings, and data.
+  /// The Amazon EC2 API <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ImportImage.html">ImportImage</a>
+  /// action uses those files to import your VM and create an AMI. To import
+  /// using the CLI command, see <a
+  /// href="https://docs.aws.amazon.com/cli/latest/reference/ec2/import-image.html">import-image</a>
+  ///
+  /// You can reference the task ID from the VM import to pull in the AMI that
+  /// the import created as the base image for your Image Builder recipe.
+  ///
+  /// May throw [ServiceException].
+  /// May throw [ClientException].
+  /// May throw [ServiceUnavailableException].
+  ///
+  /// Parameter [name] :
+  /// The name of the base image that is created by the import process.
+  ///
+  /// Parameter [platform] :
+  /// The operating system platform for the imported VM.
+  ///
+  /// Parameter [semanticVersion] :
+  /// The semantic version to attach to the base image that was created during
+  /// the import process. This version follows the semantic version syntax.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or
+  /// 1073741823 for each node. Image Builder automatically assigns the build
+  /// number to the fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example,
+  /// you might choose a software version pattern, such as 1.0.0, or a date,
+  /// such as 2021.01.01.
+  /// </note>
+  ///
+  /// Parameter [vmImportTaskId] :
+  /// The <code>importTaskId</code> (API) or <code>ImportTaskId</code> (CLI)
+  /// from the Amazon EC2 VM import process. Image Builder retrieves information
+  /// from the import process to pull in the AMI that is created from the VM
+  /// source as the base image for your recipe.
+  ///
+  /// Parameter [clientToken] :
+  /// Unique, case-sensitive identifier you provide to ensure idempotency of the
+  /// request. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html">Ensuring
+  /// idempotency</a> in the <i>Amazon EC2 API Reference</i>.
+  ///
+  /// Parameter [description] :
+  /// The description for the base image that is created by the import process.
+  ///
+  /// Parameter [osVersion] :
+  /// The operating system version for the imported VM.
+  ///
+  /// Parameter [tags] :
+  /// Tags that are attached to the import resources.
+  Future<ImportVmImageResponse> importVmImage({
+    required String name,
+    required Platform platform,
+    required String semanticVersion,
+    required String vmImportTaskId,
+    String? clientToken,
+    String? description,
+    String? osVersion,
+    Map<String, String>? tags,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      1024,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(platform, 'platform');
+    ArgumentError.checkNotNull(semanticVersion, 'semanticVersion');
+    ArgumentError.checkNotNull(vmImportTaskId, 'vmImportTaskId');
+    _s.validateStringLength(
+      'vmImportTaskId',
+      vmImportTaskId,
+      1,
+      1024,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'clientToken',
+      clientToken,
+      1,
+      36,
+    );
+    _s.validateStringLength(
+      'description',
+      description,
+      1,
+      1024,
+    );
+    _s.validateStringLength(
+      'osVersion',
+      osVersion,
+      1,
+      1152921504606846976,
+    );
+    final $payload = <String, dynamic>{
+      'name': name,
+      'platform': platform.toValue(),
+      'semanticVersion': semanticVersion,
+      'vmImportTaskId': vmImportTaskId,
+      'clientToken': clientToken ?? _s.generateIdempotencyToken(),
+      if (description != null) 'description': description,
+      if (osVersion != null) 'osVersion': osVersion,
+      if (tags != null) 'tags': tags,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'PUT',
+      requestUri: '/ImportVmImage',
+      exceptionFnMap: _exceptionFns,
+    );
+    return ImportVmImageResponse.fromJson(response);
+  }
+
   /// Returns the list of component build versions for the specified semantic
   /// version.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to
+  /// use wildcards (x) to specify the most recent versions or nodes when
+  /// selecting the base image or components for your recipe. When you use a
+  /// wildcard in any node, all nodes to the right of the first wildcard must
+  /// also be wildcards.
+  /// </note>
   ///
   /// May throw [ServiceException].
   /// May throw [ClientException].
@@ -1603,6 +1862,17 @@ class Imagebuilder {
 
   /// Returns the list of component build versions for the specified semantic
   /// version.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to
+  /// use wildcards (x) to specify the most recent versions or nodes when
+  /// selecting the base image or components for your recipe. When you use a
+  /// wildcard in any node, all nodes to the right of the first wildcard must
+  /// also be wildcards.
+  /// </note>
   ///
   /// May throw [ServiceException].
   /// May throw [ClientException].
@@ -1613,11 +1883,31 @@ class Imagebuilder {
   /// May throw [CallRateLimitExceededException].
   ///
   /// Parameter [byName] :
-  /// Returns the list of component build versions for the specified semantic
-  /// version.
+  /// Returns the list of component build versions for the specified name.
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>description</code>
+  /// </li>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>platform</code>
+  /// </li>
+  /// <li>
+  /// <code>supportedOsVersion</code>
+  /// </li>
+  /// <li>
+  /// <code>type</code>
+  /// </li>
+  /// <li>
+  /// <code>version</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -1678,8 +1968,22 @@ class Imagebuilder {
   /// May throw [CallRateLimitExceededException].
   ///
   /// Parameter [filters] :
-  /// Request filters that are used to narrow the list of container images that
-  /// are returned.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>containerType</code>
+  /// </li>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>parentImage</code>
+  /// </li>
+  /// <li>
+  /// <code>platform</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [maxResults] :
   /// The maximum number of results to return in the list.
@@ -1736,13 +2040,7 @@ class Imagebuilder {
   /// May throw [CallRateLimitExceededException].
   ///
   /// Parameter [filters] :
-  /// The filters.
-  ///
-  /// <ul>
-  /// <li>
-  /// <code>name</code> - The name of this distribution configuration.
-  /// </li>
-  /// </ul>
+  /// You can filter on <code>name</code> to streamline results.
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -1797,7 +2095,25 @@ class Imagebuilder {
   /// to retrieve.
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>osVersion</code>
+  /// </li>
+  /// <li>
+  /// <code>platform</code>
+  /// </li>
+  /// <li>
+  /// <code>type</code>
+  /// </li>
+  /// <li>
+  /// <code>version</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -1839,6 +2155,61 @@ class Imagebuilder {
     return ListImageBuildVersionsResponse.fromJson(response);
   }
 
+  /// List the Packages that are associated with an Image Build Version, as
+  /// determined by Amazon Web Services Systems Manager Inventory at build time.
+  ///
+  /// May throw [ServiceException].
+  /// May throw [ClientException].
+  /// May throw [ServiceUnavailableException].
+  /// May throw [InvalidRequestException].
+  /// May throw [InvalidPaginationTokenException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ForbiddenException].
+  /// May throw [CallRateLimitExceededException].
+  ///
+  /// Parameter [imageBuildVersionArn] :
+  /// Filter results for the ListImagePackages request by the Image Build
+  /// Version ARN
+  ///
+  /// Parameter [maxResults] :
+  /// The maxiumum number of results to return from the ListImagePackages
+  /// request.
+  ///
+  /// Parameter [nextToken] :
+  /// A token to specify where to start paginating. This is the NextToken from a
+  /// previously truncated response.
+  Future<ListImagePackagesResponse> listImagePackages({
+    required String imageBuildVersionArn,
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    ArgumentError.checkNotNull(imageBuildVersionArn, 'imageBuildVersionArn');
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      25,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      65535,
+    );
+    final $payload = <String, dynamic>{
+      'imageBuildVersionArn': imageBuildVersionArn,
+      if (maxResults != null) 'maxResults': maxResults,
+      if (nextToken != null) 'nextToken': nextToken,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/ListImagePackages',
+      exceptionFnMap: _exceptionFns,
+    );
+    return ListImagePackagesResponse.fromJson(response);
+  }
+
   /// Returns a list of images created by the specified pipeline.
   ///
   /// May throw [ServiceException].
@@ -1855,7 +2226,16 @@ class Imagebuilder {
   /// to view.
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>version</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -1908,7 +2288,28 @@ class Imagebuilder {
   /// May throw [CallRateLimitExceededException].
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>description</code>
+  /// </li>
+  /// <li>
+  /// <code>distributionConfigurationArn</code>
+  /// </li>
+  /// <li>
+  /// <code>imageRecipeArn</code>
+  /// </li>
+  /// <li>
+  /// <code>infrastructureConfigurationArn</code>
+  /// </li>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>status</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -1958,7 +2359,19 @@ class Imagebuilder {
   /// May throw [CallRateLimitExceededException].
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>parentImage</code>
+  /// </li>
+  /// <li>
+  /// <code>platform</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -2020,7 +2433,25 @@ class Imagebuilder {
   /// Requests a list of images with a specific recipe name.
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// Use the following filters to streamline results:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>name</code>
+  /// </li>
+  /// <li>
+  /// <code>osVersion</code>
+  /// </li>
+  /// <li>
+  /// <code>platform</code>
+  /// </li>
+  /// <li>
+  /// <code>type</code>
+  /// </li>
+  /// <li>
+  /// <code>version</code>
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [includeDeprecated] :
   /// Includes deprecated images in the response list.
@@ -2085,7 +2516,7 @@ class Imagebuilder {
   /// May throw [CallRateLimitExceededException].
   ///
   /// Parameter [filters] :
-  /// The filters.
+  /// You can filter on <code>name</code> to streamline results.
   ///
   /// Parameter [maxResults] :
   /// The maximum items to return in a request.
@@ -2198,11 +2629,11 @@ class Imagebuilder {
 
   /// Applies a policy to a container image. We recommend that you call the RAM
   /// API CreateResourceShare
-  /// (https://docs.aws.amazon.com/ram/latest/APIReference/API_CreateResourceShare.html)
+  /// (https://docs.aws.amazon.com//ram/latest/APIReference/API_CreateResourceShare.html)
   /// to share resources. If you call the Image Builder API
   /// <code>PutContainerImagePolicy</code>, you must also call the RAM API
   /// PromoteResourceShareCreatedFromPolicy
-  /// (https://docs.aws.amazon.com/ram/latest/APIReference/API_PromoteResourceShareCreatedFromPolicy.html)
+  /// (https://docs.aws.amazon.com//ram/latest/APIReference/API_PromoteResourceShareCreatedFromPolicy.html)
   /// in order for the resource to be visible to all principals with whom the
   /// resource is shared.
   ///
@@ -2507,8 +2938,13 @@ class Imagebuilder {
     return UpdateDistributionConfigurationResponse.fromJson(response);
   }
 
-  /// Updates a new image pipeline. Image pipelines enable you to automate the
+  /// Updates an image pipeline. Image pipelines enable you to automate the
   /// creation and distribution of images.
+  /// <note>
+  /// UpdateImagePipeline does not support selective updates for the pipeline.
+  /// You must specify all of the required properties in the update request, not
+  /// just the properties that have changed.
+  /// </note>
   ///
   /// May throw [ServiceException].
   /// May throw [ClientException].
@@ -2630,7 +3066,7 @@ class Imagebuilder {
   ///
   /// Parameter [instanceProfileName] :
   /// The instance profile to associate with the instance used to customize your
-  /// EC2 AMI.
+  /// Amazon EC2 AMI.
   ///
   /// Parameter [clientToken] :
   /// The idempotency token used to make this request idempotent.
@@ -2638,13 +3074,34 @@ class Imagebuilder {
   /// Parameter [description] :
   /// The description of the infrastructure configuration.
   ///
+  /// Parameter [instanceMetadataOptions] :
+  /// The instance metadata options that you can set for the HTTP requests that
+  /// pipeline builds use to launch EC2 build and test instances. For more
+  /// information about instance metadata options, see one of the following
+  /// links:
+  ///
+  /// <ul>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html">Configure
+  /// the instance metadata options</a> in the <i> <i>Amazon EC2 User Guide</i>
+  /// </i> for Linux instances.
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/configuring-instance-metadata-options.html">Configure
+  /// the instance metadata options</a> in the <i> <i>Amazon EC2 Windows
+  /// Guide</i> </i> for Windows instances.
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [instanceTypes] :
   /// The instance types of the infrastructure configuration. You can specify
   /// one or more instance types to use for this build. The service will pick
   /// one of these instance types based on availability.
   ///
   /// Parameter [keyPair] :
-  /// The key pair of the infrastructure configuration. This can be used to log
+  /// The key pair of the infrastructure configuration. You can use this to log
   /// on to and debug the instance used to create your image.
   ///
   /// Parameter [logging] :
@@ -2655,13 +3112,21 @@ class Imagebuilder {
   ///
   /// Parameter [securityGroupIds] :
   /// The security group IDs to associate with the instance used to customize
-  /// your EC2 AMI.
+  /// your Amazon EC2 AMI.
   ///
   /// Parameter [snsTopicArn] :
-  /// The SNS topic on which to send image build events.
+  /// The Amazon Resource Name (ARN) for the SNS topic to which we send image
+  /// build event notifications.
+  /// <note>
+  /// EC2 Image Builder is unable to send notifications to SNS topics that are
+  /// encrypted using keys from other accounts. The key that is used to encrypt
+  /// the SNS topic must reside in the account that the Image Builder service
+  /// runs under.
+  /// </note>
   ///
   /// Parameter [subnetId] :
-  /// The subnet ID to place the instance used to customize your EC2 AMI in.
+  /// The subnet ID to place the instance used to customize your Amazon EC2 AMI
+  /// in.
   ///
   /// Parameter [terminateInstanceOnFailure] :
   /// The terminate instance on failure setting of the infrastructure
@@ -2674,6 +3139,7 @@ class Imagebuilder {
     required String instanceProfileName,
     String? clientToken,
     String? description,
+    InstanceMetadataOptions? instanceMetadataOptions,
     List<String>? instanceTypes,
     String? keyPair,
     Logging? logging,
@@ -2690,7 +3156,7 @@ class Imagebuilder {
       'instanceProfileName',
       instanceProfileName,
       1,
-      1024,
+      256,
       isRequired: true,
     );
     _s.validateStringLength(
@@ -2722,6 +3188,8 @@ class Imagebuilder {
       'instanceProfileName': instanceProfileName,
       'clientToken': clientToken ?? _s.generateIdempotencyToken(),
       if (description != null) 'description': description,
+      if (instanceMetadataOptions != null)
+        'instanceMetadataOptions': instanceMetadataOptions,
       if (instanceTypes != null) 'instanceTypes': instanceTypes,
       if (keyPair != null) 'keyPair': keyPair,
       if (logging != null) 'logging': logging,
@@ -2742,22 +3210,76 @@ class Imagebuilder {
   }
 }
 
-/// Details of an EC2 AMI.
+/// In addition to your infrastruction configuration, these settings provide an
+/// extra layer of control over your build instances. For instances where Image
+/// Builder installs the Systems Manager agent, you can choose whether to keep
+/// it for the AMI that you create. You can also specify commands to run on
+/// launch for all of your build instances.
+class AdditionalInstanceConfiguration {
+  /// Contains settings for the Systems Manager agent on your build instance.
+  final SystemsManagerAgent? systemsManagerAgent;
+
+  /// Use this property to provide commands or a command script to run when you
+  /// launch your build instance.
+  ///
+  /// The userDataOverride property replaces any commands that Image Builder might
+  /// have added to ensure that Systems Manager is installed on your Linux build
+  /// instance. If you override the user data, make sure that you add commands to
+  /// install Systems Manager, if it is not pre-installed on your base image.
+  /// <note>
+  /// The user data is always base 64 encoded. For example, the following commands
+  /// are encoded as
+  /// <code>IyEvYmluL2Jhc2gKbWtkaXIgLXAgL3Zhci9iYi8KdG91Y2ggL3Zhci$</code>:
+  ///
+  /// <i>#!/bin/bash</i>
+  ///
+  /// mkdir -p /var/bb/
+  ///
+  /// touch /var
+  /// </note>
+  final String? userDataOverride;
+
+  AdditionalInstanceConfiguration({
+    this.systemsManagerAgent,
+    this.userDataOverride,
+  });
+  factory AdditionalInstanceConfiguration.fromJson(Map<String, dynamic> json) {
+    return AdditionalInstanceConfiguration(
+      systemsManagerAgent: json['systemsManagerAgent'] != null
+          ? SystemsManagerAgent.fromJson(
+              json['systemsManagerAgent'] as Map<String, dynamic>)
+          : null,
+      userDataOverride: json['userDataOverride'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final systemsManagerAgent = this.systemsManagerAgent;
+    final userDataOverride = this.userDataOverride;
+    return {
+      if (systemsManagerAgent != null)
+        'systemsManagerAgent': systemsManagerAgent,
+      if (userDataOverride != null) 'userDataOverride': userDataOverride,
+    };
+  }
+}
+
+/// Details of an Amazon EC2 AMI.
 class Ami {
   /// The account ID of the owner of the AMI.
   final String? accountId;
 
-  /// The description of the EC2 AMI. Minimum and maximum length are in
+  /// The description of the Amazon EC2 AMI. Minimum and maximum length are in
   /// characters.
   final String? description;
 
-  /// The AMI ID of the EC2 AMI.
+  /// The AMI ID of the Amazon EC2 AMI.
   final String? image;
 
-  /// The name of the EC2 AMI.
+  /// The name of the Amazon EC2 AMI.
   final String? name;
 
-  /// The AWS Region of the EC2 AMI.
+  /// The Amazon Web Services Region of the Amazon EC2 AMI.
   final String? region;
   final ImageState? state;
 
@@ -2788,18 +3310,18 @@ class AmiDistributionConfiguration {
   /// The tags to apply to AMIs distributed to this Region.
   final Map<String, String>? amiTags;
 
-  /// The description of the distribution configuration. Minimum and maximum
+  /// The description of the AMI distribution configuration. Minimum and maximum
   /// length are in characters.
   final String? description;
 
   /// The KMS key identifier used to encrypt the distributed image.
   final String? kmsKeyId;
 
-  /// Launch permissions can be used to configure which AWS accounts can use the
-  /// AMI to launch instances.
+  /// Launch permissions can be used to configure which Amazon Web Services
+  /// accounts can use the AMI to launch instances.
   final LaunchPermissionConfiguration? launchPermission;
 
-  /// The name of the distribution configuration.
+  /// The name of the output AMI.
   final String? name;
 
   /// The ID of an account to which you want to distribute an image.
@@ -2849,8 +3371,41 @@ class AmiDistributionConfiguration {
   }
 }
 
+enum BuildType {
+  userInitiated,
+  scheduled,
+  import,
+}
+
+extension on BuildType {
+  String toValue() {
+    switch (this) {
+      case BuildType.userInitiated:
+        return 'USER_INITIATED';
+      case BuildType.scheduled:
+        return 'SCHEDULED';
+      case BuildType.import:
+        return 'IMPORT';
+    }
+  }
+}
+
+extension on String {
+  BuildType toBuildType() {
+    switch (this) {
+      case 'USER_INITIATED':
+        return BuildType.userInitiated;
+      case 'SCHEDULED':
+        return BuildType.scheduled;
+      case 'IMPORT':
+        return BuildType.import;
+    }
+    throw Exception('$this is not known in enum BuildType');
+  }
+}
+
 class CancelImageCreationResponse {
-  /// The idempotency token used to make this request idempotent.
+  /// The idempotency token that was used for this request.
   final String? clientToken;
 
   /// The Amazon Resource Name (ARN) of the image whose creation has been
@@ -2882,7 +3437,7 @@ class Component {
   /// The change description of the component.
   final String? changeDescription;
 
-  /// The data of the component.
+  /// Component data contains the YAML document content for the component.
   final String? data;
 
   /// The date that the component was created.
@@ -2903,12 +3458,20 @@ class Component {
   /// The owner of the component.
   final String? owner;
 
+  /// Contains parameter details for each of the parameters that are defined for
+  /// the component.
+  final List<ComponentParameterDetail>? parameters;
+
   /// The platform of the component.
   final Platform? platform;
 
+  /// Describes the current status of the component. This is used for components
+  /// that are no longer active.
+  final ComponentState? state;
+
   /// The operating system (OS) version supported by the component. If the OS
-  /// information is available, a prefix match is performed against the parent
-  /// image OS version during image recipe creation.
+  /// information is available, a prefix match is performed against the base image
+  /// OS version during image recipe creation.
   final List<String>? supportedOsVersions;
 
   /// The tags associated with the component.
@@ -2931,7 +3494,9 @@ class Component {
     this.kmsKeyId,
     this.name,
     this.owner,
+    this.parameters,
     this.platform,
+    this.state,
     this.supportedOsVersions,
     this.tags,
     this.type,
@@ -2948,7 +3513,15 @@ class Component {
       kmsKeyId: json['kmsKeyId'] as String?,
       name: json['name'] as String?,
       owner: json['owner'] as String?,
+      parameters: (json['parameters'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              ComponentParameterDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
       platform: (json['platform'] as String?)?.toPlatform(),
+      state: json['state'] != null
+          ? ComponentState.fromJson(json['state'] as Map<String, dynamic>)
+          : null,
       supportedOsVersions: (json['supportedOsVersions'] as List?)
           ?.whereNotNull()
           .map((e) => e as String)
@@ -2966,19 +3539,30 @@ class ComponentConfiguration {
   /// The Amazon Resource Name (ARN) of the component.
   final String componentArn;
 
+  /// A group of parameter settings that are used to configure the component for a
+  /// specific recipe.
+  final List<ComponentParameter>? parameters;
+
   ComponentConfiguration({
     required this.componentArn,
+    this.parameters,
   });
   factory ComponentConfiguration.fromJson(Map<String, dynamic> json) {
     return ComponentConfiguration(
       componentArn: json['componentArn'] as String,
+      parameters: (json['parameters'] as List?)
+          ?.whereNotNull()
+          .map((e) => ComponentParameter.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     final componentArn = this.componentArn;
+    final parameters = this.parameters;
     return {
       'componentArn': componentArn,
+      if (parameters != null) 'parameters': parameters,
     };
   }
 }
@@ -3006,6 +3590,117 @@ extension on String {
   }
 }
 
+/// Contains a key/value pair that sets the named component parameter.
+class ComponentParameter {
+  /// The name of the component parameter to set.
+  final String name;
+
+  /// Sets the value for the named component parameter.
+  final List<String> value;
+
+  ComponentParameter({
+    required this.name,
+    required this.value,
+  });
+  factory ComponentParameter.fromJson(Map<String, dynamic> json) {
+    return ComponentParameter(
+      name: json['name'] as String,
+      value: (json['value'] as List)
+          .whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final value = this.value;
+    return {
+      'name': name,
+      'value': value,
+    };
+  }
+}
+
+/// Defines a parameter that is used to provide configuration details for the
+/// component.
+class ComponentParameterDetail {
+  /// The name of this input parameter.
+  final String name;
+
+  /// The type of input this parameter provides. The currently supported value is
+  /// "string".
+  final String type;
+
+  /// The default value of this parameter if no input is provided.
+  final List<String>? defaultValue;
+
+  /// Describes this parameter.
+  final String? description;
+
+  ComponentParameterDetail({
+    required this.name,
+    required this.type,
+    this.defaultValue,
+    this.description,
+  });
+  factory ComponentParameterDetail.fromJson(Map<String, dynamic> json) {
+    return ComponentParameterDetail(
+      name: json['name'] as String,
+      type: json['type'] as String,
+      defaultValue: (json['defaultValue'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      description: json['description'] as String?,
+    );
+  }
+}
+
+/// A group of fields that describe the current status of components that are no
+/// longer active.
+class ComponentState {
+  /// Describes how or why the component changed state.
+  final String? reason;
+
+  /// The current state of the component.
+  final ComponentStatus? status;
+
+  ComponentState({
+    this.reason,
+    this.status,
+  });
+  factory ComponentState.fromJson(Map<String, dynamic> json) {
+    return ComponentState(
+      reason: json['reason'] as String?,
+      status: (json['status'] as String?)?.toComponentStatus(),
+    );
+  }
+}
+
+enum ComponentStatus {
+  deprecated,
+}
+
+extension on ComponentStatus {
+  String toValue() {
+    switch (this) {
+      case ComponentStatus.deprecated:
+        return 'DEPRECATED';
+    }
+  }
+}
+
+extension on String {
+  ComponentStatus toComponentStatus() {
+    switch (this) {
+      case 'DEPRECATED':
+        return ComponentStatus.deprecated;
+    }
+    throw Exception('$this is not known in enum ComponentStatus');
+  }
+}
+
 /// A high-level summary of a component.
 class ComponentSummary {
   /// The Amazon Resource Name (ARN) of the component.
@@ -3029,9 +3724,12 @@ class ComponentSummary {
   /// The platform of the component.
   final Platform? platform;
 
+  /// Describes the current status of the component.
+  final ComponentState? state;
+
   /// The operating system (OS) version supported by the component. If the OS
-  /// information is available, a prefix match is performed against the parent
-  /// image OS version during image recipe creation.
+  /// information is available, a prefix match is performed against the base image
+  /// OS version during image recipe creation.
   final List<String>? supportedOsVersions;
 
   /// The tags associated with the component.
@@ -3052,6 +3750,7 @@ class ComponentSummary {
     this.name,
     this.owner,
     this.platform,
+    this.state,
     this.supportedOsVersions,
     this.tags,
     this.type,
@@ -3066,6 +3765,9 @@ class ComponentSummary {
       name: json['name'] as String?,
       owner: json['owner'] as String?,
       platform: (json['platform'] as String?)?.toPlatform(),
+      state: json['state'] != null
+          ? ComponentState.fromJson(json['state'] as Map<String, dynamic>)
+          : null,
       supportedOsVersions: (json['supportedOsVersions'] as List?)
           ?.whereNotNull()
           .map((e) => e as String)
@@ -3106,9 +3808,27 @@ extension on String {
   }
 }
 
-/// A high-level overview of a component semantic version.
+/// The defining characteristics of a specific version of an Amazon Web Services
+/// TOE component.
 class ComponentVersion {
   /// The Amazon Resource Name (ARN) of the component.
+  /// <note>
+  /// Semantic versioning is included in each object's Amazon Resource Name (ARN),
+  /// at the level that applies to that object as follows:
+  /// <ol>
+  /// <li>
+  /// Versionless ARNs and Name ARNs do not include specific values in any of the
+  /// nodes. The nodes are either left off entirely, or they are specified as
+  /// wildcards, for example: x.x.x.
+  /// </li>
+  /// <li>
+  /// Version ARNs have only the first three nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;
+  /// </li>
+  /// <li>
+  /// Build version ARNs have all four nodes, and point to a specific build for a
+  /// specific version of an object.
+  /// </li> </ol> </note>
   final String? arn;
 
   /// The date that the component was created.
@@ -3126,9 +3846,9 @@ class ComponentVersion {
   /// The platform of the component.
   final Platform? platform;
 
-  /// The operating system (OS) version supported by the component. If the OS
-  /// information is available, a prefix match is performed against the parent
-  /// image OS version during image recipe creation.
+  /// he operating system (OS) version supported by the component. If the OS
+  /// information is available, a prefix match is performed against the base image
+  /// OS version during image recipe creation.
   final List<String>? supportedOsVersions;
 
   /// The type of the component denotes whether the component is used to build the
@@ -3136,6 +3856,26 @@ class ComponentVersion {
   final ComponentType? type;
 
   /// The semantic version of the component.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or 1073741823
+  /// for each node. Image Builder automatically assigns the build number to the
+  /// fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example, you
+  /// might choose a software version pattern, such as 1.0.0, or a date, such as
+  /// 2021.01.01.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to use
+  /// wildcards (x) to specify the most recent versions or nodes when selecting
+  /// the base image or components for your recipe. When you use a wildcard in any
+  /// node, all nodes to the right of the first wildcard must also be wildcards.
+  /// </note>
   final String? version;
 
   ComponentVersion({
@@ -3236,6 +3976,23 @@ class ContainerDistributionConfiguration {
 /// A container recipe.
 class ContainerRecipe {
   /// The Amazon Resource Name (ARN) of the container recipe.
+  /// <note>
+  /// Semantic versioning is included in each object's Amazon Resource Name (ARN),
+  /// at the level that applies to that object as follows:
+  /// <ol>
+  /// <li>
+  /// Versionless ARNs and Name ARNs do not include specific values in any of the
+  /// nodes. The nodes are either left off entirely, or they are specified as
+  /// wildcards, for example: x.x.x.
+  /// </li>
+  /// <li>
+  /// Version ARNs have only the first three nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;
+  /// </li>
+  /// <li>
+  /// Build version ARNs have all four nodes, and point to a specific build for a
+  /// specific version of an object.
+  /// </li> </ol> </note>
   final String? arn;
 
   /// Components for build and test that are included in the container recipe.
@@ -3260,6 +4017,10 @@ class ContainerRecipe {
   /// A flag that indicates if the target container is encrypted.
   final bool? encrypted;
 
+  /// A group of options that can be used to configure an instance for building
+  /// and testing container images.
+  final InstanceConfiguration? instanceConfiguration;
+
   /// Identifies which KMS key is used to encrypt the container image for
   /// distribution to the target Region.
   final String? kmsKeyId;
@@ -3270,7 +4031,7 @@ class ContainerRecipe {
   /// The owner of the container recipe.
   final String? owner;
 
-  /// The source image for the container recipe.
+  /// The base image for the container recipe.
   final String? parentImage;
 
   /// The system platform for the container, such as Windows or Linux.
@@ -3282,8 +4043,27 @@ class ContainerRecipe {
   /// The destination repository for the container image.
   final TargetContainerRepository? targetRepository;
 
-  /// The semantic version of the container recipe
-  /// (&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;).
+  /// The semantic version of the container recipe.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or 1073741823
+  /// for each node. Image Builder automatically assigns the build number to the
+  /// fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example, you
+  /// might choose a software version pattern, such as 1.0.0, or a date, such as
+  /// 2021.01.01.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to use
+  /// wildcards (x) to specify the most recent versions or nodes when selecting
+  /// the base image or components for your recipe. When you use a wildcard in any
+  /// node, all nodes to the right of the first wildcard must also be wildcards.
+  /// </note>
   final String? version;
 
   /// The working directory for use during build and test workflows.
@@ -3297,6 +4077,7 @@ class ContainerRecipe {
     this.description,
     this.dockerfileTemplateData,
     this.encrypted,
+    this.instanceConfiguration,
     this.kmsKeyId,
     this.name,
     this.owner,
@@ -3320,6 +4101,10 @@ class ContainerRecipe {
       description: json['description'] as String?,
       dockerfileTemplateData: json['dockerfileTemplateData'] as String?,
       encrypted: json['encrypted'] as bool?,
+      instanceConfiguration: json['instanceConfiguration'] != null
+          ? InstanceConfiguration.fromJson(
+              json['instanceConfiguration'] as Map<String, dynamic>)
+          : null,
       kmsKeyId: json['kmsKeyId'] as String?,
       name: json['name'] as String?,
       owner: json['owner'] as String?,
@@ -3354,7 +4139,7 @@ class ContainerRecipeSummary {
   /// The owner of the container recipe.
   final String? owner;
 
-  /// The source image for the container recipe.
+  /// The base image for the container recipe.
   final String? parentImage;
 
   /// The system platform for the container, such as Windows or Linux.
@@ -3713,7 +4498,8 @@ class DeleteImageRecipeResponse {
 }
 
 class DeleteImageResponse {
-  /// The Amazon Resource Name (ARN) of the image that was deleted.
+  /// The Amazon Resource Name (ARN) of the Image Builder image resource that was
+  /// deleted.
   final String? imageBuildVersionArn;
 
   /// The request ID that uniquely identifies this request.
@@ -3753,27 +4539,74 @@ class DeleteInfrastructureConfigurationResponse {
   }
 }
 
+enum DiskImageFormat {
+  vmdk,
+  raw,
+  vhd,
+}
+
+extension on DiskImageFormat {
+  String toValue() {
+    switch (this) {
+      case DiskImageFormat.vmdk:
+        return 'VMDK';
+      case DiskImageFormat.raw:
+        return 'RAW';
+      case DiskImageFormat.vhd:
+        return 'VHD';
+    }
+  }
+}
+
+extension on String {
+  DiskImageFormat toDiskImageFormat() {
+    switch (this) {
+      case 'VMDK':
+        return DiskImageFormat.vmdk;
+      case 'RAW':
+        return DiskImageFormat.raw;
+      case 'VHD':
+        return DiskImageFormat.vhd;
+    }
+    throw Exception('$this is not known in enum DiskImageFormat');
+  }
+}
+
 /// Defines the settings for a specific Region.
 class Distribution {
   /// The target Region.
   final String region;
 
-  /// The specific AMI settings (for example, launch permissions, AMI tags).
+  /// The specific AMI settings; for example, launch permissions or AMI tags.
   final AmiDistributionConfiguration? amiDistributionConfiguration;
 
   /// Container distribution settings for encryption, licensing, and sharing in a
   /// specific Region.
   final ContainerDistributionConfiguration? containerDistributionConfiguration;
 
+  /// The Windows faster-launching configurations to use for AMI distribution.
+  final List<FastLaunchConfiguration>? fastLaunchConfigurations;
+
+  /// A group of launchTemplateConfiguration settings that apply to image
+  /// distribution for specified accounts.
+  final List<LaunchTemplateConfiguration>? launchTemplateConfigurations;
+
   /// The License Manager Configuration to associate with the AMI in the specified
   /// Region.
   final List<String>? licenseConfigurationArns;
+
+  /// Configure export settings to deliver disk images created from your image
+  /// build, using a file format that is compatible with your VMs in that Region.
+  final S3ExportConfiguration? s3ExportConfiguration;
 
   Distribution({
     required this.region,
     this.amiDistributionConfiguration,
     this.containerDistributionConfiguration,
+    this.fastLaunchConfigurations,
+    this.launchTemplateConfigurations,
     this.licenseConfigurationArns,
+    this.s3ExportConfiguration,
   });
   factory Distribution.fromJson(Map<String, dynamic> json) {
     return Distribution(
@@ -3788,10 +4621,25 @@ class Distribution {
                   json['containerDistributionConfiguration']
                       as Map<String, dynamic>)
               : null,
+      fastLaunchConfigurations: (json['fastLaunchConfigurations'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              FastLaunchConfiguration.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      launchTemplateConfigurations: (json['launchTemplateConfigurations']
+              as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              LaunchTemplateConfiguration.fromJson(e as Map<String, dynamic>))
+          .toList(),
       licenseConfigurationArns: (json['licenseConfigurationArns'] as List?)
           ?.whereNotNull()
           .map((e) => e as String)
           .toList(),
+      s3ExportConfiguration: json['s3ExportConfiguration'] != null
+          ? S3ExportConfiguration.fromJson(
+              json['s3ExportConfiguration'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -3800,7 +4648,10 @@ class Distribution {
     final amiDistributionConfiguration = this.amiDistributionConfiguration;
     final containerDistributionConfiguration =
         this.containerDistributionConfiguration;
+    final fastLaunchConfigurations = this.fastLaunchConfigurations;
+    final launchTemplateConfigurations = this.launchTemplateConfigurations;
     final licenseConfigurationArns = this.licenseConfigurationArns;
+    final s3ExportConfiguration = this.s3ExportConfiguration;
     return {
       'region': region,
       if (amiDistributionConfiguration != null)
@@ -3808,8 +4659,14 @@ class Distribution {
       if (containerDistributionConfiguration != null)
         'containerDistributionConfiguration':
             containerDistributionConfiguration,
+      if (fastLaunchConfigurations != null)
+        'fastLaunchConfigurations': fastLaunchConfigurations,
+      if (launchTemplateConfigurations != null)
+        'launchTemplateConfigurations': launchTemplateConfigurations,
       if (licenseConfigurationArns != null)
         'licenseConfigurationArns': licenseConfigurationArns,
+      if (s3ExportConfiguration != null)
+        's3ExportConfiguration': s3ExportConfiguration,
     };
   }
 }
@@ -3831,7 +4688,8 @@ class DistributionConfiguration {
   /// The description of the distribution configuration.
   final String? description;
 
-  /// The distributions of the distribution configuration.
+  /// The distribution objects that apply Region-specific settings for the
+  /// deployment of the image to targeted Regions.
   final List<Distribution>? distributions;
 
   /// The name of the distribution configuration.
@@ -3934,6 +4792,10 @@ class EbsInstanceBlockDeviceSpecification {
   /// The snapshot that defines the device contents.
   final String? snapshotId;
 
+  /// <b>For GP3 volumes only</b> – The throughput in MiB/s that the volume
+  /// supports.
+  final int? throughput;
+
   /// Use to override the device's volume size.
   final int? volumeSize;
 
@@ -3946,6 +4808,7 @@ class EbsInstanceBlockDeviceSpecification {
     this.iops,
     this.kmsKeyId,
     this.snapshotId,
+    this.throughput,
     this.volumeSize,
     this.volumeType,
   });
@@ -3957,6 +4820,7 @@ class EbsInstanceBlockDeviceSpecification {
       iops: json['iops'] as int?,
       kmsKeyId: json['kmsKeyId'] as String?,
       snapshotId: json['snapshotId'] as String?,
+      throughput: json['throughput'] as int?,
       volumeSize: json['volumeSize'] as int?,
       volumeType: (json['volumeType'] as String?)?.toEbsVolumeType(),
     );
@@ -3968,6 +4832,7 @@ class EbsInstanceBlockDeviceSpecification {
     final iops = this.iops;
     final kmsKeyId = this.kmsKeyId;
     final snapshotId = this.snapshotId;
+    final throughput = this.throughput;
     final volumeSize = this.volumeSize;
     final volumeType = this.volumeType;
     return {
@@ -3977,6 +4842,7 @@ class EbsInstanceBlockDeviceSpecification {
       if (iops != null) 'iops': iops,
       if (kmsKeyId != null) 'kmsKeyId': kmsKeyId,
       if (snapshotId != null) 'snapshotId': snapshotId,
+      if (throughput != null) 'throughput': throughput,
       if (volumeSize != null) 'volumeSize': volumeSize,
       if (volumeType != null) 'volumeType': volumeType.toValue(),
     };
@@ -3988,6 +4854,7 @@ enum EbsVolumeType {
   io1,
   io2,
   gp2,
+  gp3,
   sc1,
   st1,
 }
@@ -4003,6 +4870,8 @@ extension on EbsVolumeType {
         return 'io2';
       case EbsVolumeType.gp2:
         return 'gp2';
+      case EbsVolumeType.gp3:
+        return 'gp3';
       case EbsVolumeType.sc1:
         return 'sc1';
       case EbsVolumeType.st1:
@@ -4022,12 +4891,148 @@ extension on String {
         return EbsVolumeType.io2;
       case 'gp2':
         return EbsVolumeType.gp2;
+      case 'gp3':
+        return EbsVolumeType.gp3;
       case 'sc1':
         return EbsVolumeType.sc1;
       case 'st1':
         return EbsVolumeType.st1;
     }
     throw Exception('$this is not known in enum EbsVolumeType');
+  }
+}
+
+/// Define and configure faster launching for output Windows AMIs.
+class FastLaunchConfiguration {
+  /// A Boolean that represents the current state of faster launching for the
+  /// Windows AMI. Set to <code>true</code> to start using Windows faster
+  /// launching, or <code>false</code> to stop using it.
+  final bool enabled;
+
+  /// The owner account ID for the fast-launch enabled Windows AMI.
+  final String? accountId;
+
+  /// The launch template that the fast-launch enabled Windows AMI uses when it
+  /// launches Windows instances to create pre-provisioned snapshots.
+  final FastLaunchLaunchTemplateSpecification? launchTemplate;
+
+  /// The maximum number of parallel instances that are launched for creating
+  /// resources.
+  final int? maxParallelLaunches;
+
+  /// Configuration settings for managing the number of snapshots that are created
+  /// from pre-provisioned instances for the Windows AMI when faster launching is
+  /// enabled.
+  final FastLaunchSnapshotConfiguration? snapshotConfiguration;
+
+  FastLaunchConfiguration({
+    required this.enabled,
+    this.accountId,
+    this.launchTemplate,
+    this.maxParallelLaunches,
+    this.snapshotConfiguration,
+  });
+  factory FastLaunchConfiguration.fromJson(Map<String, dynamic> json) {
+    return FastLaunchConfiguration(
+      enabled: json['enabled'] as bool,
+      accountId: json['accountId'] as String?,
+      launchTemplate: json['launchTemplate'] != null
+          ? FastLaunchLaunchTemplateSpecification.fromJson(
+              json['launchTemplate'] as Map<String, dynamic>)
+          : null,
+      maxParallelLaunches: json['maxParallelLaunches'] as int?,
+      snapshotConfiguration: json['snapshotConfiguration'] != null
+          ? FastLaunchSnapshotConfiguration.fromJson(
+              json['snapshotConfiguration'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final enabled = this.enabled;
+    final accountId = this.accountId;
+    final launchTemplate = this.launchTemplate;
+    final maxParallelLaunches = this.maxParallelLaunches;
+    final snapshotConfiguration = this.snapshotConfiguration;
+    return {
+      'enabled': enabled,
+      if (accountId != null) 'accountId': accountId,
+      if (launchTemplate != null) 'launchTemplate': launchTemplate,
+      if (maxParallelLaunches != null)
+        'maxParallelLaunches': maxParallelLaunches,
+      if (snapshotConfiguration != null)
+        'snapshotConfiguration': snapshotConfiguration,
+    };
+  }
+}
+
+/// Identifies the launch template that the associated Windows AMI uses for
+/// launching an instance when faster launching is enabled.
+/// <note>
+/// You can specify either the <code>launchTemplateName</code> or the
+/// <code>launchTemplateId</code>, but not both.
+/// </note>
+class FastLaunchLaunchTemplateSpecification {
+  /// The ID of the launch template to use for faster launching for a Windows AMI.
+  final String? launchTemplateId;
+
+  /// The name of the launch template to use for faster launching for a Windows
+  /// AMI.
+  final String? launchTemplateName;
+
+  /// The version of the launch template to use for faster launching for a Windows
+  /// AMI.
+  final String? launchTemplateVersion;
+
+  FastLaunchLaunchTemplateSpecification({
+    this.launchTemplateId,
+    this.launchTemplateName,
+    this.launchTemplateVersion,
+  });
+  factory FastLaunchLaunchTemplateSpecification.fromJson(
+      Map<String, dynamic> json) {
+    return FastLaunchLaunchTemplateSpecification(
+      launchTemplateId: json['launchTemplateId'] as String?,
+      launchTemplateName: json['launchTemplateName'] as String?,
+      launchTemplateVersion: json['launchTemplateVersion'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final launchTemplateId = this.launchTemplateId;
+    final launchTemplateName = this.launchTemplateName;
+    final launchTemplateVersion = this.launchTemplateVersion;
+    return {
+      if (launchTemplateId != null) 'launchTemplateId': launchTemplateId,
+      if (launchTemplateName != null) 'launchTemplateName': launchTemplateName,
+      if (launchTemplateVersion != null)
+        'launchTemplateVersion': launchTemplateVersion,
+    };
+  }
+}
+
+/// Configuration settings for creating and managing pre-provisioned snapshots
+/// for a fast-launch enabled Windows AMI.
+class FastLaunchSnapshotConfiguration {
+  /// The number of pre-provisioned snapshots to keep on hand for a fast-launch
+  /// enabled Windows AMI.
+  final int? targetResourceCount;
+
+  FastLaunchSnapshotConfiguration({
+    this.targetResourceCount,
+  });
+  factory FastLaunchSnapshotConfiguration.fromJson(Map<String, dynamic> json) {
+    return FastLaunchSnapshotConfiguration(
+      targetResourceCount: json['targetResourceCount'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final targetResourceCount = this.targetResourceCount;
+    return {
+      if (targetResourceCount != null)
+        'targetResourceCount': targetResourceCount,
+    };
   }
 }
 
@@ -4285,12 +5290,50 @@ class GetInfrastructureConfigurationResponse {
   }
 }
 
-/// An image build version.
+/// An Image Builder image. You must specify exactly one recipe for the image –
+/// either a container recipe (<code>containerRecipe</code>), which creates a
+/// container image, or an image recipe (<code>imageRecipe</code>), which
+/// creates an AMI.
 class Image {
   /// The Amazon Resource Name (ARN) of the image.
+  /// <note>
+  /// Semantic versioning is included in each object's Amazon Resource Name (ARN),
+  /// at the level that applies to that object as follows:
+  /// <ol>
+  /// <li>
+  /// Versionless ARNs and Name ARNs do not include specific values in any of the
+  /// nodes. The nodes are either left off entirely, or they are specified as
+  /// wildcards, for example: x.x.x.
+  /// </li>
+  /// <li>
+  /// Version ARNs have only the first three nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;
+  /// </li>
+  /// <li>
+  /// Build version ARNs have all four nodes, and point to a specific build for a
+  /// specific version of an object.
+  /// </li> </ol> </note>
   final String? arn;
 
-  /// The container recipe used to create the container image type.
+  /// Indicates the type of build that created this image. The build can be
+  /// initiated in the following ways:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>USER_INITIATED</b> – A manual pipeline build request.
+  /// </li>
+  /// <li>
+  /// <b>SCHEDULED</b> – A pipeline build initiated by a cron expression in the
+  /// Image Builder pipeline, or from EventBridge.
+  /// </li>
+  /// <li>
+  /// <b>IMPORT</b> – A VM import created the image to use as the base image for
+  /// the recipe.
+  /// </li>
+  /// </ul>
+  final BuildType? buildType;
+
+  /// The recipe that is used to create an Image Builder container image.
   final ContainerRecipe? containerRecipe;
 
   /// The date on which this image was created.
@@ -4344,10 +5387,31 @@ class Image {
   final ImageType? type;
 
   /// The semantic version of the image.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or 1073741823
+  /// for each node. Image Builder automatically assigns the build number to the
+  /// fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example, you
+  /// might choose a software version pattern, such as 1.0.0, or a date, such as
+  /// 2021.01.01.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to use
+  /// wildcards (x) to specify the most recent versions or nodes when selecting
+  /// the base image or components for your recipe. When you use a wildcard in any
+  /// node, all nodes to the right of the first wildcard must also be wildcards.
+  /// </note>
   final String? version;
 
   Image({
     this.arn,
+    this.buildType,
     this.containerRecipe,
     this.dateCreated,
     this.distributionConfiguration,
@@ -4369,6 +5433,7 @@ class Image {
   factory Image.fromJson(Map<String, dynamic> json) {
     return Image(
       arn: json['arn'] as String?,
+      buildType: (json['buildType'] as String?)?.toBuildType(),
       containerRecipe: json['containerRecipe'] != null
           ? ContainerRecipe.fromJson(
               json['containerRecipe'] as Map<String, dynamic>)
@@ -4407,6 +5472,27 @@ class Image {
           ?.map((k, e) => MapEntry(k, e as String)),
       type: (json['type'] as String?)?.toImageType(),
       version: json['version'] as String?,
+    );
+  }
+}
+
+/// Represents a package installed on an Image Builder image.
+class ImagePackage {
+  /// The name of the package as reported to the operating system package manager.
+  final String? packageName;
+
+  /// The version of the package as reported to the operating system package
+  /// manager.
+  final String? packageVersion;
+
+  ImagePackage({
+    this.packageName,
+    this.packageVersion,
+  });
+  factory ImagePackage.fromJson(Map<String, dynamic> json) {
+    return ImagePackage(
+      packageName: json['packageName'] as String?,
+      packageVersion: json['packageVersion'] as String?,
     );
   }
 }
@@ -4524,6 +5610,12 @@ class ImagePipeline {
 
 /// An image recipe.
 class ImageRecipe {
+  /// Before you create a new AMI, Image Builder launches temporary Amazon EC2
+  /// instances to build and test your image configuration. Instance configuration
+  /// adds a layer of control over those instances. You can define settings and
+  /// add scripts to run when an instance is launched from your AMI.
+  final AdditionalInstanceConfiguration? additionalInstanceConfiguration;
+
   /// The Amazon Resource Name (ARN) of the image recipe.
   final String? arn;
 
@@ -4545,7 +5637,7 @@ class ImageRecipe {
   /// The owner of the image recipe.
   final String? owner;
 
-  /// The parent image of the image recipe.
+  /// The base image of the image recipe.
   final String? parentImage;
 
   /// The platform of the image recipe.
@@ -4565,6 +5657,7 @@ class ImageRecipe {
   final String? workingDirectory;
 
   ImageRecipe({
+    this.additionalInstanceConfiguration,
     this.arn,
     this.blockDeviceMappings,
     this.components,
@@ -4581,6 +5674,12 @@ class ImageRecipe {
   });
   factory ImageRecipe.fromJson(Map<String, dynamic> json) {
     return ImageRecipe(
+      additionalInstanceConfiguration:
+          json['additionalInstanceConfiguration'] != null
+              ? AdditionalInstanceConfiguration.fromJson(
+                  json['additionalInstanceConfiguration']
+                      as Map<String, dynamic>)
+              : null,
       arn: json['arn'] as String?,
       blockDeviceMappings: (json['blockDeviceMappings'] as List?)
           ?.whereNotNull()
@@ -4621,7 +5720,7 @@ class ImageRecipeSummary {
   /// The owner of the image recipe.
   final String? owner;
 
-  /// The parent image of the image recipe.
+  /// The base image of the image recipe.
   final String? parentImage;
 
   /// The platform of the image recipe.
@@ -4751,6 +5850,24 @@ class ImageSummary {
   /// The Amazon Resource Name (ARN) of the image.
   final String? arn;
 
+  /// Indicates the type of build that created this image. The build can be
+  /// initiated in the following ways:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>USER_INITIATED</b> – A manual pipeline build request.
+  /// </li>
+  /// <li>
+  /// <b>SCHEDULED</b> – A pipeline build initiated by a cron expression in the
+  /// Image Builder pipeline, or from EventBridge.
+  /// </li>
+  /// <li>
+  /// <b>IMPORT</b> – A VM import created the image to use as the base image for
+  /// the recipe.
+  /// </li>
+  /// </ul>
+  final BuildType? buildType;
+
   /// The date on which this image was created.
   final String? dateCreated;
 
@@ -4784,6 +5901,7 @@ class ImageSummary {
 
   ImageSummary({
     this.arn,
+    this.buildType,
     this.dateCreated,
     this.name,
     this.osVersion,
@@ -4798,6 +5916,7 @@ class ImageSummary {
   factory ImageSummary.fromJson(Map<String, dynamic> json) {
     return ImageSummary(
       arn: json['arn'] as String?,
+      buildType: (json['buildType'] as String?)?.toBuildType(),
       dateCreated: json['dateCreated'] as String?,
       name: json['name'] as String?,
       osVersion: json['osVersion'] as String?,
@@ -4818,9 +5937,13 @@ class ImageSummary {
   }
 }
 
-/// Image tests configuration.
+/// Configure image tests for your pipeline build. Tests run after building the
+/// image, to verify that the AMI or container image is valid before
+/// distributing it.
 class ImageTestsConfiguration {
-  /// Defines if tests should be executed when building this image.
+  /// Determines if tests should run after building the image. Image Builder
+  /// defaults to enable tests to run following the image build, before image
+  /// distribution.
   final bool? imageTestsEnabled;
 
   /// The maximum time in minutes that tests are permitted to run.
@@ -4875,35 +5998,95 @@ extension on String {
   }
 }
 
-/// An image semantic version.
+/// The defining characteristics of a specific version of an Image Builder
+/// image.
 class ImageVersion {
-  /// The Amazon Resource Name (ARN) of the image semantic version.
+  /// The Amazon Resource Name (ARN) of a specific version of an Image Builder
+  /// image.
+  /// <note>
+  /// Semantic versioning is included in each object's Amazon Resource Name (ARN),
+  /// at the level that applies to that object as follows:
+  /// <ol>
+  /// <li>
+  /// Versionless ARNs and Name ARNs do not include specific values in any of the
+  /// nodes. The nodes are either left off entirely, or they are specified as
+  /// wildcards, for example: x.x.x.
+  /// </li>
+  /// <li>
+  /// Version ARNs have only the first three nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;
+  /// </li>
+  /// <li>
+  /// Build version ARNs have all four nodes, and point to a specific build for a
+  /// specific version of an object.
+  /// </li> </ol> </note>
   final String? arn;
 
-  /// The date at which this image semantic version was created.
+  /// Indicates the type of build that created this image. The build can be
+  /// initiated in the following ways:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>USER_INITIATED</b> – A manual pipeline build request.
+  /// </li>
+  /// <li>
+  /// <b>SCHEDULED</b> – A pipeline build initiated by a cron expression in the
+  /// Image Builder pipeline, or from EventBridge.
+  /// </li>
+  /// <li>
+  /// <b>IMPORT</b> – A VM import created the image to use as the base image for
+  /// the recipe.
+  /// </li>
+  /// </ul>
+  final BuildType? buildType;
+
+  /// The date on which this specific version of the Image Builder image was
+  /// created.
   final String? dateCreated;
 
-  /// The name of the image semantic version.
+  /// The name of this specific version of an Image Builder image.
   final String? name;
 
-  /// The operating system version of the instance. For example, Amazon Linux 2,
-  /// Ubuntu 18, or Microsoft Windows Server 2019.
+  /// The operating system version of the Amazon EC2 build instance. For example,
+  /// Amazon Linux 2, Ubuntu 18, or Microsoft Windows Server 2019.
   final String? osVersion;
 
-  /// The owner of the image semantic version.
+  /// The owner of the image version.
   final String? owner;
 
-  /// The platform of the image semantic version.
+  /// The platform of the image version, for example "Windows" or "Linux".
   final Platform? platform;
 
-  /// Specifies whether this is an AMI or container image.
+  /// Specifies whether this image is an AMI or a container image.
   final ImageType? type;
 
-  /// The semantic version of the image semantic version.
+  /// Details for a specific version of an Image Builder image. This version
+  /// follows the semantic version syntax.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Assignment:</b> For the first three nodes you can assign any positive
+  /// integer value, including zero, with an upper limit of 2^30-1, or 1073741823
+  /// for each node. Image Builder automatically assigns the build number to the
+  /// fourth node.
+  ///
+  /// <b>Patterns:</b> You can use any numeric pattern that adheres to the
+  /// assignment requirements for the nodes that you can assign. For example, you
+  /// might choose a software version pattern, such as 1.0.0, or a date, such as
+  /// 2021.01.01.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to use
+  /// wildcards (x) to specify the most recent versions or nodes when selecting
+  /// the base image or components for your recipe. When you use a wildcard in any
+  /// node, all nodes to the right of the first wildcard must also be wildcards.
+  /// </note>
   final String? version;
 
   ImageVersion({
     this.arn,
+    this.buildType,
     this.dateCreated,
     this.name,
     this.osVersion,
@@ -4915,6 +6098,7 @@ class ImageVersion {
   factory ImageVersion.fromJson(Map<String, dynamic> json) {
     return ImageVersion(
       arn: json['arn'] as String?,
+      buildType: (json['buildType'] as String?)?.toBuildType(),
       dateCreated: json['dateCreated'] as String?,
       name: json['name'] as String?,
       osVersion: json['osVersion'] as String?,
@@ -4950,6 +6134,32 @@ class ImportComponentResponse {
   }
 }
 
+class ImportVmImageResponse {
+  /// The idempotency token that was used for this request.
+  final String? clientToken;
+
+  /// The Amazon Resource Name (ARN) of the AMI that was created during the VM
+  /// import process. This AMI is used as the base image for the recipe that
+  /// imported the VM.
+  final String? imageArn;
+
+  /// The request ID that uniquely identifies this request.
+  final String? requestId;
+
+  ImportVmImageResponse({
+    this.clientToken,
+    this.imageArn,
+    this.requestId,
+  });
+  factory ImportVmImageResponse.fromJson(Map<String, dynamic> json) {
+    return ImportVmImageResponse(
+      clientToken: json['clientToken'] as String?,
+      imageArn: json['imageArn'] as String?,
+      requestId: json['requestId'] as String?,
+    );
+  }
+}
+
 /// Details of the infrastructure configuration.
 class InfrastructureConfiguration {
   /// The Amazon Resource Name (ARN) of the infrastructure configuration.
@@ -4964,13 +6174,16 @@ class InfrastructureConfiguration {
   /// The description of the infrastructure configuration.
   final String? description;
 
+  /// The instance metadata option settings for the infrastructure configuration.
+  final InstanceMetadataOptions? instanceMetadataOptions;
+
   /// The instance profile of the infrastructure configuration.
   final String? instanceProfileName;
 
   /// The instance types of the infrastructure configuration.
   final List<String>? instanceTypes;
 
-  /// The EC2 key pair of the infrastructure configuration.
+  /// The Amazon EC2 key pair of the infrastructure configuration.
   final String? keyPair;
 
   /// The logging configuration of the infrastructure configuration.
@@ -4985,8 +6198,14 @@ class InfrastructureConfiguration {
   /// The security group IDs of the infrastructure configuration.
   final List<String>? securityGroupIds;
 
-  /// The SNS topic Amazon Resource Name (ARN) of the infrastructure
-  /// configuration.
+  /// The Amazon Resource Name (ARN) for the SNS topic to which we send image
+  /// build event notifications.
+  /// <note>
+  /// EC2 Image Builder is unable to send notifications to SNS topics that are
+  /// encrypted using keys from other accounts. The key that is used to encrypt
+  /// the SNS topic must reside in the account that the Image Builder service runs
+  /// under.
+  /// </note>
   final String? snsTopicArn;
 
   /// The subnet ID of the infrastructure configuration.
@@ -5004,6 +6223,7 @@ class InfrastructureConfiguration {
     this.dateCreated,
     this.dateUpdated,
     this.description,
+    this.instanceMetadataOptions,
     this.instanceProfileName,
     this.instanceTypes,
     this.keyPair,
@@ -5022,6 +6242,10 @@ class InfrastructureConfiguration {
       dateCreated: json['dateCreated'] as String?,
       dateUpdated: json['dateUpdated'] as String?,
       description: json['description'] as String?,
+      instanceMetadataOptions: json['instanceMetadataOptions'] != null
+          ? InstanceMetadataOptions.fromJson(
+              json['instanceMetadataOptions'] as Map<String, dynamic>)
+          : null,
       instanceProfileName: json['instanceProfileName'] as String?,
       instanceTypes: (json['instanceTypes'] as List?)
           ?.whereNotNull()
@@ -5047,7 +6271,7 @@ class InfrastructureConfiguration {
   }
 }
 
-/// The infrastructure used when building EC2 AMIs.
+/// The infrastructure used when building Amazon EC2 AMIs.
 class InfrastructureConfigurationSummary {
   /// The Amazon Resource Name (ARN) of the infrastructure configuration.
   final String? arn;
@@ -5060,6 +6284,12 @@ class InfrastructureConfigurationSummary {
 
   /// The description of the infrastructure configuration.
   final String? description;
+
+  /// The instance profile of the infrastructure configuration.
+  final String? instanceProfileName;
+
+  /// The instance types of the infrastructure configuration.
+  final List<String>? instanceTypes;
 
   /// The name of the infrastructure configuration.
   final String? name;
@@ -5075,6 +6305,8 @@ class InfrastructureConfigurationSummary {
     this.dateCreated,
     this.dateUpdated,
     this.description,
+    this.instanceProfileName,
+    this.instanceTypes,
     this.name,
     this.resourceTags,
     this.tags,
@@ -5086,6 +6318,11 @@ class InfrastructureConfigurationSummary {
       dateCreated: json['dateCreated'] as String?,
       dateUpdated: json['dateUpdated'] as String?,
       description: json['description'] as String?,
+      instanceProfileName: json['instanceProfileName'] as String?,
+      instanceTypes: (json['instanceTypes'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       name: json['name'] as String?,
       resourceTags: (json['resourceTags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -5103,7 +6340,7 @@ class InstanceBlockDeviceMapping {
   /// Use to manage Amazon EBS-specific configuration for this mapping.
   final EbsInstanceBlockDeviceSpecification? ebs;
 
-  /// Use to remove a mapping from the parent image.
+  /// Use to remove a mapping from the base image.
   final String? noDevice;
 
   /// Use to manage instance ephemeral devices.
@@ -5141,28 +6378,143 @@ class InstanceBlockDeviceMapping {
   }
 }
 
+/// Defines a custom base AMI and block device mapping configurations of an
+/// instance used for building and testing container images.
+class InstanceConfiguration {
+  /// Defines the block devices to attach for building an instance from this Image
+  /// Builder AMI.
+  final List<InstanceBlockDeviceMapping>? blockDeviceMappings;
+
+  /// The AMI ID to use as the base image for a container build and test instance.
+  /// If not specified, Image Builder will use the appropriate ECS-optimized AMI
+  /// as a base image.
+  final String? image;
+
+  InstanceConfiguration({
+    this.blockDeviceMappings,
+    this.image,
+  });
+  factory InstanceConfiguration.fromJson(Map<String, dynamic> json) {
+    return InstanceConfiguration(
+      blockDeviceMappings: (json['blockDeviceMappings'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              InstanceBlockDeviceMapping.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      image: json['image'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final blockDeviceMappings = this.blockDeviceMappings;
+    final image = this.image;
+    return {
+      if (blockDeviceMappings != null)
+        'blockDeviceMappings': blockDeviceMappings,
+      if (image != null) 'image': image,
+    };
+  }
+}
+
+/// The instance metadata options that apply to the HTTP requests that pipeline
+/// builds use to launch EC2 build and test instances. For more information
+/// about instance metadata options, see <a
+/// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html">Configure
+/// the instance metadata options</a> in the <i> <i>Amazon EC2 User Guide</i>
+/// </i> for Linux instances, or <a
+/// href="https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/configuring-instance-metadata-options.html">Configure
+/// the instance metadata options</a> in the <i> <i>Amazon EC2 Windows Guide</i>
+/// </i> for Windows instances.
+class InstanceMetadataOptions {
+  /// Limit the number of hops that an instance metadata request can traverse to
+  /// reach its destination.
+  final int? httpPutResponseHopLimit;
+
+  /// Indicates whether a signed token header is required for instance metadata
+  /// retrieval requests. The values affect the response as follows:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>required</b> – When you retrieve the IAM role credentials, version 2.0
+  /// credentials are returned in all cases.
+  /// </li>
+  /// <li>
+  /// <b>optional</b> – You can include a signed token header in your request to
+  /// retrieve instance metadata, or you can leave it out. If you include it,
+  /// version 2.0 credentials are returned for the IAM role. Otherwise, version
+  /// 1.0 credentials are returned.
+  /// </li>
+  /// </ul>
+  /// The default setting is <b>optional</b>.
+  final String? httpTokens;
+
+  InstanceMetadataOptions({
+    this.httpPutResponseHopLimit,
+    this.httpTokens,
+  });
+  factory InstanceMetadataOptions.fromJson(Map<String, dynamic> json) {
+    return InstanceMetadataOptions(
+      httpPutResponseHopLimit: json['httpPutResponseHopLimit'] as int?,
+      httpTokens: json['httpTokens'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final httpPutResponseHopLimit = this.httpPutResponseHopLimit;
+    final httpTokens = this.httpTokens;
+    return {
+      if (httpPutResponseHopLimit != null)
+        'httpPutResponseHopLimit': httpPutResponseHopLimit,
+      if (httpTokens != null) 'httpTokens': httpTokens,
+    };
+  }
+}
+
 /// Describes the configuration for a launch permission. The launch permission
 /// modification request is sent to the <a
-/// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyImageAttribute.html">EC2
-/// ModifyImageAttribute</a> API on behalf of the user for each Region they have
-/// selected to distribute the AMI. To make an AMI public, set the launch
+/// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyImageAttribute.html">Amazon
+/// EC2 ModifyImageAttribute</a> API on behalf of the user for each Region they
+/// have selected to distribute the AMI. To make an AMI public, set the launch
 /// permission authorized accounts to <code>all</code>. See the examples for
 /// making an AMI public at <a
-/// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyImageAttribute.html">EC2
-/// ModifyImageAttribute</a>.
+/// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_ModifyImageAttribute.html">Amazon
+/// EC2 ModifyImageAttribute</a>.
 class LaunchPermissionConfiguration {
+  /// The ARN for an Amazon Web Services Organization that you want to share your
+  /// AMI with. For more information, see <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html">What
+  /// is Organizations?</a>.
+  final List<String>? organizationArns;
+
+  /// The ARN for an Organizations organizational unit (OU) that you want to share
+  /// your AMI with. For more information about key concepts for Organizations,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html">Organizations
+  /// terminology and concepts</a>.
+  final List<String>? organizationalUnitArns;
+
   /// The name of the group.
   final List<String>? userGroups;
 
-  /// The AWS account ID.
+  /// The Amazon Web Services account ID.
   final List<String>? userIds;
 
   LaunchPermissionConfiguration({
+    this.organizationArns,
+    this.organizationalUnitArns,
     this.userGroups,
     this.userIds,
   });
   factory LaunchPermissionConfiguration.fromJson(Map<String, dynamic> json) {
     return LaunchPermissionConfiguration(
+      organizationArns: (json['organizationArns'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      organizationalUnitArns: (json['organizationalUnitArns'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       userGroups: (json['userGroups'] as List?)
           ?.whereNotNull()
           .map((e) => e as String)
@@ -5175,11 +6527,53 @@ class LaunchPermissionConfiguration {
   }
 
   Map<String, dynamic> toJson() {
+    final organizationArns = this.organizationArns;
+    final organizationalUnitArns = this.organizationalUnitArns;
     final userGroups = this.userGroups;
     final userIds = this.userIds;
     return {
+      if (organizationArns != null) 'organizationArns': organizationArns,
+      if (organizationalUnitArns != null)
+        'organizationalUnitArns': organizationalUnitArns,
       if (userGroups != null) 'userGroups': userGroups,
       if (userIds != null) 'userIds': userIds,
+    };
+  }
+}
+
+/// Identifies an Amazon EC2 launch template to use for a specific account.
+class LaunchTemplateConfiguration {
+  /// Identifies the Amazon EC2 launch template to use.
+  final String launchTemplateId;
+
+  /// The account ID that this configuration applies to.
+  final String? accountId;
+
+  /// Set the specified Amazon EC2 launch template as the default launch template
+  /// for the specified account.
+  final bool? setDefaultVersion;
+
+  LaunchTemplateConfiguration({
+    required this.launchTemplateId,
+    this.accountId,
+    this.setDefaultVersion,
+  });
+  factory LaunchTemplateConfiguration.fromJson(Map<String, dynamic> json) {
+    return LaunchTemplateConfiguration(
+      launchTemplateId: json['launchTemplateId'] as String,
+      accountId: json['accountId'] as String?,
+      setDefaultVersion: json['setDefaultVersion'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final launchTemplateId = this.launchTemplateId;
+    final accountId = this.accountId;
+    final setDefaultVersion = this.setDefaultVersion;
+    return {
+      'launchTemplateId': launchTemplateId,
+      if (accountId != null) 'accountId': accountId,
+      if (setDefaultVersion != null) 'setDefaultVersion': setDefaultVersion,
     };
   }
 }
@@ -5216,6 +6610,11 @@ class ListComponentBuildVersionsResponse {
 
 class ListComponentsResponse {
   /// The list of component semantic versions.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  /// </note>
   final List<ComponentVersion>? componentVersionList;
 
   /// The next token used for paginated responses. When this is not empty, there
@@ -5336,6 +6735,34 @@ class ListImageBuildVersionsResponse {
   }
 }
 
+class ListImagePackagesResponse {
+  /// The list of Image Packages returned in the response.
+  final List<ImagePackage>? imagePackageList;
+
+  /// A token to specify where to start paginating. This is the NextToken from a
+  /// previously truncated response.
+  final String? nextToken;
+
+  /// The request ID that uniquely identifies this request.
+  final String? requestId;
+
+  ListImagePackagesResponse({
+    this.imagePackageList,
+    this.nextToken,
+    this.requestId,
+  });
+  factory ListImagePackagesResponse.fromJson(Map<String, dynamic> json) {
+    return ListImagePackagesResponse(
+      imagePackageList: (json['imagePackageList'] as List?)
+          ?.whereNotNull()
+          .map((e) => ImagePackage.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['nextToken'] as String?,
+      requestId: json['requestId'] as String?,
+    );
+  }
+}
+
 class ListImagePipelineImagesResponse {
   /// The list of images built by this pipeline.
   final List<ImageSummary>? imageSummaryList;
@@ -5425,6 +6852,16 @@ class ListImageRecipesResponse {
 
 class ListImagesResponse {
   /// The list of image semantic versions.
+  /// <note>
+  /// The semantic version has four nodes:
+  /// &lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;/&lt;build&gt;. You can assign
+  /// values for the first three, and can filter on all of them.
+  ///
+  /// <b>Filtering:</b> With semantic versioning, you have the flexibility to use
+  /// wildcards (x) to specify the most recent versions or nodes when selecting
+  /// the base image or components for your recipe. When you use a wildcard in any
+  /// node, all nodes to the right of the first wildcard must also be wildcards.
+  /// </note>
   final List<ImageVersion>? imageVersionList;
 
   /// The next token used for paginated responses. When this is not empty, there
@@ -5526,7 +6963,7 @@ class Logging {
 
 /// The resources produced by this image.
 class OutputResources {
-  /// The EC2 AMIs created by this image.
+  /// The Amazon EC2 AMIs created by this image.
   final List<Ami>? amis;
 
   /// Container images that the pipeline has generated and stored in the output
@@ -5750,12 +7187,73 @@ class PutImageRecipePolicyResponse {
   }
 }
 
+/// Properties that configure export from your build instance to a compatible
+/// file format for your VM.
+class S3ExportConfiguration {
+  /// Export the updated image to one of the following supported disk image
+  /// formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Virtual Hard Disk (VHD)</b> – Compatible with Citrix Xen and Microsoft
+  /// Hyper-V virtualization products.
+  /// </li>
+  /// <li>
+  /// <b>Stream-optimized ESX Virtual Machine Disk (VMDK)</b> – Compatible with
+  /// VMware ESX and VMware vSphere versions 4, 5, and 6.
+  /// </li>
+  /// <li>
+  /// <b>Raw</b> – Raw format.
+  /// </li>
+  /// </ul>
+  final DiskImageFormat diskImageFormat;
+
+  /// The name of the role that grants VM Import/Export permission to export
+  /// images to your S3 bucket.
+  final String roleName;
+
+  /// The S3 bucket in which to store the output disk images for your VM.
+  final String s3Bucket;
+
+  /// The Amazon S3 path for the bucket where the output disk images for your VM
+  /// are stored.
+  final String? s3Prefix;
+
+  S3ExportConfiguration({
+    required this.diskImageFormat,
+    required this.roleName,
+    required this.s3Bucket,
+    this.s3Prefix,
+  });
+  factory S3ExportConfiguration.fromJson(Map<String, dynamic> json) {
+    return S3ExportConfiguration(
+      diskImageFormat: (json['diskImageFormat'] as String).toDiskImageFormat(),
+      roleName: json['roleName'] as String,
+      s3Bucket: json['s3Bucket'] as String,
+      s3Prefix: json['s3Prefix'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final diskImageFormat = this.diskImageFormat;
+    final roleName = this.roleName;
+    final s3Bucket = this.s3Bucket;
+    final s3Prefix = this.s3Prefix;
+    return {
+      'diskImageFormat': diskImageFormat.toValue(),
+      'roleName': roleName,
+      's3Bucket': s3Bucket,
+      if (s3Prefix != null) 's3Prefix': s3Prefix,
+    };
+  }
+}
+
 /// Amazon S3 logging configuration.
 class S3Logs {
-  /// The Amazon S3 bucket in which to store the logs.
+  /// The S3 bucket in which to store the logs.
   final String? s3BucketName;
 
-  /// The Amazon S3 path in which to store the logs.
+  /// The Amazon S3 path to the bucket where the logs are stored.
   final String? s3KeyPrefix;
 
   S3Logs({
@@ -5785,7 +7283,7 @@ class Schedule {
   /// The condition configures when the pipeline should trigger a new image build.
   /// When the <code>pipelineExecutionStartCondition</code> is set to
   /// <code>EXPRESSION_MATCH_AND_DEPENDENCY_UPDATES_AVAILABLE</code>, and you use
-  /// semantic version filters on the source image or components in your image
+  /// semantic version filters on the base image or components in your image
   /// recipe, EC2 Image Builder will build a new image only when there are new
   /// versions of the image or components in your recipe that match the semantic
   /// version filter. When it is set to <code>EXPRESSION_MATCH_ONLY</code>, it
@@ -5803,9 +7301,16 @@ class Schedule {
   /// cron expressions in EC2 Image Builder</a>.
   final String? scheduleExpression;
 
+  /// The timezone that applies to the scheduling expression. For example,
+  /// "Etc/UTC", "America/Los_Angeles" in the <a
+  /// href="https://www.joda.org/joda-time/timezones.html">IANA timezone
+  /// format</a>. If not specified this defaults to UTC.
+  final String? timezone;
+
   Schedule({
     this.pipelineExecutionStartCondition,
     this.scheduleExpression,
+    this.timezone,
   });
   factory Schedule.fromJson(Map<String, dynamic> json) {
     return Schedule(
@@ -5813,6 +7318,7 @@ class Schedule {
           (json['pipelineExecutionStartCondition'] as String?)
               ?.toPipelineExecutionStartCondition(),
       scheduleExpression: json['scheduleExpression'] as String?,
+      timezone: json['timezone'] as String?,
     );
   }
 
@@ -5820,11 +7326,13 @@ class Schedule {
     final pipelineExecutionStartCondition =
         this.pipelineExecutionStartCondition;
     final scheduleExpression = this.scheduleExpression;
+    final timezone = this.timezone;
     return {
       if (pipelineExecutionStartCondition != null)
         'pipelineExecutionStartCondition':
             pipelineExecutionStartCondition.toValue(),
       if (scheduleExpression != null) 'scheduleExpression': scheduleExpression,
+      if (timezone != null) 'timezone': timezone,
     };
   }
 }
@@ -5852,6 +7360,32 @@ class StartImagePipelineExecutionResponse {
       imageBuildVersionArn: json['imageBuildVersionArn'] as String?,
       requestId: json['requestId'] as String?,
     );
+  }
+}
+
+/// Contains settings for the Systems Manager agent on your build instance.
+class SystemsManagerAgent {
+  /// Controls whether the Systems Manager agent is removed from your final build
+  /// image, prior to creating the new AMI. If this is set to true, then the agent
+  /// is removed from the final image. If it's set to false, then the agent is
+  /// left in, so that it is included in the new AMI. The default value is false.
+  final bool? uninstallAfterBuild;
+
+  SystemsManagerAgent({
+    this.uninstallAfterBuild,
+  });
+  factory SystemsManagerAgent.fromJson(Map<String, dynamic> json) {
+    return SystemsManagerAgent(
+      uninstallAfterBuild: json['uninstallAfterBuild'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final uninstallAfterBuild = this.uninstallAfterBuild;
+    return {
+      if (uninstallAfterBuild != null)
+        'uninstallAfterBuild': uninstallAfterBuild,
+    };
   }
 }
 

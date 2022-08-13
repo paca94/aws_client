@@ -48,9 +48,15 @@ class Route53Domains {
     _protocol.close();
   }
 
-  /// Accepts the transfer of a domain from another AWS account to the current
-  /// AWS account. You initiate a transfer between AWS accounts using <a
+  /// Accepts the transfer of a domain from another Amazon Web Services account
+  /// to the currentAmazon Web Services account. You initiate a transfer between
+  /// Amazon Web Services accounts using <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html">TransferDomainToAnotherAwsAccount</a>.
+  ///
+  /// If you use the CLI command at <a
+  /// href="https://docs.aws.amazon.com/cli/latest/reference/route53domains/accept-domain-transfer-from-another-aws-account.html">accept-domain-transfer-from-another-aws-account</a>,
+  /// use JSON format as input instead of text because otherwise CLI will throw
+  /// an error from domain transfer input that includes single quotes.
   ///
   /// Use either <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_ListOperations.html">ListOperations</a>
@@ -64,10 +70,11 @@ class Route53Domains {
   /// May throw [InvalidInput].
   /// May throw [OperationLimitExceeded].
   /// May throw [DomainLimitExceeded].
+  /// May throw [UnsupportedTLD].
   ///
   /// Parameter [domainName] :
-  /// The name of the domain that was specified when another AWS account
-  /// submitted a <a
+  /// The name of the domain that was specified when another Amazon Web Services
+  /// account submitted a <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html">TransferDomainToAnotherAwsAccount</a>
   /// request.
   ///
@@ -110,12 +117,13 @@ class Route53Domains {
         jsonResponse.body);
   }
 
-  /// Cancels the transfer of a domain from the current AWS account to another
-  /// AWS account. You initiate a transfer between AWS accounts using <a
+  /// Cancels the transfer of a domain from the current Amazon Web Services
+  /// account to another Amazon Web Services account. You initiate a transfer
+  /// betweenAmazon Web Services accounts using <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html">TransferDomainToAnotherAwsAccount</a>.
   /// <important>
-  /// You must cancel the transfer before the other AWS account accepts the
-  /// transfer using <a
+  /// You must cancel the transfer before the other Amazon Web Services account
+  /// accepts the transfer using <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_AcceptDomainTransferFromAnotherAwsAccount.html">AcceptDomainTransferFromAnotherAwsAccount</a>.
   /// </important>
   /// Use either <a
@@ -129,10 +137,11 @@ class Route53Domains {
   ///
   /// May throw [InvalidInput].
   /// May throw [OperationLimitExceeded].
+  /// May throw [UnsupportedTLD].
   ///
   /// Parameter [domainName] :
   /// The name of the domain for which you want to cancel the transfer to
-  /// another AWS account.
+  /// another Amazon Web Services account.
   Future<CancelDomainTransferToAnotherAwsAccountResponse>
       cancelDomainTransferToAnotherAwsAccount({
     required String domainName,
@@ -317,6 +326,66 @@ class Route53Domains {
     return CheckDomainTransferabilityResponse.fromJson(jsonResponse.body);
   }
 
+  /// This operation deletes the specified domain. This action is permanent. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-delete.html">Deleting
+  /// a domain name registration</a>.
+  ///
+  /// To transfer the domain registration to another registrar, use the transfer
+  /// process that’s provided by the registrar to which you want to transfer the
+  /// registration. Otherwise, the following apply:
+  /// <ol>
+  /// <li>
+  /// You can’t get a refund for the cost of a deleted domain registration.
+  /// </li>
+  /// <li>
+  /// The registry for the top-level domain might hold the domain name for a
+  /// brief time before releasing it for other users to register (varies by
+  /// registry).
+  /// </li>
+  /// <li>
+  /// When the registration has been deleted, we'll send you a confirmation to
+  /// the registrant contact. The email will come from
+  /// <code>noreply@domainnameverification.net</code> or
+  /// <code>noreply@registrar.amazon.com</code>.
+  /// </li> </ol>
+  ///
+  /// May throw [InvalidInput].
+  /// May throw [DuplicateRequest].
+  /// May throw [TLDRulesViolation].
+  /// May throw [UnsupportedTLD].
+  ///
+  /// Parameter [domainName] :
+  /// Name of the domain to be deleted.
+  Future<DeleteDomainResponse> deleteDomain({
+    required String domainName,
+  }) async {
+    ArgumentError.checkNotNull(domainName, 'domainName');
+    _s.validateStringLength(
+      'domainName',
+      domainName,
+      0,
+      255,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Route53Domains_v20140515.DeleteDomain'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'DomainName': domainName,
+      },
+    );
+
+    return DeleteDomainResponse.fromJson(jsonResponse.body);
+  }
+
   /// This operation deletes the specified tags for a domain.
   ///
   /// All tag operations are eventually consistent; subsequent operations might
@@ -443,7 +512,8 @@ class Route53Domains {
 
   /// This operation configures Amazon Route 53 to automatically renew the
   /// specified domain before the domain registration expires. The cost of
-  /// renewing your domain registration is billed to your AWS account.
+  /// renewing your domain registration is billed to your Amazon Web Services
+  /// account.
   ///
   /// The period during which you can renew a domain name varies by TLD. For a
   /// list of TLDs and their renewal policies, see <a
@@ -571,8 +641,8 @@ class Route53Domains {
   }
 
   /// This operation returns detailed information about a specified domain that
-  /// is associated with the current AWS account. Contact information for the
-  /// domain is also returned as part of the output.
+  /// is associated with the current Amazon Web Services account. Contact
+  /// information for the domain is also returned as part of the output.
   ///
   /// May throw [InvalidInput].
   /// May throw [UnsupportedTLD].
@@ -729,18 +799,24 @@ class Route53Domains {
   }
 
   /// This operation returns all the domain names registered with Amazon Route
-  /// 53 for the current AWS account.
+  /// 53 for the current Amazon Web Services account if no filtering conditions
+  /// are used.
   ///
   /// May throw [InvalidInput].
   ///
+  /// Parameter [filterConditions] :
+  /// A complex type that contains information about the filters applied during
+  /// the <code>ListDomains</code> request. The filter conditions can include
+  /// domain name and domain expiration.
+  ///
   /// Parameter [marker] :
   /// For an initial request for a list of domains, omit this element. If the
-  /// number of domains that are associated with the current AWS account is
-  /// greater than the value that you specified for <code>MaxItems</code>, you
-  /// can use <code>Marker</code> to return additional domains. Get the value of
-  /// <code>NextPageMarker</code> from the previous response, and submit another
-  /// request that includes the value of <code>NextPageMarker</code> in the
-  /// <code>Marker</code> element.
+  /// number of domains that are associated with the current Amazon Web Services
+  /// account is greater than the value that you specified for
+  /// <code>MaxItems</code>, you can use <code>Marker</code> to return
+  /// additional domains. Get the value of <code>NextPageMarker</code> from the
+  /// previous response, and submit another request that includes the value of
+  /// <code>NextPageMarker</code> in the <code>Marker</code> element.
   ///
   /// Constraints: The marker must match the value specified in the previous
   /// request.
@@ -749,9 +825,15 @@ class Route53Domains {
   /// Number of domains to be returned.
   ///
   /// Default: 20
+  ///
+  /// Parameter [sortCondition] :
+  /// A complex type that contains information about the requested ordering of
+  /// domains in the returned list.
   Future<ListDomainsResponse> listDomains({
+    List<FilterCondition>? filterConditions,
     String? marker,
     int? maxItems,
+    SortCondition? sortCondition,
   }) async {
     _s.validateStringLength(
       'marker',
@@ -776,8 +858,10 @@ class Route53Domains {
       // TODO queryParams
       headers: headers,
       payload: {
+        if (filterConditions != null) 'FilterConditions': filterConditions,
         if (marker != null) 'Marker': marker,
         if (maxItems != null) 'MaxItems': maxItems,
+        if (sortCondition != null) 'SortCondition': sortCondition,
       },
     );
 
@@ -787,6 +871,8 @@ class Route53Domains {
   /// Returns information about all of the operations that return an operation
   /// ID and that have ever been performed on domains that were registered by
   /// the current account.
+  ///
+  /// This command runs only in the us-east-1 Region.
   ///
   /// May throw [InvalidInput].
   ///
@@ -844,6 +930,96 @@ class Route53Domains {
     );
 
     return ListOperationsResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Lists the following prices for either all the TLDs supported by Route 53,
+  /// or the specified TLD:
+  ///
+  /// <ul>
+  /// <li>
+  /// Registration
+  /// </li>
+  /// <li>
+  /// Transfer
+  /// </li>
+  /// <li>
+  /// Owner change
+  /// </li>
+  /// <li>
+  /// Domain renewal
+  /// </li>
+  /// <li>
+  /// Domain restoration
+  /// </li>
+  /// </ul>
+  ///
+  /// May throw [InvalidInput].
+  /// May throw [UnsupportedTLD].
+  ///
+  /// Parameter [marker] :
+  /// For an initial request for a list of prices, omit this element. If the
+  /// number of prices that are not yet complete is greater than the value that
+  /// you specified for <code>MaxItems</code>, you can use <code>Marker</code>
+  /// to return additional prices. Get the value of <code>NextPageMarker</code>
+  /// from the previous response, and submit another request that includes the
+  /// value of <code>NextPageMarker</code> in the <code>Marker</code> element.
+  ///
+  /// Used only for all TLDs. If you specify a TLD, don't specify a
+  /// <code>Marker</code>.
+  ///
+  /// Parameter [maxItems] :
+  /// Number of <code>Prices</code> to be returned.
+  ///
+  /// Used only for all TLDs. If you specify a TLD, don't specify a
+  /// <code>MaxItems</code>.
+  ///
+  /// Parameter [tld] :
+  /// The TLD for which you want to receive the pricing information. For
+  /// example. <code>.net</code>.
+  ///
+  /// If a <code>Tld</code> value is not provided, a list of prices for all TLDs
+  /// supported by Route 53 is returned.
+  Future<ListPricesResponse> listPrices({
+    String? marker,
+    int? maxItems,
+    String? tld,
+  }) async {
+    _s.validateStringLength(
+      'marker',
+      marker,
+      0,
+      4096,
+    );
+    _s.validateNumRange(
+      'maxItems',
+      maxItems,
+      0,
+      100,
+    );
+    _s.validateStringLength(
+      'tld',
+      tld,
+      1,
+      255,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Route53Domains_v20140515.ListPrices'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (marker != null) 'Marker': marker,
+        if (maxItems != null) 'MaxItems': maxItems,
+        if (tld != null) 'Tld': tld,
+      },
+    );
+
+    return ListPricesResponse.fromJson(jsonResponse.body);
   }
 
   /// This operation returns all of the tags that are associated with the
@@ -910,17 +1086,20 @@ class Route53Domains {
   /// information either for Amazon Registrar (for .com, .net, and .org domains)
   /// or for our registrar associate, Gandi (for all other TLDs). If you don't
   /// enable privacy protection, WHOIS queries return the information that you
-  /// entered for the registrant, admin, and tech contacts.
-  /// </li>
+  /// entered for the administrative, registrant, and technical contacts.
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note> </li>
   /// <li>
   /// If registration is successful, returns an operation ID that you can use to
   /// track the progress and completion of the action. If the request is not
   /// completed successfully, the domain registrant is notified by email.
   /// </li>
   /// <li>
-  /// Charges your AWS account an amount based on the top-level domain. For more
-  /// information, see <a href="http://aws.amazon.com/route53/pricing/">Amazon
-  /// Route 53 Pricing</a>.
+  /// Charges your Amazon Web Services account an amount based on the top-level
+  /// domain. For more information, see <a
+  /// href="http://aws.amazon.com/route53/pricing/">Amazon Route 53 Pricing</a>.
   /// </li>
   /// </ul>
   ///
@@ -1007,7 +1186,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the admin contact.
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// Default: <code>true</code>
   ///
   /// Parameter [privacyProtectRegistrantContact] :
@@ -1017,7 +1199,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the registrant contact (the domain owner).
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// Default: <code>true</code>
   ///
   /// Parameter [privacyProtectTechContact] :
@@ -1027,7 +1212,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the technical contact.
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// Default: <code>true</code>
   Future<RegisterDomainResponse> registerDomain({
     required ContactDetail adminContact,
@@ -1096,8 +1284,9 @@ class Route53Domains {
     return RegisterDomainResponse.fromJson(jsonResponse.body);
   }
 
-  /// Rejects the transfer of a domain from another AWS account to the current
-  /// AWS account. You initiate a transfer between AWS accounts using <a
+  /// Rejects the transfer of a domain from another Amazon Web Services account
+  /// to the current Amazon Web Services account. You initiate a transfer
+  /// betweenAmazon Web Services accounts using <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html">TransferDomainToAnotherAwsAccount</a>.
   ///
   /// Use either <a
@@ -1111,10 +1300,11 @@ class Route53Domains {
   ///
   /// May throw [InvalidInput].
   /// May throw [OperationLimitExceeded].
+  /// May throw [UnsupportedTLD].
   ///
   /// Parameter [domainName] :
-  /// The name of the domain that was specified when another AWS account
-  /// submitted a <a
+  /// The name of the domain that was specified when another Amazon Web Services
+  /// account submitted a <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html">TransferDomainToAnotherAwsAccount</a>
   /// request.
   Future<RejectDomainTransferFromAnotherAwsAccountResponse>
@@ -1150,7 +1340,7 @@ class Route53Domains {
   }
 
   /// This operation renews a domain for the specified number of years. The cost
-  /// of renewing your domain is billed to your AWS account.
+  /// of renewing your domain is billed to your Amazon Web Services account.
   ///
   /// We recommend that you renew your domain several weeks before the
   /// expiration date. Some TLD registries delete domains before the expiration
@@ -1316,8 +1506,8 @@ class Route53Domains {
   /// Developer Guide</i>.
   /// </li>
   /// <li>
-  /// For information about how to transfer a domain from one AWS account to
-  /// another, see <a
+  /// For information about how to transfer a domain from one Amazon Web
+  /// Services account to another, see <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_TransferDomainToAnotherAwsAccount.html">TransferDomainToAnotherAwsAccount</a>.
   /// </li>
   /// <li>
@@ -1418,7 +1608,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the admin contact.
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// Default: <code>true</code>
   ///
   /// Parameter [privacyProtectRegistrantContact] :
@@ -1428,7 +1621,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the registrant contact (domain owner).
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// Default: <code>true</code>
   ///
   /// Parameter [privacyProtectTechContact] :
@@ -1438,7 +1634,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the technical contact.
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// Default: <code>true</code>
   Future<TransferDomainResponse> transferDomain({
     required ContactDetail adminContact,
@@ -1517,14 +1716,14 @@ class Route53Domains {
     return TransferDomainResponse.fromJson(jsonResponse.body);
   }
 
-  /// Transfers a domain from the current AWS account to another AWS account.
-  /// Note the following:
+  /// Transfers a domain from the current Amazon Web Services account to another
+  /// Amazon Web Services account. Note the following:
   ///
   /// <ul>
   /// <li>
-  /// The AWS account that you're transferring the domain to must accept the
-  /// transfer. If the other account doesn't accept the transfer within 3 days,
-  /// we cancel the transfer. See <a
+  /// The Amazon Web Services account that you're transferring the domain to
+  /// must accept the transfer. If the other account doesn't accept the transfer
+  /// within 3 days, we cancel the transfer. See <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_AcceptDomainTransferFromAnotherAwsAccount.html">AcceptDomainTransferFromAnotherAwsAccount</a>.
   /// </li>
   /// <li>
@@ -1536,15 +1735,15 @@ class Route53Domains {
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_RejectDomainTransferFromAnotherAwsAccount.html">RejectDomainTransferFromAnotherAwsAccount</a>.
   /// </li>
   /// </ul> <important>
-  /// When you transfer a domain from one AWS account to another, Route 53
-  /// doesn't transfer the hosted zone that is associated with the domain. DNS
-  /// resolution isn't affected if the domain and the hosted zone are owned by
-  /// separate accounts, so transferring the hosted zone is optional. For
-  /// information about transferring the hosted zone to another AWS account, see
-  /// <a
+  /// When you transfer a domain from one Amazon Web Services account to
+  /// another, Route 53 doesn't transfer the hosted zone that is associated with
+  /// the domain. DNS resolution isn't affected if the domain and the hosted
+  /// zone are owned by separate accounts, so transferring the hosted zone is
+  /// optional. For information about transferring the hosted zone to another
+  /// Amazon Web Services account, see <a
   /// href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/hosted-zones-migrating.html">Migrating
-  /// a Hosted Zone to a Different AWS Account</a> in the <i>Amazon Route 53
-  /// Developer Guide</i>.
+  /// a Hosted Zone to a Different Amazon Web Services Account</a> in the
+  /// <i>Amazon Route 53 Developer Guide</i>.
   /// </important>
   /// Use either <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_ListOperations.html">ListOperations</a>
@@ -1558,20 +1757,28 @@ class Route53Domains {
   /// May throw [InvalidInput].
   /// May throw [OperationLimitExceeded].
   /// May throw [DuplicateRequest].
+  /// May throw [UnsupportedTLD].
   ///
   /// Parameter [accountId] :
-  /// The account ID of the AWS account that you want to transfer the domain to,
-  /// for example, <code>111122223333</code>.
+  /// The account ID of the Amazon Web Services account that you want to
+  /// transfer the domain to, for example, <code>111122223333</code>.
   ///
   /// Parameter [domainName] :
-  /// The name of the domain that you want to transfer from the current AWS
-  /// account to another account.
+  /// The name of the domain that you want to transfer from the current Amazon
+  /// Web Services account to another account.
   Future<TransferDomainToAnotherAwsAccountResponse>
       transferDomainToAnotherAwsAccount({
     required String accountId,
     required String domainName,
   }) async {
     ArgumentError.checkNotNull(accountId, 'accountId');
+    _s.validateStringLength(
+      'accountId',
+      accountId,
+      12,
+      12,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(domainName, 'domainName');
     _s.validateStringLength(
       'domainName',
@@ -1667,9 +1874,12 @@ class Route53Domains {
   /// address is replaced either with contact information for Amazon Registrar
   /// (for .com, .net, and .org domains) or with contact information for our
   /// registrar associate, Gandi.
-  ///
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   /// This operation affects only the contact information for the specified
-  /// contact type (registrant, administrator, or tech). If the request
+  /// contact type (administrative, registrant, or technical). If the request
   /// succeeds, Amazon Route 53 returns an operation ID that you can use with <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html">GetOperationDetail</a>
   /// to track the progress and completion of the action. If the request doesn't
@@ -1703,6 +1913,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the admin contact.
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   ///
   /// Parameter [registrantPrivacy] :
   /// Whether you want to conceal contact information from WHOIS queries. If you
@@ -1711,6 +1925,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the registrant contact (domain owner).
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   ///
   /// Parameter [techPrivacy] :
   /// Whether you want to conceal contact information from WHOIS queries. If you
@@ -1719,6 +1937,10 @@ class Route53Domains {
   /// or for our registrar associate, Gandi (for all other TLDs). If you specify
   /// <code>false</code>, WHOIS queries return the information that you entered
   /// for the technical contact.
+  /// <note>
+  /// You must specify the same privacy setting for the administrative,
+  /// registrant, and technical contacts.
+  /// </note>
   Future<UpdateDomainContactPrivacyResponse> updateDomainContactPrivacy({
     required String domainName,
     bool? adminPrivacy,
@@ -1791,6 +2013,12 @@ class Route53Domains {
       isRequired: true,
     );
     ArgumentError.checkNotNull(nameservers, 'nameservers');
+    _s.validateStringLength(
+      'fIAuthKey',
+      fIAuthKey,
+      0,
+      255,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'Route53Domains_v20140515.UpdateDomainNameservers'
@@ -1856,8 +2084,8 @@ class Route53Domains {
     );
   }
 
-  /// Returns all the domain-related billing records for the current AWS account
-  /// for a specified period
+  /// Returns all the domain-related billing records for the current Amazon Web
+  /// Services account for a specified period
   ///
   /// May throw [InvalidInput].
   ///
@@ -1868,10 +2096,10 @@ class Route53Domains {
   ///
   /// Parameter [marker] :
   /// For an initial request for a list of billing records, omit this element.
-  /// If the number of billing records that are associated with the current AWS
-  /// account during the specified period is greater than the value that you
-  /// specified for <code>MaxItems</code>, you can use <code>Marker</code> to
-  /// return additional billing records. Get the value of
+  /// If the number of billing records that are associated with the current
+  /// Amazon Web Services account during the specified period is greater than
+  /// the value that you specified for <code>MaxItems</code>, you can use
+  /// <code>Marker</code> to return additional billing records. Get the value of
   /// <code>NextPageMarker</code> from the previous response, and submit another
   /// request that includes the value of <code>NextPageMarker</code> in the
   /// <code>Marker</code> element.
@@ -2098,8 +2326,8 @@ class ContactDetail {
   /// Developer Guide</i>
   /// </li>
   /// <li>
-  /// For .es domains, if you specify <code>PERSON</code>, you must specify
-  /// <code>INDIVIDUAL</code> for the value of <code>ES_LEGAL_FORM</code>.
+  /// For .es domains, the value of <code>ContactType</code> must be
+  /// <code>PERSON</code> for all three contacts.
   /// </li>
   /// </ul>
   final ContactType? contactType;
@@ -2259,6 +2487,7 @@ extension on String {
 }
 
 enum CountryCode {
+  ac,
   ad,
   ae,
   af,
@@ -2274,6 +2503,7 @@ enum CountryCode {
   at,
   au,
   aw,
+  ax,
   az,
   ba,
   bb,
@@ -2288,9 +2518,11 @@ enum CountryCode {
   bm,
   bn,
   bo,
+  bq,
   br,
   bs,
   bt,
+  bv,
   bw,
   by,
   bz,
@@ -2309,6 +2541,7 @@ enum CountryCode {
   cr,
   cu,
   cv,
+  cw,
   cx,
   cy,
   cz,
@@ -2321,6 +2554,7 @@ enum CountryCode {
   ec,
   ee,
   eg,
+  eh,
   er,
   es,
   et,
@@ -2334,18 +2568,23 @@ enum CountryCode {
   gb,
   gd,
   ge,
+  gf,
+  gg,
   gh,
   gi,
   gl,
   gm,
   gn,
+  gp,
   gq,
   gr,
+  gs,
   gt,
   gu,
   gw,
   gy,
   hk,
+  hm,
   hn,
   hr,
   ht,
@@ -2355,10 +2594,12 @@ enum CountryCode {
   il,
   im,
   $in,
+  io,
   iq,
   ir,
   $is,
   it,
+  je,
   jm,
   jo,
   jp,
@@ -2397,6 +2638,7 @@ enum CountryCode {
   mn,
   mo,
   mp,
+  mq,
   mr,
   ms,
   mt,
@@ -2409,6 +2651,7 @@ enum CountryCode {
   na,
   nc,
   ne,
+  nf,
   ng,
   ni,
   nl,
@@ -2428,10 +2671,12 @@ enum CountryCode {
   pm,
   pn,
   pr,
+  ps,
   pt,
   pw,
   py,
   qa,
+  re,
   ro,
   rs,
   ru,
@@ -2444,18 +2689,22 @@ enum CountryCode {
   sg,
   sh,
   si,
+  sj,
   sk,
   sl,
   sm,
   sn,
   so,
   sr,
+  ss,
   st,
   sv,
+  sx,
   sy,
   sz,
   tc,
   td,
+  tf,
   tg,
   th,
   tj,
@@ -2464,6 +2713,7 @@ enum CountryCode {
   tm,
   tn,
   to,
+  tp,
   tr,
   tt,
   tv,
@@ -2493,6 +2743,8 @@ enum CountryCode {
 extension on CountryCode {
   String toValue() {
     switch (this) {
+      case CountryCode.ac:
+        return 'AC';
       case CountryCode.ad:
         return 'AD';
       case CountryCode.ae:
@@ -2523,6 +2775,8 @@ extension on CountryCode {
         return 'AU';
       case CountryCode.aw:
         return 'AW';
+      case CountryCode.ax:
+        return 'AX';
       case CountryCode.az:
         return 'AZ';
       case CountryCode.ba:
@@ -2551,12 +2805,16 @@ extension on CountryCode {
         return 'BN';
       case CountryCode.bo:
         return 'BO';
+      case CountryCode.bq:
+        return 'BQ';
       case CountryCode.br:
         return 'BR';
       case CountryCode.bs:
         return 'BS';
       case CountryCode.bt:
         return 'BT';
+      case CountryCode.bv:
+        return 'BV';
       case CountryCode.bw:
         return 'BW';
       case CountryCode.by:
@@ -2593,6 +2851,8 @@ extension on CountryCode {
         return 'CU';
       case CountryCode.cv:
         return 'CV';
+      case CountryCode.cw:
+        return 'CW';
       case CountryCode.cx:
         return 'CX';
       case CountryCode.cy:
@@ -2617,6 +2877,8 @@ extension on CountryCode {
         return 'EE';
       case CountryCode.eg:
         return 'EG';
+      case CountryCode.eh:
+        return 'EH';
       case CountryCode.er:
         return 'ER';
       case CountryCode.es:
@@ -2643,6 +2905,10 @@ extension on CountryCode {
         return 'GD';
       case CountryCode.ge:
         return 'GE';
+      case CountryCode.gf:
+        return 'GF';
+      case CountryCode.gg:
+        return 'GG';
       case CountryCode.gh:
         return 'GH';
       case CountryCode.gi:
@@ -2653,10 +2919,14 @@ extension on CountryCode {
         return 'GM';
       case CountryCode.gn:
         return 'GN';
+      case CountryCode.gp:
+        return 'GP';
       case CountryCode.gq:
         return 'GQ';
       case CountryCode.gr:
         return 'GR';
+      case CountryCode.gs:
+        return 'GS';
       case CountryCode.gt:
         return 'GT';
       case CountryCode.gu:
@@ -2667,6 +2937,8 @@ extension on CountryCode {
         return 'GY';
       case CountryCode.hk:
         return 'HK';
+      case CountryCode.hm:
+        return 'HM';
       case CountryCode.hn:
         return 'HN';
       case CountryCode.hr:
@@ -2685,6 +2957,8 @@ extension on CountryCode {
         return 'IM';
       case CountryCode.$in:
         return 'IN';
+      case CountryCode.io:
+        return 'IO';
       case CountryCode.iq:
         return 'IQ';
       case CountryCode.ir:
@@ -2693,6 +2967,8 @@ extension on CountryCode {
         return 'IS';
       case CountryCode.it:
         return 'IT';
+      case CountryCode.je:
+        return 'JE';
       case CountryCode.jm:
         return 'JM';
       case CountryCode.jo:
@@ -2769,6 +3045,8 @@ extension on CountryCode {
         return 'MO';
       case CountryCode.mp:
         return 'MP';
+      case CountryCode.mq:
+        return 'MQ';
       case CountryCode.mr:
         return 'MR';
       case CountryCode.ms:
@@ -2793,6 +3071,8 @@ extension on CountryCode {
         return 'NC';
       case CountryCode.ne:
         return 'NE';
+      case CountryCode.nf:
+        return 'NF';
       case CountryCode.ng:
         return 'NG';
       case CountryCode.ni:
@@ -2831,6 +3111,8 @@ extension on CountryCode {
         return 'PN';
       case CountryCode.pr:
         return 'PR';
+      case CountryCode.ps:
+        return 'PS';
       case CountryCode.pt:
         return 'PT';
       case CountryCode.pw:
@@ -2839,6 +3121,8 @@ extension on CountryCode {
         return 'PY';
       case CountryCode.qa:
         return 'QA';
+      case CountryCode.re:
+        return 'RE';
       case CountryCode.ro:
         return 'RO';
       case CountryCode.rs:
@@ -2863,6 +3147,8 @@ extension on CountryCode {
         return 'SH';
       case CountryCode.si:
         return 'SI';
+      case CountryCode.sj:
+        return 'SJ';
       case CountryCode.sk:
         return 'SK';
       case CountryCode.sl:
@@ -2875,10 +3161,14 @@ extension on CountryCode {
         return 'SO';
       case CountryCode.sr:
         return 'SR';
+      case CountryCode.ss:
+        return 'SS';
       case CountryCode.st:
         return 'ST';
       case CountryCode.sv:
         return 'SV';
+      case CountryCode.sx:
+        return 'SX';
       case CountryCode.sy:
         return 'SY';
       case CountryCode.sz:
@@ -2887,6 +3177,8 @@ extension on CountryCode {
         return 'TC';
       case CountryCode.td:
         return 'TD';
+      case CountryCode.tf:
+        return 'TF';
       case CountryCode.tg:
         return 'TG';
       case CountryCode.th:
@@ -2903,6 +3195,8 @@ extension on CountryCode {
         return 'TN';
       case CountryCode.to:
         return 'TO';
+      case CountryCode.tp:
+        return 'TP';
       case CountryCode.tr:
         return 'TR';
       case CountryCode.tt:
@@ -2958,6 +3252,8 @@ extension on CountryCode {
 extension on String {
   CountryCode toCountryCode() {
     switch (this) {
+      case 'AC':
+        return CountryCode.ac;
       case 'AD':
         return CountryCode.ad;
       case 'AE':
@@ -2988,6 +3284,8 @@ extension on String {
         return CountryCode.au;
       case 'AW':
         return CountryCode.aw;
+      case 'AX':
+        return CountryCode.ax;
       case 'AZ':
         return CountryCode.az;
       case 'BA':
@@ -3016,12 +3314,16 @@ extension on String {
         return CountryCode.bn;
       case 'BO':
         return CountryCode.bo;
+      case 'BQ':
+        return CountryCode.bq;
       case 'BR':
         return CountryCode.br;
       case 'BS':
         return CountryCode.bs;
       case 'BT':
         return CountryCode.bt;
+      case 'BV':
+        return CountryCode.bv;
       case 'BW':
         return CountryCode.bw;
       case 'BY':
@@ -3058,6 +3360,8 @@ extension on String {
         return CountryCode.cu;
       case 'CV':
         return CountryCode.cv;
+      case 'CW':
+        return CountryCode.cw;
       case 'CX':
         return CountryCode.cx;
       case 'CY':
@@ -3082,6 +3386,8 @@ extension on String {
         return CountryCode.ee;
       case 'EG':
         return CountryCode.eg;
+      case 'EH':
+        return CountryCode.eh;
       case 'ER':
         return CountryCode.er;
       case 'ES':
@@ -3108,6 +3414,10 @@ extension on String {
         return CountryCode.gd;
       case 'GE':
         return CountryCode.ge;
+      case 'GF':
+        return CountryCode.gf;
+      case 'GG':
+        return CountryCode.gg;
       case 'GH':
         return CountryCode.gh;
       case 'GI':
@@ -3118,10 +3428,14 @@ extension on String {
         return CountryCode.gm;
       case 'GN':
         return CountryCode.gn;
+      case 'GP':
+        return CountryCode.gp;
       case 'GQ':
         return CountryCode.gq;
       case 'GR':
         return CountryCode.gr;
+      case 'GS':
+        return CountryCode.gs;
       case 'GT':
         return CountryCode.gt;
       case 'GU':
@@ -3132,6 +3446,8 @@ extension on String {
         return CountryCode.gy;
       case 'HK':
         return CountryCode.hk;
+      case 'HM':
+        return CountryCode.hm;
       case 'HN':
         return CountryCode.hn;
       case 'HR':
@@ -3150,6 +3466,8 @@ extension on String {
         return CountryCode.im;
       case 'IN':
         return CountryCode.$in;
+      case 'IO':
+        return CountryCode.io;
       case 'IQ':
         return CountryCode.iq;
       case 'IR':
@@ -3158,6 +3476,8 @@ extension on String {
         return CountryCode.$is;
       case 'IT':
         return CountryCode.it;
+      case 'JE':
+        return CountryCode.je;
       case 'JM':
         return CountryCode.jm;
       case 'JO':
@@ -3234,6 +3554,8 @@ extension on String {
         return CountryCode.mo;
       case 'MP':
         return CountryCode.mp;
+      case 'MQ':
+        return CountryCode.mq;
       case 'MR':
         return CountryCode.mr;
       case 'MS':
@@ -3258,6 +3580,8 @@ extension on String {
         return CountryCode.nc;
       case 'NE':
         return CountryCode.ne;
+      case 'NF':
+        return CountryCode.nf;
       case 'NG':
         return CountryCode.ng;
       case 'NI':
@@ -3296,6 +3620,8 @@ extension on String {
         return CountryCode.pn;
       case 'PR':
         return CountryCode.pr;
+      case 'PS':
+        return CountryCode.ps;
       case 'PT':
         return CountryCode.pt;
       case 'PW':
@@ -3304,6 +3630,8 @@ extension on String {
         return CountryCode.py;
       case 'QA':
         return CountryCode.qa;
+      case 'RE':
+        return CountryCode.re;
       case 'RO':
         return CountryCode.ro;
       case 'RS':
@@ -3328,6 +3656,8 @@ extension on String {
         return CountryCode.sh;
       case 'SI':
         return CountryCode.si;
+      case 'SJ':
+        return CountryCode.sj;
       case 'SK':
         return CountryCode.sk;
       case 'SL':
@@ -3340,10 +3670,14 @@ extension on String {
         return CountryCode.so;
       case 'SR':
         return CountryCode.sr;
+      case 'SS':
+        return CountryCode.ss;
       case 'ST':
         return CountryCode.st;
       case 'SV':
         return CountryCode.sv;
+      case 'SX':
+        return CountryCode.sx;
       case 'SY':
         return CountryCode.sy;
       case 'SZ':
@@ -3352,6 +3686,8 @@ extension on String {
         return CountryCode.tc;
       case 'TD':
         return CountryCode.td;
+      case 'TF':
+        return CountryCode.tf;
       case 'TG':
         return CountryCode.tg;
       case 'TH':
@@ -3368,6 +3704,8 @@ extension on String {
         return CountryCode.tn;
       case 'TO':
         return CountryCode.to;
+      case 'TP':
+        return CountryCode.tp;
       case 'TR':
         return CountryCode.tr;
       case 'TT':
@@ -3418,6 +3756,22 @@ extension on String {
         return CountryCode.zw;
     }
     throw Exception('$this is not known in enum CountryCode');
+  }
+}
+
+class DeleteDomainResponse {
+  /// Identifier for tracking the progress of the request. To query the operation
+  /// status, use <a
+  /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html">GetOperationDetail</a>.
+  final String? operationId;
+
+  DeleteDomainResponse({
+    this.operationId,
+  });
+  factory DeleteDomainResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteDomainResponse(
+      operationId: json['OperationId'] as String?,
+    );
   }
 }
 
@@ -3508,6 +3862,61 @@ extension on String {
         return DomainAvailability.dontKnow;
     }
     throw Exception('$this is not known in enum DomainAvailability');
+  }
+}
+
+/// Information about the domain price associated with a TLD.
+class DomainPrice {
+  /// The price for changing domain ownership.
+  final PriceWithCurrency? changeOwnershipPrice;
+
+  /// The name of the TLD for which the prices apply.
+  final String? name;
+
+  /// The price for domain registration with Route 53.
+  final PriceWithCurrency? registrationPrice;
+
+  /// The price for renewing domain registration with Route 53.
+  final PriceWithCurrency? renewalPrice;
+
+  /// The price for restoring the domain with Route 53.
+  final PriceWithCurrency? restorationPrice;
+
+  /// The price for transferring the domain registration to Route 53.
+  final PriceWithCurrency? transferPrice;
+
+  DomainPrice({
+    this.changeOwnershipPrice,
+    this.name,
+    this.registrationPrice,
+    this.renewalPrice,
+    this.restorationPrice,
+    this.transferPrice,
+  });
+  factory DomainPrice.fromJson(Map<String, dynamic> json) {
+    return DomainPrice(
+      changeOwnershipPrice: json['ChangeOwnershipPrice'] != null
+          ? PriceWithCurrency.fromJson(
+              json['ChangeOwnershipPrice'] as Map<String, dynamic>)
+          : null,
+      name: json['Name'] as String?,
+      registrationPrice: json['RegistrationPrice'] != null
+          ? PriceWithCurrency.fromJson(
+              json['RegistrationPrice'] as Map<String, dynamic>)
+          : null,
+      renewalPrice: json['RenewalPrice'] != null
+          ? PriceWithCurrency.fromJson(
+              json['RenewalPrice'] as Map<String, dynamic>)
+          : null,
+      restorationPrice: json['RestorationPrice'] != null
+          ? PriceWithCurrency.fromJson(
+              json['RestorationPrice'] as Map<String, dynamic>)
+          : null,
+      transferPrice: json['TransferPrice'] != null
+          ? PriceWithCurrency.fromJson(
+              json['TransferPrice'] as Map<String, dynamic>)
+          : null,
+    );
   }
 }
 
@@ -3813,19 +4222,68 @@ class ExtraParam {
   /// <li>
   /// <code>ES_IDENTIFICATION</code>
   ///
-  /// Specify the applicable value:
+  /// The value of <code>ES_IDENTIFICATION</code> depends on the following values:
   ///
   /// <ul>
   /// <li>
-  /// <b>For contacts inside Spain:</b> Enter your passport ID.
+  /// The value of <code>ES_LEGAL_FORM</code>
   /// </li>
   /// <li>
-  /// <b>For contacts outside of Spain:</b> Enter the VAT identification number
-  /// for the company.
-  /// <note>
-  /// For .es domains, the value of <code>ContactType</code> must be
-  /// <code>PERSON</code>.
-  /// </note> </li>
+  /// The value of <code>ES_IDENTIFICATION_TYPE</code>
+  /// </li>
+  /// </ul>
+  /// <b>If <code>ES_LEGAL_FORM</code> is any value other than
+  /// <code>INDIVIDUAL</code>:</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// Specify 1 letter + 8 numbers (CIF [Certificado de Identificación Fiscal])
+  /// </li>
+  /// <li>
+  /// Example: B12345678
+  /// </li>
+  /// </ul>
+  /// <b>If <code>ES_LEGAL_FORM</code> is <code>INDIVIDUAL</code>, the value that
+  /// you specify for <code>ES_IDENTIFICATION</code> depends on the value of
+  /// <code>ES_IDENTIFICATION_TYPE</code>:</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// If <code>ES_IDENTIFICATION_TYPE</code> is <code>DNI_AND_NIF</code> (for
+  /// Spanish contacts):
+  ///
+  /// <ul>
+  /// <li>
+  /// Specify 8 numbers + 1 letter (DNI [Documento Nacional de Identidad], NIF
+  /// [Número de Identificación Fiscal])
+  /// </li>
+  /// <li>
+  /// Example: 12345678M
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// If <code>ES_IDENTIFICATION_TYPE</code> is <code>NIE</code> (for foreigners
+  /// with legal residence):
+  ///
+  /// <ul>
+  /// <li>
+  /// Specify 1 letter + 7 numbers + 1 letter ( NIE [Número de Identidad de
+  /// Extranjero])
+  /// </li>
+  /// <li>
+  /// Example: Y1234567X
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// If <code>ES_IDENTIFICATION_TYPE</code> is <code>OTHER</code> (for contacts
+  /// outside of Spain):
+  ///
+  /// <ul>
+  /// <li>
+  /// Specify a passport number, drivers license number, or national identity card
+  /// number
+  /// </li>
+  /// </ul> </li>
   /// </ul> </li>
   /// <li>
   /// <code>ES_IDENTIFICATION_TYPE</code>
@@ -3964,6 +4422,11 @@ class ExtraParam {
   /// <code>WORKER_OWNED_LIMITED_COMPANY</code>
   /// </li>
   /// </ul> </li>
+  /// </ul> </dd> <dt>.eu</dt> <dd>
+  /// <ul>
+  /// <li>
+  /// <code> EU_COUNTRY_OF_CITIZENSHIP</code>
+  /// </li>
   /// </ul> </dd> <dt>.fi</dt> <dd>
   /// <ul>
   /// <li>
@@ -4212,6 +4675,7 @@ enum ExtraParamName {
   vatNumber,
   ukContactType,
   ukCompanyNumber,
+  euCountryOfCitizenship,
 }
 
 extension on ExtraParamName {
@@ -4275,6 +4739,8 @@ extension on ExtraParamName {
         return 'UK_CONTACT_TYPE';
       case ExtraParamName.ukCompanyNumber:
         return 'UK_COMPANY_NUMBER';
+      case ExtraParamName.euCountryOfCitizenship:
+        return 'EU_COUNTRY_OF_CITIZENSHIP';
     }
   }
 }
@@ -4340,8 +4806,52 @@ extension on String {
         return ExtraParamName.ukContactType;
       case 'UK_COMPANY_NUMBER':
         return ExtraParamName.ukCompanyNumber;
+      case 'EU_COUNTRY_OF_CITIZENSHIP':
+        return ExtraParamName.euCountryOfCitizenship;
     }
     throw Exception('$this is not known in enum ExtraParamName');
+  }
+}
+
+/// Information for the filtering of a list of domains returned by <a
+/// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains__ListDomains.html">ListDomains</a>.
+class FilterCondition {
+  /// Name of the field which should be used for filtering the list of domains.
+  final ListDomainsAttributeName name;
+
+  /// The operator values for filtering domain names. The values can be:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>LE</code>: Less than, or equal to
+  /// </li>
+  /// <li>
+  /// <code>GE</code>: Greater than, or equal to
+  /// </li>
+  /// <li>
+  /// <code>BEGINS_WITH</code>: Begins with
+  /// </li>
+  /// </ul>
+  final Operator operator;
+
+  /// An array of strings presenting values to compare. Only 1 item in the list is
+  /// currently supported.
+  final List<String> values;
+
+  FilterCondition({
+    required this.name,
+    required this.operator,
+    required this.values,
+  });
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final operator = this.operator;
+    final values = this.values;
+    return {
+      'Name': name.toValue(),
+      'Operator': operator.toValue(),
+      'Values': values,
+    };
   }
 }
 
@@ -4414,7 +4924,7 @@ class GetDomainDetailResponse {
   /// time (UTC).
   final DateTime? creationDate;
 
-  /// Reserved for future use.
+  /// Deprecated.
   final String? dnsSec;
 
   /// The date when the registration for the domain is set to expire. The date and
@@ -4597,9 +5107,37 @@ class GetOperationDetailResponse {
   }
 }
 
+enum ListDomainsAttributeName {
+  domainName,
+  expiry,
+}
+
+extension on ListDomainsAttributeName {
+  String toValue() {
+    switch (this) {
+      case ListDomainsAttributeName.domainName:
+        return 'DomainName';
+      case ListDomainsAttributeName.expiry:
+        return 'Expiry';
+    }
+  }
+}
+
+extension on String {
+  ListDomainsAttributeName toListDomainsAttributeName() {
+    switch (this) {
+      case 'DomainName':
+        return ListDomainsAttributeName.domainName;
+      case 'Expiry':
+        return ListDomainsAttributeName.expiry;
+    }
+    throw Exception('$this is not known in enum ListDomainsAttributeName');
+  }
+}
+
 /// The ListDomains response includes the following elements.
 class ListDomainsResponse {
-  /// A summary of domains.
+  /// A list of domains.
   final List<DomainSummary> domains;
 
   /// If there are more domains than you specified for <code>MaxItems</code> in
@@ -4641,6 +5179,34 @@ class ListOperationsResponse {
       operations: (json['Operations'] as List)
           .whereNotNull()
           .map((e) => OperationSummary.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextPageMarker: json['NextPageMarker'] as String?,
+    );
+  }
+}
+
+class ListPricesResponse {
+  /// A complex type that includes all the pricing information. If you specify a
+  /// TLD, this array contains only the pricing for that TLD.
+  final List<DomainPrice> prices;
+
+  /// If there are more prices than you specified for <code>MaxItems</code> in the
+  /// request, submit another request and include the value of
+  /// <code>NextPageMarker</code> in the value of <code>Marker</code>.
+  ///
+  /// Used only for all TLDs. If you specify a TLD, don't specify a
+  /// <code>NextPageMarker</code>.
+  final String? nextPageMarker;
+
+  ListPricesResponse({
+    required this.prices,
+    this.nextPageMarker,
+  });
+  factory ListPricesResponse.fromJson(Map<String, dynamic> json) {
+    return ListPricesResponse(
+      prices: (json['Prices'] as List)
+          .whereNotNull()
+          .map((e) => DomainPrice.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextPageMarker: json['NextPageMarker'] as String?,
     );
@@ -4886,6 +5452,59 @@ extension on String {
   }
 }
 
+enum Operator {
+  le,
+  ge,
+  beginsWith,
+}
+
+extension on Operator {
+  String toValue() {
+    switch (this) {
+      case Operator.le:
+        return 'LE';
+      case Operator.ge:
+        return 'GE';
+      case Operator.beginsWith:
+        return 'BEGINS_WITH';
+    }
+  }
+}
+
+extension on String {
+  Operator toOperator() {
+    switch (this) {
+      case 'LE':
+        return Operator.le;
+      case 'GE':
+        return Operator.ge;
+      case 'BEGINS_WITH':
+        return Operator.beginsWith;
+    }
+    throw Exception('$this is not known in enum Operator');
+  }
+}
+
+/// Currency-specific price information.
+class PriceWithCurrency {
+  /// The currency specifier.
+  final String currency;
+
+  /// The price of a domain, in a specific currency.
+  final double price;
+
+  PriceWithCurrency({
+    required this.currency,
+    required this.price,
+  });
+  factory PriceWithCurrency.fromJson(Map<String, dynamic> json) {
+    return PriceWithCurrency(
+      currency: json['Currency'] as String,
+      price: json['Price'] as double,
+    );
+  }
+}
+
 enum ReachabilityStatus {
   pending,
   done,
@@ -5015,6 +5634,62 @@ class RetrieveDomainAuthCodeResponse {
   }
 }
 
+/// Information for sorting a list of domains.
+class SortCondition {
+  /// Field to be used for sorting the list of domains. It can be either the name
+  /// or the expiration for a domain. Note that if <code>filterCondition</code> is
+  /// used in the same <a
+  /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains__ListDomains.html">ListDomains</a>
+  /// call, the field used for sorting has to be the same as the field used for
+  /// filtering.
+  final ListDomainsAttributeName name;
+
+  /// The sort order for a list of domains. Either ascending (ASC) or descending
+  /// (DES).
+  final SortOrder sortOrder;
+
+  SortCondition({
+    required this.name,
+    required this.sortOrder,
+  });
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final sortOrder = this.sortOrder;
+    return {
+      'Name': name.toValue(),
+      'SortOrder': sortOrder.toValue(),
+    };
+  }
+}
+
+enum SortOrder {
+  asc,
+  desc,
+}
+
+extension on SortOrder {
+  String toValue() {
+    switch (this) {
+      case SortOrder.asc:
+        return 'ASC';
+      case SortOrder.desc:
+        return 'DESC';
+    }
+  }
+}
+
+extension on String {
+  SortOrder toSortOrder() {
+    switch (this) {
+      case 'ASC':
+        return SortOrder.asc;
+      case 'DESC':
+        return SortOrder.desc;
+    }
+    throw Exception('$this is not known in enum SortOrder');
+  }
+}
+
 /// Each tag includes the following elements.
 class Tag {
   /// The key (name) of a tag.
@@ -5077,8 +5752,8 @@ class TransferDomainToAnotherAwsAccountResponse {
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_GetOperationDetail.html">GetOperationDetail</a>.
   final String? operationId;
 
-  /// To finish transferring a domain to another AWS account, the account that the
-  /// domain is being transferred to must submit an <a
+  /// To finish transferring a domain to another Amazon Web Services account, the
+  /// account that the domain is being transferred to must submit an <a
   /// href="https://docs.aws.amazon.com/Route53/latest/APIReference/API_domains_AcceptDomainTransferFromAnotherAwsAccount.html">AcceptDomainTransferFromAnotherAwsAccount</a>
   /// request. The request must include the value of the <code>Password</code>
   /// element that was returned in the

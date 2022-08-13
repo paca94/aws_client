@@ -19,10 +19,10 @@ import 'package:shared_aws_api/shared.dart'
 import 'monitoring-2010-08-01.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// Amazon CloudWatch monitors your Amazon Web Services (AWS) resources and the
-/// applications you run on AWS in real time. You can use CloudWatch to collect
-/// and track metrics, which are the variables you want to measure for your
-/// resources and applications.
+/// Amazon CloudWatch monitors your Amazon Web Services (Amazon Web Services)
+/// resources and the applications you run on Amazon Web Services in real time.
+/// You can use CloudWatch to collect and track metrics, which are the variables
+/// you want to measure for your resources and applications.
 ///
 /// CloudWatch alarms send notifications or automatically change the resources
 /// you are monitoring based on rules that you define. For example, you can
@@ -31,10 +31,10 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 /// additional instances to handle increased load. You can also use this data to
 /// stop under-used instances to save money.
 ///
-/// In addition to monitoring the built-in metrics that come with AWS, you can
-/// monitor your own custom metrics. With CloudWatch, you gain system-wide
-/// visibility into resource utilization, application performance, and
-/// operational health.
+/// In addition to monitoring the built-in metrics that come with Amazon Web
+/// Services, you can monitor your own custom metrics. With CloudWatch, you gain
+/// system-wide visibility into resource utilization, application performance,
+/// and operational health.
 class CloudWatch {
   final _s.QueryProtocol _protocol;
   final Map<String, _s.Shape> shapes;
@@ -113,12 +113,47 @@ class CloudWatch {
     );
   }
 
-  /// Deletes the specified anomaly detection model from your account.
+  /// Deletes the specified anomaly detection model from your account. For more
+  /// information about how to delete an anomaly detection model, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Create_Anomaly_Detection_Alarm.html#Delete_Anomaly_Detection_Model">Deleting
+  /// an anomaly detection model</a> in the <i>CloudWatch User Guide</i>.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalServiceFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [MissingRequiredParameterException].
+  /// May throw [InvalidParameterCombinationException].
+  ///
+  /// Parameter [dimensions] :
+  /// The metric dimensions associated with the anomaly detection model to
+  /// delete.
+  ///
+  /// Parameter [metricMathAnomalyDetector] :
+  /// The metric math anomaly detector to be deleted.
+  ///
+  /// When using <code>MetricMathAnomalyDetector</code>, you cannot include
+  /// following parameters in the same operation:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Dimensions</code>,
+  /// </li>
+  /// <li>
+  /// <code>MetricName</code>
+  /// </li>
+  /// <li>
+  /// <code>Namespace</code>
+  /// </li>
+  /// <li>
+  /// <code>Stat</code>
+  /// </li>
+  /// <li>
+  /// the <code>SingleMetricAnomalyDetector</code> parameters of
+  /// <code>DeleteAnomalyDetectorInput</code>
+  /// </li>
+  /// </ul>
+  /// Instead, specify the metric math anomaly detector attributes as part of
+  /// the <code>MetricMathAnomalyDetector</code> property.
   ///
   /// Parameter [metricName] :
   /// The metric name associated with the anomaly detection model to delete.
@@ -126,40 +161,70 @@ class CloudWatch {
   /// Parameter [namespace] :
   /// The namespace associated with the anomaly detection model to delete.
   ///
+  /// Parameter [singleMetricAnomalyDetector] :
+  /// A single metric anomaly detector to be deleted.
+  ///
+  /// When using <code>SingleMetricAnomalyDetector</code>, you cannot include
+  /// the following parameters in the same operation:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Dimensions</code>,
+  /// </li>
+  /// <li>
+  /// <code>MetricName</code>
+  /// </li>
+  /// <li>
+  /// <code>Namespace</code>
+  /// </li>
+  /// <li>
+  /// <code>Stat</code>
+  /// </li>
+  /// <li>
+  /// the <code>MetricMathAnomalyDetector</code> parameters of
+  /// <code>DeleteAnomalyDetectorInput</code>
+  /// </li>
+  /// </ul>
+  /// Instead, specify the single metric anomaly detector attributes as part of
+  /// the <code>SingleMetricAnomalyDetector</code> property.
+  ///
   /// Parameter [stat] :
   /// The statistic associated with the anomaly detection model to delete.
-  ///
-  /// Parameter [dimensions] :
-  /// The metric dimensions associated with the anomaly detection model to
-  /// delete.
   Future<void> deleteAnomalyDetector({
-    required String metricName,
-    required String namespace,
-    required String stat,
     List<Dimension>? dimensions,
+    MetricMathAnomalyDetector? metricMathAnomalyDetector,
+    String? metricName,
+    String? namespace,
+    SingleMetricAnomalyDetector? singleMetricAnomalyDetector,
+    String? stat,
   }) async {
-    ArgumentError.checkNotNull(metricName, 'metricName');
     _s.validateStringLength(
       'metricName',
       metricName,
       1,
       255,
-      isRequired: true,
     );
-    ArgumentError.checkNotNull(namespace, 'namespace');
     _s.validateStringLength(
       'namespace',
       namespace,
       1,
       255,
-      isRequired: true,
     );
-    ArgumentError.checkNotNull(stat, 'stat');
+    _s.validateStringLength(
+      'stat',
+      stat,
+      0,
+      50,
+    );
     final $request = <String, dynamic>{};
-    $request['MetricName'] = metricName;
-    $request['Namespace'] = namespace;
-    $request['Stat'] = stat;
     dimensions?.also((arg) => $request['Dimensions'] = arg);
+    metricMathAnomalyDetector
+        ?.also((arg) => $request['MetricMathAnomalyDetector'] = arg);
+    metricName?.also((arg) => $request['MetricName'] = arg);
+    namespace?.also((arg) => $request['Namespace'] = arg);
+    singleMetricAnomalyDetector
+        ?.also((arg) => $request['SingleMetricAnomalyDetector'] = arg);
+    stat?.also((arg) => $request['Stat'] = arg);
     await _protocol.send(
       $request,
       action: 'DeleteAnomalyDetector',
@@ -235,12 +300,53 @@ class CloudWatch {
     return DeleteInsightRulesOutput.fromXml($result);
   }
 
+  /// Permanently deletes the metric stream that you specify.
+  ///
+  /// May throw [InternalServiceFault].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [MissingRequiredParameterException].
+  ///
+  /// Parameter [name] :
+  /// The name of the metric stream to delete.
+  Future<void> deleteMetricStream({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      255,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['Name'] = name;
+    await _protocol.send(
+      $request,
+      action: 'DeleteMetricStream',
+      version: '2010-08-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['DeleteMetricStreamInput'],
+      shapes: shapes,
+      resultWrapper: 'DeleteMetricStreamResult',
+    );
+  }
+
   /// Retrieves the history for the specified alarm. You can filter the results
   /// by date range or item type. If an alarm name is not specified, the
   /// histories for either all metric alarms or all composite alarms are
   /// returned.
   ///
   /// CloudWatch retains the history of an alarm even if you delete the alarm.
+  ///
+  /// To use this operation and return information about a composite alarm, you
+  /// must be signed on with the <code>cloudwatch:DescribeAlarmHistory</code>
+  /// permission that is scoped to <code>*</code>. You can't return information
+  /// about composite alarms if your
+  /// <code>cloudwatch:DescribeAlarmHistory</code> permission has a narrower
+  /// scope.
   ///
   /// May throw [InvalidNextToken].
   ///
@@ -321,6 +427,12 @@ class CloudWatch {
 
   /// Retrieves the specified alarms. You can filter the results by specifying a
   /// prefix for the alarm name, the alarm state, or a prefix for any action.
+  ///
+  /// To use this operation and return information about composite alarms, you
+  /// must be signed on with the <code>cloudwatch:DescribeAlarms</code>
+  /// permission that is scoped to <code>*</code>. You can't return information
+  /// about composite alarms if your <code>cloudwatch:DescribeAlarms</code>
+  /// permission has a narrower scope.
   ///
   /// May throw [InvalidNextToken].
   ///
@@ -545,13 +657,22 @@ class CloudWatch {
   }
 
   /// Lists the anomaly detection models that you have created in your account.
-  /// You can list all models in your account or filter the results to only the
-  /// models that are related to a certain namespace, metric name, or metric
-  /// dimension.
+  /// For single metric anomaly detectors, you can list all of the models in
+  /// your account or filter the results to only the models that are related to
+  /// a certain namespace, metric name, or metric dimension. For metric math
+  /// anomaly detectors, you can list them by adding <code>METRIC_MATH</code> to
+  /// the <code>AnomalyDetectorTypes</code> array. This will return all metric
+  /// math anomaly detectors in your account.
   ///
   /// May throw [InvalidNextToken].
   /// May throw [InternalServiceFault].
   /// May throw [InvalidParameterValueException].
+  /// May throw [InvalidParameterCombinationException].
+  ///
+  /// Parameter [anomalyDetectorTypes] :
+  /// The anomaly detector types to request when using
+  /// <code>DescribeAnomalyDetectorsInput</code>. If empty, defaults to
+  /// <code>SINGLE_METRIC</code>.
   ///
   /// Parameter [dimensions] :
   /// Limits the results to only the anomaly detection models that are
@@ -580,6 +701,7 @@ class CloudWatch {
   /// Use the token returned by the previous operation to request the next page
   /// of results.
   Future<DescribeAnomalyDetectorsOutput> describeAnomalyDetectors({
+    List<AnomalyDetectorType>? anomalyDetectorTypes,
     List<Dimension>? dimensions,
     int? maxResults,
     String? metricName,
@@ -605,6 +727,8 @@ class CloudWatch {
       255,
     );
     final $request = <String, dynamic>{};
+    anomalyDetectorTypes?.also((arg) => $request['AnomalyDetectorTypes'] =
+        arg.map((e) => e.toValue()).toList());
     dimensions?.also((arg) => $request['Dimensions'] = arg);
     maxResults?.also((arg) => $request['MaxResults'] = arg);
     metricName?.also((arg) => $request['MetricName'] = arg);
@@ -973,16 +1097,28 @@ class CloudWatch {
     return GetInsightRuleReportOutput.fromXml($result);
   }
 
-  /// You can use the <code>GetMetricData</code> API to retrieve as many as 500
-  /// different metrics in a single request, with a total of as many as 100,800
-  /// data points. You can also optionally perform math expressions on the
-  /// values of the returned statistics, to create new time series that
-  /// represent new insights into your data. For example, using Lambda metrics,
-  /// you could divide the Errors metric by the Invocations metric to get an
-  /// error rate time series. For more information about metric math
-  /// expressions, see <a
+  /// You can use the <code>GetMetricData</code> API to retrieve CloudWatch
+  /// metric values. The operation can also include a CloudWatch Metrics
+  /// Insights query, and one or more metric math functions.
+  ///
+  /// A <code>GetMetricData</code> operation that does not include a query can
+  /// retrieve as many as 500 different metrics in a single request, with a
+  /// total of as many as 100,800 data points. You can also optionally perform
+  /// metric math expressions on the values of the returned statistics, to
+  /// create new time series that represent new insights into your data. For
+  /// example, using Lambda metrics, you could divide the Errors metric by the
+  /// Invocations metric to get an error rate time series. For more information
+  /// about metric math expressions, see <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax">Metric
   /// Math Syntax and Functions</a> in the <i>Amazon CloudWatch User Guide</i>.
+  ///
+  /// If you include a Metrics Insights query, each <code>GetMetricData</code>
+  /// operation can include only one query. But the same
+  /// <code>GetMetricData</code> operation can also retrieve other metrics.
+  /// Metrics Insights queries can query only the most recent three hours of
+  /// metric data. For more information about Metrics Insights, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/query_with_cloudwatch-metrics-insights.html">Query
+  /// your metrics with CloudWatch Metrics Insights</a>.
   ///
   /// Calls to the <code>GetMetricData</code> API have a different pricing
   /// structure than calls to <code>GetMetricStatistics</code>. For more
@@ -1028,6 +1164,17 @@ class CloudWatch {
   /// the results of the operation are null. CloudWatch does not perform unit
   /// conversions.
   ///
+  /// <b>Using Metrics Insights queries with metric math</b>
+  ///
+  /// You can't mix a Metric Insights query and metric math syntax in the same
+  /// expression, but you can reference results from a Metrics Insights query
+  /// within other Metric math expressions. A Metrics Insights query without a
+  /// <b>GROUP BY</b> clause returns a single time-series (TS), and can be used
+  /// as input for a metric math expression that expects a single time series. A
+  /// Metrics Insights query with a <b>GROUP BY</b> clause returns an array of
+  /// time-series (TS[]), and can be used as input for a metric math expression
+  /// that expects an array of time series.
+  ///
   /// May throw [InvalidNextToken].
   ///
   /// Parameter [endTime] :
@@ -1046,8 +1193,8 @@ class CloudWatch {
   /// Parameter [metricDataQueries] :
   /// The metric queries to be returned. A single <code>GetMetricData</code>
   /// call can include as many as 500 <code>MetricDataQuery</code> structures.
-  /// Each of these structures can specify either a metric to retrieve, or a
-  /// math expression to perform on retrieved data.
+  /// Each of these structures can specify either a metric to retrieve, a
+  /// Metrics Insights query, or a math expression to perform on retrieved data.
   ///
   /// Parameter [startTime] :
   /// The time stamp indicating the earliest data to be returned.
@@ -1087,6 +1234,11 @@ class CloudWatch {
   /// 12:05 or 12:30 as <code>StartTime</code> can get a faster response from
   /// CloudWatch than setting 12:07 or 12:29 as the <code>StartTime</code>.
   ///
+  /// Parameter [labelOptions] :
+  /// This structure includes the <code>Timezone</code> parameter, which you can
+  /// use to specify your time zone so that the labels of returned data display
+  /// the correct time for your time zone.
+  ///
   /// Parameter [maxDatapoints] :
   /// The maximum number of data points the request should return before
   /// paginating. If you omit this, the default of 100,800 is used.
@@ -1105,6 +1257,7 @@ class CloudWatch {
     required DateTime endTime,
     required List<MetricDataQuery> metricDataQueries,
     required DateTime startTime,
+    LabelOptions? labelOptions,
     int? maxDatapoints,
     String? nextToken,
     ScanBy? scanBy,
@@ -1116,6 +1269,7 @@ class CloudWatch {
     $request['EndTime'] = _s.iso8601ToJson(endTime);
     $request['MetricDataQueries'] = metricDataQueries;
     $request['StartTime'] = _s.iso8601ToJson(startTime);
+    labelOptions?.also((arg) => $request['LabelOptions'] = arg);
     maxDatapoints?.also((arg) => $request['MaxDatapoints'] = arg);
     nextToken?.also((arg) => $request['NextToken'] = arg);
     scanBy?.also((arg) => $request['ScanBy'] = arg.toValue());
@@ -1197,8 +1351,8 @@ class CloudWatch {
   /// CloudWatch started retaining 5-minute and 1-hour metric data as of July 9,
   /// 2016.
   ///
-  /// For information about metrics and dimensions supported by AWS services,
-  /// see the <a
+  /// For information about metrics and dimensions supported by Amazon Web
+  /// Services services, see the <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CW_Support_For_AWS.html">Amazon
   /// CloudWatch Metrics and Dimensions Reference</a> in the <i>Amazon
   /// CloudWatch User Guide</i>.
@@ -1378,6 +1532,43 @@ class CloudWatch {
     return GetMetricStatisticsOutput.fromXml($result);
   }
 
+  /// Returns information about the metric stream that you specify.
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalServiceFault].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [MissingRequiredParameterException].
+  /// May throw [InvalidParameterCombinationException].
+  ///
+  /// Parameter [name] :
+  /// The name of the metric stream to retrieve information about.
+  Future<GetMetricStreamOutput> getMetricStream({
+    required String name,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      255,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['Name'] = name;
+    final $result = await _protocol.send(
+      $request,
+      action: 'GetMetricStream',
+      version: '2010-08-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['GetMetricStreamInput'],
+      shapes: shapes,
+      resultWrapper: 'GetMetricStreamResult',
+    );
+    return GetMetricStreamOutput.fromXml($result);
+  }
+
   /// You can use the <code>GetMetricWidgetImage</code> API to retrieve a
   /// snapshot graph of one or more Amazon CloudWatch metrics as a bitmap image.
   /// You can then embed this image into your services and products, such as
@@ -1445,10 +1636,10 @@ class CloudWatch {
   /// <code>&lt;/GetMetricWidgetImageResponse&gt;</code>
   ///
   /// The <code>image/png</code> setting is intended only for custom HTTP
-  /// requests. For most use cases, and all actions using an AWS SDK, you should
-  /// use <code>png</code>. If you specify <code>image/png</code>, the HTTP
-  /// response has a content-type set to <code>image/png</code>, and the body of
-  /// the response is a PNG image.
+  /// requests. For most use cases, and all actions using an Amazon Web Services
+  /// SDK, you should use <code>png</code>. If you specify
+  /// <code>image/png</code>, the HTTP response has a content-type set to
+  /// <code>image/png</code>, and the body of the response is a PNG image.
   Future<GetMetricWidgetImageOutput> getMetricWidgetImage({
     required String metricWidget,
     String? outputFormat,
@@ -1512,6 +1703,46 @@ class CloudWatch {
       resultWrapper: 'ListDashboardsResult',
     );
     return ListDashboardsOutput.fromXml($result);
+  }
+
+  /// Returns a list of metric streams in this account.
+  ///
+  /// May throw [InvalidNextToken].
+  /// May throw [InternalServiceFault].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [MissingRequiredParameterException].
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of results to return in one operation.
+  ///
+  /// Parameter [nextToken] :
+  /// Include this value, if it was returned by the previous call, to get the
+  /// next set of metric streams.
+  Future<ListMetricStreamsOutput> listMetricStreams({
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      500,
+    );
+    final $request = <String, dynamic>{};
+    maxResults?.also((arg) => $request['MaxResults'] = arg);
+    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'ListMetricStreams',
+      version: '2010-08-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['ListMetricStreamsInput'],
+      shapes: shapes,
+      resultWrapper: 'ListMetricStreamsResult',
+    );
+    return ListMetricStreamsOutput.fromXml($result);
   }
 
   /// List the specified metrics. You can use the returned metrics with <a
@@ -1664,15 +1895,7 @@ class CloudWatch {
   /// May throw [InternalServiceFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [MissingRequiredParameterException].
-  ///
-  /// Parameter [metricName] :
-  /// The name of the metric to create the anomaly detection model for.
-  ///
-  /// Parameter [namespace] :
-  /// The namespace of the metric to create the anomaly detection model for.
-  ///
-  /// Parameter [stat] :
-  /// The statistic to use for the metric and the anomaly detection model.
+  /// May throw [InvalidParameterCombinationException].
   ///
   /// Parameter [configuration] :
   /// The configuration specifies details about how the anomaly detection model
@@ -1683,36 +1906,106 @@ class CloudWatch {
   ///
   /// Parameter [dimensions] :
   /// The metric dimensions to create the anomaly detection model for.
+  ///
+  /// Parameter [metricMathAnomalyDetector] :
+  /// The metric math anomaly detector to be created.
+  ///
+  /// When using <code>MetricMathAnomalyDetector</code>, you cannot include the
+  /// following parameters in the same operation:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Dimensions</code>
+  /// </li>
+  /// <li>
+  /// <code>MetricName</code>
+  /// </li>
+  /// <li>
+  /// <code>Namespace</code>
+  /// </li>
+  /// <li>
+  /// <code>Stat</code>
+  /// </li>
+  /// <li>
+  /// the <code>SingleMetricAnomalyDetector</code> parameters of
+  /// <code>PutAnomalyDetectorInput</code>
+  /// </li>
+  /// </ul>
+  /// Instead, specify the metric math anomaly detector attributes as part of
+  /// the property <code>MetricMathAnomalyDetector</code>.
+  ///
+  /// Parameter [metricName] :
+  /// The name of the metric to create the anomaly detection model for.
+  ///
+  /// Parameter [namespace] :
+  /// The namespace of the metric to create the anomaly detection model for.
+  ///
+  /// Parameter [singleMetricAnomalyDetector] :
+  /// A single metric anomaly detector to be created.
+  ///
+  /// When using <code>SingleMetricAnomalyDetector</code>, you cannot include
+  /// the following parameters in the same operation:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Dimensions</code>
+  /// </li>
+  /// <li>
+  /// <code>MetricName</code>
+  /// </li>
+  /// <li>
+  /// <code>Namespace</code>
+  /// </li>
+  /// <li>
+  /// <code>Stat</code>
+  /// </li>
+  /// <li>
+  /// the <code>MetricMatchAnomalyDetector</code> parameters of
+  /// <code>PutAnomalyDetectorInput</code>
+  /// </li>
+  /// </ul>
+  /// Instead, specify the single metric anomaly detector attributes as part of
+  /// the property <code>SingleMetricAnomalyDetector</code>.
+  ///
+  /// Parameter [stat] :
+  /// The statistic to use for the metric and the anomaly detection model.
   Future<void> putAnomalyDetector({
-    required String metricName,
-    required String namespace,
-    required String stat,
     AnomalyDetectorConfiguration? configuration,
     List<Dimension>? dimensions,
+    MetricMathAnomalyDetector? metricMathAnomalyDetector,
+    String? metricName,
+    String? namespace,
+    SingleMetricAnomalyDetector? singleMetricAnomalyDetector,
+    String? stat,
   }) async {
-    ArgumentError.checkNotNull(metricName, 'metricName');
     _s.validateStringLength(
       'metricName',
       metricName,
       1,
       255,
-      isRequired: true,
     );
-    ArgumentError.checkNotNull(namespace, 'namespace');
     _s.validateStringLength(
       'namespace',
       namespace,
       1,
       255,
-      isRequired: true,
     );
-    ArgumentError.checkNotNull(stat, 'stat');
+    _s.validateStringLength(
+      'stat',
+      stat,
+      0,
+      50,
+    );
     final $request = <String, dynamic>{};
-    $request['MetricName'] = metricName;
-    $request['Namespace'] = namespace;
-    $request['Stat'] = stat;
     configuration?.also((arg) => $request['Configuration'] = arg);
     dimensions?.also((arg) => $request['Dimensions'] = arg);
+    metricMathAnomalyDetector
+        ?.also((arg) => $request['MetricMathAnomalyDetector'] = arg);
+    metricName?.also((arg) => $request['MetricName'] = arg);
+    namespace?.also((arg) => $request['Namespace'] = arg);
+    singleMetricAnomalyDetector
+        ?.also((arg) => $request['SingleMetricAnomalyDetector'] = arg);
+    stat?.also((arg) => $request['Stat'] = arg);
     await _protocol.send(
       $request,
       action: 'PutAnomalyDetector',
@@ -1732,7 +2025,10 @@ class CloudWatch {
   /// alarm goes into ALARM state only if all conditions of the rule are met.
   ///
   /// The alarms specified in a composite alarm's rule expression can include
-  /// metric alarms and other composite alarms.
+  /// metric alarms and other composite alarms. The rule expression of a
+  /// composite alarm can include as many as 100 underlying alarms. Any single
+  /// alarm can be included in the rule expressions of as many as 150 composite
+  /// alarms.
   ///
   /// Using composite alarms can reduce alarm noise. You can create multiple
   /// metric alarms, and also create a composite alarm and set up alerts only
@@ -1767,6 +2063,11 @@ class CloudWatch {
   ///
   /// When you update an existing alarm, its state is left unchanged, but the
   /// update completely overwrites the previous configuration of the alarm.
+  ///
+  /// To use this operation, you must be signed on with the
+  /// <code>cloudwatch:PutCompositeAlarm</code> permission that is scoped to
+  /// <code>*</code>. You can't create a composite alarms if your
+  /// <code>cloudwatch:PutCompositeAlarm</code> permission has a narrower scope.
   ///
   /// If you are an IAM user, you must have
   /// <code>iam:CreateServiceLinkedRole</code> to create a composite alarm that
@@ -1851,6 +2152,29 @@ class CloudWatch {
   /// Indicates whether actions should be executed during any changes to the
   /// alarm state of the composite alarm. The default is <code>TRUE</code>.
   ///
+  /// Parameter [actionsSuppressor] :
+  /// Actions will be suppressed if the suppressor alarm is in the
+  /// <code>ALARM</code> state. <code>ActionsSuppressor</code> can be an
+  /// AlarmName or an Amazon Resource Name (ARN) from an existing alarm.
+  ///
+  /// Parameter [actionsSuppressorExtensionPeriod] :
+  /// The maximum time in seconds that the composite alarm waits after
+  /// suppressor alarm goes out of the <code>ALARM</code> state. After this
+  /// time, the composite alarm performs its actions.
+  /// <important>
+  /// <code>ExtensionPeriod</code> is required only when
+  /// <code>ActionsSuppressor</code> is specified.
+  /// </important>
+  ///
+  /// Parameter [actionsSuppressorWaitPeriod] :
+  /// The maximum time in seconds that the composite alarm waits for the
+  /// suppressor alarm to go into the <code>ALARM</code> state. After this time,
+  /// the composite alarm performs its actions.
+  /// <important>
+  /// <code>WaitPeriod</code> is required only when
+  /// <code>ActionsSuppressor</code> is specified.
+  /// </important>
+  ///
   /// Parameter [alarmActions] :
   /// The actions to execute when this alarm transitions to the
   /// <code>ALARM</code> state from any other state. Each action is specified as
@@ -1894,6 +2218,9 @@ class CloudWatch {
     required String alarmName,
     required String alarmRule,
     bool? actionsEnabled,
+    String? actionsSuppressor,
+    int? actionsSuppressorExtensionPeriod,
+    int? actionsSuppressorWaitPeriod,
     List<String>? alarmActions,
     String? alarmDescription,
     List<String>? insufficientDataActions,
@@ -1917,6 +2244,12 @@ class CloudWatch {
       isRequired: true,
     );
     _s.validateStringLength(
+      'actionsSuppressor',
+      actionsSuppressor,
+      1,
+      1600,
+    );
+    _s.validateStringLength(
       'alarmDescription',
       alarmDescription,
       0,
@@ -1926,6 +2259,11 @@ class CloudWatch {
     $request['AlarmName'] = alarmName;
     $request['AlarmRule'] = alarmRule;
     actionsEnabled?.also((arg) => $request['ActionsEnabled'] = arg);
+    actionsSuppressor?.also((arg) => $request['ActionsSuppressor'] = arg);
+    actionsSuppressorExtensionPeriod
+        ?.also((arg) => $request['ActionsSuppressorExtensionPeriod'] = arg);
+    actionsSuppressorWaitPeriod
+        ?.also((arg) => $request['ActionsSuppressorWaitPeriod'] = arg);
     alarmActions?.also((arg) => $request['AlarmActions'] = arg);
     alarmDescription?.also((arg) => $request['AlarmDescription'] = arg);
     insufficientDataActions
@@ -2120,14 +2458,44 @@ class CloudWatch {
   /// Systems Manager OpsItem actions.
   /// </li>
   /// </ul>
-  /// The first time you create an alarm in the AWS Management Console, the CLI,
-  /// or by using the PutMetricAlarm API, CloudWatch creates the necessary
-  /// service-linked rolea for you. The service-linked roles are called
-  /// <code>AWSServiceRoleForCloudWatchEvents</code> and
+  /// The first time you create an alarm in the Amazon Web Services Management
+  /// Console, the CLI, or by using the PutMetricAlarm API, CloudWatch creates
+  /// the necessary service-linked role for you. The service-linked roles are
+  /// called <code>AWSServiceRoleForCloudWatchEvents</code> and
   /// <code>AWSServiceRoleForCloudWatchAlarms_ActionSSM</code>. For more
   /// information, see <a
-  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html#iam-term-service-linked-role">AWS
-  /// service-linked role</a>.
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html#iam-term-service-linked-role">Amazon
+  /// Web Services service-linked role</a>.
+  ///
+  /// <b>Cross-account alarms</b>
+  ///
+  /// You can set an alarm on metrics in the current account, or in another
+  /// account. To create a cross-account alarm that watches a metric in a
+  /// different account, you must have completed the following pre-requisites:
+  ///
+  /// <ul>
+  /// <li>
+  /// The account where the metrics are located (the <i>sharing account</i>)
+  /// must already have a sharing role named
+  /// <b>CloudWatch-CrossAccountSharingRole</b>. If it does not already have
+  /// this role, you must create it using the instructions in <b>Set up a
+  /// sharing account</b> in <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html#enable-cross-account-cross-Region">
+  /// Cross-account cross-Region CloudWatch console</a>. The policy for that
+  /// role must grant access to the ID of the account where you are creating the
+  /// alarm.
+  /// </li>
+  /// <li>
+  /// The account where you are creating the alarm (the <i>monitoring
+  /// account</i>) must already have a service-linked role named
+  /// <b>AWSServiceRoleForCloudWatchCrossAccount</b> to allow CloudWatch to
+  /// assume the sharing role in the sharing account. If it does not, you must
+  /// create it following the directions in <b>Set up a monitoring account</b>
+  /// in <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html#enable-cross-account-cross-Region">
+  /// Cross-account cross-Region CloudWatch console</a>.
+  /// </li>
+  /// </ul>
   ///
   /// May throw [LimitExceededFault].
   ///
@@ -2172,6 +2540,8 @@ class CloudWatch {
   /// <code>arn:aws:autoscaling:<i>region</i>:<i>account-id</i>:scalingPolicy:<i>policy-id</i>:autoScalingGroupName/<i>group-friendly-name</i>:policyName/<i>policy-friendly-name</i>
   /// </code> |
   /// <code>arn:aws:ssm:<i>region</i>:<i>account-id</i>:opsitem:<i>severity</i>
+  /// </code> |
+  /// <code>arn:aws:ssm-incidents::<i>account-id</i>:response-plan:<i>response-plan-name</i>
   /// </code>
   ///
   /// Valid Values (for use with IAM roles):
@@ -2180,6 +2550,8 @@ class CloudWatch {
   /// <code>arn:aws:swf:<i>region</i>:<i>account-id</i>:action/actions/AWS_EC2.InstanceId.Terminate/1.0</code>
   /// |
   /// <code>arn:aws:swf:<i>region</i>:<i>account-id</i>:action/actions/AWS_EC2.InstanceId.Reboot/1.0</code>
+  /// |
+  /// <code>arn:aws:swf:<i>region</i>:<i>account-id</i>:action/actions/AWS_EC2.InstanceId.Recover/1.0</code>
   ///
   /// Parameter [alarmDescription] :
   /// The description for the alarm.
@@ -2291,6 +2663,8 @@ class CloudWatch {
   /// <code>arn:aws:swf:<i>region</i>:<i>account-id</i>:action/actions/AWS_EC2.InstanceId.Terminate/1.0</code>
   /// |
   /// <code>arn:aws:swf:<i>region</i>:<i>account-id</i>:action/actions/AWS_EC2.InstanceId.Reboot/1.0</code>
+  /// |
+  /// <code>arn:aws:swf:<i>region</i>:<i>account-id</i>:action/actions/AWS_EC2.InstanceId.Recover/1.0</code>
   ///
   /// Parameter [period] :
   /// The length, in seconds, used each time the metric specified in
@@ -2363,6 +2737,13 @@ class CloudWatch {
   /// How CloudWatch Alarms Treats Missing Data</a>.
   ///
   /// Valid Values: <code>breaching | notBreaching | ignore | missing</code>
+  /// <note>
+  /// Alarms that evaluate metrics in the <code>AWS/DynamoDB</code> namespace
+  /// always <code>ignore</code> missing data even if you choose a different
+  /// option for <code>TreatMissingData</code>. When an
+  /// <code>AWS/DynamoDB</code> metric has missing data, alarms that evaluate
+  /// that metric remain in their current state.
+  /// </note>
   ///
   /// Parameter [unit] :
   /// The unit of measure for the statistic. For example, the units for the
@@ -2379,7 +2760,7 @@ class CloudWatch {
   ///
   /// However, if the metric is published with multiple types of units and you
   /// don't specify a unit, the alarm's behavior is not defined and it behaves
-  /// predictably.
+  /// unpredictably.
   ///
   /// We recommend omitting <code>Unit</code> so that you don't inadvertently
   /// specify an incorrect unit that is not published for this metric. Doing so
@@ -2525,16 +2906,16 @@ class CloudWatch {
   /// up to 150 values per metric with one <code>PutMetricData</code> request,
   /// and supports retrieving percentile statistics on this data.
   ///
-  /// Each <code>PutMetricData</code> request is limited to 40 KB in size for
+  /// Each <code>PutMetricData</code> request is limited to 1 MB in size for
   /// HTTP POST requests. You can send a payload compressed by gzip. Each
-  /// request is also limited to no more than 20 different metrics.
+  /// request is also limited to no more than 1000 different metrics.
   ///
   /// Although the <code>Value</code> parameter accepts numbers of type
   /// <code>Double</code>, CloudWatch rejects values that are either too small
   /// or too large. Values must be in the range of -2^360 to 2^360. In addition,
   /// special values (for example, NaN, +Infinity, -Infinity) are not supported.
   ///
-  /// You can use up to 10 dimensions per metric to further clarify what data
+  /// You can use up to 30 dimensions per metric to further clarify what data
   /// the metric collects. Each dimension consists of a Name and Value pair. For
   /// more information about specifying dimensions, see <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html">Publishing
@@ -2578,14 +2959,14 @@ class CloudWatch {
   /// May throw [InternalServiceFault].
   ///
   /// Parameter [metricData] :
-  /// The data for the metric. The array can include no more than 20 metrics per
-  /// call.
+  /// The data for the metric. The array can include no more than 1000 metrics
+  /// per call.
   ///
   /// Parameter [namespace] :
   /// The namespace for the metric data.
   ///
-  /// To avoid conflicts with AWS service namespaces, you should not specify a
-  /// namespace that begins with <code>AWS/</code>
+  /// To avoid conflicts with Amazon Web Services service namespaces, you should
+  /// not specify a namespace that begins with <code>AWS/</code>
   Future<void> putMetricData({
     required List<MetricDatum> metricData,
     required String namespace,
@@ -2612,6 +2993,196 @@ class CloudWatch {
       shape: shapes['PutMetricDataInput'],
       shapes: shapes,
     );
+  }
+
+  /// Creates or updates a metric stream. Metric streams can automatically
+  /// stream CloudWatch metrics to Amazon Web Services destinations including
+  /// Amazon S3 and to many third-party solutions.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Metric-Streams.html">
+  /// Using Metric Streams</a>.
+  ///
+  /// To create a metric stream, you must be logged on to an account that has
+  /// the <code>iam:PassRole</code> permission and either the
+  /// <code>CloudWatchFullAccess</code> policy or the
+  /// <code>cloudwatch:PutMetricStream</code> permission.
+  ///
+  /// When you create or update a metric stream, you choose one of the
+  /// following:
+  ///
+  /// <ul>
+  /// <li>
+  /// Stream metrics from all metric namespaces in the account.
+  /// </li>
+  /// <li>
+  /// Stream metrics from all metric namespaces in the account, except for the
+  /// namespaces that you list in <code>ExcludeFilters</code>.
+  /// </li>
+  /// <li>
+  /// Stream metrics from only the metric namespaces that you list in
+  /// <code>IncludeFilters</code>.
+  /// </li>
+  /// </ul>
+  /// By default, a metric stream always sends the <code>MAX</code>,
+  /// <code>MIN</code>, <code>SUM</code>, and <code>SAMPLECOUNT</code>
+  /// statistics for each metric that is streamed. You can use the
+  /// <code>StatisticsConfigurations</code> parameter to have the metric stream
+  /// also send additional statistics in the stream. Streaming additional
+  /// statistics incurs additional costs. For more information, see <a
+  /// href="https://aws.amazon.com/cloudwatch/pricing/">Amazon CloudWatch
+  /// Pricing</a>.
+  ///
+  /// When you use <code>PutMetricStream</code> to create a new metric stream,
+  /// the stream is created in the <code>running</code> state. If you use it to
+  /// update an existing stream, the state of the stream is not changed.
+  ///
+  /// May throw [ConcurrentModificationException].
+  /// May throw [InternalServiceFault].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [MissingRequiredParameterException].
+  /// May throw [InvalidParameterCombinationException].
+  ///
+  /// Parameter [firehoseArn] :
+  /// The ARN of the Amazon Kinesis Firehose delivery stream to use for this
+  /// metric stream. This Amazon Kinesis Firehose delivery stream must already
+  /// exist and must be in the same account as the metric stream.
+  ///
+  /// Parameter [name] :
+  /// If you are creating a new metric stream, this is the name for the new
+  /// stream. The name must be different than the names of other metric streams
+  /// in this account and Region.
+  ///
+  /// If you are updating a metric stream, specify the name of that stream here.
+  ///
+  /// Valid characters are A-Z, a-z, 0-9, "-" and "_".
+  ///
+  /// Parameter [outputFormat] :
+  /// The output format for the stream. Valid values are <code>json</code> and
+  /// <code>opentelemetry0.7</code>. For more information about metric stream
+  /// output formats, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-formats.html">
+  /// Metric streams output formats</a>.
+  ///
+  /// Parameter [roleArn] :
+  /// The ARN of an IAM role that this metric stream will use to access Amazon
+  /// Kinesis Firehose resources. This IAM role must already exist and must be
+  /// in the same account as the metric stream. This IAM role must include the
+  /// following permissions:
+  ///
+  /// <ul>
+  /// <li>
+  /// firehose:PutRecord
+  /// </li>
+  /// <li>
+  /// firehose:PutRecordBatch
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [excludeFilters] :
+  /// If you specify this parameter, the stream sends metrics from all metric
+  /// namespaces except for the namespaces that you specify here.
+  ///
+  /// You cannot include <code>ExcludeFilters</code> and
+  /// <code>IncludeFilters</code> in the same operation.
+  ///
+  /// Parameter [includeFilters] :
+  /// If you specify this parameter, the stream sends only the metrics from the
+  /// metric namespaces that you specify here.
+  ///
+  /// You cannot include <code>IncludeFilters</code> and
+  /// <code>ExcludeFilters</code> in the same operation.
+  ///
+  /// Parameter [statisticsConfigurations] :
+  /// By default, a metric stream always sends the <code>MAX</code>,
+  /// <code>MIN</code>, <code>SUM</code>, and <code>SAMPLECOUNT</code>
+  /// statistics for each metric that is streamed. You can use this parameter to
+  /// have the metric stream also send additional statistics in the stream. This
+  /// array can have up to 100 members.
+  ///
+  /// For each entry in this array, you specify one or more metrics and the list
+  /// of additional statistics to stream for those metrics. The additional
+  /// statistics that you can stream depend on the stream's
+  /// <code>OutputFormat</code>. If the <code>OutputFormat</code> is
+  /// <code>json</code>, you can stream any additional statistic that is
+  /// supported by CloudWatch, listed in <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html">
+  /// CloudWatch statistics definitions</a>. If the <code>OutputFormat</code> is
+  /// <code>opentelemetry0.7</code>, you can stream percentile statistics such
+  /// as p95, p99.9 and so on.
+  ///
+  /// Parameter [tags] :
+  /// A list of key-value pairs to associate with the metric stream. You can
+  /// associate as many as 50 tags with a metric stream.
+  ///
+  /// Tags can help you organize and categorize your resources. You can also use
+  /// them to scope user permissions by granting a user permission to access or
+  /// change only resources with certain tag values.
+  ///
+  /// You can use this parameter only when you are creating a new metric stream.
+  /// If you are using this operation to update an existing metric stream, any
+  /// tags you specify in this parameter are ignored. To change the tags of an
+  /// existing metric stream, use <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_TagResource.html">TagResource</a>
+  /// or <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_UntagResource.html">UntagResource</a>.
+  Future<PutMetricStreamOutput> putMetricStream({
+    required String firehoseArn,
+    required String name,
+    required MetricStreamOutputFormat outputFormat,
+    required String roleArn,
+    List<MetricStreamFilter>? excludeFilters,
+    List<MetricStreamFilter>? includeFilters,
+    List<MetricStreamStatisticsConfiguration>? statisticsConfigurations,
+    List<Tag>? tags,
+  }) async {
+    ArgumentError.checkNotNull(firehoseArn, 'firehoseArn');
+    _s.validateStringLength(
+      'firehoseArn',
+      firehoseArn,
+      1,
+      1024,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      1,
+      255,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(outputFormat, 'outputFormat');
+    ArgumentError.checkNotNull(roleArn, 'roleArn');
+    _s.validateStringLength(
+      'roleArn',
+      roleArn,
+      1,
+      1024,
+      isRequired: true,
+    );
+    final $request = <String, dynamic>{};
+    $request['FirehoseArn'] = firehoseArn;
+    $request['Name'] = name;
+    $request['OutputFormat'] = outputFormat.toValue();
+    $request['RoleArn'] = roleArn;
+    excludeFilters?.also((arg) => $request['ExcludeFilters'] = arg);
+    includeFilters?.also((arg) => $request['IncludeFilters'] = arg);
+    statisticsConfigurations
+        ?.also((arg) => $request['StatisticsConfigurations'] = arg);
+    tags?.also((arg) => $request['Tags'] = arg);
+    final $result = await _protocol.send(
+      $request,
+      action: 'PutMetricStream',
+      version: '2010-08-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['PutMetricStreamInput'],
+      shapes: shapes,
+      resultWrapper: 'PutMetricStreamResult',
+    );
+    return PutMetricStreamOutput.fromXml($result);
   }
 
   /// Temporarily sets the state of an alarm for testing purposes. When the
@@ -2699,6 +3270,68 @@ class CloudWatch {
     );
   }
 
+  /// Starts the streaming of metrics for one or more of your metric streams.
+  ///
+  /// May throw [InternalServiceFault].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [MissingRequiredParameterException].
+  ///
+  /// Parameter [names] :
+  /// The array of the names of metric streams to start streaming.
+  ///
+  /// This is an "all or nothing" operation. If you do not have permission to
+  /// access all of the metric streams that you list here, then none of the
+  /// streams that you list in the operation will start streaming.
+  Future<void> startMetricStreams({
+    required List<String> names,
+  }) async {
+    ArgumentError.checkNotNull(names, 'names');
+    final $request = <String, dynamic>{};
+    $request['Names'] = names;
+    await _protocol.send(
+      $request,
+      action: 'StartMetricStreams',
+      version: '2010-08-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['StartMetricStreamsInput'],
+      shapes: shapes,
+      resultWrapper: 'StartMetricStreamsResult',
+    );
+  }
+
+  /// Stops the streaming of metrics for one or more of your metric streams.
+  ///
+  /// May throw [InternalServiceFault].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [MissingRequiredParameterException].
+  ///
+  /// Parameter [names] :
+  /// The array of the names of metric streams to stop streaming.
+  ///
+  /// This is an "all or nothing" operation. If you do not have permission to
+  /// access all of the metric streams that you list here, then none of the
+  /// streams that you list in the operation will stop streaming.
+  Future<void> stopMetricStreams({
+    required List<String> names,
+  }) async {
+    ArgumentError.checkNotNull(names, 'names');
+    final $request = <String, dynamic>{};
+    $request['Names'] = names;
+    await _protocol.send(
+      $request,
+      action: 'StopMetricStreams',
+      version: '2010-08-01',
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      shape: shapes['StopMetricStreamsInput'],
+      shapes: shapes,
+      resultWrapper: 'StopMetricStreamsResult',
+    );
+  }
+
   /// Assigns one or more tags (key-value pairs) to the specified CloudWatch
   /// resource. Currently, the only CloudWatch resources that can be tagged are
   /// alarms and Contributor Insights rules.
@@ -2707,8 +3340,8 @@ class CloudWatch {
   /// them to scope user permissions by granting a user permission to access or
   /// change only resources with certain tag values.
   ///
-  /// Tags don't have any semantic meaning to AWS and are interpreted strictly
-  /// as strings of characters.
+  /// Tags don't have any semantic meaning to Amazon Web Services and are
+  /// interpreted strictly as strings of characters.
   ///
   /// You can use the <code>TagResource</code> action with an alarm that already
   /// has tags. If you specify a new tag key for the alarm, this tag is appended
@@ -2825,6 +3458,39 @@ class CloudWatch {
   }
 }
 
+enum ActionsSuppressedBy {
+  waitPeriod,
+  extensionPeriod,
+  alarm,
+}
+
+extension on ActionsSuppressedBy {
+  String toValue() {
+    switch (this) {
+      case ActionsSuppressedBy.waitPeriod:
+        return 'WaitPeriod';
+      case ActionsSuppressedBy.extensionPeriod:
+        return 'ExtensionPeriod';
+      case ActionsSuppressedBy.alarm:
+        return 'Alarm';
+    }
+  }
+}
+
+extension on String {
+  ActionsSuppressedBy toActionsSuppressedBy() {
+    switch (this) {
+      case 'WaitPeriod':
+        return ActionsSuppressedBy.waitPeriod;
+      case 'ExtensionPeriod':
+        return ActionsSuppressedBy.extensionPeriod;
+      case 'Alarm':
+        return ActionsSuppressedBy.alarm;
+    }
+    throw Exception('$this is not known in enum ActionsSuppressedBy');
+  }
+}
+
 /// Represents the history of a specific alarm.
 class AlarmHistoryItem {
   /// The descriptive name for the alarm.
@@ -2895,9 +3561,9 @@ extension on String {
   }
 }
 
-/// An anomaly detection model associated with a particular CloudWatch metric
-/// and statistic. You can use the model to display a band of expected normal
-/// values when the metric is graphed.
+/// An anomaly detection model associated with a particular CloudWatch metric,
+/// statistic, or metric math expression. You can use the model to display a
+/// band of expected, normal values when the metric is graphed.
 class AnomalyDetector {
   /// The configuration specifies details about how the anomaly detection model is
   /// to be trained, including time ranges to exclude from use for training the
@@ -2907,11 +3573,17 @@ class AnomalyDetector {
   /// The metric dimensions associated with the anomaly detection model.
   final List<Dimension>? dimensions;
 
+  /// The CloudWatch metric math expression for this anomaly detector.
+  final MetricMathAnomalyDetector? metricMathAnomalyDetector;
+
   /// The name of the metric associated with the anomaly detection model.
   final String? metricName;
 
   /// The namespace of the metric associated with the anomaly detection model.
   final String? namespace;
+
+  /// The CloudWatch metric and statistic for this anomaly detector.
+  final SingleMetricAnomalyDetector? singleMetricAnomalyDetector;
 
   /// The statistic associated with the anomaly detection model.
   final String? stat;
@@ -2923,8 +3595,10 @@ class AnomalyDetector {
   AnomalyDetector({
     this.configuration,
     this.dimensions,
+    this.metricMathAnomalyDetector,
     this.metricName,
     this.namespace,
+    this.singleMetricAnomalyDetector,
     this.stat,
     this.stateValue,
   });
@@ -2937,8 +3611,14 @@ class AnomalyDetector {
           .findElements('member')
           .map((c) => Dimension.fromXml(c))
           .toList()),
+      metricMathAnomalyDetector: _s
+          .extractXmlChild(elem, 'MetricMathAnomalyDetector')
+          ?.let((e) => MetricMathAnomalyDetector.fromXml(e)),
       metricName: _s.extractXmlStringValue(elem, 'MetricName'),
       namespace: _s.extractXmlStringValue(elem, 'Namespace'),
+      singleMetricAnomalyDetector: _s
+          .extractXmlChild(elem, 'SingleMetricAnomalyDetector')
+          ?.let((e) => SingleMetricAnomalyDetector.fromXml(e)),
       stat: _s.extractXmlStringValue(elem, 'Stat'),
       stateValue: _s
           .extractXmlStringValue(elem, 'StateValue')
@@ -3024,6 +3704,34 @@ extension on String {
   }
 }
 
+enum AnomalyDetectorType {
+  singleMetric,
+  metricMath,
+}
+
+extension on AnomalyDetectorType {
+  String toValue() {
+    switch (this) {
+      case AnomalyDetectorType.singleMetric:
+        return 'SINGLE_METRIC';
+      case AnomalyDetectorType.metricMath:
+        return 'METRIC_MATH';
+    }
+  }
+}
+
+extension on String {
+  AnomalyDetectorType toAnomalyDetectorType() {
+    switch (this) {
+      case 'SINGLE_METRIC':
+        return AnomalyDetectorType.singleMetric;
+      case 'METRIC_MATH':
+        return AnomalyDetectorType.metricMath;
+    }
+    throw Exception('$this is not known in enum AnomalyDetectorType');
+  }
+}
+
 enum ComparisonOperator {
   greaterThanOrEqualToThreshold,
   greaterThanThreshold,
@@ -3083,6 +3791,46 @@ class CompositeAlarm {
   /// state.
   final bool? actionsEnabled;
 
+  /// When the value is <code>ALARM</code>, it means that the actions are
+  /// suppressed because the suppressor alarm is in <code>ALARM</code> When the
+  /// value is <code>WaitPeriod</code>, it means that the actions are suppressed
+  /// because the composite alarm is waiting for the suppressor alarm to go into
+  /// into the <code>ALARM</code> state. The maximum waiting time is as specified
+  /// in <code>ActionsSuppressorWaitPeriod</code>. After this time, the composite
+  /// alarm performs its actions. When the value is <code>ExtensionPeriod</code>,
+  /// it means that the actions are suppressed because the composite alarm is
+  /// waiting after the suppressor alarm went out of the <code>ALARM</code> state.
+  /// The maximum waiting time is as specified in
+  /// <code>ActionsSuppressorExtensionPeriod</code>. After this time, the
+  /// composite alarm performs its actions.
+  final ActionsSuppressedBy? actionsSuppressedBy;
+
+  /// Captures the reason for action suppression.
+  final String? actionsSuppressedReason;
+
+  /// Actions will be suppressed if the suppressor alarm is in the
+  /// <code>ALARM</code> state. <code>ActionsSuppressor</code> can be an AlarmName
+  /// or an Amazon Resource Name (ARN) from an existing alarm.
+  final String? actionsSuppressor;
+
+  /// The maximum time in seconds that the composite alarm waits after suppressor
+  /// alarm goes out of the <code>ALARM</code> state. After this time, the
+  /// composite alarm performs its actions.
+  /// <important>
+  /// <code>ExtensionPeriod</code> is required only when
+  /// <code>ActionsSuppressor</code> is specified.
+  /// </important>
+  final int? actionsSuppressorExtensionPeriod;
+
+  /// The maximum time in seconds that the composite alarm waits for the
+  /// suppressor alarm to go into the <code>ALARM</code> state. After this time,
+  /// the composite alarm performs its actions.
+  /// <important>
+  /// <code>WaitPeriod</code> is required only when <code>ActionsSuppressor</code>
+  /// is specified.
+  /// </important>
+  final int? actionsSuppressorWaitPeriod;
+
   /// The actions to execute when this alarm transitions to the ALARM state from
   /// any other state. Each action is specified as an Amazon Resource Name (ARN).
   final List<String>? alarmActions;
@@ -3117,7 +3865,11 @@ class CompositeAlarm {
   /// An explanation for the alarm state, in JSON format.
   final String? stateReasonData;
 
-  /// The time stamp of the last update to the alarm state.
+  /// The timestamp of the last change to the alarm's <code>StateValue</code>.
+  final DateTime? stateTransitionedTimestamp;
+
+  /// Tracks the timestamp of any state update, even if <code>StateValue</code>
+  /// doesn't change.
   final DateTime? stateUpdatedTimestamp;
 
   /// The state value for the alarm.
@@ -3125,6 +3877,11 @@ class CompositeAlarm {
 
   CompositeAlarm({
     this.actionsEnabled,
+    this.actionsSuppressedBy,
+    this.actionsSuppressedReason,
+    this.actionsSuppressor,
+    this.actionsSuppressorExtensionPeriod,
+    this.actionsSuppressorWaitPeriod,
     this.alarmActions,
     this.alarmArn,
     this.alarmConfigurationUpdatedTimestamp,
@@ -3135,12 +3892,23 @@ class CompositeAlarm {
     this.oKActions,
     this.stateReason,
     this.stateReasonData,
+    this.stateTransitionedTimestamp,
     this.stateUpdatedTimestamp,
     this.stateValue,
   });
   factory CompositeAlarm.fromXml(_s.XmlElement elem) {
     return CompositeAlarm(
       actionsEnabled: _s.extractXmlBoolValue(elem, 'ActionsEnabled'),
+      actionsSuppressedBy: _s
+          .extractXmlStringValue(elem, 'ActionsSuppressedBy')
+          ?.toActionsSuppressedBy(),
+      actionsSuppressedReason:
+          _s.extractXmlStringValue(elem, 'ActionsSuppressedReason'),
+      actionsSuppressor: _s.extractXmlStringValue(elem, 'ActionsSuppressor'),
+      actionsSuppressorExtensionPeriod:
+          _s.extractXmlIntValue(elem, 'ActionsSuppressorExtensionPeriod'),
+      actionsSuppressorWaitPeriod:
+          _s.extractXmlIntValue(elem, 'ActionsSuppressorWaitPeriod'),
       alarmActions: _s
           .extractXmlChild(elem, 'AlarmActions')
           ?.let((elem) => _s.extractXmlStringListValues(elem, 'member')),
@@ -3158,6 +3926,8 @@ class CompositeAlarm {
           ?.let((elem) => _s.extractXmlStringListValues(elem, 'member')),
       stateReason: _s.extractXmlStringValue(elem, 'StateReason'),
       stateReasonData: _s.extractXmlStringValue(elem, 'StateReasonData'),
+      stateTransitionedTimestamp:
+          _s.extractXmlDateTimeValue(elem, 'StateTransitionedTimestamp'),
       stateUpdatedTimestamp:
           _s.extractXmlDateTimeValue(elem, 'StateUpdatedTimestamp'),
       stateValue: _s.extractXmlStringValue(elem, 'StateValue')?.toStateValue(),
@@ -3312,6 +4082,15 @@ class DeleteInsightRulesOutput {
   }
 }
 
+class DeleteMetricStreamOutput {
+  DeleteMetricStreamOutput();
+  factory DeleteMetricStreamOutput.fromXml(
+      // ignore: avoid_unused_constructor_parameters
+      _s.XmlElement elem) {
+    return DeleteMetricStreamOutput();
+  }
+}
+
 class DescribeAlarmHistoryOutput {
   /// The alarm histories, in JSON format.
   final List<AlarmHistoryItem>? alarmHistoryItems;
@@ -3431,17 +4210,21 @@ class DescribeInsightRulesOutput {
 }
 
 /// A dimension is a name/value pair that is part of the identity of a metric.
-/// You can assign up to 10 dimensions to a metric. Because dimensions are part
-/// of the unique identifier for a metric, whenever you add a unique name/value
-/// pair to one of your metrics, you are creating a new variation of that
-/// metric.
+/// Because dimensions are part of the unique identifier for a metric, whenever
+/// you add a unique name/value pair to one of your metrics, you are creating a
+/// new variation of that metric. For example, many Amazon EC2 metrics publish
+/// <code>InstanceId</code> as a dimension name, and the actual instance ID as
+/// the value for that dimension.
+///
+/// You can assign up to 30 dimensions to a metric.
 class Dimension {
-  /// The name of the dimension. Dimension names cannot contain blank spaces or
-  /// non-ASCII characters.
+  /// The name of the dimension. Dimension names must contain only ASCII
+  /// characters, must include at least one non-whitespace character, and cannot
+  /// start with a colon (<code>:</code>).
   final String name;
 
-  /// The value of the dimension. Dimension values cannot contain blank spaces or
-  /// non-ASCII characters.
+  /// The value of the dimension. Dimension values must contain only ASCII
+  /// characters and must include at least one non-whitespace character.
   final String value;
 
   Dimension({
@@ -3670,6 +4453,99 @@ class GetMetricStatisticsOutput {
   }
 }
 
+class GetMetricStreamOutput {
+  /// The ARN of the metric stream.
+  final String? arn;
+
+  /// The date that the metric stream was created.
+  final DateTime? creationDate;
+
+  /// If this array of metric namespaces is present, then these namespaces are the
+  /// only metric namespaces that are not streamed by this metric stream. In this
+  /// case, all other metric namespaces in the account are streamed by this metric
+  /// stream.
+  final List<MetricStreamFilter>? excludeFilters;
+
+  /// The ARN of the Amazon Kinesis Firehose delivery stream that is used by this
+  /// metric stream.
+  final String? firehoseArn;
+
+  /// If this array of metric namespaces is present, then these namespaces are the
+  /// only metric namespaces that are streamed by this metric stream.
+  final List<MetricStreamFilter>? includeFilters;
+
+  /// The date of the most recent update to the metric stream's configuration.
+  final DateTime? lastUpdateDate;
+
+  /// The name of the metric stream.
+  final String? name;
+
+  /// The output format for the stream. Valid values are <code>json</code> and
+  /// <code>opentelemetry0.7</code>. For more information about metric stream
+  /// output formats, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-formats.html">
+  /// Metric streams output formats</a>.
+  final MetricStreamOutputFormat? outputFormat;
+
+  /// The ARN of the IAM role that is used by this metric stream.
+  final String? roleArn;
+
+  /// The state of the metric stream. The possible values are <code>running</code>
+  /// and <code>stopped</code>.
+  final String? state;
+
+  /// Each entry in this array displays information about one or more metrics that
+  /// include additional statistics in the metric stream. For more information
+  /// about the additional statistics, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html">
+  /// CloudWatch statistics definitions</a>.
+  final List<MetricStreamStatisticsConfiguration>? statisticsConfigurations;
+
+  GetMetricStreamOutput({
+    this.arn,
+    this.creationDate,
+    this.excludeFilters,
+    this.firehoseArn,
+    this.includeFilters,
+    this.lastUpdateDate,
+    this.name,
+    this.outputFormat,
+    this.roleArn,
+    this.state,
+    this.statisticsConfigurations,
+  });
+  factory GetMetricStreamOutput.fromXml(_s.XmlElement elem) {
+    return GetMetricStreamOutput(
+      arn: _s.extractXmlStringValue(elem, 'Arn'),
+      creationDate: _s.extractXmlDateTimeValue(elem, 'CreationDate'),
+      excludeFilters: _s.extractXmlChild(elem, 'ExcludeFilters')?.let((elem) =>
+          elem
+              .findElements('member')
+              .map((c) => MetricStreamFilter.fromXml(c))
+              .toList()),
+      firehoseArn: _s.extractXmlStringValue(elem, 'FirehoseArn'),
+      includeFilters: _s.extractXmlChild(elem, 'IncludeFilters')?.let((elem) =>
+          elem
+              .findElements('member')
+              .map((c) => MetricStreamFilter.fromXml(c))
+              .toList()),
+      lastUpdateDate: _s.extractXmlDateTimeValue(elem, 'LastUpdateDate'),
+      name: _s.extractXmlStringValue(elem, 'Name'),
+      outputFormat: _s
+          .extractXmlStringValue(elem, 'OutputFormat')
+          ?.toMetricStreamOutputFormat(),
+      roleArn: _s.extractXmlStringValue(elem, 'RoleArn'),
+      state: _s.extractXmlStringValue(elem, 'State'),
+      statisticsConfigurations: _s
+          .extractXmlChild(elem, 'StatisticsConfigurations')
+          ?.let((elem) => elem
+              .findElements('member')
+              .map((c) => MetricStreamStatisticsConfiguration.fromXml(c))
+              .toList()),
+    );
+  }
+}
+
 class GetMetricWidgetImageOutput {
   /// The image of the graph, in the output format specified. The output is
   /// base64-encoded.
@@ -3718,7 +4594,11 @@ extension on String {
   }
 }
 
-/// This structure contains the definition for a Contributor Insights rule.
+/// This structure contains the definition for a Contributor Insights rule. For
+/// more information about this rule, see<a
+/// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ContributorInsights.html">
+/// Using Constributor Insights to analyze high-cardinality data</a> in the
+/// <i>Amazon CloudWatch User Guide</i>.
 class InsightRule {
   /// The definition of the rule, as a JSON object. The definition contains the
   /// keywords used to define contributors, the value to aggregate on if this rule
@@ -3732,7 +4612,7 @@ class InsightRule {
   final String name;
 
   /// For rules that you create, this is always <code>{"Name":
-  /// "CloudWatchLogRule", "Version": 1}</code>. For built-in rules, this is
+  /// "CloudWatchLogRule", "Version": 1}</code>. For managed rules, this is
   /// <code>{"Name": "ServiceLogRule", "Version": 1}</code>
   final String schema;
 
@@ -3903,6 +4783,34 @@ class InsightRuleMetricDatapoint {
   }
 }
 
+/// This structure includes the <code>Timezone</code> parameter, which you can
+/// use to specify your time zone so that the labels that are associated with
+/// returned metrics display the correct time for your time zone.
+///
+/// The <code>Timezone</code> value affects a label only if you have a
+/// time-based dynamic expression in the label. For more information about
+/// dynamic expressions in labels, see <a
+/// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/graph-dynamic-labels.html">Using
+/// Dynamic Labels</a>.
+class LabelOptions {
+  /// The time zone to use for metric data return in this operation. The format is
+  /// <code>+</code> or <code>-</code> followed by four digits. The first two
+  /// digits indicate the number of hours ahead or behind of UTC, and the final
+  /// two digits are the number of minutes. For example, +0130 indicates a time
+  /// zone that is 1 hour and 30 minutes ahead of UTC. The default is +0000.
+  final String? timezone;
+
+  LabelOptions({
+    this.timezone,
+  });
+  Map<String, dynamic> toJson() {
+    final timezone = this.timezone;
+    return {
+      if (timezone != null) 'Timezone': timezone,
+    };
+  }
+}
+
 class ListDashboardsOutput {
   /// The list of matching dashboards.
   final List<DashboardEntry>? dashboardEntries;
@@ -3921,6 +4829,30 @@ class ListDashboardsOutput {
               .findElements('member')
               .map((c) => DashboardEntry.fromXml(c))
               .toList()),
+      nextToken: _s.extractXmlStringValue(elem, 'NextToken'),
+    );
+  }
+}
+
+class ListMetricStreamsOutput {
+  /// The array of metric stream information.
+  final List<MetricStreamEntry>? entries;
+
+  /// The token that marks the start of the next batch of returned results. You
+  /// can use this token in a subsequent operation to get the next batch of
+  /// results.
+  final String? nextToken;
+
+  ListMetricStreamsOutput({
+    this.entries,
+    this.nextToken,
+  });
+  factory ListMetricStreamsOutput.fromXml(_s.XmlElement elem) {
+    return ListMetricStreamsOutput(
+      entries: _s.extractXmlChild(elem, 'Entries')?.let((elem) => elem
+          .findElements('member')
+          .map((c) => MetricStreamEntry.fromXml(c))
+          .toList()),
       nextToken: _s.extractXmlStringValue(elem, 'NextToken'),
     );
   }
@@ -3963,6 +4895,12 @@ class ListTagsForResourceOutput {
 
 /// A message returned by the <code>GetMetricData</code>API, including a code
 /// and a description.
+///
+/// If a cross-Region <code>GetMetricData</code> operation fails with a code of
+/// <code>Forbidden</code> and a value of <code>Authentication too complex to
+/// retrieve cross region data</code>, you can correct the problem by running
+/// the <code>GetMetricData</code> operation in the same Region where the metric
+/// data is.
 class MessageData {
   /// The error code or status code associated with the message.
   final String? code;
@@ -4120,8 +5058,14 @@ class MetricAlarm {
   /// alarm.
   final String? thresholdMetricId;
 
-  /// Sets how this alarm is to handle missing data points. If this parameter is
-  /// omitted, the default behavior of <code>missing</code> is used.
+  /// Sets how this alarm is to handle missing data points. The valid values are
+  /// <code>breaching</code>, <code>notBreaching</code>, <code>ignore</code>, and
+  /// <code>missing</code>. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data">Configuring
+  /// how CloudWatch alarms treat missing data</a>.
+  ///
+  /// If this parameter is omitted, the default behavior of <code>missing</code>
+  /// is used.
   final String? treatMissingData;
 
   /// The unit of the metric associated with the alarm.
@@ -4212,8 +5156,8 @@ class MetricAlarm {
 ///
 /// When used in <code>GetMetricData</code>, it indicates the metric data to
 /// return, and whether this call is just retrieving a batch set of data for one
-/// metric, or is performing a math expression on metric data. A single
-/// <code>GetMetricData</code> call can include up to 500
+/// metric, or is performing a Metrics Insights query or a math expression. A
+/// single <code>GetMetricData</code> call can include up to 500
 /// <code>MetricDataQuery</code> structures.
 ///
 /// When used in <code>PutMetricAlarm</code>, it enables you to create an alarm
@@ -4246,11 +5190,24 @@ class MetricDataQuery {
   /// first character must be a lowercase letter.
   final String id;
 
-  /// The math expression to be performed on the returned data, if this object is
-  /// performing a math expression. This expression can use the <code>Id</code> of
-  /// the other metrics to refer to those metrics, and can also use the
-  /// <code>Id</code> of other expressions to use the result of those expressions.
-  /// For more information about metric math expressions, see <a
+  /// The ID of the account where the metrics are located, if this is a
+  /// cross-account alarm.
+  ///
+  /// Use this field only for <code>PutMetricAlarm</code> operations. It is not
+  /// used in <code>GetMetricData</code> operations.
+  final String? accountId;
+
+  /// This field can contain either a Metrics Insights query, or a metric math
+  /// expression to be performed on the returned data. For more information about
+  /// Metrics Insights queries, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-metrics-insights-querylanguage">Metrics
+  /// Insights query components and syntax</a> in the <i>Amazon CloudWatch User
+  /// Guide</i>.
+  ///
+  /// A math expression can use the <code>Id</code> of the other metrics or
+  /// queries to refer to those metrics, and can also use the <code>Id</code> of
+  /// other expressions to use the result of those expressions. For more
+  /// information about metric math expressions, see <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/using-metric-math.html#metric-math-syntax">Metric
   /// Math Syntax and Functions</a> in the <i>Amazon CloudWatch User Guide</i>.
   ///
@@ -4262,6 +5219,11 @@ class MetricDataQuery {
   /// useful if this is an expression, so that you know what the value represents.
   /// If the metric or expression is shown in a CloudWatch dashboard widget, the
   /// label is shown. If Label is omitted, CloudWatch generates a default.
+  ///
+  /// You can put dynamic expressions into a label, so that it is more
+  /// descriptive. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/graph-dynamic-labels.html">Using
+  /// Dynamic Labels</a>.
   final String? label;
 
   /// The metric to be returned, along with statistics, period, and units. Use
@@ -4295,6 +5257,7 @@ class MetricDataQuery {
 
   MetricDataQuery({
     required this.id,
+    this.accountId,
     this.expression,
     this.label,
     this.metricStat,
@@ -4304,6 +5267,7 @@ class MetricDataQuery {
   factory MetricDataQuery.fromXml(_s.XmlElement elem) {
     return MetricDataQuery(
       id: _s.extractXmlStringValue(elem, 'Id')!,
+      accountId: _s.extractXmlStringValue(elem, 'AccountId'),
       expression: _s.extractXmlStringValue(elem, 'Expression'),
       label: _s.extractXmlStringValue(elem, 'Label'),
       metricStat: _s
@@ -4316,6 +5280,7 @@ class MetricDataQuery {
 
   Map<String, dynamic> toJson() {
     final id = this.id;
+    final accountId = this.accountId;
     final expression = this.expression;
     final label = this.label;
     final metricStat = this.metricStat;
@@ -4323,6 +5288,7 @@ class MetricDataQuery {
     final returnData = this.returnData;
     return {
       'Id': id,
+      if (accountId != null) 'AccountId': accountId,
       if (expression != null) 'Expression': expression,
       if (label != null) 'Label': label,
       if (metricStat != null) 'MetricStat': metricStat,
@@ -4449,7 +5415,7 @@ class MetricDatum {
   /// Array of numbers representing the values for the metric during the period.
   /// Each unique value is listed just once in this array, and the corresponding
   /// number in the <code>Counts</code> array specifies the number of times that
-  /// value occurred during the period. You can include up to 150 unique values in
+  /// value occurred during the period. You can include up to 500 unique values in
   /// each <code>PutMetricData</code> action that specifies a <code>Values</code>
   /// array.
   ///
@@ -4490,6 +5456,42 @@ class MetricDatum {
       if (unit != null) 'Unit': unit.toValue(),
       if (value != null) 'Value': value,
       if (values != null) 'Values': values,
+    };
+  }
+}
+
+/// Indicates the CloudWatch math expression that provides the time series the
+/// anomaly detector uses as input. The designated math expression must return a
+/// single time series.
+class MetricMathAnomalyDetector {
+  /// An array of metric data query structures that enables you to create an
+  /// anomaly detector based on the result of a metric math expression. Each item
+  /// in <code>MetricDataQueries</code> gets a metric or performs a math
+  /// expression. One item in <code>MetricDataQueries</code> is the expression
+  /// that provides the time series that the anomaly detector uses as input.
+  /// Designate the expression by setting <code>ReturnData</code> to
+  /// <code>True</code> for this object in the array. For all other expressions
+  /// and metrics, set <code>ReturnData</code> to <code>False</code>. The
+  /// designated expression must return a single time series.
+  final List<MetricDataQuery>? metricDataQueries;
+
+  MetricMathAnomalyDetector({
+    this.metricDataQueries,
+  });
+  factory MetricMathAnomalyDetector.fromXml(_s.XmlElement elem) {
+    return MetricMathAnomalyDetector(
+      metricDataQueries: _s.extractXmlChild(elem, 'MetricDataQueries')?.let(
+          (elem) => elem
+              .findElements('member')
+              .map((c) => MetricDataQuery.fromXml(c))
+              .toList()),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final metricDataQueries = this.metricDataQueries;
+    return {
+      if (metricDataQueries != null) 'MetricDataQueries': metricDataQueries,
     };
   }
 }
@@ -4573,6 +5575,198 @@ class MetricStat {
   }
 }
 
+/// This structure contains the configuration information about one metric
+/// stream.
+class MetricStreamEntry {
+  /// The ARN of the metric stream.
+  final String? arn;
+
+  /// The date that the metric stream was originally created.
+  final DateTime? creationDate;
+
+  /// The ARN of the Kinesis Firehose devlivery stream that is used for this
+  /// metric stream.
+  final String? firehoseArn;
+
+  /// The date that the configuration of this metric stream was most recently
+  /// updated.
+  final DateTime? lastUpdateDate;
+
+  /// The name of the metric stream.
+  final String? name;
+
+  /// The output format of this metric stream. Valid values are <code>json</code>
+  /// and <code>opentelemetry0.7</code>.
+  final MetricStreamOutputFormat? outputFormat;
+
+  /// The current state of this stream. Valid values are <code>running</code> and
+  /// <code>stopped</code>.
+  final String? state;
+
+  MetricStreamEntry({
+    this.arn,
+    this.creationDate,
+    this.firehoseArn,
+    this.lastUpdateDate,
+    this.name,
+    this.outputFormat,
+    this.state,
+  });
+  factory MetricStreamEntry.fromXml(_s.XmlElement elem) {
+    return MetricStreamEntry(
+      arn: _s.extractXmlStringValue(elem, 'Arn'),
+      creationDate: _s.extractXmlDateTimeValue(elem, 'CreationDate'),
+      firehoseArn: _s.extractXmlStringValue(elem, 'FirehoseArn'),
+      lastUpdateDate: _s.extractXmlDateTimeValue(elem, 'LastUpdateDate'),
+      name: _s.extractXmlStringValue(elem, 'Name'),
+      outputFormat: _s
+          .extractXmlStringValue(elem, 'OutputFormat')
+          ?.toMetricStreamOutputFormat(),
+      state: _s.extractXmlStringValue(elem, 'State'),
+    );
+  }
+}
+
+/// This structure contains the name of one of the metric namespaces that is
+/// listed in a filter of a metric stream.
+class MetricStreamFilter {
+  /// The name of the metric namespace in the filter.
+  final String? namespace;
+
+  MetricStreamFilter({
+    this.namespace,
+  });
+  factory MetricStreamFilter.fromXml(_s.XmlElement elem) {
+    return MetricStreamFilter(
+      namespace: _s.extractXmlStringValue(elem, 'Namespace'),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final namespace = this.namespace;
+    return {
+      if (namespace != null) 'Namespace': namespace,
+    };
+  }
+}
+
+enum MetricStreamOutputFormat {
+  json,
+  opentelemetry0_7,
+}
+
+extension on MetricStreamOutputFormat {
+  String toValue() {
+    switch (this) {
+      case MetricStreamOutputFormat.json:
+        return 'json';
+      case MetricStreamOutputFormat.opentelemetry0_7:
+        return 'opentelemetry0.7';
+    }
+  }
+}
+
+extension on String {
+  MetricStreamOutputFormat toMetricStreamOutputFormat() {
+    switch (this) {
+      case 'json':
+        return MetricStreamOutputFormat.json;
+      case 'opentelemetry0.7':
+        return MetricStreamOutputFormat.opentelemetry0_7;
+    }
+    throw Exception('$this is not known in enum MetricStreamOutputFormat');
+  }
+}
+
+/// By default, a metric stream always sends the <code>MAX</code>,
+/// <code>MIN</code>, <code>SUM</code>, and <code>SAMPLECOUNT</code> statistics
+/// for each metric that is streamed. This structure contains information for
+/// one metric that includes additional statistics in the stream. For more
+/// information about statistics, see CloudWatch, listed in <a
+/// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html">
+/// CloudWatch statistics definitions</a>.
+class MetricStreamStatisticsConfiguration {
+  /// The list of additional statistics that are to be streamed for the metrics
+  /// listed in the <code>IncludeMetrics</code> array in this structure. This list
+  /// can include as many as 20 statistics.
+  ///
+  /// If the <code>OutputFormat</code> for the stream is
+  /// <code>opentelemetry0.7</code>, the only valid values are <code>p<i>??</i>
+  /// </code> percentile statistics such as <code>p90</code>, <code>p99</code> and
+  /// so on.
+  ///
+  /// If the <code>OutputFormat</code> for the stream is <code>json</code>, the
+  /// valid values include the abbreviations for all of the statistics listed in
+  /// <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html">
+  /// CloudWatch statistics definitions</a>. For example, this includes
+  /// <code>tm98, </code> <code>wm90</code>, <code>PR(:300)</code>, and so on.
+  final List<String> additionalStatistics;
+
+  /// An array of metric name and namespace pairs that stream the additional
+  /// statistics listed in the value of the <code>AdditionalStatistics</code>
+  /// parameter. There can be as many as 100 pairs in the array.
+  ///
+  /// All metrics that match the combination of metric name and namespace will be
+  /// streamed with the additional statistics, no matter their dimensions.
+  final List<MetricStreamStatisticsMetric> includeMetrics;
+
+  MetricStreamStatisticsConfiguration({
+    required this.additionalStatistics,
+    required this.includeMetrics,
+  });
+  factory MetricStreamStatisticsConfiguration.fromXml(_s.XmlElement elem) {
+    return MetricStreamStatisticsConfiguration(
+      additionalStatistics: _s.extractXmlStringListValues(
+          _s.extractXmlChild(elem, 'AdditionalStatistics')!, 'member'),
+      includeMetrics: _s
+          .extractXmlChild(elem, 'IncludeMetrics')!
+          .findElements('member')
+          .map((c) => MetricStreamStatisticsMetric.fromXml(c))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final additionalStatistics = this.additionalStatistics;
+    final includeMetrics = this.includeMetrics;
+    return {
+      'AdditionalStatistics': additionalStatistics,
+      'IncludeMetrics': includeMetrics,
+    };
+  }
+}
+
+/// This object contains the information for one metric that is to be streamed
+/// with additional statistics.
+class MetricStreamStatisticsMetric {
+  /// The name of the metric.
+  final String metricName;
+
+  /// The namespace of the metric.
+  final String namespace;
+
+  MetricStreamStatisticsMetric({
+    required this.metricName,
+    required this.namespace,
+  });
+  factory MetricStreamStatisticsMetric.fromXml(_s.XmlElement elem) {
+    return MetricStreamStatisticsMetric(
+      metricName: _s.extractXmlStringValue(elem, 'MetricName')!,
+      namespace: _s.extractXmlStringValue(elem, 'Namespace')!,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final metricName = this.metricName;
+    final namespace = this.namespace;
+    return {
+      'MetricName': metricName,
+      'Namespace': namespace,
+    };
+  }
+}
+
 /// This array is empty if the API operation was successful for all the rules
 /// specified in the request. If the operation could not process one of the
 /// rules, the following data is returned for each of those rules.
@@ -4647,6 +5841,20 @@ class PutInsightRuleOutput {
       // ignore: avoid_unused_constructor_parameters
       _s.XmlElement elem) {
     return PutInsightRuleOutput();
+  }
+}
+
+class PutMetricStreamOutput {
+  /// The ARN of the metric stream.
+  final String? arn;
+
+  PutMetricStreamOutput({
+    this.arn,
+  });
+  factory PutMetricStreamOutput.fromXml(_s.XmlElement elem) {
+    return PutMetricStreamOutput(
+      arn: _s.extractXmlStringValue(elem, 'Arn'),
+    );
   }
 }
 
@@ -4732,6 +5940,53 @@ extension on String {
         return ScanBy.timestampAscending;
     }
     throw Exception('$this is not known in enum ScanBy');
+  }
+}
+
+/// Designates the CloudWatch metric and statistic that provides the time series
+/// the anomaly detector uses as input.
+class SingleMetricAnomalyDetector {
+  /// The metric dimensions to create the anomaly detection model for.
+  final List<Dimension>? dimensions;
+
+  /// The name of the metric to create the anomaly detection model for.
+  final String? metricName;
+
+  /// The namespace of the metric to create the anomaly detection model for.
+  final String? namespace;
+
+  /// The statistic to use for the metric and anomaly detection model.
+  final String? stat;
+
+  SingleMetricAnomalyDetector({
+    this.dimensions,
+    this.metricName,
+    this.namespace,
+    this.stat,
+  });
+  factory SingleMetricAnomalyDetector.fromXml(_s.XmlElement elem) {
+    return SingleMetricAnomalyDetector(
+      dimensions: _s.extractXmlChild(elem, 'Dimensions')?.let((elem) => elem
+          .findElements('member')
+          .map((c) => Dimension.fromXml(c))
+          .toList()),
+      metricName: _s.extractXmlStringValue(elem, 'MetricName'),
+      namespace: _s.extractXmlStringValue(elem, 'Namespace'),
+      stat: _s.extractXmlStringValue(elem, 'Stat'),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final dimensions = this.dimensions;
+    final metricName = this.metricName;
+    final namespace = this.namespace;
+    final stat = this.stat;
+    return {
+      if (dimensions != null) 'Dimensions': dimensions,
+      if (metricName != null) 'MetricName': metricName,
+      if (namespace != null) 'Namespace': namespace,
+      if (stat != null) 'Stat': stat,
+    };
   }
 }
 
@@ -4888,6 +6143,15 @@ extension on String {
   }
 }
 
+class StartMetricStreamsOutput {
+  StartMetricStreamsOutput();
+  factory StartMetricStreamsOutput.fromXml(
+      // ignore: avoid_unused_constructor_parameters
+      _s.XmlElement elem) {
+    return StartMetricStreamsOutput();
+  }
+}
+
 enum StateValue {
   ok,
   alarm,
@@ -5028,6 +6292,15 @@ extension on String {
         return StatusCode.partialData;
     }
     throw Exception('$this is not known in enum StatusCode');
+  }
+}
+
+class StopMetricStreamsOutput {
+  StopMetricStreamsOutput();
+  factory StopMetricStreamsOutput.fromXml(
+      // ignore: avoid_unused_constructor_parameters
+      _s.XmlElement elem) {
+    return StopMetricStreamsOutput();
   }
 }
 

@@ -18,11 +18,11 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// Use the Amazon Elasticsearch Configuration API to create, configure, and
-/// manage Elasticsearch domains.
-class ElasticsearchService {
+/// Use the Amazon OpenSearch configuration API to create, configure, and manage
+/// Amazon OpenSearch Service domains.
+class OpenSearchService {
   final _s.RestJsonProtocol _protocol;
-  ElasticsearchService({
+  OpenSearchService({
     required String region,
     _s.AwsClientCredentials? credentials,
     _s.AwsClientCredentialsProvider? credentialsProvider,
@@ -48,37 +48,41 @@ class ElasticsearchService {
     _protocol.close();
   }
 
-  /// Allows the destination domain owner to accept an inbound cross-cluster
-  /// search connection request.
+  /// Allows the remote domain owner to accept an inbound cross-cluster
+  /// connection request.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [LimitExceededException].
   /// May throw [DisabledOperationException].
   ///
-  /// Parameter [crossClusterSearchConnectionId] :
-  /// The id of the inbound connection that you want to accept.
-  Future<AcceptInboundCrossClusterSearchConnectionResponse>
-      acceptInboundCrossClusterSearchConnection({
-    required String crossClusterSearchConnectionId,
+  /// Parameter [connectionId] :
+  /// The ID of the inbound connection you want to accept.
+  Future<AcceptInboundConnectionResponse> acceptInboundConnection({
+    required String connectionId,
   }) async {
-    ArgumentError.checkNotNull(
-        crossClusterSearchConnectionId, 'crossClusterSearchConnectionId');
+    ArgumentError.checkNotNull(connectionId, 'connectionId');
+    _s.validateStringLength(
+      'connectionId',
+      connectionId,
+      10,
+      256,
+      isRequired: true,
+    );
     final response = await _protocol.send(
       payload: null,
       method: 'PUT',
       requestUri:
-          '/2015-01-01/es/ccs/inboundConnection/${Uri.encodeComponent(crossClusterSearchConnectionId)}/accept',
+          '/2021-01-01/opensearch/cc/inboundConnection/${Uri.encodeComponent(connectionId)}/accept',
       exceptionFnMap: _exceptionFns,
     );
-    return AcceptInboundCrossClusterSearchConnectionResponse.fromJson(response);
+    return AcceptInboundConnectionResponse.fromJson(response);
   }
 
-  /// Attaches tags to an existing Elasticsearch domain. Tags are a set of
-  /// case-sensitive key value pairs. An Elasticsearch domain may have up to 10
-  /// tags. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains.html#es-managedomains-awsresorcetagging"
-  /// target="_blank"> Tagging Amazon Elasticsearch Service Domains for more
-  /// information.</a>
+  /// Attaches tags to an existing domain. Tags are a set of case-sensitive key
+  /// value pairs. An domain can have up to 10 tags. See <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains.html#managedomains-awsresorcetagging"
+  /// target="_blank"> Tagging Amazon OpenSearch Service domains</a> for more
+  /// information.
   ///
   /// May throw [BaseException].
   /// May throw [LimitExceededException].
@@ -86,16 +90,22 @@ class ElasticsearchService {
   /// May throw [InternalException].
   ///
   /// Parameter [arn] :
-  /// Specify the <code>ARN</code> for which you want to add the tags.
+  /// Specify the <code>ARN</code> of the domain you want to add tags to.
   ///
   /// Parameter [tagList] :
-  /// List of <code>Tag</code> that need to be added for the Elasticsearch
-  /// domain.
+  /// List of <code>Tag</code> to add to the domain.
   Future<void> addTags({
     required String arn,
     required List<Tag> tagList,
   }) async {
     ArgumentError.checkNotNull(arn, 'arn');
+    _s.validateStringLength(
+      'arn',
+      arn,
+      20,
+      2048,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(tagList, 'tagList');
     final $payload = <String, dynamic>{
       'ARN': arn,
@@ -104,12 +114,12 @@ class ElasticsearchService {
     await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/tags',
+      requestUri: '/2021-01-01/tags',
       exceptionFnMap: _exceptionFns,
     );
   }
 
-  /// Associates a package with an Amazon ES domain.
+  /// Associates a package with an Amazon OpenSearch Service domain.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -119,10 +129,10 @@ class ElasticsearchService {
   /// May throw [ConflictException].
   ///
   /// Parameter [domainName] :
-  /// Name of the domain that you want to associate the package with.
+  /// The name of the domain to associate the package with.
   ///
   /// Parameter [packageID] :
-  /// Internal ID of the package that you want to associate with a domain. Use
+  /// Internal ID of the package to associate with a domain. Use
   /// <code>DescribePackages</code> to find this value.
   Future<AssociatePackageResponse> associatePackage({
     required String domainName,
@@ -141,14 +151,14 @@ class ElasticsearchService {
       payload: null,
       method: 'POST',
       requestUri:
-          '/2015-01-01/packages/associate/${Uri.encodeComponent(packageID)}/${Uri.encodeComponent(domainName)}',
+          '/2021-01-01/packages/associate/${Uri.encodeComponent(packageID)}/${Uri.encodeComponent(domainName)}',
       exceptionFnMap: _exceptionFns,
     );
     return AssociatePackageResponse.fromJson(response);
   }
 
-  /// Cancels a scheduled service software update for an Amazon ES domain. You
-  /// can only perform this operation before the
+  /// Cancels a scheduled service software update for an Amazon OpenSearch
+  /// Service domain. You can only perform this operation before the
   /// <code>AutomatedUpdateDate</code> and when the <code>UpdateStatus</code> is
   /// in the <code>PENDING_UPDATE</code> state.
   ///
@@ -160,8 +170,7 @@ class ElasticsearchService {
   /// Parameter [domainName] :
   /// The name of the domain that you want to stop the latest service software
   /// update on.
-  Future<CancelElasticsearchServiceSoftwareUpdateResponse>
-      cancelElasticsearchServiceSoftwareUpdate({
+  Future<CancelServiceSoftwareUpdateResponse> cancelServiceSoftwareUpdate({
     required String domainName,
   }) async {
     ArgumentError.checkNotNull(domainName, 'domainName');
@@ -178,16 +187,17 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/serviceSoftwareUpdate/cancel',
+      requestUri: '/2021-01-01/opensearch/serviceSoftwareUpdate/cancel',
       exceptionFnMap: _exceptionFns,
     );
-    return CancelElasticsearchServiceSoftwareUpdateResponse.fromJson(response);
+    return CancelServiceSoftwareUpdateResponse.fromJson(response);
   }
 
-  /// Creates a new Elasticsearch domain. For more information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomains"
-  /// target="_blank">Creating Elasticsearch Domains</a> in the <i>Amazon
-  /// Elasticsearch Service Developer Guide</i>.
+  /// Creates a new Amazon OpenSearch Service domain. For more information, see
+  /// <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html"
+  /// target="_blank">Creating and managing Amazon OpenSearch Service domains
+  /// </a> in the <i>Amazon OpenSearch Service Developer Guide</i>.
   ///
   /// May throw [BaseException].
   /// May throw [DisabledOperationException].
@@ -198,10 +208,10 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [domainName] :
-  /// The name of the Elasticsearch domain that you are creating. Domain names
-  /// are unique across the domains owned by an account within an AWS region.
-  /// Domain names must start with a lowercase letter and can contain the
-  /// following characters: a-z (lowercase), 0-9, and - (hyphen).
+  /// The name of the Amazon OpenSearch Service domain you're creating. Domain
+  /// names are unique across the domains owned by an account within an AWS
+  /// region. Domain names must start with a lowercase letter and can contain
+  /// the following characters: a-z (lowercase), 0-9, and - (hyphen).
   ///
   /// Parameter [accessPolicies] :
   /// IAM access policy as a JSON-formatted string.
@@ -210,8 +220,8 @@ class ElasticsearchService {
   /// Option to allow references to indices in an HTTP request body. Must be
   /// <code>false</code> when configuring access to individual sub-resources. By
   /// default, the value is <code>true</code>. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-advanced-options"
-  /// target="_blank">Configuration Advanced Options</a> for more information.
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomain-configure-advanced-options"
+  /// target="_blank">Advanced cluster parameters </a> for more information.
   ///
   /// Parameter [advancedSecurityOptions] :
   /// Specifies advanced security options.
@@ -219,40 +229,42 @@ class ElasticsearchService {
   /// Parameter [autoTuneOptions] :
   /// Specifies Auto-Tune options.
   ///
+  /// Parameter [clusterConfig] :
+  /// Configuration options for a domain. Specifies the instance type and number
+  /// of instances in the domain.
+  ///
   /// Parameter [cognitoOptions] :
-  /// Options to specify the Cognito user and identity pools for Kibana
-  /// authentication. For more information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html"
-  /// target="_blank">Amazon Cognito Authentication for Kibana</a>.
+  /// Options to specify the Cognito user and identity pools for OpenSearch
+  /// Dashboards authentication. For more information, see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/cognito-auth.html"
+  /// target="_blank">Configuring Amazon Cognito authentication for OpenSearch
+  /// Dashboards</a>.
   ///
   /// Parameter [domainEndpointOptions] :
-  /// Options to specify configuration that will be applied to the domain
+  /// Options to specify configurations that will be applied to the domain
   /// endpoint.
   ///
   /// Parameter [eBSOptions] :
-  /// Options to enable, disable and specify the type and size of EBS storage
+  /// Options to enable, disable, and specify the type and size of EBS storage
   /// volumes.
   ///
-  /// Parameter [elasticsearchClusterConfig] :
-  /// Configuration options for an Elasticsearch domain. Specifies the instance
-  /// type and number of instances in the domain cluster.
-  ///
-  /// Parameter [elasticsearchVersion] :
-  /// String of format X.Y to specify version for the Elasticsearch domain eg.
-  /// "1.5" or "2.3". For more information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomains"
-  /// target="_blank">Creating Elasticsearch Domains</a> in the <i>Amazon
-  /// Elasticsearch Service Developer Guide</i>.
-  ///
   /// Parameter [encryptionAtRestOptions] :
-  /// Specifies the Encryption At Rest Options.
+  /// Options for encryption of data at rest.
+  ///
+  /// Parameter [engineVersion] :
+  /// String of format Elasticsearch_X.Y or OpenSearch_X.Y to specify the engine
+  /// version for the Amazon OpenSearch Service domain. For example,
+  /// "OpenSearch_1.0" or "Elasticsearch_7.9". For more information, see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomains"
+  /// target="_blank">Creating and managing Amazon OpenSearch Service domains
+  /// </a>.
   ///
   /// Parameter [logPublishingOptions] :
   /// Map of <code>LogType</code> and <code>LogPublishingOption</code>, each
-  /// containing options to publish a given type of Elasticsearch log.
+  /// containing options to publish a given type of OpenSearch log.
   ///
   /// Parameter [nodeToNodeEncryptionOptions] :
-  /// Specifies the NodeToNodeEncryptionOptions.
+  /// Node-to-node encryption options.
   ///
   /// Parameter [snapshotOptions] :
   /// Option to set time, in UTC format, of the daily automated snapshot.
@@ -262,23 +274,23 @@ class ElasticsearchService {
   /// A list of <code>Tag</code> added during domain creation.
   ///
   /// Parameter [vPCOptions] :
-  /// Options to specify the subnets and security groups for VPC endpoint. For
+  /// Options to specify the subnets and security groups for a VPC endpoint. For
   /// more information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html#es-creating-vpc"
-  /// target="_blank">Creating a VPC</a> in <i>VPC Endpoints for Amazon
-  /// Elasticsearch Service Domains</i>
-  Future<CreateElasticsearchDomainResponse> createElasticsearchDomain({
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html"
+  /// target="_blank">Launching your Amazon OpenSearch Service domains using a
+  /// VPC </a>.
+  Future<CreateDomainResponse> createDomain({
     required String domainName,
     String? accessPolicies,
     Map<String, String>? advancedOptions,
     AdvancedSecurityOptionsInput? advancedSecurityOptions,
     AutoTuneOptionsInput? autoTuneOptions,
+    ClusterConfig? clusterConfig,
     CognitoOptions? cognitoOptions,
     DomainEndpointOptions? domainEndpointOptions,
     EBSOptions? eBSOptions,
-    ElasticsearchClusterConfig? elasticsearchClusterConfig,
-    String? elasticsearchVersion,
     EncryptionAtRestOptions? encryptionAtRestOptions,
+    String? engineVersion,
     Map<LogType, LogPublishingOption>? logPublishingOptions,
     NodeToNodeEncryptionOptions? nodeToNodeEncryptionOptions,
     SnapshotOptions? snapshotOptions,
@@ -293,6 +305,18 @@ class ElasticsearchService {
       28,
       isRequired: true,
     );
+    _s.validateStringLength(
+      'accessPolicies',
+      accessPolicies,
+      0,
+      102400,
+    );
+    _s.validateStringLength(
+      'engineVersion',
+      engineVersion,
+      14,
+      18,
+    );
     final $payload = <String, dynamic>{
       'DomainName': domainName,
       if (accessPolicies != null) 'AccessPolicies': accessPolicies,
@@ -300,16 +324,14 @@ class ElasticsearchService {
       if (advancedSecurityOptions != null)
         'AdvancedSecurityOptions': advancedSecurityOptions,
       if (autoTuneOptions != null) 'AutoTuneOptions': autoTuneOptions,
+      if (clusterConfig != null) 'ClusterConfig': clusterConfig,
       if (cognitoOptions != null) 'CognitoOptions': cognitoOptions,
       if (domainEndpointOptions != null)
         'DomainEndpointOptions': domainEndpointOptions,
       if (eBSOptions != null) 'EBSOptions': eBSOptions,
-      if (elasticsearchClusterConfig != null)
-        'ElasticsearchClusterConfig': elasticsearchClusterConfig,
-      if (elasticsearchVersion != null)
-        'ElasticsearchVersion': elasticsearchVersion,
       if (encryptionAtRestOptions != null)
         'EncryptionAtRestOptions': encryptionAtRestOptions,
+      if (engineVersion != null) 'EngineVersion': engineVersion,
       if (logPublishingOptions != null)
         'LogPublishingOptions':
             logPublishingOptions.map((k, e) => MapEntry(k.toValue(), e)),
@@ -322,14 +344,14 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/domain',
+      requestUri: '/2021-01-01/opensearch/domain',
       exceptionFnMap: _exceptionFns,
     );
-    return CreateElasticsearchDomainResponse.fromJson(response);
+    return CreateDomainResponse.fromJson(response);
   }
 
-  /// Creates a new cross-cluster search connection from a source domain to a
-  /// destination domain.
+  /// Creates a new cross-cluster connection from a local OpenSearch domain to a
+  /// remote OpenSearch domain.
   ///
   /// May throw [LimitExceededException].
   /// May throw [InternalException].
@@ -337,48 +359,46 @@ class ElasticsearchService {
   /// May throw [DisabledOperationException].
   ///
   /// Parameter [connectionAlias] :
-  /// Specifies the connection alias that will be used by the customer for this
+  /// The connection alias used used by the customer for this cross-cluster
   /// connection.
   ///
-  /// Parameter [destinationDomainInfo] :
-  /// Specifies the <code><a>DomainInformation</a></code> for the destination
-  /// Elasticsearch domain.
+  /// Parameter [localDomainInfo] :
+  /// The <code> <a>AWSDomainInformation</a> </code> for the local OpenSearch
+  /// domain.
   ///
-  /// Parameter [sourceDomainInfo] :
-  /// Specifies the <code><a>DomainInformation</a></code> for the source
-  /// Elasticsearch domain.
-  Future<CreateOutboundCrossClusterSearchConnectionResponse>
-      createOutboundCrossClusterSearchConnection({
+  /// Parameter [remoteDomainInfo] :
+  /// The <code> <a>AWSDomainInformation</a> </code> for the remote OpenSearch
+  /// domain.
+  Future<CreateOutboundConnectionResponse> createOutboundConnection({
     required String connectionAlias,
-    required DomainInformation destinationDomainInfo,
-    required DomainInformation sourceDomainInfo,
+    required DomainInformationContainer localDomainInfo,
+    required DomainInformationContainer remoteDomainInfo,
   }) async {
     ArgumentError.checkNotNull(connectionAlias, 'connectionAlias');
     _s.validateStringLength(
       'connectionAlias',
       connectionAlias,
-      0,
-      20,
+      2,
+      100,
       isRequired: true,
     );
-    ArgumentError.checkNotNull(destinationDomainInfo, 'destinationDomainInfo');
-    ArgumentError.checkNotNull(sourceDomainInfo, 'sourceDomainInfo');
+    ArgumentError.checkNotNull(localDomainInfo, 'localDomainInfo');
+    ArgumentError.checkNotNull(remoteDomainInfo, 'remoteDomainInfo');
     final $payload = <String, dynamic>{
       'ConnectionAlias': connectionAlias,
-      'DestinationDomainInfo': destinationDomainInfo,
-      'SourceDomainInfo': sourceDomainInfo,
+      'LocalDomainInfo': localDomainInfo,
+      'RemoteDomainInfo': remoteDomainInfo,
     };
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/ccs/outboundConnection',
+      requestUri: '/2021-01-01/opensearch/cc/outboundConnection',
       exceptionFnMap: _exceptionFns,
     );
-    return CreateOutboundCrossClusterSearchConnectionResponse.fromJson(
-        response);
+    return CreateOutboundConnectionResponse.fromJson(response);
   }
 
-  /// Create a package for use with Amazon ES domains.
+  /// Create a package for use with Amazon OpenSearch Service domains.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -392,8 +412,7 @@ class ElasticsearchService {
   /// Unique identifier for the package.
   ///
   /// Parameter [packageSource] :
-  /// The customer S3 location <code>PackageSource</code> for importing the
-  /// package.
+  /// The Amazon S3 location from which to import the package.
   ///
   /// Parameter [packageType] :
   /// Type of package. Currently supports only TXT-DICTIONARY.
@@ -431,14 +450,14 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/packages',
+      requestUri: '/2021-01-01/packages',
       exceptionFnMap: _exceptionFns,
     );
     return CreatePackageResponse.fromJson(response);
   }
 
-  /// Permanently deletes the specified Elasticsearch domain and all of its
-  /// data. Once a domain is deleted, it cannot be recovered.
+  /// Permanently deletes the specified domain and all of its data. Once a
+  /// domain is deleted, it cannot be recovered.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -446,8 +465,8 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [domainName] :
-  /// The name of the Elasticsearch domain that you want to permanently delete.
-  Future<DeleteElasticsearchDomainResponse> deleteElasticsearchDomain({
+  /// The name of the domain you want to permanently delete.
+  Future<DeleteDomainResponse> deleteDomain({
     required String domainName,
   }) async {
     ArgumentError.checkNotNull(domainName, 'domainName');
@@ -461,82 +480,72 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: null,
       method: 'DELETE',
-      requestUri: '/2015-01-01/es/domain/${Uri.encodeComponent(domainName)}',
+      requestUri:
+          '/2021-01-01/opensearch/domain/${Uri.encodeComponent(domainName)}',
       exceptionFnMap: _exceptionFns,
     );
-    return DeleteElasticsearchDomainResponse.fromJson(response);
+    return DeleteDomainResponse.fromJson(response);
   }
 
-  /// Deletes the service-linked role that Elasticsearch Service uses to manage
-  /// and maintain VPC domains. Role deletion will fail if any existing VPC
-  /// domains use the role. You must delete any such Elasticsearch domains
-  /// before deleting the role. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html#es-enabling-slr"
-  /// target="_blank">Deleting Elasticsearch Service Role</a> in <i>VPC
-  /// Endpoints for Amazon Elasticsearch Service Domains</i>.
-  ///
-  /// May throw [BaseException].
-  /// May throw [InternalException].
-  /// May throw [ValidationException].
-  Future<void> deleteElasticsearchServiceRole() async {
-    await _protocol.send(
-      payload: null,
-      method: 'DELETE',
-      requestUri: '/2015-01-01/es/role',
-      exceptionFnMap: _exceptionFns,
-    );
-  }
-
-  /// Allows the destination domain owner to delete an existing inbound
-  /// cross-cluster search connection.
+  /// Allows the remote domain owner to delete an existing inbound cross-cluster
+  /// connection.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [DisabledOperationException].
   ///
-  /// Parameter [crossClusterSearchConnectionId] :
-  /// The id of the inbound connection that you want to permanently delete.
-  Future<DeleteInboundCrossClusterSearchConnectionResponse>
-      deleteInboundCrossClusterSearchConnection({
-    required String crossClusterSearchConnectionId,
+  /// Parameter [connectionId] :
+  /// The ID of the inbound connection to permanently delete.
+  Future<DeleteInboundConnectionResponse> deleteInboundConnection({
+    required String connectionId,
   }) async {
-    ArgumentError.checkNotNull(
-        crossClusterSearchConnectionId, 'crossClusterSearchConnectionId');
+    ArgumentError.checkNotNull(connectionId, 'connectionId');
+    _s.validateStringLength(
+      'connectionId',
+      connectionId,
+      10,
+      256,
+      isRequired: true,
+    );
     final response = await _protocol.send(
       payload: null,
       method: 'DELETE',
       requestUri:
-          '/2015-01-01/es/ccs/inboundConnection/${Uri.encodeComponent(crossClusterSearchConnectionId)}',
+          '/2021-01-01/opensearch/cc/inboundConnection/${Uri.encodeComponent(connectionId)}',
       exceptionFnMap: _exceptionFns,
     );
-    return DeleteInboundCrossClusterSearchConnectionResponse.fromJson(response);
+    return DeleteInboundConnectionResponse.fromJson(response);
   }
 
-  /// Allows the source domain owner to delete an existing outbound
-  /// cross-cluster search connection.
+  /// Allows the local domain owner to delete an existing outbound cross-cluster
+  /// connection.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [DisabledOperationException].
   ///
-  /// Parameter [crossClusterSearchConnectionId] :
-  /// The id of the outbound connection that you want to permanently delete.
-  Future<DeleteOutboundCrossClusterSearchConnectionResponse>
-      deleteOutboundCrossClusterSearchConnection({
-    required String crossClusterSearchConnectionId,
+  /// Parameter [connectionId] :
+  /// The ID of the outbound connection you want to permanently delete.
+  Future<DeleteOutboundConnectionResponse> deleteOutboundConnection({
+    required String connectionId,
   }) async {
-    ArgumentError.checkNotNull(
-        crossClusterSearchConnectionId, 'crossClusterSearchConnectionId');
+    ArgumentError.checkNotNull(connectionId, 'connectionId');
+    _s.validateStringLength(
+      'connectionId',
+      connectionId,
+      10,
+      256,
+      isRequired: true,
+    );
     final response = await _protocol.send(
       payload: null,
       method: 'DELETE',
       requestUri:
-          '/2015-01-01/es/ccs/outboundConnection/${Uri.encodeComponent(crossClusterSearchConnectionId)}',
+          '/2021-01-01/opensearch/cc/outboundConnection/${Uri.encodeComponent(connectionId)}',
       exceptionFnMap: _exceptionFns,
     );
-    return DeleteOutboundCrossClusterSearchConnectionResponse.fromJson(
-        response);
+    return DeleteOutboundConnectionResponse.fromJson(response);
   }
 
-  /// Delete the package.
+  /// Deletes the package.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -546,7 +555,7 @@ class ElasticsearchService {
   /// May throw [ConflictException].
   ///
   /// Parameter [packageID] :
-  /// Internal ID of the package that you want to delete. Use
+  /// The internal ID of the package you want to delete. Use
   /// <code>DescribePackages</code> to find this value.
   Future<DeletePackageResponse> deletePackage({
     required String packageID,
@@ -555,14 +564,14 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: null,
       method: 'DELETE',
-      requestUri: '/2015-01-01/packages/${Uri.encodeComponent(packageID)}',
+      requestUri: '/2021-01-01/packages/${Uri.encodeComponent(packageID)}',
       exceptionFnMap: _exceptionFns,
     );
     return DeletePackageResponse.fromJson(response);
   }
 
-  /// Provides scheduled Auto-Tune action details for the Elasticsearch domain,
-  /// such as Auto-Tune action type, description, severity, and scheduled date.
+  /// Returns domain configuration information about the specified domain,
+  /// including the domain ID, domain endpoint, and domain ARN.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -570,7 +579,38 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [domainName] :
-  /// Specifies the domain name for which you want Auto-Tune action details.
+  /// The name of the domain for which you want information.
+  Future<DescribeDomainResponse> describeDomain({
+    required String domainName,
+  }) async {
+    ArgumentError.checkNotNull(domainName, 'domainName');
+    _s.validateStringLength(
+      'domainName',
+      domainName,
+      3,
+      28,
+      isRequired: true,
+    );
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri:
+          '/2021-01-01/opensearch/domain/${Uri.encodeComponent(domainName)}',
+      exceptionFnMap: _exceptionFns,
+    );
+    return DescribeDomainResponse.fromJson(response);
+  }
+
+  /// Provides scheduled Auto-Tune action details for the domain, such as
+  /// Auto-Tune action type, description, severity, and scheduled date.
+  ///
+  /// May throw [BaseException].
+  /// May throw [InternalException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
+  ///
+  /// Parameter [domainName] :
+  /// The domain name for which you want Auto-Tune action details.
   ///
   /// Parameter [maxResults] :
   /// Set this value to limit the number of results returned. If not specified,
@@ -578,7 +618,7 @@ class ElasticsearchService {
   ///
   /// Parameter [nextToken] :
   /// NextToken is sent in case the earlier API call results contain the
-  /// NextToken. It is used for pagination.
+  /// NextToken. Used for pagination.
   Future<DescribeDomainAutoTunesResponse> describeDomainAutoTunes({
     required String domainName,
     int? maxResults,
@@ -602,7 +642,7 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/domain/${Uri.encodeComponent(domainName)}/autoTunes',
+          '/2021-01-01/opensearch/domain/${Uri.encodeComponent(domainName)}/autoTunes',
       exceptionFnMap: _exceptionFns,
     );
     return DescribeDomainAutoTunesResponse.fromJson(response);
@@ -635,6 +675,12 @@ class ElasticsearchService {
       28,
       isRequired: true,
     );
+    _s.validateStringLength(
+      'changeId',
+      changeId,
+      36,
+      36,
+    );
     final $query = <String, List<String>>{
       if (changeId != null) 'changeid': [changeId],
     };
@@ -642,15 +688,16 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/domain/${Uri.encodeComponent(domainName)}/progress',
+          '/2021-01-01/opensearch/domain/${Uri.encodeComponent(domainName)}/progress',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return DescribeDomainChangeProgressResponse.fromJson(response);
   }
 
-  /// Returns domain configuration information about the specified Elasticsearch
-  /// domain, including the domain ID, domain endpoint, and domain ARN.
+  /// Provides cluster configuration information about the specified domain,
+  /// such as the state, creation date, update version, and update date for
+  /// cluster options.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -658,40 +705,8 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [domainName] :
-  /// The name of the Elasticsearch domain for which you want information.
-  Future<DescribeElasticsearchDomainResponse> describeElasticsearchDomain({
-    required String domainName,
-  }) async {
-    ArgumentError.checkNotNull(domainName, 'domainName');
-    _s.validateStringLength(
-      'domainName',
-      domainName,
-      3,
-      28,
-      isRequired: true,
-    );
-    final response = await _protocol.send(
-      payload: null,
-      method: 'GET',
-      requestUri: '/2015-01-01/es/domain/${Uri.encodeComponent(domainName)}',
-      exceptionFnMap: _exceptionFns,
-    );
-    return DescribeElasticsearchDomainResponse.fromJson(response);
-  }
-
-  /// Provides cluster configuration information about the specified
-  /// Elasticsearch domain, such as the state, creation date, update version,
-  /// and update date for cluster options.
-  ///
-  /// May throw [BaseException].
-  /// May throw [InternalException].
-  /// May throw [ResourceNotFoundException].
-  /// May throw [ValidationException].
-  ///
-  /// Parameter [domainName] :
-  /// The Elasticsearch domain that you want to get information about.
-  Future<DescribeElasticsearchDomainConfigResponse>
-      describeElasticsearchDomainConfig({
+  /// The domain you want to get information about.
+  Future<DescribeDomainConfigResponse> describeDomainConfig({
     required String domainName,
   }) async {
     ArgumentError.checkNotNull(domainName, 'domainName');
@@ -706,22 +721,22 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/domain/${Uri.encodeComponent(domainName)}/config',
+          '/2021-01-01/opensearch/domain/${Uri.encodeComponent(domainName)}/config',
       exceptionFnMap: _exceptionFns,
     );
-    return DescribeElasticsearchDomainConfigResponse.fromJson(response);
+    return DescribeDomainConfigResponse.fromJson(response);
   }
 
-  /// Returns domain configuration information about the specified Elasticsearch
-  /// domains, including the domain ID, domain endpoint, and domain ARN.
+  /// Returns domain configuration information about the specified domains,
+  /// including the domain ID, domain endpoint, and domain ARN.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
   /// May throw [ValidationException].
   ///
   /// Parameter [domainNames] :
-  /// The Elasticsearch domains for which you want information.
-  Future<DescribeElasticsearchDomainsResponse> describeElasticsearchDomains({
+  /// The domains for which you want information.
+  Future<DescribeDomainsResponse> describeDomains({
     required List<String> domainNames,
   }) async {
     ArgumentError.checkNotNull(domainNames, 'domainNames');
@@ -731,15 +746,64 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/domain-info',
+      requestUri: '/2021-01-01/opensearch/domain-info',
       exceptionFnMap: _exceptionFns,
     );
-    return DescribeElasticsearchDomainsResponse.fromJson(response);
+    return DescribeDomainsResponse.fromJson(response);
   }
 
-  /// Describe Elasticsearch Limits for a given InstanceType and
-  /// ElasticsearchVersion. When modifying existing Domain, specify the <code>
-  /// <a>DomainName</a> </code> to know what Limits are supported for modifying.
+  /// Lists all the inbound cross-cluster connections for a remote domain.
+  ///
+  /// May throw [InvalidPaginationTokenException].
+  /// May throw [DisabledOperationException].
+  ///
+  /// Parameter [filters] :
+  /// A list of filters used to match properties for inbound cross-cluster
+  /// connections. Available <code> <a>Filter</a> </code> values are:
+  /// <ul>
+  /// <li>connection-id</li>
+  /// <li>local-domain-info.domain-name</li>
+  /// <li>local-domain-info.owner-id</li>
+  /// <li>local-domain-info.region</li>
+  /// <li>remote-domain-info.domain-name</li>
+  /// </ul>
+  ///
+  /// Parameter [maxResults] :
+  /// Set this value to limit the number of results returned. If not specified,
+  /// defaults to 100.
+  ///
+  /// Parameter [nextToken] :
+  /// If more results are available and NextToken is present, make the next
+  /// request to the same API with the received NextToken to paginate the
+  /// remaining results.
+  Future<DescribeInboundConnectionsResponse> describeInboundConnections({
+    List<Filter>? filters,
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      0,
+      100,
+    );
+    final $payload = <String, dynamic>{
+      if (filters != null) 'Filters': filters,
+      if (maxResults != null) 'MaxResults': maxResults,
+      if (nextToken != null) 'NextToken': nextToken,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/2021-01-01/opensearch/cc/inboundConnection/search',
+      exceptionFnMap: _exceptionFns,
+    );
+    return DescribeInboundConnectionsResponse.fromJson(response);
+  }
+
+  /// Describe the limits for a given instance type and OpenSearch or
+  /// Elasticsearch version. When modifying an existing domain, specify the
+  /// <code> <a>DomainName</a> </code> to see which limits you can modify.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -748,25 +812,30 @@ class ElasticsearchService {
   /// May throw [ResourceNotFoundException].
   /// May throw [ValidationException].
   ///
-  /// Parameter [elasticsearchVersion] :
-  /// Version of Elasticsearch for which <code> <a>Limits</a> </code> are
-  /// needed.
+  /// Parameter [engineVersion] :
+  /// Version of OpenSearch for which <code> <a>Limits</a> </code> are needed.
   ///
   /// Parameter [instanceType] :
-  /// The instance type for an Elasticsearch cluster for which Elasticsearch
-  /// <code> <a>Limits</a> </code> are needed.
+  /// The instance type for an OpenSearch cluster for which OpenSearch <code>
+  /// <a>Limits</a> </code> are needed.
   ///
   /// Parameter [domainName] :
-  /// DomainName represents the name of the Domain that we are trying to modify.
-  /// This should be present only if we are querying for Elasticsearch <code>
-  /// <a>Limits</a> </code> for existing domain.
-  Future<DescribeElasticsearchInstanceTypeLimitsResponse>
-      describeElasticsearchInstanceTypeLimits({
-    required String elasticsearchVersion,
-    required ESPartitionInstanceType instanceType,
+  /// The name of the domain you want to modify. Only include this value if
+  /// you're querying OpenSearch <code> <a>Limits</a> </code> for an existing
+  /// domain.
+  Future<DescribeInstanceTypeLimitsResponse> describeInstanceTypeLimits({
+    required String engineVersion,
+    required OpenSearchPartitionInstanceType instanceType,
     String? domainName,
   }) async {
-    ArgumentError.checkNotNull(elasticsearchVersion, 'elasticsearchVersion');
+    ArgumentError.checkNotNull(engineVersion, 'engineVersion');
+    _s.validateStringLength(
+      'engineVersion',
+      engineVersion,
+      14,
+      18,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(instanceType, 'instanceType');
     _s.validateStringLength(
       'domainName',
@@ -781,81 +850,28 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/instanceTypeLimits/${Uri.encodeComponent(elasticsearchVersion)}/${Uri.encodeComponent(instanceType.toValue())}',
+          '/2021-01-01/opensearch/instanceTypeLimits/${Uri.encodeComponent(engineVersion)}/${Uri.encodeComponent(instanceType.toValue())}',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
-    return DescribeElasticsearchInstanceTypeLimitsResponse.fromJson(response);
+    return DescribeInstanceTypeLimitsResponse.fromJson(response);
   }
 
-  /// Lists all the inbound cross-cluster search connections for a destination
-  /// domain.
-  ///
-  /// May throw [InvalidPaginationTokenException].
-  /// May throw [DisabledOperationException].
-  ///
-  /// Parameter [filters] :
-  /// A list of filters used to match properties for inbound cross-cluster
-  /// search connection. Available <code><a>Filter</a></code> names for this
-  /// operation are:
-  /// <ul>
-  /// <li>cross-cluster-search-connection-id</li>
-  /// <li>source-domain-info.domain-name</li>
-  /// <li>source-domain-info.owner-id</li>
-  /// <li>source-domain-info.region</li>
-  /// <li>destination-domain-info.domain-name</li>
-  /// </ul>
-  ///
-  /// Parameter [maxResults] :
-  /// Set this value to limit the number of results returned. If not specified,
-  /// defaults to 100.
-  ///
-  /// Parameter [nextToken] :
-  /// NextToken is sent in case the earlier API call results contain the
-  /// NextToken. It is used for pagination.
-  Future<DescribeInboundCrossClusterSearchConnectionsResponse>
-      describeInboundCrossClusterSearchConnections({
-    List<Filter>? filters,
-    int? maxResults,
-    String? nextToken,
-  }) async {
-    _s.validateNumRange(
-      'maxResults',
-      maxResults,
-      0,
-      100,
-    );
-    final $payload = <String, dynamic>{
-      if (filters != null) 'Filters': filters,
-      if (maxResults != null) 'MaxResults': maxResults,
-      if (nextToken != null) 'NextToken': nextToken,
-    };
-    final response = await _protocol.send(
-      payload: $payload,
-      method: 'POST',
-      requestUri: '/2015-01-01/es/ccs/inboundConnection/search',
-      exceptionFnMap: _exceptionFns,
-    );
-    return DescribeInboundCrossClusterSearchConnectionsResponse.fromJson(
-        response);
-  }
-
-  /// Lists all the outbound cross-cluster search connections for a source
-  /// domain.
+  /// Lists all the outbound cross-cluster connections for a local domain.
   ///
   /// May throw [InvalidPaginationTokenException].
   /// May throw [DisabledOperationException].
   ///
   /// Parameter [filters] :
   /// A list of filters used to match properties for outbound cross-cluster
-  /// search connection. Available <code><a>Filter</a></code> names for this
+  /// connections. Available <code> <a>Filter</a> </code> names for this
   /// operation are:
   /// <ul>
-  /// <li>cross-cluster-search-connection-id</li>
-  /// <li>destination-domain-info.domain-name</li>
-  /// <li>destination-domain-info.owner-id</li>
-  /// <li>destination-domain-info.region</li>
-  /// <li>source-domain-info.domain-name</li>
+  /// <li>connection-id</li>
+  /// <li>remote-domain-info.domain-name</li>
+  /// <li>remote-domain-info.owner-id</li>
+  /// <li>remote-domain-info.region</li>
+  /// <li>local-domain-info.domain-name</li>
   /// </ul>
   ///
   /// Parameter [maxResults] :
@@ -864,9 +880,8 @@ class ElasticsearchService {
   ///
   /// Parameter [nextToken] :
   /// NextToken is sent in case the earlier API call results contain the
-  /// NextToken. It is used for pagination.
-  Future<DescribeOutboundCrossClusterSearchConnectionsResponse>
-      describeOutboundCrossClusterSearchConnections({
+  /// NextToken parameter. Used for pagination.
+  Future<DescribeOutboundConnectionsResponse> describeOutboundConnections({
     List<Filter>? filters,
     int? maxResults,
     String? nextToken,
@@ -885,15 +900,15 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/ccs/outboundConnection/search',
+      requestUri: '/2021-01-01/opensearch/cc/outboundConnection/search',
       exceptionFnMap: _exceptionFns,
     );
-    return DescribeOutboundCrossClusterSearchConnectionsResponse.fromJson(
-        response);
+    return DescribeOutboundConnectionsResponse.fromJson(response);
   }
 
-  /// Describes all packages available to Amazon ES. Includes options for
-  /// filtering, limiting the number of results, and pagination.
+  /// Describes all packages available to Amazon OpenSearch Service domains.
+  /// Includes options for filtering, limiting the number of results, and
+  /// pagination.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -930,13 +945,13 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/packages/describe',
+      requestUri: '/2021-01-01/packages/describe',
       exceptionFnMap: _exceptionFns,
     );
     return DescribePackagesResponse.fromJson(response);
   }
 
-  /// Lists available reserved Elasticsearch instance offerings.
+  /// Lists available reserved OpenSearch instance offerings.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ValidationException].
@@ -948,17 +963,16 @@ class ElasticsearchService {
   /// defaults to 100.
   ///
   /// Parameter [nextToken] :
-  /// NextToken should be sent in case if earlier API call produced result
-  /// containing NextToken. It is used for pagination.
+  /// Provides an identifier to allow retrieval of paginated results.
   ///
-  /// Parameter [reservedElasticsearchInstanceOfferingId] :
+  /// Parameter [reservedInstanceOfferingId] :
   /// The offering identifier filter value. Use this parameter to show only the
   /// available offering that matches the specified reservation identifier.
-  Future<DescribeReservedElasticsearchInstanceOfferingsResponse>
-      describeReservedElasticsearchInstanceOfferings({
+  Future<DescribeReservedInstanceOfferingsResponse>
+      describeReservedInstanceOfferings({
     int? maxResults,
     String? nextToken,
-    String? reservedElasticsearchInstanceOfferingId,
+    String? reservedInstanceOfferingId,
   }) async {
     _s.validateNumRange(
       'maxResults',
@@ -966,25 +980,29 @@ class ElasticsearchService {
       0,
       100,
     );
+    _s.validateStringLength(
+      'reservedInstanceOfferingId',
+      reservedInstanceOfferingId,
+      36,
+      36,
+    );
     final $query = <String, List<String>>{
       if (maxResults != null) 'maxResults': [maxResults.toString()],
       if (nextToken != null) 'nextToken': [nextToken],
-      if (reservedElasticsearchInstanceOfferingId != null)
-        'offeringId': [reservedElasticsearchInstanceOfferingId],
+      if (reservedInstanceOfferingId != null)
+        'offeringId': [reservedInstanceOfferingId],
     };
     final response = await _protocol.send(
       payload: null,
       method: 'GET',
-      requestUri: '/2015-01-01/es/reservedInstanceOfferings',
+      requestUri: '/2021-01-01/opensearch/reservedInstanceOfferings',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
-    return DescribeReservedElasticsearchInstanceOfferingsResponse.fromJson(
-        response);
+    return DescribeReservedInstanceOfferingsResponse.fromJson(response);
   }
 
-  /// Returns information about reserved Elasticsearch instances for this
-  /// account.
+  /// Returns information about reserved OpenSearch instances for this account.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InternalException].
@@ -996,18 +1014,16 @@ class ElasticsearchService {
   /// defaults to 100.
   ///
   /// Parameter [nextToken] :
-  /// NextToken should be sent in case if earlier API call produced result
-  /// containing NextToken. It is used for pagination.
+  /// Provides an identifier to allow retrieval of paginated results.
   ///
-  /// Parameter [reservedElasticsearchInstanceId] :
+  /// Parameter [reservedInstanceId] :
   /// The reserved instance identifier filter value. Use this parameter to show
-  /// only the reservation that matches the specified reserved Elasticsearch
+  /// only the reservation that matches the specified reserved OpenSearch
   /// instance ID.
-  Future<DescribeReservedElasticsearchInstancesResponse>
-      describeReservedElasticsearchInstances({
+  Future<DescribeReservedInstancesResponse> describeReservedInstances({
     int? maxResults,
     String? nextToken,
-    String? reservedElasticsearchInstanceId,
+    String? reservedInstanceId,
   }) async {
     _s.validateNumRange(
       'maxResults',
@@ -1015,23 +1031,28 @@ class ElasticsearchService {
       0,
       100,
     );
+    _s.validateStringLength(
+      'reservedInstanceId',
+      reservedInstanceId,
+      36,
+      36,
+    );
     final $query = <String, List<String>>{
       if (maxResults != null) 'maxResults': [maxResults.toString()],
       if (nextToken != null) 'nextToken': [nextToken],
-      if (reservedElasticsearchInstanceId != null)
-        'reservationId': [reservedElasticsearchInstanceId],
+      if (reservedInstanceId != null) 'reservationId': [reservedInstanceId],
     };
     final response = await _protocol.send(
       payload: null,
       method: 'GET',
-      requestUri: '/2015-01-01/es/reservedInstances',
+      requestUri: '/2021-01-01/opensearch/reservedInstances',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
-    return DescribeReservedElasticsearchInstancesResponse.fromJson(response);
+    return DescribeReservedInstancesResponse.fromJson(response);
   }
 
-  /// Dissociates a package from the Amazon ES domain.
+  /// Dissociates a package from the Amazon OpenSearch Service domain.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1041,10 +1062,10 @@ class ElasticsearchService {
   /// May throw [ConflictException].
   ///
   /// Parameter [domainName] :
-  /// Name of the domain that you want to associate the package with.
+  /// The name of the domain to associate the package with.
   ///
   /// Parameter [packageID] :
-  /// Internal ID of the package that you want to associate with a domain. Use
+  /// The internal ID of the package to associate with a domain. Use
   /// <code>DescribePackages</code> to find this value.
   Future<DissociatePackageResponse> dissociatePackage({
     required String domainName,
@@ -1063,23 +1084,23 @@ class ElasticsearchService {
       payload: null,
       method: 'POST',
       requestUri:
-          '/2015-01-01/packages/dissociate/${Uri.encodeComponent(packageID)}/${Uri.encodeComponent(domainName)}',
+          '/2021-01-01/packages/dissociate/${Uri.encodeComponent(packageID)}/${Uri.encodeComponent(domainName)}',
       exceptionFnMap: _exceptionFns,
     );
     return DissociatePackageResponse.fromJson(response);
   }
 
-  /// Returns a list of upgrade compatible Elastisearch versions. You can
-  /// optionally pass a <code> <a>DomainName</a> </code> to get all upgrade
-  /// compatible Elasticsearch versions for that specific domain.
+  /// Returns a list of upgrade-compatible versions of OpenSearch/Elasticsearch.
+  /// You can optionally pass a <code> <a>DomainName</a> </code> to get all
+  /// upgrade-compatible versions of OpenSearch/Elasticsearch for that specific
+  /// domain.
   ///
   /// May throw [BaseException].
   /// May throw [ResourceNotFoundException].
   /// May throw [DisabledOperationException].
   /// May throw [ValidationException].
   /// May throw [InternalException].
-  Future<GetCompatibleElasticsearchVersionsResponse>
-      getCompatibleElasticsearchVersions({
+  Future<GetCompatibleVersionsResponse> getCompatibleVersions({
     String? domainName,
   }) async {
     _s.validateStringLength(
@@ -1094,15 +1115,15 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: null,
       method: 'GET',
-      requestUri: '/2015-01-01/es/compatibleVersions',
+      requestUri: '/2021-01-01/opensearch/compatibleVersions',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
-    return GetCompatibleElasticsearchVersionsResponse.fromJson(response);
+    return GetCompatibleVersionsResponse.fromJson(response);
   }
 
-  /// Returns a list of versions of the package, along with their creation time
-  /// and commit message.
+  /// Returns a list of package versions, along with their creation time and
+  /// commit message.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1111,10 +1132,10 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [packageID] :
-  /// Returns an audit history of versions of the package.
+  /// Returns an audit history of package versions.
   ///
   /// Parameter [maxResults] :
-  /// Limits results to a maximum number of versions.
+  /// Limits results to a maximum number of package versions.
   ///
   /// Parameter [nextToken] :
   /// Used for pagination. Only necessary if a previous API call includes a
@@ -1139,15 +1160,15 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/packages/${Uri.encodeComponent(packageID)}/history',
+          '/2021-01-01/packages/${Uri.encodeComponent(packageID)}/history',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return GetPackageVersionHistoryResponse.fromJson(response);
   }
 
-  /// Retrieves the complete history of the last 10 upgrades that were performed
-  /// on the domain.
+  /// Retrieves the complete history of the last 10 upgrades performed on the
+  /// domain.
   ///
   /// May throw [BaseException].
   /// May throw [ResourceNotFoundException].
@@ -1181,7 +1202,7 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/upgradeDomain/${Uri.encodeComponent(domainName)}/history',
+          '/2021-01-01/opensearch/upgradeDomain/${Uri.encodeComponent(domainName)}/history',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
@@ -1189,7 +1210,7 @@ class ElasticsearchService {
   }
 
   /// Retrieves the latest status of the last upgrade or upgrade eligibility
-  /// check that was performed on the domain.
+  /// check performed on the domain.
   ///
   /// May throw [BaseException].
   /// May throw [ResourceNotFoundException].
@@ -1211,14 +1232,13 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/upgradeDomain/${Uri.encodeComponent(domainName)}/status',
+          '/2021-01-01/opensearch/upgradeDomain/${Uri.encodeComponent(domainName)}/status',
       exceptionFnMap: _exceptionFns,
     );
     return GetUpgradeStatusResponse.fromJson(response);
   }
 
-  /// Returns the name of all Elasticsearch domains owned by the current user's
-  /// account.
+  /// Returns the names of all domains owned by the current user's account.
   ///
   /// May throw [BaseException].
   /// May throw [ValidationException].
@@ -1235,14 +1255,14 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: null,
       method: 'GET',
-      requestUri: '/2015-01-01/domain',
+      requestUri: '/2021-01-01/domain',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return ListDomainNamesResponse.fromJson(response);
   }
 
-  /// Lists all Amazon ES domains associated with the package.
+  /// Lists all Amazon OpenSearch Service domains associated with the package.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1251,10 +1271,10 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [packageID] :
-  /// The package for which to list domains.
+  /// The package for which to list associated domains.
   ///
   /// Parameter [maxResults] :
-  /// Limits results to a maximum number of domains.
+  /// Limits the results to a maximum number of domains.
   ///
   /// Parameter [nextToken] :
   /// Used for pagination. Only necessary if a previous API call includes a
@@ -1279,45 +1299,32 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/packages/${Uri.encodeComponent(packageID)}/domains',
+          '/2021-01-01/packages/${Uri.encodeComponent(packageID)}/domains',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return ListDomainsForPackageResponse.fromJson(response);
   }
 
-  /// List all Elasticsearch instance types that are supported for given
-  /// ElasticsearchVersion
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
   /// May throw [ResourceNotFoundException].
   /// May throw [ValidationException].
-  ///
-  /// Parameter [elasticsearchVersion] :
-  /// Version of Elasticsearch for which list of supported elasticsearch
-  /// instance types are needed.
-  ///
-  /// Parameter [domainName] :
-  /// DomainName represents the name of the Domain that we are trying to modify.
-  /// This should be present only if we are querying for list of available
-  /// Elasticsearch instance types when modifying existing domain.
-  ///
-  /// Parameter [maxResults] :
-  /// Set this value to limit the number of results returned. Value provided
-  /// must be greater than 30 else it wont be honored.
-  ///
-  /// Parameter [nextToken] :
-  /// NextToken should be sent in case if earlier API call produced result
-  /// containing NextToken. It is used for pagination.
-  Future<ListElasticsearchInstanceTypesResponse>
-      listElasticsearchInstanceTypes({
-    required String elasticsearchVersion,
+  Future<ListInstanceTypeDetailsResponse> listInstanceTypeDetails({
+    required String engineVersion,
     String? domainName,
     int? maxResults,
     String? nextToken,
   }) async {
-    ArgumentError.checkNotNull(elasticsearchVersion, 'elasticsearchVersion');
+    ArgumentError.checkNotNull(engineVersion, 'engineVersion');
+    _s.validateStringLength(
+      'engineVersion',
+      engineVersion,
+      14,
+      18,
+      isRequired: true,
+    );
     _s.validateStringLength(
       'domainName',
       domainName,
@@ -1339,48 +1346,14 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/es/instanceTypes/${Uri.encodeComponent(elasticsearchVersion)}',
+          '/2021-01-01/opensearch/instanceTypeDetails/${Uri.encodeComponent(engineVersion)}',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
-    return ListElasticsearchInstanceTypesResponse.fromJson(response);
+    return ListInstanceTypeDetailsResponse.fromJson(response);
   }
 
-  /// List all supported Elasticsearch versions
-  ///
-  /// May throw [BaseException].
-  /// May throw [InternalException].
-  /// May throw [ResourceNotFoundException].
-  /// May throw [ValidationException].
-  ///
-  /// Parameter [maxResults] :
-  /// Set this value to limit the number of results returned. Value provided
-  /// must be greater than 10 else it wont be honored.
-  Future<ListElasticsearchVersionsResponse> listElasticsearchVersions({
-    int? maxResults,
-    String? nextToken,
-  }) async {
-    _s.validateNumRange(
-      'maxResults',
-      maxResults,
-      0,
-      100,
-    );
-    final $query = <String, List<String>>{
-      if (maxResults != null) 'maxResults': [maxResults.toString()],
-      if (nextToken != null) 'nextToken': [nextToken],
-    };
-    final response = await _protocol.send(
-      payload: null,
-      method: 'GET',
-      requestUri: '/2015-01-01/es/versions',
-      queryParams: $query,
-      exceptionFnMap: _exceptionFns,
-    );
-    return ListElasticsearchVersionsResponse.fromJson(response);
-  }
-
-  /// Lists all packages associated with the Amazon ES domain.
+  /// Lists all packages associated with the Amazon OpenSearch Service domain.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1424,14 +1397,14 @@ class ElasticsearchService {
       payload: null,
       method: 'GET',
       requestUri:
-          '/2015-01-01/domain/${Uri.encodeComponent(domainName)}/packages',
+          '/2021-01-01/domain/${Uri.encodeComponent(domainName)}/packages',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return ListPackagesForDomainResponse.fromJson(response);
   }
 
-  /// Returns all tags for the given Elasticsearch domain.
+  /// Returns all tags for the given domain.
   ///
   /// May throw [BaseException].
   /// May throw [ResourceNotFoundException].
@@ -1439,26 +1412,67 @@ class ElasticsearchService {
   /// May throw [InternalException].
   ///
   /// Parameter [arn] :
-  /// Specify the <code>ARN</code> for the Elasticsearch domain to which the
-  /// tags are attached that you want to view.
+  /// Specify the <code>ARN</code> of the domain that the tags you want to view
+  /// are attached to.
   Future<ListTagsResponse> listTags({
     required String arn,
   }) async {
     ArgumentError.checkNotNull(arn, 'arn');
+    _s.validateStringLength(
+      'arn',
+      arn,
+      20,
+      2048,
+      isRequired: true,
+    );
     final $query = <String, List<String>>{
       'arn': [arn],
     };
     final response = await _protocol.send(
       payload: null,
       method: 'GET',
-      requestUri: '/2015-01-01/tags/',
+      requestUri: '/2021-01-01/tags/',
       queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return ListTagsResponse.fromJson(response);
   }
 
-  /// Allows you to purchase reserved Elasticsearch instances.
+  /// List all supported versions of OpenSearch and Elasticsearch.
+  ///
+  /// May throw [BaseException].
+  /// May throw [InternalException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
+  ///
+  /// Parameter [maxResults] :
+  /// Set this value to limit the number of results returned. Value must be
+  /// greater than 10 or it won't be honored.
+  Future<ListVersionsResponse> listVersions({
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      0,
+      100,
+    );
+    final $query = <String, List<String>>{
+      if (maxResults != null) 'maxResults': [maxResults.toString()],
+      if (nextToken != null) 'nextToken': [nextToken],
+    };
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri: '/2021-01-01/opensearch/versions',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    return ListVersionsResponse.fromJson(response);
+  }
+
+  /// Allows you to purchase reserved OpenSearch instances.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceAlreadyExistsException].
@@ -1470,15 +1484,15 @@ class ElasticsearchService {
   /// Parameter [reservationName] :
   /// A customer-specified identifier to track this reservation.
   ///
-  /// Parameter [reservedElasticsearchInstanceOfferingId] :
-  /// The ID of the reserved Elasticsearch instance offering to purchase.
+  /// Parameter [reservedInstanceOfferingId] :
+  /// The ID of the reserved OpenSearch instance offering to purchase.
   ///
   /// Parameter [instanceCount] :
-  /// The number of Elasticsearch instances to reserve.
-  Future<PurchaseReservedElasticsearchInstanceOfferingResponse>
-      purchaseReservedElasticsearchInstanceOffering({
+  /// The number of OpenSearch instances to reserve.
+  Future<PurchaseReservedInstanceOfferingResponse>
+      purchaseReservedInstanceOffering({
     required String reservationName,
-    required String reservedElasticsearchInstanceOfferingId,
+    required String reservedInstanceOfferingId,
     int? instanceCount,
   }) async {
     ArgumentError.checkNotNull(reservationName, 'reservationName');
@@ -1489,8 +1503,15 @@ class ElasticsearchService {
       64,
       isRequired: true,
     );
-    ArgumentError.checkNotNull(reservedElasticsearchInstanceOfferingId,
-        'reservedElasticsearchInstanceOfferingId');
+    ArgumentError.checkNotNull(
+        reservedInstanceOfferingId, 'reservedInstanceOfferingId');
+    _s.validateStringLength(
+      'reservedInstanceOfferingId',
+      reservedInstanceOfferingId,
+      36,
+      36,
+      isRequired: true,
+    );
     _s.validateNumRange(
       'instanceCount',
       instanceCount,
@@ -1499,62 +1520,71 @@ class ElasticsearchService {
     );
     final $payload = <String, dynamic>{
       'ReservationName': reservationName,
-      'ReservedElasticsearchInstanceOfferingId':
-          reservedElasticsearchInstanceOfferingId,
+      'ReservedInstanceOfferingId': reservedInstanceOfferingId,
       if (instanceCount != null) 'InstanceCount': instanceCount,
     };
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/purchaseReservedInstanceOffering',
+      requestUri: '/2021-01-01/opensearch/purchaseReservedInstanceOffering',
       exceptionFnMap: _exceptionFns,
     );
-    return PurchaseReservedElasticsearchInstanceOfferingResponse.fromJson(
-        response);
+    return PurchaseReservedInstanceOfferingResponse.fromJson(response);
   }
 
-  /// Allows the destination domain owner to reject an inbound cross-cluster
-  /// search connection request.
+  /// Allows the remote domain owner to reject an inbound cross-cluster
+  /// connection request.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [DisabledOperationException].
   ///
-  /// Parameter [crossClusterSearchConnectionId] :
-  /// The id of the inbound connection that you want to reject.
-  Future<RejectInboundCrossClusterSearchConnectionResponse>
-      rejectInboundCrossClusterSearchConnection({
-    required String crossClusterSearchConnectionId,
+  /// Parameter [connectionId] :
+  /// The ID of the inbound connection to reject.
+  Future<RejectInboundConnectionResponse> rejectInboundConnection({
+    required String connectionId,
   }) async {
-    ArgumentError.checkNotNull(
-        crossClusterSearchConnectionId, 'crossClusterSearchConnectionId');
+    ArgumentError.checkNotNull(connectionId, 'connectionId');
+    _s.validateStringLength(
+      'connectionId',
+      connectionId,
+      10,
+      256,
+      isRequired: true,
+    );
     final response = await _protocol.send(
       payload: null,
       method: 'PUT',
       requestUri:
-          '/2015-01-01/es/ccs/inboundConnection/${Uri.encodeComponent(crossClusterSearchConnectionId)}/reject',
+          '/2021-01-01/opensearch/cc/inboundConnection/${Uri.encodeComponent(connectionId)}/reject',
       exceptionFnMap: _exceptionFns,
     );
-    return RejectInboundCrossClusterSearchConnectionResponse.fromJson(response);
+    return RejectInboundConnectionResponse.fromJson(response);
   }
 
-  /// Removes the specified set of tags from the specified Elasticsearch domain.
+  /// Removes the specified set of tags from the given domain.
   ///
   /// May throw [BaseException].
   /// May throw [ValidationException].
   /// May throw [InternalException].
   ///
   /// Parameter [arn] :
-  /// Specifies the <code>ARN</code> for the Elasticsearch domain from which you
-  /// want to delete the specified tags.
+  /// The <code>ARN</code> of the domain from which you want to delete the
+  /// specified tags.
   ///
   /// Parameter [tagKeys] :
-  /// Specifies the <code>TagKey</code> list which you want to remove from the
-  /// Elasticsearch domain.
+  /// The <code>TagKey</code> list you want to remove from the domain.
   Future<void> removeTags({
     required String arn,
     required List<String> tagKeys,
   }) async {
     ArgumentError.checkNotNull(arn, 'arn');
+    _s.validateStringLength(
+      'arn',
+      arn,
+      20,
+      2048,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(tagKeys, 'tagKeys');
     final $payload = <String, dynamic>{
       'ARN': arn,
@@ -1563,12 +1593,13 @@ class ElasticsearchService {
     await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/tags-removal',
+      requestUri: '/2021-01-01/tags-removal',
       exceptionFnMap: _exceptionFns,
     );
   }
 
-  /// Schedules a service software update for an Amazon ES domain.
+  /// Schedules a service software update for an Amazon OpenSearch Service
+  /// domain.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1578,8 +1609,7 @@ class ElasticsearchService {
   /// Parameter [domainName] :
   /// The name of the domain that you want to update to the latest service
   /// software.
-  Future<StartElasticsearchServiceSoftwareUpdateResponse>
-      startElasticsearchServiceSoftwareUpdate({
+  Future<StartServiceSoftwareUpdateResponse> startServiceSoftwareUpdate({
     required String domainName,
   }) async {
     ArgumentError.checkNotNull(domainName, 'domainName');
@@ -1596,14 +1626,14 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/serviceSoftwareUpdate/start',
+      requestUri: '/2021-01-01/opensearch/serviceSoftwareUpdate/start',
       exceptionFnMap: _exceptionFns,
     );
-    return StartElasticsearchServiceSoftwareUpdateResponse.fromJson(response);
+    return StartServiceSoftwareUpdateResponse.fromJson(response);
   }
 
-  /// Modifies the cluster configuration of the specified Elasticsearch domain,
-  /// setting as setting the instance type and the number of instances.
+  /// Modifies the cluster configuration of the specified domain, such as
+  /// setting the instance type and the number of instances.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1613,7 +1643,7 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [domainName] :
-  /// The name of the Elasticsearch domain that you are updating.
+  /// The name of the domain you're updating.
   ///
   /// Parameter [accessPolicies] :
   /// IAM access policy as a JSON-formatted string.
@@ -1623,8 +1653,8 @@ class ElasticsearchService {
   /// request body. Must be <code>false</code> when configuring access to
   /// individual sub-resources. By default, the value is <code>true</code>. See
   /// <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-advanced-options"
-  /// target="_blank">Configuration Advanced Options</a> for more information.
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomain-configure-advanced-options"
+  /// target="_blank">Advanced options </a> for more information.
   ///
   /// Parameter [advancedSecurityOptions] :
   /// Specifies advanced security options.
@@ -1632,11 +1662,15 @@ class ElasticsearchService {
   /// Parameter [autoTuneOptions] :
   /// Specifies Auto-Tune options.
   ///
+  /// Parameter [clusterConfig] :
+  /// The type and number of instances to instantiate for the domain cluster.
+  ///
   /// Parameter [cognitoOptions] :
-  /// Options to specify the Cognito user and identity pools for Kibana
-  /// authentication. For more information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html"
-  /// target="_blank">Amazon Cognito Authentication for Kibana</a>.
+  /// Options to specify the Cognito user and identity pools for OpenSearch
+  /// Dashboards authentication. For more information, see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/cognito-auth.html"
+  /// target="_blank">Configuring Amazon Cognito authentication for OpenSearch
+  /// Dashboards</a>.
   ///
   /// Parameter [domainEndpointOptions] :
   /// Options to specify configuration that will be applied to the domain
@@ -1644,49 +1678,43 @@ class ElasticsearchService {
   ///
   /// Parameter [dryRun] :
   /// This flag, when set to True, specifies whether the
-  /// <code>UpdateElasticsearchDomain</code> request should return the results
-  /// of validation checks without actually applying the change. This flag, when
-  /// set to True, specifies the deployment mechanism through which the update
-  /// shall be applied on the domain. This will not actually perform the Update.
+  /// <code>UpdateDomain</code> request should return the results of validation
+  /// checks (DryRunResults) without actually applying the change.
   ///
   /// Parameter [eBSOptions] :
-  /// Specify the type and size of the EBS volume that you want to use.
-  ///
-  /// Parameter [elasticsearchClusterConfig] :
-  /// The type and number of instances to instantiate for the domain cluster.
+  /// Specify the type and size of the EBS volume to use.
   ///
   /// Parameter [encryptionAtRestOptions] :
-  /// Specifies the Encryption At Rest Options.
+  /// Specifies encryption of data at rest options.
   ///
   /// Parameter [logPublishingOptions] :
   /// Map of <code>LogType</code> and <code>LogPublishingOption</code>, each
-  /// containing options to publish a given type of Elasticsearch log.
+  /// containing options to publish a given type of OpenSearch log.
   ///
   /// Parameter [nodeToNodeEncryptionOptions] :
-  /// Specifies the NodeToNodeEncryptionOptions.
+  /// Specifies node-to-node encryption options.
   ///
   /// Parameter [snapshotOptions] :
   /// Option to set the time, in UTC format, for the daily automated snapshot.
   /// Default value is <code>0</code> hours.
   ///
   /// Parameter [vPCOptions] :
-  /// Options to specify the subnets and security groups for VPC endpoint. For
-  /// more information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html#es-creating-vpc"
-  /// target="_blank">Creating a VPC</a> in <i>VPC Endpoints for Amazon
-  /// Elasticsearch Service Domains</i>
-  Future<UpdateElasticsearchDomainConfigResponse>
-      updateElasticsearchDomainConfig({
+  /// Options to specify the subnets and security groups for the VPC endpoint.
+  /// For more information, see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html"
+  /// target="_blank">Launching your Amazon OpenSearch Service domains using a
+  /// VPC </a>.
+  Future<UpdateDomainConfigResponse> updateDomainConfig({
     required String domainName,
     String? accessPolicies,
     Map<String, String>? advancedOptions,
     AdvancedSecurityOptionsInput? advancedSecurityOptions,
     AutoTuneOptions? autoTuneOptions,
+    ClusterConfig? clusterConfig,
     CognitoOptions? cognitoOptions,
     DomainEndpointOptions? domainEndpointOptions,
     bool? dryRun,
     EBSOptions? eBSOptions,
-    ElasticsearchClusterConfig? elasticsearchClusterConfig,
     EncryptionAtRestOptions? encryptionAtRestOptions,
     Map<LogType, LogPublishingOption>? logPublishingOptions,
     NodeToNodeEncryptionOptions? nodeToNodeEncryptionOptions,
@@ -1701,19 +1729,24 @@ class ElasticsearchService {
       28,
       isRequired: true,
     );
+    _s.validateStringLength(
+      'accessPolicies',
+      accessPolicies,
+      0,
+      102400,
+    );
     final $payload = <String, dynamic>{
       if (accessPolicies != null) 'AccessPolicies': accessPolicies,
       if (advancedOptions != null) 'AdvancedOptions': advancedOptions,
       if (advancedSecurityOptions != null)
         'AdvancedSecurityOptions': advancedSecurityOptions,
       if (autoTuneOptions != null) 'AutoTuneOptions': autoTuneOptions,
+      if (clusterConfig != null) 'ClusterConfig': clusterConfig,
       if (cognitoOptions != null) 'CognitoOptions': cognitoOptions,
       if (domainEndpointOptions != null)
         'DomainEndpointOptions': domainEndpointOptions,
       if (dryRun != null) 'DryRun': dryRun,
       if (eBSOptions != null) 'EBSOptions': eBSOptions,
-      if (elasticsearchClusterConfig != null)
-        'ElasticsearchClusterConfig': elasticsearchClusterConfig,
       if (encryptionAtRestOptions != null)
         'EncryptionAtRestOptions': encryptionAtRestOptions,
       if (logPublishingOptions != null)
@@ -1728,13 +1761,13 @@ class ElasticsearchService {
       payload: $payload,
       method: 'POST',
       requestUri:
-          '/2015-01-01/es/domain/${Uri.encodeComponent(domainName)}/config',
+          '/2021-01-01/opensearch/domain/${Uri.encodeComponent(domainName)}/config',
       exceptionFnMap: _exceptionFns,
     );
-    return UpdateElasticsearchDomainConfigResponse.fromJson(response);
+    return UpdateDomainConfigResponse.fromJson(response);
   }
 
-  /// Updates a package for use with Amazon ES domains.
+  /// Updates a package for use with Amazon OpenSearch Service domains.
   ///
   /// May throw [BaseException].
   /// May throw [InternalException].
@@ -1744,14 +1777,14 @@ class ElasticsearchService {
   /// May throw [ValidationException].
   ///
   /// Parameter [packageID] :
-  /// Unique identifier for the package.
+  /// The unique identifier for the package.
   ///
   /// Parameter [commitMessage] :
-  /// An info message for the new version which will be shown as part of
+  /// A commit message for the new version which is shown as part of
   /// <code>GetPackageVersionHistoryResponse</code>.
   ///
   /// Parameter [packageDescription] :
-  /// New description of the package.
+  /// A new description of the package.
   Future<UpdatePackageResponse> updatePackage({
     required String packageID,
     required PackageSource packageSource,
@@ -1781,14 +1814,14 @@ class ElasticsearchService {
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/packages/update',
+      requestUri: '/2021-01-01/packages/update',
       exceptionFnMap: _exceptionFns,
     );
     return UpdatePackageResponse.fromJson(response);
   }
 
-  /// Allows you to either upgrade your domain or perform an Upgrade eligibility
-  /// check to a compatible Elasticsearch version.
+  /// Allows you to either upgrade your domain or perform an upgrade eligibility
+  /// check to a compatible version of OpenSearch or Elasticsearch.
   ///
   /// May throw [BaseException].
   /// May throw [ResourceNotFoundException].
@@ -1798,14 +1831,15 @@ class ElasticsearchService {
   /// May throw [InternalException].
   ///
   /// Parameter [targetVersion] :
-  /// The version of Elasticsearch that you intend to upgrade the domain to.
+  /// The version of OpenSearch you intend to upgrade the domain to.
   ///
   /// Parameter [performCheckOnly] :
-  /// This flag, when set to True, indicates that an Upgrade Eligibility Check
-  /// needs to be performed. This will not actually perform the Upgrade.
-  Future<UpgradeElasticsearchDomainResponse> upgradeElasticsearchDomain({
+  /// When true, indicates that an upgrade eligibility check needs to be
+  /// performed. Does not actually perform the upgrade.
+  Future<UpgradeDomainResponse> upgradeDomain({
     required String domainName,
     required String targetVersion,
+    Map<String, String>? advancedOptions,
     bool? performCheckOnly,
   }) async {
     ArgumentError.checkNotNull(domainName, 'domainName');
@@ -1817,38 +1851,74 @@ class ElasticsearchService {
       isRequired: true,
     );
     ArgumentError.checkNotNull(targetVersion, 'targetVersion');
+    _s.validateStringLength(
+      'targetVersion',
+      targetVersion,
+      14,
+      18,
+      isRequired: true,
+    );
     final $payload = <String, dynamic>{
       'DomainName': domainName,
       'TargetVersion': targetVersion,
+      if (advancedOptions != null) 'AdvancedOptions': advancedOptions,
       if (performCheckOnly != null) 'PerformCheckOnly': performCheckOnly,
     };
     final response = await _protocol.send(
       payload: $payload,
       method: 'POST',
-      requestUri: '/2015-01-01/es/upgradeDomain',
+      requestUri: '/2021-01-01/opensearch/upgradeDomain',
       exceptionFnMap: _exceptionFns,
     );
-    return UpgradeElasticsearchDomainResponse.fromJson(response);
+    return UpgradeDomainResponse.fromJson(response);
   }
 }
 
-/// The result of a
-/// <code><a>AcceptInboundCrossClusterSearchConnection</a></code> operation.
-/// Contains details of accepted inbound connection.
-class AcceptInboundCrossClusterSearchConnectionResponse {
-  /// Specifies the <code><a>InboundCrossClusterSearchConnection</a></code> of
-  /// accepted inbound connection.
-  final InboundCrossClusterSearchConnection? crossClusterSearchConnection;
+class AWSDomainInformation {
+  final String domainName;
+  final String? ownerId;
+  final String? region;
 
-  AcceptInboundCrossClusterSearchConnectionResponse({
-    this.crossClusterSearchConnection,
+  AWSDomainInformation({
+    required this.domainName,
+    this.ownerId,
+    this.region,
   });
-  factory AcceptInboundCrossClusterSearchConnectionResponse.fromJson(
-      Map<String, dynamic> json) {
-    return AcceptInboundCrossClusterSearchConnectionResponse(
-      crossClusterSearchConnection: json['CrossClusterSearchConnection'] != null
-          ? InboundCrossClusterSearchConnection.fromJson(
-              json['CrossClusterSearchConnection'] as Map<String, dynamic>)
+  factory AWSDomainInformation.fromJson(Map<String, dynamic> json) {
+    return AWSDomainInformation(
+      domainName: json['DomainName'] as String,
+      ownerId: json['OwnerId'] as String?,
+      region: json['Region'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final domainName = this.domainName;
+    final ownerId = this.ownerId;
+    final region = this.region;
+    return {
+      'DomainName': domainName,
+      if (ownerId != null) 'OwnerId': ownerId,
+      if (region != null) 'Region': region,
+    };
+  }
+}
+
+/// The result of an <code> <a>AcceptInboundConnection</a> </code> operation.
+/// Contains details about the accepted inbound connection.
+class AcceptInboundConnectionResponse {
+  /// The <code> <a>InboundConnection</a> </code> of the accepted inbound
+  /// connection.
+  final InboundConnection? connection;
+
+  AcceptInboundConnectionResponse({
+    this.connection,
+  });
+  factory AcceptInboundConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return AcceptInboundConnectionResponse(
+      connection: json['Connection'] != null
+          ? InboundConnection.fromJson(
+              json['Connection'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1857,13 +1927,13 @@ class AcceptInboundCrossClusterSearchConnectionResponse {
 /// The configured access rules for the domain's document and search endpoints,
 /// and the current status of those rules.
 class AccessPoliciesStatus {
-  /// The access policy configured for the Elasticsearch domain. Access policies
-  /// may be resource-based, IP-based, or IAM-based. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-access-policies"
-  /// target="_blank"> Configuring Access Policies</a>for more information.
+  /// The access policy configured for the domain. Access policies can be
+  /// resource-based, IP-based, or IAM-based. See <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomain-configure-access-policies"
+  /// target="_blank"> Configuring access policies</a>for more information.
   final String options;
 
-  /// The status of the access policy for the Elasticsearch domain. See
+  /// The status of the access policy for the domain. See
   /// <code>OptionStatus</code> for the status information that's included.
   final OptionStatus status;
 
@@ -1879,24 +1949,24 @@ class AccessPoliciesStatus {
   }
 }
 
-/// List of limits that are specific to a given InstanceType and for each of
-/// it's <code> <a>InstanceRole</a> </code> .
+/// List of limits that are specific to a given InstanceType and for each of its
+/// <code> <a>InstanceRole</a> </code> .
 class AdditionalLimit {
-  /// Name of Additional Limit is specific to a given InstanceType and for each of
-  /// it's <code> <a>InstanceRole</a> </code> etc. <br/> Attributes and their
-  /// details: <br/>
+  /// Additional limit is specific to a given InstanceType and for each of its
+  /// <code> <a>InstanceRole</a> </code> etc. <br/> Attributes and their details:
+  /// <br/>
   /// <ul>
-  /// <li>MaximumNumberOfDataNodesSupported</li> This attribute will be present in
-  /// Master node only to specify how much data nodes upto which given <code>
+  /// <li>MaximumNumberOfDataNodesSupported</li> This attribute is present on the
+  /// master node only to specify how much data nodes up to which given <code>
   /// <a>ESPartitionInstanceType</a> </code> can support as master node.
-  /// <li>MaximumNumberOfDataNodesWithoutMasterNode</li> This attribute will be
-  /// present in Data node only to specify how much data nodes of given <code>
-  /// <a>ESPartitionInstanceType</a> </code> upto which you don't need any master
+  /// <li>MaximumNumberOfDataNodesWithoutMasterNode</li> This attribute is present
+  /// on data node only to specify how much data nodes of given <code>
+  /// <a>ESPartitionInstanceType</a> </code> up to which you don't need any master
   /// nodes to govern them.
   /// </ul>
   final String? limitName;
 
-  /// Value for given <code> <a>AdditionalLimit$LimitName</a> </code> .
+  /// Value for a given <code> <a>AdditionalLimit$LimitName</a> </code> .
   final List<String>? limitValues;
 
   AdditionalLimit({
@@ -1914,29 +1984,26 @@ class AdditionalLimit {
   }
 }
 
-/// Status of the advanced options for the specified Elasticsearch domain.
-/// Currently, the following advanced options are available:
+/// Status of the advanced options for the specified domain. Currently, the
+/// following advanced options are available:
 ///
 /// <ul>
 /// <li>Option to allow references to indices in an HTTP request body. Must be
 /// <code>false</code> when configuring access to individual sub-resources. By
 /// default, the value is <code>true</code>. See <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-advanced-options"
-/// target="_blank">Configuration Advanced Options</a> for more
-/// information.</li>
-/// <li>Option to specify the percentage of heap space that is allocated to
-/// field data. By default, this setting is unbounded.</li>
+/// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomain-configure-advanced-options"
+/// target="_blank">Advanced cluster parameters </a> for more information. </li>
+/// <li>Option to specify the percentage of heap space allocated to field data.
+/// By default, this setting is unbounded. </li>
 /// </ul>
 /// For more information, see <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-advanced-options">Configuring
-/// Advanced Options</a>.
+/// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomain-configure-advanced-options">
+/// Advanced cluster parameters</a>.
 class AdvancedOptionsStatus {
-  /// Specifies the status of advanced options for the specified Elasticsearch
-  /// domain.
+  /// The status of advanced options for the specified domain.
   final Map<String, String> options;
 
-  /// Specifies the status of <code>OptionStatus</code> for advanced options for
-  /// the specified Elasticsearch domain.
+  /// The <code>OptionStatus</code> for advanced options for the specified domain.
   final OptionStatus status;
 
   AdvancedOptionsStatus({
@@ -1952,8 +2019,8 @@ class AdvancedOptionsStatus {
   }
 }
 
-/// Specifies the advanced security configuration: whether advanced security is
-/// enabled, whether the internal database option is enabled.
+/// The advanced security configuration: whether advanced security is enabled,
+/// whether the internal database option is enabled.
 class AdvancedSecurityOptions {
   /// Specifies the Anonymous Auth Disable Date when Anonymous Auth is enabled.
   final DateTime? anonymousAuthDisableDate;
@@ -1993,10 +2060,10 @@ class AdvancedSecurityOptions {
   }
 }
 
-/// Specifies the advanced security configuration: whether advanced security is
-/// enabled, whether the internal database option is enabled, master username
-/// and password (if internal database is enabled), and master user ARN (if IAM
-/// is enabled).
+/// The advanced security configuration: whether advanced security is enabled,
+/// whether the internal database option is enabled, master username and
+/// password (if internal database is enabled), and master user ARN (if IAM is
+/// enabled).
 class AdvancedSecurityOptionsInput {
   /// True if Anonymous auth is enabled. Anonymous auth can be enabled only when
   /// AdvancedSecurity is enabled on existing domains.
@@ -2011,7 +2078,7 @@ class AdvancedSecurityOptionsInput {
   /// Credentials for the master user: username and password, ARN, or both.
   final MasterUserOptions? masterUserOptions;
 
-  /// Specifies the SAML application configuration for the domain.
+  /// The SAML application configuration for the domain.
   final SAMLOptionsInput? sAMLOptions;
 
   AdvancedSecurityOptionsInput({
@@ -2039,14 +2106,12 @@ class AdvancedSecurityOptionsInput {
   }
 }
 
-/// Specifies the status of advanced security options for the specified
-/// Elasticsearch domain.
+/// The status of advanced security options for the specified domain.
 class AdvancedSecurityOptionsStatus {
-  /// Specifies advanced security options for the specified Elasticsearch domain.
+  /// Advanced security options for the specified domain.
   final AdvancedSecurityOptions options;
 
-  /// Status of the advanced security options for the specified Elasticsearch
-  /// domain.
+  /// Status of the advanced security options for the specified domain.
   final OptionStatus status;
 
   AdvancedSecurityOptionsStatus({
@@ -2062,8 +2127,8 @@ class AdvancedSecurityOptionsStatus {
   }
 }
 
-/// Container for response returned by <code> <a>AssociatePackage</a> </code>
-/// operation.
+/// Container for the response returned by <code> <a>AssociatePackage</a>
+/// </code> operation.
 class AssociatePackageResponse {
   /// <code>DomainPackageDetails</code>
   final DomainPackageDetails? domainPackageDetails;
@@ -2081,14 +2146,15 @@ class AssociatePackageResponse {
   }
 }
 
-/// Specifies Auto-Tune type and Auto-Tune action details.
+/// Specifies the Auto-Tune type and Auto-Tune action details.
 class AutoTune {
-  /// Specifies details of the Auto-Tune action. See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// Specifies details about the Auto-Tune action. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final AutoTuneDetails? autoTuneDetails;
 
-  /// Specifies Auto-Tune type. Valid value is SCHEDULED_ACTION.
+  /// Specifies the Auto-Tune type. Valid value is SCHEDULED_ACTION.
   final AutoTuneType? autoTuneType;
 
   AutoTune({
@@ -2106,7 +2172,7 @@ class AutoTune {
   }
 }
 
-/// Specifies the Auto-Tune desired state. Valid values are ENABLED, DISABLED.
+/// The Auto-Tune desired state. Valid values are ENABLED and DISABLED.
 enum AutoTuneDesiredState {
   enabled,
   disabled,
@@ -2135,9 +2201,10 @@ extension on String {
   }
 }
 
-/// Specifies details of the Auto-Tune action. See the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a> for more information.
+/// Specifies details about the Auto-Tune action. See <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+/// information.
 class AutoTuneDetails {
   final ScheduledAutoTuneDetails? scheduledAutoTuneDetails;
 
@@ -2154,22 +2221,25 @@ class AutoTuneDetails {
   }
 }
 
-/// Specifies Auto-Tune maitenance schedule. See the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a> for more information.
+/// Specifies the Auto-Tune maintenance schedule. See <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+/// information.
 class AutoTuneMaintenanceSchedule {
-  /// Specifies cron expression for a recurring maintenance schedule. See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// A cron expression for a recurring maintenance schedule. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final String? cronExpressionForRecurrence;
 
   /// Specifies maintenance schedule duration: duration value and duration unit.
-  /// See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final Duration? duration;
 
-  /// Specifies timestamp at which Auto-Tune maintenance schedule start.
+  /// The timestamp at which the Auto-Tune maintenance schedule starts.
   final DateTime? startAt;
 
   AutoTuneMaintenanceSchedule({
@@ -2201,20 +2271,20 @@ class AutoTuneMaintenanceSchedule {
   }
 }
 
-/// Specifies the Auto-Tune options: the Auto-Tune desired state for the domain,
-/// rollback state when disabling Auto-Tune options and list of maintenance
-/// schedules.
+/// The Auto-Tune options: the Auto-Tune desired state for the domain, rollback
+/// state when disabling Auto-Tune options and list of maintenance schedules.
 class AutoTuneOptions {
-  /// Specifies the Auto-Tune desired state. Valid values are ENABLED, DISABLED.
+  /// The Auto-Tune desired state. Valid values are ENABLED and DISABLED.
   final AutoTuneDesiredState? desiredState;
 
-  /// Specifies list of maitenance schedules. See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// A list of maintenance schedules. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final List<AutoTuneMaintenanceSchedule>? maintenanceSchedules;
 
-  /// Specifies the rollback state while disabling Auto-Tune for the domain. Valid
-  /// values are NO_ROLLBACK, DEFAULT_ROLLBACK.
+  /// The rollback state while disabling Auto-Tune for the domain. Valid values
+  /// are NO_ROLLBACK and DEFAULT_ROLLBACK.
   final RollbackOnDisable? rollbackOnDisable;
 
   AutoTuneOptions({
@@ -2249,15 +2319,16 @@ class AutoTuneOptions {
   }
 }
 
-/// Specifies the Auto-Tune options: the Auto-Tune desired state for the domain
-/// and list of maintenance schedules.
+/// The Auto-Tune options: the Auto-Tune desired state for the domain and list
+/// of maintenance schedules.
 class AutoTuneOptionsInput {
-  /// Specifies the Auto-Tune desired state. Valid values are ENABLED, DISABLED.
+  /// The Auto-Tune desired state. Valid values are ENABLED and DISABLED.
   final AutoTuneDesiredState? desiredState;
 
-  /// Specifies list of maitenance schedules. See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// A list of maintenance schedules. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final List<AutoTuneMaintenanceSchedule>? maintenanceSchedules;
 
   AutoTuneOptionsInput({
@@ -2275,13 +2346,13 @@ class AutoTuneOptionsInput {
   }
 }
 
-/// Specifies the Auto-Tune options: the Auto-Tune desired state for the domain
-/// and list of maintenance schedules.
+/// The Auto-Tune options: the Auto-Tune desired state for the domain and list
+/// of maintenance schedules.
 class AutoTuneOptionsOutput {
-  /// Specifies the error message while enabling or disabling the Auto-Tune.
+  /// The error message while enabling or disabling Auto-Tune.
   final String? errorMessage;
 
-  /// Specifies the <code>AutoTuneState</code> for the Elasticsearch domain.
+  /// The <code>AutoTuneState</code> for the domain.
   final AutoTuneState? state;
 
   AutoTuneOptionsOutput({
@@ -2296,14 +2367,12 @@ class AutoTuneOptionsOutput {
   }
 }
 
-/// Specifies the status of Auto-Tune options for the specified Elasticsearch
-/// domain.
+/// The Auto-Tune status for the domain.
 class AutoTuneOptionsStatus {
-  /// Specifies Auto-Tune options for the specified Elasticsearch domain.
+  /// Specifies Auto-Tune options for the domain.
   final AutoTuneOptions? options;
 
-  /// Specifies Status of the Auto-Tune options for the specified Elasticsearch
-  /// domain.
+  /// The status of the Auto-Tune options for the domain.
   final AutoTuneStatus? status;
 
   AutoTuneOptionsStatus({
@@ -2322,10 +2391,9 @@ class AutoTuneOptionsStatus {
   }
 }
 
-/// Specifies the Auto-Tune state for the Elasticsearch domain. For valid states
-/// see the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a>.
+/// The Auto-Tune state for the domain. For valid states see <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service</a>.
 enum AutoTuneState {
   enabled,
   disabled,
@@ -2389,25 +2457,24 @@ extension on String {
   }
 }
 
-/// Provides the current status of the Auto-Tune options.
+/// Provides the current Auto-Tune status for the domain.
 class AutoTuneStatus {
-  /// Timestamp which tells Auto-Tune options creation date .
+  /// The timestamp of the Auto-Tune options creation date.
   final DateTime creationDate;
 
-  /// Specifies the <code>AutoTuneState</code> for the Elasticsearch domain.
+  /// The <code>AutoTuneState</code> for the domain.
   final AutoTuneState state;
 
-  /// Timestamp which tells Auto-Tune options last updated time.
+  /// The timestamp of when the Auto-Tune options were last updated.
   final DateTime updateDate;
 
-  /// Specifies the error message while enabling or disabling the Auto-Tune
-  /// options.
+  /// The error message while enabling or disabling Auto-Tune.
   final String? errorMessage;
 
-  /// Indicates whether the Elasticsearch domain is being deleted.
+  /// Indicates whether the domain is being deleted.
   final bool? pendingDeletion;
 
-  /// Specifies the Auto-Tune options latest version.
+  /// The latest version of the Auto-Tune options.
   final int? updateVersion;
 
   AutoTuneStatus({
@@ -2431,7 +2498,7 @@ class AutoTuneStatus {
   }
 }
 
-/// Specifies Auto-Tune type. Valid value is SCHEDULED_ACTION.
+/// Specifies the Auto-Tune type. Valid value is SCHEDULED_ACTION.
 enum AutoTuneType {
   scheduledAction,
 }
@@ -2455,18 +2522,18 @@ extension on String {
   }
 }
 
-/// The result of a <code>CancelElasticsearchServiceSoftwareUpdate</code>
-/// operation. Contains the status of the update.
-class CancelElasticsearchServiceSoftwareUpdateResponse {
-  /// The current status of the Elasticsearch service software update.
+/// The result of a <code>CancelServiceSoftwareUpdate</code> operation. Contains
+/// the status of the update.
+class CancelServiceSoftwareUpdateResponse {
+  /// The current status of the OpenSearch service software update.
   final ServiceSoftwareOptions? serviceSoftwareOptions;
 
-  CancelElasticsearchServiceSoftwareUpdateResponse({
+  CancelServiceSoftwareUpdateResponse({
     this.serviceSoftwareOptions,
   });
-  factory CancelElasticsearchServiceSoftwareUpdateResponse.fromJson(
+  factory CancelServiceSoftwareUpdateResponse.fromJson(
       Map<String, dynamic> json) {
-    return CancelElasticsearchServiceSoftwareUpdateResponse(
+    return CancelServiceSoftwareUpdateResponse(
       serviceSoftwareOptions: json['ServiceSoftwareOptions'] != null
           ? ServiceSoftwareOptions.fromJson(
               json['ServiceSoftwareOptions'] as Map<String, dynamic>)
@@ -2587,22 +2654,160 @@ class ChangeProgressStatusDetails {
   }
 }
 
-/// Options to specify the Cognito user and identity pools for Kibana
-/// authentication. For more information, see <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html"
-/// target="_blank">Amazon Cognito Authentication for Kibana</a>.
+/// The configuration for the domain cluster, such as the type and number of
+/// instances.
+class ClusterConfig {
+  /// Specifies the <code>ColdStorageOptions</code> config for a Domain
+  final ColdStorageOptions? coldStorageOptions;
+
+  /// Total number of dedicated master nodes, active and on standby, for the
+  /// cluster.
+  final int? dedicatedMasterCount;
+
+  /// A boolean value to indicate whether a dedicated master node is enabled. See
+  /// <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains.html#managedomains-dedicatedmasternodes"
+  /// target="_blank">Dedicated master nodes in Amazon OpenSearch Service </a> for
+  /// more information.
+  final bool? dedicatedMasterEnabled;
+
+  /// The instance type for a dedicated master node.
+  final OpenSearchPartitionInstanceType? dedicatedMasterType;
+
+  /// The number of instances in the specified domain cluster.
+  final int? instanceCount;
+
+  /// The instance type for an OpenSearch cluster. UltraWarm instance types are
+  /// not supported for data instances.
+  final OpenSearchPartitionInstanceType? instanceType;
+
+  /// The number of UltraWarm nodes in the cluster.
+  final int? warmCount;
+
+  /// True to enable UltraWarm storage.
+  final bool? warmEnabled;
+
+  /// The instance type for the OpenSearch cluster's warm nodes.
+  final OpenSearchWarmPartitionInstanceType? warmType;
+
+  /// The zone awareness configuration for a domain when zone awareness is
+  /// enabled.
+  final ZoneAwarenessConfig? zoneAwarenessConfig;
+
+  /// A boolean value to indicate whether zone awareness is enabled. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/managedomains-multiaz.html"
+  /// target="_blank">Configuring a multi-AZ domain in Amazon OpenSearch Service
+  /// </a> for more information.
+  final bool? zoneAwarenessEnabled;
+
+  ClusterConfig({
+    this.coldStorageOptions,
+    this.dedicatedMasterCount,
+    this.dedicatedMasterEnabled,
+    this.dedicatedMasterType,
+    this.instanceCount,
+    this.instanceType,
+    this.warmCount,
+    this.warmEnabled,
+    this.warmType,
+    this.zoneAwarenessConfig,
+    this.zoneAwarenessEnabled,
+  });
+  factory ClusterConfig.fromJson(Map<String, dynamic> json) {
+    return ClusterConfig(
+      coldStorageOptions: json['ColdStorageOptions'] != null
+          ? ColdStorageOptions.fromJson(
+              json['ColdStorageOptions'] as Map<String, dynamic>)
+          : null,
+      dedicatedMasterCount: json['DedicatedMasterCount'] as int?,
+      dedicatedMasterEnabled: json['DedicatedMasterEnabled'] as bool?,
+      dedicatedMasterType: (json['DedicatedMasterType'] as String?)
+          ?.toOpenSearchPartitionInstanceType(),
+      instanceCount: json['InstanceCount'] as int?,
+      instanceType: (json['InstanceType'] as String?)
+          ?.toOpenSearchPartitionInstanceType(),
+      warmCount: json['WarmCount'] as int?,
+      warmEnabled: json['WarmEnabled'] as bool?,
+      warmType: (json['WarmType'] as String?)
+          ?.toOpenSearchWarmPartitionInstanceType(),
+      zoneAwarenessConfig: json['ZoneAwarenessConfig'] != null
+          ? ZoneAwarenessConfig.fromJson(
+              json['ZoneAwarenessConfig'] as Map<String, dynamic>)
+          : null,
+      zoneAwarenessEnabled: json['ZoneAwarenessEnabled'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final coldStorageOptions = this.coldStorageOptions;
+    final dedicatedMasterCount = this.dedicatedMasterCount;
+    final dedicatedMasterEnabled = this.dedicatedMasterEnabled;
+    final dedicatedMasterType = this.dedicatedMasterType;
+    final instanceCount = this.instanceCount;
+    final instanceType = this.instanceType;
+    final warmCount = this.warmCount;
+    final warmEnabled = this.warmEnabled;
+    final warmType = this.warmType;
+    final zoneAwarenessConfig = this.zoneAwarenessConfig;
+    final zoneAwarenessEnabled = this.zoneAwarenessEnabled;
+    return {
+      if (coldStorageOptions != null) 'ColdStorageOptions': coldStorageOptions,
+      if (dedicatedMasterCount != null)
+        'DedicatedMasterCount': dedicatedMasterCount,
+      if (dedicatedMasterEnabled != null)
+        'DedicatedMasterEnabled': dedicatedMasterEnabled,
+      if (dedicatedMasterType != null)
+        'DedicatedMasterType': dedicatedMasterType.toValue(),
+      if (instanceCount != null) 'InstanceCount': instanceCount,
+      if (instanceType != null) 'InstanceType': instanceType.toValue(),
+      if (warmCount != null) 'WarmCount': warmCount,
+      if (warmEnabled != null) 'WarmEnabled': warmEnabled,
+      if (warmType != null) 'WarmType': warmType.toValue(),
+      if (zoneAwarenessConfig != null)
+        'ZoneAwarenessConfig': zoneAwarenessConfig,
+      if (zoneAwarenessEnabled != null)
+        'ZoneAwarenessEnabled': zoneAwarenessEnabled,
+    };
+  }
+}
+
+/// The configuration status for the specified domain.
+class ClusterConfigStatus {
+  /// The cluster configuration for the specified domain.
+  final ClusterConfig options;
+
+  /// The cluster configuration status for the specified domain.
+  final OptionStatus status;
+
+  ClusterConfigStatus({
+    required this.options,
+    required this.status,
+  });
+  factory ClusterConfigStatus.fromJson(Map<String, dynamic> json) {
+    return ClusterConfigStatus(
+      options: ClusterConfig.fromJson(json['Options'] as Map<String, dynamic>),
+      status: OptionStatus.fromJson(json['Status'] as Map<String, dynamic>),
+    );
+  }
+}
+
+/// Options to specify the Cognito user and identity pools for OpenSearch
+/// Dashboards authentication. For more information, see <a
+/// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/cognito-auth.html"
+/// target="_blank">Configuring Amazon Cognito authentication for OpenSearch
+/// Dashboards</a>.
 class CognitoOptions {
-  /// Specifies the option to enable Cognito for Kibana authentication.
+  /// The option to enable Cognito for OpenSearch Dashboards authentication.
   final bool? enabled;
 
-  /// Specifies the Cognito identity pool ID for Kibana authentication.
+  /// The Cognito identity pool ID for OpenSearch Dashboards authentication.
   final String? identityPoolId;
 
-  /// Specifies the role ARN that provides Elasticsearch permissions for accessing
-  /// Cognito resources.
+  /// The role ARN that provides OpenSearch permissions for accessing Cognito
+  /// resources.
   final String? roleArn;
 
-  /// Specifies the Cognito user pool ID for Kibana authentication.
+  /// The Cognito user pool ID for OpenSearch Dashboards authentication.
   final String? userPoolId;
 
   CognitoOptions({
@@ -2634,13 +2839,12 @@ class CognitoOptions {
   }
 }
 
-/// Status of the Cognito options for the specified Elasticsearch domain.
+/// The status of the Cognito options for the specified domain.
 class CognitoOptionsStatus {
-  /// Specifies the Cognito options for the specified Elasticsearch domain.
+  /// Cognito options for the specified domain.
   final CognitoOptions options;
 
-  /// Specifies the status of the Cognito options for the specified Elasticsearch
-  /// domain.
+  /// The status of the Cognito options for the specified domain.
   final OptionStatus status;
 
   CognitoOptionsStatus({
@@ -2677,11 +2881,10 @@ class ColdStorageOptions {
   }
 }
 
-/// A map from an <code> <a>ElasticsearchVersion</a> </code> to a list of
-/// compatible <code> <a>ElasticsearchVersion</a> </code> s to which the domain
-/// can be upgraded.
+/// A map from an <code> <a>EngineVersion</a> </code> to a list of compatible
+/// <code> <a>EngineVersion</a> </code> s to which the domain can be upgraded.
 class CompatibleVersionsMap {
-  /// The current version of Elasticsearch on which a domain is.
+  /// The current version of OpenSearch a domain is on.
   final String? sourceVersion;
   final List<String>? targetVersions;
 
@@ -2700,83 +2903,77 @@ class CompatibleVersionsMap {
   }
 }
 
-/// The result of a <code>CreateElasticsearchDomain</code> operation. Contains
-/// the status of the newly created Elasticsearch domain.
-class CreateElasticsearchDomainResponse {
-  /// The status of the newly created Elasticsearch domain.
-  final ElasticsearchDomainStatus? domainStatus;
+/// The result of a <code>CreateDomain</code> operation. Contains the status of
+/// the newly created Amazon OpenSearch Service domain.
+class CreateDomainResponse {
+  /// The status of the newly created domain.
+  final DomainStatus? domainStatus;
 
-  CreateElasticsearchDomainResponse({
+  CreateDomainResponse({
     this.domainStatus,
   });
-  factory CreateElasticsearchDomainResponse.fromJson(
-      Map<String, dynamic> json) {
-    return CreateElasticsearchDomainResponse(
+  factory CreateDomainResponse.fromJson(Map<String, dynamic> json) {
+    return CreateDomainResponse(
       domainStatus: json['DomainStatus'] != null
-          ? ElasticsearchDomainStatus.fromJson(
-              json['DomainStatus'] as Map<String, dynamic>)
+          ? DomainStatus.fromJson(json['DomainStatus'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// The result of a
-/// <code><a>CreateOutboundCrossClusterSearchConnection</a></code> request.
-/// Contains the details of the newly created cross-cluster search connection.
-class CreateOutboundCrossClusterSearchConnectionResponse {
-  /// Specifies the connection alias provided during the create connection
-  /// request.
+/// The result of a <code> <a>CreateOutboundConnection</a> </code> request.
+/// Contains the details about the newly created cross-cluster connection.
+class CreateOutboundConnectionResponse {
+  /// The connection alias provided during the create connection request.
   final String? connectionAlias;
 
-  /// Specifies the <code><a>OutboundCrossClusterSearchConnectionStatus</a></code>
-  /// for the newly created connection.
-  final OutboundCrossClusterSearchConnectionStatus? connectionStatus;
+  /// The unique ID for the created outbound connection, which is used for
+  /// subsequent operations on the connection.
+  final String? connectionId;
 
-  /// Unique id for the created outbound connection, which is used for subsequent
-  /// operations on connection.
-  final String? crossClusterSearchConnectionId;
+  /// The <code> <a>OutboundConnectionStatus</a> </code> for the newly created
+  /// connection.
+  final OutboundConnectionStatus? connectionStatus;
 
-  /// Specifies the <code><a>DomainInformation</a></code> for the destination
-  /// Elasticsearch domain.
-  final DomainInformation? destinationDomainInfo;
+  /// The <code> <a>AWSDomainInformation</a> </code> for the local OpenSearch
+  /// domain.
+  final DomainInformationContainer? localDomainInfo;
 
-  /// Specifies the <code><a>DomainInformation</a></code> for the source
-  /// Elasticsearch domain.
-  final DomainInformation? sourceDomainInfo;
+  /// The <code> <a>AWSDomainInformation</a> </code> for the remote OpenSearch
+  /// domain.
+  final DomainInformationContainer? remoteDomainInfo;
 
-  CreateOutboundCrossClusterSearchConnectionResponse({
+  CreateOutboundConnectionResponse({
     this.connectionAlias,
+    this.connectionId,
     this.connectionStatus,
-    this.crossClusterSearchConnectionId,
-    this.destinationDomainInfo,
-    this.sourceDomainInfo,
+    this.localDomainInfo,
+    this.remoteDomainInfo,
   });
-  factory CreateOutboundCrossClusterSearchConnectionResponse.fromJson(
-      Map<String, dynamic> json) {
-    return CreateOutboundCrossClusterSearchConnectionResponse(
+  factory CreateOutboundConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return CreateOutboundConnectionResponse(
       connectionAlias: json['ConnectionAlias'] as String?,
+      connectionId: json['ConnectionId'] as String?,
       connectionStatus: json['ConnectionStatus'] != null
-          ? OutboundCrossClusterSearchConnectionStatus.fromJson(
+          ? OutboundConnectionStatus.fromJson(
               json['ConnectionStatus'] as Map<String, dynamic>)
           : null,
-      crossClusterSearchConnectionId:
-          json['CrossClusterSearchConnectionId'] as String?,
-      destinationDomainInfo: json['DestinationDomainInfo'] != null
-          ? DomainInformation.fromJson(
-              json['DestinationDomainInfo'] as Map<String, dynamic>)
+      localDomainInfo: json['LocalDomainInfo'] != null
+          ? DomainInformationContainer.fromJson(
+              json['LocalDomainInfo'] as Map<String, dynamic>)
           : null,
-      sourceDomainInfo: json['SourceDomainInfo'] != null
-          ? DomainInformation.fromJson(
-              json['SourceDomainInfo'] as Map<String, dynamic>)
+      remoteDomainInfo: json['RemoteDomainInfo'] != null
+          ? DomainInformationContainer.fromJson(
+              json['RemoteDomainInfo'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// Container for response returned by <code> <a>CreatePackage</a> </code>
-/// operation.
+/// Container for the response returned by the <code> <a>CreatePackage</a>
+/// </code> operation.
 class CreatePackageResponse {
-  /// Information about the package <code>PackageDetails</code>.
+  /// Information about the package.
   final PackageDetails? packageDetails;
 
   CreatePackageResponse({
@@ -2792,73 +2989,67 @@ class CreatePackageResponse {
   }
 }
 
-/// The result of a <code>DeleteElasticsearchDomain</code> request. Contains the
-/// status of the pending deletion, or no status if the domain and all of its
-/// resources have been deleted.
-class DeleteElasticsearchDomainResponse {
-  /// The status of the Elasticsearch domain being deleted.
-  final ElasticsearchDomainStatus? domainStatus;
+/// The result of a <code>DeleteDomain</code> request. Contains the status of
+/// the pending deletion, or a "domain not found" error if the domain and all of
+/// its resources have been deleted.
+class DeleteDomainResponse {
+  /// The status of the domain being deleted.
+  final DomainStatus? domainStatus;
 
-  DeleteElasticsearchDomainResponse({
+  DeleteDomainResponse({
     this.domainStatus,
   });
-  factory DeleteElasticsearchDomainResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DeleteElasticsearchDomainResponse(
+  factory DeleteDomainResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteDomainResponse(
       domainStatus: json['DomainStatus'] != null
-          ? ElasticsearchDomainStatus.fromJson(
-              json['DomainStatus'] as Map<String, dynamic>)
+          ? DomainStatus.fromJson(json['DomainStatus'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// The result of a
-/// <code><a>DeleteInboundCrossClusterSearchConnection</a></code> operation.
-/// Contains details of deleted inbound connection.
-class DeleteInboundCrossClusterSearchConnectionResponse {
-  /// Specifies the <code><a>InboundCrossClusterSearchConnection</a></code> of
-  /// deleted inbound connection.
-  final InboundCrossClusterSearchConnection? crossClusterSearchConnection;
+/// The result of a <code> <a>DeleteInboundConnection</a> </code> operation.
+/// Contains details about the deleted inbound connection.
+class DeleteInboundConnectionResponse {
+  /// The <code> <a>InboundConnection</a> </code> of the deleted inbound
+  /// connection.
+  final InboundConnection? connection;
 
-  DeleteInboundCrossClusterSearchConnectionResponse({
-    this.crossClusterSearchConnection,
+  DeleteInboundConnectionResponse({
+    this.connection,
   });
-  factory DeleteInboundCrossClusterSearchConnectionResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DeleteInboundCrossClusterSearchConnectionResponse(
-      crossClusterSearchConnection: json['CrossClusterSearchConnection'] != null
-          ? InboundCrossClusterSearchConnection.fromJson(
-              json['CrossClusterSearchConnection'] as Map<String, dynamic>)
+  factory DeleteInboundConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteInboundConnectionResponse(
+      connection: json['Connection'] != null
+          ? InboundConnection.fromJson(
+              json['Connection'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// The result of a
-/// <code><a>DeleteOutboundCrossClusterSearchConnection</a></code> operation.
-/// Contains details of deleted outbound connection.
-class DeleteOutboundCrossClusterSearchConnectionResponse {
-  /// Specifies the <code><a>OutboundCrossClusterSearchConnection</a></code> of
-  /// deleted outbound connection.
-  final OutboundCrossClusterSearchConnection? crossClusterSearchConnection;
+/// The result of a <code> <a>DeleteOutboundConnection</a> </code> operation.
+/// Contains details about the deleted outbound connection.
+class DeleteOutboundConnectionResponse {
+  /// The <code> <a>OutboundConnection</a> </code> of the deleted outbound
+  /// connection.
+  final OutboundConnection? connection;
 
-  DeleteOutboundCrossClusterSearchConnectionResponse({
-    this.crossClusterSearchConnection,
+  DeleteOutboundConnectionResponse({
+    this.connection,
   });
-  factory DeleteOutboundCrossClusterSearchConnectionResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DeleteOutboundCrossClusterSearchConnectionResponse(
-      crossClusterSearchConnection: json['CrossClusterSearchConnection'] != null
-          ? OutboundCrossClusterSearchConnection.fromJson(
-              json['CrossClusterSearchConnection'] as Map<String, dynamic>)
+  factory DeleteOutboundConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteOutboundConnectionResponse(
+      connection: json['Connection'] != null
+          ? OutboundConnection.fromJson(
+              json['Connection'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// Container for response parameters to <code> <a>DeletePackage</a> </code>
-/// operation.
+/// Container for the response parameters to the <code> <a>DeletePackage</a>
+/// </code> operation.
 class DeletePackageResponse {
   /// <code>PackageDetails</code>
   final PackageDetails? packageDetails;
@@ -2919,17 +3110,19 @@ extension on String {
   }
 }
 
-/// The result of <code>DescribeDomainAutoTunes</code> request. See the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a> for more information.
+/// The result of a <code>DescribeDomainAutoTunes</code> request. See <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+/// information.
 class DescribeDomainAutoTunesResponse {
-  /// Specifies the list of setting adjustments that Auto-Tune has made to the
-  /// domain. See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// The list of setting adjustments that Auto-Tune has made to the domain. See
+  /// <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final List<AutoTune>? autoTunes;
 
-  /// Specifies an identifier to allow retrieval of paginated results.
+  /// An identifier to allow retrieval of paginated results.
   final String? nextToken;
 
   DescribeDomainAutoTunesResponse({
@@ -2968,147 +3161,135 @@ class DescribeDomainChangeProgressResponse {
   }
 }
 
-/// The result of a <code>DescribeElasticsearchDomainConfig</code> request.
-/// Contains the configuration information of the requested domain.
-class DescribeElasticsearchDomainConfigResponse {
+/// The result of a <code>DescribeDomainConfig</code> request. Contains the
+/// configuration information of the requested domain.
+class DescribeDomainConfigResponse {
   /// The configuration information of the domain requested in the
-  /// <code>DescribeElasticsearchDomainConfig</code> request.
-  final ElasticsearchDomainConfig domainConfig;
+  /// <code>DescribeDomainConfig</code> request.
+  final DomainConfig domainConfig;
 
-  DescribeElasticsearchDomainConfigResponse({
+  DescribeDomainConfigResponse({
     required this.domainConfig,
   });
-  factory DescribeElasticsearchDomainConfigResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DescribeElasticsearchDomainConfigResponse(
-      domainConfig: ElasticsearchDomainConfig.fromJson(
-          json['DomainConfig'] as Map<String, dynamic>),
+  factory DescribeDomainConfigResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeDomainConfigResponse(
+      domainConfig:
+          DomainConfig.fromJson(json['DomainConfig'] as Map<String, dynamic>),
     );
   }
 }
 
-/// The result of a <code>DescribeElasticsearchDomain</code> request. Contains
-/// the status of the domain specified in the request.
-class DescribeElasticsearchDomainResponse {
-  /// The current status of the Elasticsearch domain.
-  final ElasticsearchDomainStatus domainStatus;
+/// The result of a <code>DescribeDomain</code> request. Contains the status of
+/// the domain specified in the request.
+class DescribeDomainResponse {
+  /// The current status of the domain.
+  final DomainStatus domainStatus;
 
-  DescribeElasticsearchDomainResponse({
+  DescribeDomainResponse({
     required this.domainStatus,
   });
-  factory DescribeElasticsearchDomainResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DescribeElasticsearchDomainResponse(
-      domainStatus: ElasticsearchDomainStatus.fromJson(
-          json['DomainStatus'] as Map<String, dynamic>),
+  factory DescribeDomainResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeDomainResponse(
+      domainStatus:
+          DomainStatus.fromJson(json['DomainStatus'] as Map<String, dynamic>),
     );
   }
 }
 
-/// The result of a <code>DescribeElasticsearchDomains</code> request. Contains
-/// the status of the specified domains or all domains owned by the account.
-class DescribeElasticsearchDomainsResponse {
-  /// The status of the domains requested in the
-  /// <code>DescribeElasticsearchDomains</code> request.
-  final List<ElasticsearchDomainStatus> domainStatusList;
+/// The result of a <code>DescribeDomains</code> request. Contains the status of
+/// the specified domains or all domains owned by the account.
+class DescribeDomainsResponse {
+  /// The status of the domains requested in the <code>DescribeDomains</code>
+  /// request.
+  final List<DomainStatus> domainStatusList;
 
-  DescribeElasticsearchDomainsResponse({
+  DescribeDomainsResponse({
     required this.domainStatusList,
   });
-  factory DescribeElasticsearchDomainsResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DescribeElasticsearchDomainsResponse(
+  factory DescribeDomainsResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeDomainsResponse(
       domainStatusList: (json['DomainStatusList'] as List)
           .whereNotNull()
-          .map((e) =>
-              ElasticsearchDomainStatus.fromJson(e as Map<String, dynamic>))
+          .map((e) => DomainStatus.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 }
 
-/// Container for the parameters received from <code>
-/// <a>DescribeElasticsearchInstanceTypeLimits</a> </code> operation.
-class DescribeElasticsearchInstanceTypeLimitsResponse {
+/// The result of a <code> <a>DescribeInboundConnections</a> </code> request.
+/// Contains a list of connections matching the filter criteria.
+class DescribeInboundConnectionsResponse {
+  /// A list of <code> <a>InboundConnection</a> </code> matching the specified
+  /// filter criteria.
+  final List<InboundConnection>? connections;
+
+  /// If more results are available and NextToken is present, make the next
+  /// request to the same API with the received NextToken to paginate the
+  /// remaining results.
+  final String? nextToken;
+
+  DescribeInboundConnectionsResponse({
+    this.connections,
+    this.nextToken,
+  });
+  factory DescribeInboundConnectionsResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DescribeInboundConnectionsResponse(
+      connections: (json['Connections'] as List?)
+          ?.whereNotNull()
+          .map((e) => InboundConnection.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+/// Container for the parameters received from the <code>
+/// <a>DescribeInstanceTypeLimits</a> </code> operation.
+class DescribeInstanceTypeLimitsResponse {
   final Map<String, Limits>? limitsByRole;
 
-  DescribeElasticsearchInstanceTypeLimitsResponse({
+  DescribeInstanceTypeLimitsResponse({
     this.limitsByRole,
   });
-  factory DescribeElasticsearchInstanceTypeLimitsResponse.fromJson(
+  factory DescribeInstanceTypeLimitsResponse.fromJson(
       Map<String, dynamic> json) {
-    return DescribeElasticsearchInstanceTypeLimitsResponse(
+    return DescribeInstanceTypeLimitsResponse(
       limitsByRole: (json['LimitsByRole'] as Map<String, dynamic>?)?.map(
           (k, e) => MapEntry(k, Limits.fromJson(e as Map<String, dynamic>))),
     );
   }
 }
 
-/// The result of a
-/// <code><a>DescribeInboundCrossClusterSearchConnections</a></code> request.
+/// The result of a <code> <a>DescribeOutboundConnections</a> </code> request.
 /// Contains the list of connections matching the filter criteria.
-class DescribeInboundCrossClusterSearchConnectionsResponse {
-  /// Consists of list of <code><a>InboundCrossClusterSearchConnection</a></code>
-  /// matching the specified filter criteria.
-  final List<InboundCrossClusterSearchConnection>?
-      crossClusterSearchConnections;
+class DescribeOutboundConnectionsResponse {
+  /// A list of <code> <a>OutboundConnection</a> </code> matching the specified
+  /// filter criteria.
+  final List<OutboundConnection>? connections;
 
   /// If more results are available and NextToken is present, make the next
   /// request to the same API with the received NextToken to paginate the
   /// remaining results.
   final String? nextToken;
 
-  DescribeInboundCrossClusterSearchConnectionsResponse({
-    this.crossClusterSearchConnections,
+  DescribeOutboundConnectionsResponse({
+    this.connections,
     this.nextToken,
   });
-  factory DescribeInboundCrossClusterSearchConnectionsResponse.fromJson(
+  factory DescribeOutboundConnectionsResponse.fromJson(
       Map<String, dynamic> json) {
-    return DescribeInboundCrossClusterSearchConnectionsResponse(
-      crossClusterSearchConnections:
-          (json['CrossClusterSearchConnections'] as List?)
-              ?.whereNotNull()
-              .map((e) => InboundCrossClusterSearchConnection.fromJson(
-                  e as Map<String, dynamic>))
-              .toList(),
+    return DescribeOutboundConnectionsResponse(
+      connections: (json['Connections'] as List?)
+          ?.whereNotNull()
+          .map((e) => OutboundConnection.fromJson(e as Map<String, dynamic>))
+          .toList(),
       nextToken: json['NextToken'] as String?,
     );
   }
 }
 
-/// The result of a
-/// <code><a>DescribeOutboundCrossClusterSearchConnections</a></code> request.
-/// Contains the list of connections matching the filter criteria.
-class DescribeOutboundCrossClusterSearchConnectionsResponse {
-  /// Consists of list of <code><a>OutboundCrossClusterSearchConnection</a></code>
-  /// matching the specified filter criteria.
-  final List<OutboundCrossClusterSearchConnection>?
-      crossClusterSearchConnections;
-
-  /// If more results are available and NextToken is present, make the next
-  /// request to the same API with the received NextToken to paginate the
-  /// remaining results.
-  final String? nextToken;
-
-  DescribeOutboundCrossClusterSearchConnectionsResponse({
-    this.crossClusterSearchConnections,
-    this.nextToken,
-  });
-  factory DescribeOutboundCrossClusterSearchConnectionsResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DescribeOutboundCrossClusterSearchConnectionsResponse(
-      crossClusterSearchConnections:
-          (json['CrossClusterSearchConnections'] as List?)
-              ?.whereNotNull()
-              .map((e) => OutboundCrossClusterSearchConnection.fromJson(
-                  e as Map<String, dynamic>))
-              .toList(),
-      nextToken: json['NextToken'] as String?,
-    );
-  }
-}
-
-/// Filter to apply in <code>DescribePackage</code> response.
+/// A filter to apply to the <code>DescribePackage</code> response.
 class DescribePackagesFilter {
   /// Any field from <code>PackageDetails</code>.
   final DescribePackagesFilterName? name;
@@ -3163,8 +3344,8 @@ extension on String {
   }
 }
 
-/// Container for response returned by <code> <a>DescribePackages</a> </code>
-/// operation.
+/// Container for the response returned by the <code> <a>DescribePackages</a>
+/// </code> operation.
 class DescribePackagesResponse {
   final String? nextToken;
 
@@ -3186,63 +3367,57 @@ class DescribePackagesResponse {
   }
 }
 
-/// Container for results from
-/// <code>DescribeReservedElasticsearchInstanceOfferings</code>
-class DescribeReservedElasticsearchInstanceOfferingsResponse {
+/// Container for results from <code>DescribeReservedInstanceOfferings</code>
+class DescribeReservedInstanceOfferingsResponse {
   /// Provides an identifier to allow retrieval of paginated results.
   final String? nextToken;
 
-  /// List of reserved Elasticsearch instance offerings
-  final List<ReservedElasticsearchInstanceOffering>?
-      reservedElasticsearchInstanceOfferings;
+  /// List of reserved OpenSearch instance offerings
+  final List<ReservedInstanceOffering>? reservedInstanceOfferings;
 
-  DescribeReservedElasticsearchInstanceOfferingsResponse({
+  DescribeReservedInstanceOfferingsResponse({
     this.nextToken,
-    this.reservedElasticsearchInstanceOfferings,
+    this.reservedInstanceOfferings,
   });
-  factory DescribeReservedElasticsearchInstanceOfferingsResponse.fromJson(
+  factory DescribeReservedInstanceOfferingsResponse.fromJson(
       Map<String, dynamic> json) {
-    return DescribeReservedElasticsearchInstanceOfferingsResponse(
+    return DescribeReservedInstanceOfferingsResponse(
       nextToken: json['NextToken'] as String?,
-      reservedElasticsearchInstanceOfferings:
-          (json['ReservedElasticsearchInstanceOfferings'] as List?)
-              ?.whereNotNull()
-              .map((e) => ReservedElasticsearchInstanceOffering.fromJson(
-                  e as Map<String, dynamic>))
-              .toList(),
-    );
-  }
-}
-
-/// Container for results from
-/// <code>DescribeReservedElasticsearchInstances</code>
-class DescribeReservedElasticsearchInstancesResponse {
-  /// Provides an identifier to allow retrieval of paginated results.
-  final String? nextToken;
-
-  /// List of reserved Elasticsearch instances.
-  final List<ReservedElasticsearchInstance>? reservedElasticsearchInstances;
-
-  DescribeReservedElasticsearchInstancesResponse({
-    this.nextToken,
-    this.reservedElasticsearchInstances,
-  });
-  factory DescribeReservedElasticsearchInstancesResponse.fromJson(
-      Map<String, dynamic> json) {
-    return DescribeReservedElasticsearchInstancesResponse(
-      nextToken: json['NextToken'] as String?,
-      reservedElasticsearchInstances: (json['ReservedElasticsearchInstances']
-              as List?)
+      reservedInstanceOfferings: (json['ReservedInstanceOfferings'] as List?)
           ?.whereNotNull()
           .map((e) =>
-              ReservedElasticsearchInstance.fromJson(e as Map<String, dynamic>))
+              ReservedInstanceOffering.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 }
 
-/// Container for response returned by <code> <a>DissociatePackage</a> </code>
-/// operation.
+/// Container for results from <code>DescribeReservedInstances</code>
+class DescribeReservedInstancesResponse {
+  /// Provides an identifier to allow retrieval of paginated results.
+  final String? nextToken;
+
+  /// List of reserved OpenSearch instances.
+  final List<ReservedInstance>? reservedInstances;
+
+  DescribeReservedInstancesResponse({
+    this.nextToken,
+    this.reservedInstances,
+  });
+  factory DescribeReservedInstancesResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DescribeReservedInstancesResponse(
+      nextToken: json['NextToken'] as String?,
+      reservedInstances: (json['ReservedInstances'] as List?)
+          ?.whereNotNull()
+          .map((e) => ReservedInstance.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+/// Container for the response returned by <code> <a>DissociatePackage</a>
+/// </code> operation.
 class DissociatePackageResponse {
   /// <code>DomainPackageDetails</code>
   final DomainPackageDetails? domainPackageDetails;
@@ -3260,29 +3435,168 @@ class DissociatePackageResponse {
   }
 }
 
-/// Options to configure endpoint for the Elasticsearch domain.
+/// The configuration of a domain.
+class DomainConfig {
+  /// IAM access policy as a JSON-formatted string.
+  final AccessPoliciesStatus? accessPolicies;
+
+  /// The <code>AdvancedOptions</code> for the domain. See <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/createupdatedomains.html#createdomain-configure-advanced-options"
+  /// target="_blank">Advanced options </a> for more information.
+  final AdvancedOptionsStatus? advancedOptions;
+
+  /// Specifies <code>AdvancedSecurityOptions</code> for the domain.
+  final AdvancedSecurityOptionsStatus? advancedSecurityOptions;
+
+  /// Specifies <code>AutoTuneOptions</code> for the domain.
+  final AutoTuneOptionsStatus? autoTuneOptions;
+
+  /// Specifies change details of the domain configuration change.
+  final ChangeProgressDetails? changeProgressDetails;
+
+  /// The <code>ClusterConfig</code> for the domain.
+  final ClusterConfigStatus? clusterConfig;
+
+  /// The <code>CognitoOptions</code> for the specified domain. For more
+  /// information, see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/cognito-auth.html"
+  /// target="_blank">Configuring Amazon Cognito authentication for OpenSearch
+  /// Dashboards</a>.
+  final CognitoOptionsStatus? cognitoOptions;
+
+  /// The <code>DomainEndpointOptions</code> for the domain.
+  final DomainEndpointOptionsStatus? domainEndpointOptions;
+
+  /// The <code>EBSOptions</code> for the domain.
+  final EBSOptionsStatus? eBSOptions;
+
+  /// The <code>EncryptionAtRestOptions</code> for the domain.
+  final EncryptionAtRestOptionsStatus? encryptionAtRestOptions;
+
+  /// String of format Elasticsearch_X.Y or OpenSearch_X.Y to specify the engine
+  /// version for the OpenSearch or Elasticsearch domain.
+  final VersionStatus? engineVersion;
+
+  /// Log publishing options for the given domain.
+  final LogPublishingOptionsStatus? logPublishingOptions;
+
+  /// The <code>NodeToNodeEncryptionOptions</code> for the domain.
+  final NodeToNodeEncryptionOptionsStatus? nodeToNodeEncryptionOptions;
+
+  /// The <code>SnapshotOptions</code> for the domain.
+  final SnapshotOptionsStatus? snapshotOptions;
+
+  /// The <code>VPCOptions</code> for the specified domain. For more information,
+  /// see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html"
+  /// target="_blank"> Launching your Amazon OpenSearch Service domains using a
+  /// VPC</a>.
+  final VPCDerivedInfoStatus? vPCOptions;
+
+  DomainConfig({
+    this.accessPolicies,
+    this.advancedOptions,
+    this.advancedSecurityOptions,
+    this.autoTuneOptions,
+    this.changeProgressDetails,
+    this.clusterConfig,
+    this.cognitoOptions,
+    this.domainEndpointOptions,
+    this.eBSOptions,
+    this.encryptionAtRestOptions,
+    this.engineVersion,
+    this.logPublishingOptions,
+    this.nodeToNodeEncryptionOptions,
+    this.snapshotOptions,
+    this.vPCOptions,
+  });
+  factory DomainConfig.fromJson(Map<String, dynamic> json) {
+    return DomainConfig(
+      accessPolicies: json['AccessPolicies'] != null
+          ? AccessPoliciesStatus.fromJson(
+              json['AccessPolicies'] as Map<String, dynamic>)
+          : null,
+      advancedOptions: json['AdvancedOptions'] != null
+          ? AdvancedOptionsStatus.fromJson(
+              json['AdvancedOptions'] as Map<String, dynamic>)
+          : null,
+      advancedSecurityOptions: json['AdvancedSecurityOptions'] != null
+          ? AdvancedSecurityOptionsStatus.fromJson(
+              json['AdvancedSecurityOptions'] as Map<String, dynamic>)
+          : null,
+      autoTuneOptions: json['AutoTuneOptions'] != null
+          ? AutoTuneOptionsStatus.fromJson(
+              json['AutoTuneOptions'] as Map<String, dynamic>)
+          : null,
+      changeProgressDetails: json['ChangeProgressDetails'] != null
+          ? ChangeProgressDetails.fromJson(
+              json['ChangeProgressDetails'] as Map<String, dynamic>)
+          : null,
+      clusterConfig: json['ClusterConfig'] != null
+          ? ClusterConfigStatus.fromJson(
+              json['ClusterConfig'] as Map<String, dynamic>)
+          : null,
+      cognitoOptions: json['CognitoOptions'] != null
+          ? CognitoOptionsStatus.fromJson(
+              json['CognitoOptions'] as Map<String, dynamic>)
+          : null,
+      domainEndpointOptions: json['DomainEndpointOptions'] != null
+          ? DomainEndpointOptionsStatus.fromJson(
+              json['DomainEndpointOptions'] as Map<String, dynamic>)
+          : null,
+      eBSOptions: json['EBSOptions'] != null
+          ? EBSOptionsStatus.fromJson(
+              json['EBSOptions'] as Map<String, dynamic>)
+          : null,
+      encryptionAtRestOptions: json['EncryptionAtRestOptions'] != null
+          ? EncryptionAtRestOptionsStatus.fromJson(
+              json['EncryptionAtRestOptions'] as Map<String, dynamic>)
+          : null,
+      engineVersion: json['EngineVersion'] != null
+          ? VersionStatus.fromJson(
+              json['EngineVersion'] as Map<String, dynamic>)
+          : null,
+      logPublishingOptions: json['LogPublishingOptions'] != null
+          ? LogPublishingOptionsStatus.fromJson(
+              json['LogPublishingOptions'] as Map<String, dynamic>)
+          : null,
+      nodeToNodeEncryptionOptions: json['NodeToNodeEncryptionOptions'] != null
+          ? NodeToNodeEncryptionOptionsStatus.fromJson(
+              json['NodeToNodeEncryptionOptions'] as Map<String, dynamic>)
+          : null,
+      snapshotOptions: json['SnapshotOptions'] != null
+          ? SnapshotOptionsStatus.fromJson(
+              json['SnapshotOptions'] as Map<String, dynamic>)
+          : null,
+      vPCOptions: json['VPCOptions'] != null
+          ? VPCDerivedInfoStatus.fromJson(
+              json['VPCOptions'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Options to configure the endpoint for the domain.
 class DomainEndpointOptions {
-  /// Specify the fully qualified domain for your custom endpoint.
+  /// The fully qualified domain for your custom endpoint.
   final String? customEndpoint;
 
-  /// Specify ACM certificate ARN for your custom endpoint.
+  /// The ACM certificate ARN for your custom endpoint.
   final String? customEndpointCertificateArn;
 
-  /// Specify if custom endpoint should be enabled for the Elasticsearch domain.
+  /// Whether to enable a custom endpoint for the domain.
   final bool? customEndpointEnabled;
 
-  /// Specify if only HTTPS endpoint should be enabled for the Elasticsearch
-  /// domain.
+  /// Whether only HTTPS endpoint should be enabled for the domain.
   final bool? enforceHTTPS;
 
-  /// Specify the TLS security policy that needs to be applied to the HTTPS
-  /// endpoint of Elasticsearch domain. <br/> It can be one of the following
-  /// values:
+  /// Specify the TLS security policy to apply to the HTTPS endpoint of the
+  /// domain. <br/> Can be one of the following values:
   /// <ul>
-  /// <li><b>Policy-Min-TLS-1-0-2019-07: </b> TLS security policy which supports
-  /// TLSv1.0 and higher.</li>
-  /// <li><b>Policy-Min-TLS-1-2-2019-07: </b> TLS security policy which supports
-  /// only TLSv1.2</li>
+  /// <li> <b>Policy-Min-TLS-1-0-2019-07:</b> TLS security policy which supports
+  /// TLSv1.0 and higher. </li>
+  /// <li> <b>Policy-Min-TLS-1-2-2019-07:</b> TLS security policy which supports
+  /// only TLSv1.2 </li>
   /// </ul>
   final TLSSecurityPolicy? tLSSecurityPolicy;
 
@@ -3326,10 +3640,10 @@ class DomainEndpointOptions {
 
 /// The configured endpoint options for the domain and their current status.
 class DomainEndpointOptionsStatus {
-  /// Options to configure endpoint for the Elasticsearch domain.
+  /// Options to configure the endpoint for the domain.
   final DomainEndpointOptions options;
 
-  /// The status of the endpoint options for the Elasticsearch domain. See
+  /// The status of the endpoint options for the domain. See
   /// <code>OptionStatus</code> for the status information that's included.
   final OptionStatus status;
 
@@ -3347,7 +3661,7 @@ class DomainEndpointOptionsStatus {
 }
 
 class DomainInfo {
-  /// Specifies the <code>DomainName</code>.
+  /// The <code>DomainName</code>.
   final String? domainName;
 
   /// Specifies the <code>EngineType</code> of the domain.
@@ -3365,63 +3679,57 @@ class DomainInfo {
   }
 }
 
-class DomainInformation {
-  final String domainName;
-  final String? ownerId;
-  final String? region;
+class DomainInformationContainer {
+  final AWSDomainInformation? awsDomainInformation;
 
-  DomainInformation({
-    required this.domainName,
-    this.ownerId,
-    this.region,
+  DomainInformationContainer({
+    this.awsDomainInformation,
   });
-  factory DomainInformation.fromJson(Map<String, dynamic> json) {
-    return DomainInformation(
-      domainName: json['DomainName'] as String,
-      ownerId: json['OwnerId'] as String?,
-      region: json['Region'] as String?,
+  factory DomainInformationContainer.fromJson(Map<String, dynamic> json) {
+    return DomainInformationContainer(
+      awsDomainInformation: json['AWSDomainInformation'] != null
+          ? AWSDomainInformation.fromJson(
+              json['AWSDomainInformation'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
-    final domainName = this.domainName;
-    final ownerId = this.ownerId;
-    final region = this.region;
+    final awsDomainInformation = this.awsDomainInformation;
     return {
-      'DomainName': domainName,
-      if (ownerId != null) 'OwnerId': ownerId,
-      if (region != null) 'Region': region,
+      if (awsDomainInformation != null)
+        'AWSDomainInformation': awsDomainInformation,
     };
   }
 }
 
-/// Information on a package that is associated with a domain.
+/// Information on a package associated with a domain.
 class DomainPackageDetails {
-  /// Name of the domain you've associated a package with.
+  /// The name of the domain you've associated a package with.
   final String? domainName;
 
-  /// State of the association. Values are
-  /// ASSOCIATING/ASSOCIATION_FAILED/ACTIVE/DISSOCIATING/DISSOCIATION_FAILED.
+  /// State of the association. Values are ASSOCIATING, ASSOCIATION_FAILED,
+  /// ACTIVE, DISSOCIATING, and DISSOCIATION_FAILED.
   final DomainPackageStatus? domainPackageStatus;
 
   /// Additional information if the package is in an error state. Null otherwise.
   final ErrorDetails? errorDetails;
 
-  /// Timestamp of the most-recent update to the association status.
+  /// The timestamp of the most recent update to the package association status.
   final DateTime? lastUpdated;
 
-  /// Internal ID of the package.
+  /// The internal ID of the package.
   final String? packageID;
 
-  /// User specified name of the package.
+  /// User-specified name of the package.
   final String? packageName;
 
   /// Currently supports only TXT-DICTIONARY.
   final PackageType? packageType;
   final String? packageVersion;
 
-  /// The relative path on Amazon ES nodes, which can be used as synonym_path when
-  /// the package is synonym file.
+  /// The relative path on Amazon OpenSearch Service nodes, which can be used as
+  /// synonym_path when the package is a synonym file.
   final String? referencePath;
 
   DomainPackageDetails({
@@ -3496,15 +3804,206 @@ extension on String {
   }
 }
 
+/// The current status of a domain.
+class DomainStatus {
+  /// The Amazon Resource Name (ARN) of a domain. See <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html"
+  /// target="_blank">IAM identifiers </a> in the <i>AWS Identity and Access
+  /// Management User Guide</i> for more information.
+  final String arn;
+
+  /// The type and number of instances in the domain.
+  final ClusterConfig clusterConfig;
+
+  /// The unique identifier for the specified domain.
+  final String domainId;
+
+  /// The name of a domain. Domain names are unique across the domains owned by an
+  /// account within an AWS region. Domain names start with a letter or number and
+  /// can contain the following characters: a-z (lowercase), 0-9, and - (hyphen).
+  final String domainName;
+
+  /// IAM access policy as a JSON-formatted string.
+  final String? accessPolicies;
+
+  /// The status of the <code>AdvancedOptions</code>.
+  final Map<String, String>? advancedOptions;
+
+  /// The current status of the domain's advanced security options.
+  final AdvancedSecurityOptions? advancedSecurityOptions;
+
+  /// The current status of the domain's Auto-Tune options.
+  final AutoTuneOptionsOutput? autoTuneOptions;
+
+  /// Specifies change details of the domain configuration change.
+  final ChangeProgressDetails? changeProgressDetails;
+
+  /// The <code>CognitoOptions</code> for the specified domain. For more
+  /// information, see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/cognito-auth.html"
+  /// target="_blank">Configuring Amazon Cognito authentication for OpenSearch
+  /// Dashboards</a>.
+  final CognitoOptions? cognitoOptions;
+
+  /// The domain creation status. <code>True</code> if the creation of a domain is
+  /// complete. <code> False </code> if domain creation is still in progress.
+  final bool? created;
+
+  /// The domain deletion status. <code>True</code> if a delete request has been
+  /// received for the domain but resource cleanup is still in progress.
+  /// <code>False</code> if the domain has not been deleted. Once domain deletion
+  /// is complete, the status of the domain is no longer returned.
+  final bool? deleted;
+
+  /// The current status of the domain's endpoint options.
+  final DomainEndpointOptions? domainEndpointOptions;
+
+  /// The <code>EBSOptions</code> for the specified domain.
+  final EBSOptions? eBSOptions;
+
+  /// The status of the <code>EncryptionAtRestOptions</code>.
+  final EncryptionAtRestOptions? encryptionAtRestOptions;
+
+  /// The domain endpoint that you use to submit index and search requests.
+  final String? endpoint;
+
+  /// Map containing the domain endpoints used to submit index and search
+  /// requests. Example <code>key, value</code>:
+  /// <code>'vpc','vpc-endpoint-h2dsd34efgyghrtguk5gt6j2foh4.us-east-1.es.amazonaws.com'</code>.
+  final Map<String, String>? endpoints;
+  final String? engineVersion;
+
+  /// Log publishing options for the given domain.
+  final Map<LogType, LogPublishingOption>? logPublishingOptions;
+
+  /// The status of the <code>NodeToNodeEncryptionOptions</code>.
+  final NodeToNodeEncryptionOptions? nodeToNodeEncryptionOptions;
+
+  /// The status of the domain configuration. <code>True</code> if Amazon
+  /// OpenSearch Service is processing configuration changes. <code>False</code>
+  /// if the configuration is active.
+  final bool? processing;
+
+  /// The current status of the domain's service software.
+  final ServiceSoftwareOptions? serviceSoftwareOptions;
+
+  /// The status of the <code>SnapshotOptions</code>.
+  final SnapshotOptions? snapshotOptions;
+
+  /// The status of a domain version upgrade. <code>True</code> if Amazon
+  /// OpenSearch Service is undergoing a version upgrade. <code>False</code> if
+  /// the configuration is active.
+  final bool? upgradeProcessing;
+
+  /// The <code>VPCOptions</code> for the specified domain. For more information,
+  /// see <a
+  /// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html"
+  /// target="_blank"> Launching your Amazon OpenSearch Service domains using a
+  /// VPC</a>.
+  final VPCDerivedInfo? vPCOptions;
+
+  DomainStatus({
+    required this.arn,
+    required this.clusterConfig,
+    required this.domainId,
+    required this.domainName,
+    this.accessPolicies,
+    this.advancedOptions,
+    this.advancedSecurityOptions,
+    this.autoTuneOptions,
+    this.changeProgressDetails,
+    this.cognitoOptions,
+    this.created,
+    this.deleted,
+    this.domainEndpointOptions,
+    this.eBSOptions,
+    this.encryptionAtRestOptions,
+    this.endpoint,
+    this.endpoints,
+    this.engineVersion,
+    this.logPublishingOptions,
+    this.nodeToNodeEncryptionOptions,
+    this.processing,
+    this.serviceSoftwareOptions,
+    this.snapshotOptions,
+    this.upgradeProcessing,
+    this.vPCOptions,
+  });
+  factory DomainStatus.fromJson(Map<String, dynamic> json) {
+    return DomainStatus(
+      arn: json['ARN'] as String,
+      clusterConfig:
+          ClusterConfig.fromJson(json['ClusterConfig'] as Map<String, dynamic>),
+      domainId: json['DomainId'] as String,
+      domainName: json['DomainName'] as String,
+      accessPolicies: json['AccessPolicies'] as String?,
+      advancedOptions: (json['AdvancedOptions'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+      advancedSecurityOptions: json['AdvancedSecurityOptions'] != null
+          ? AdvancedSecurityOptions.fromJson(
+              json['AdvancedSecurityOptions'] as Map<String, dynamic>)
+          : null,
+      autoTuneOptions: json['AutoTuneOptions'] != null
+          ? AutoTuneOptionsOutput.fromJson(
+              json['AutoTuneOptions'] as Map<String, dynamic>)
+          : null,
+      changeProgressDetails: json['ChangeProgressDetails'] != null
+          ? ChangeProgressDetails.fromJson(
+              json['ChangeProgressDetails'] as Map<String, dynamic>)
+          : null,
+      cognitoOptions: json['CognitoOptions'] != null
+          ? CognitoOptions.fromJson(
+              json['CognitoOptions'] as Map<String, dynamic>)
+          : null,
+      created: json['Created'] as bool?,
+      deleted: json['Deleted'] as bool?,
+      domainEndpointOptions: json['DomainEndpointOptions'] != null
+          ? DomainEndpointOptions.fromJson(
+              json['DomainEndpointOptions'] as Map<String, dynamic>)
+          : null,
+      eBSOptions: json['EBSOptions'] != null
+          ? EBSOptions.fromJson(json['EBSOptions'] as Map<String, dynamic>)
+          : null,
+      encryptionAtRestOptions: json['EncryptionAtRestOptions'] != null
+          ? EncryptionAtRestOptions.fromJson(
+              json['EncryptionAtRestOptions'] as Map<String, dynamic>)
+          : null,
+      endpoint: json['Endpoint'] as String?,
+      endpoints: (json['Endpoints'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+      engineVersion: json['EngineVersion'] as String?,
+      logPublishingOptions:
+          (json['LogPublishingOptions'] as Map<String, dynamic>?)?.map((k, e) =>
+              MapEntry(k.toLogType(),
+                  LogPublishingOption.fromJson(e as Map<String, dynamic>))),
+      nodeToNodeEncryptionOptions: json['NodeToNodeEncryptionOptions'] != null
+          ? NodeToNodeEncryptionOptions.fromJson(
+              json['NodeToNodeEncryptionOptions'] as Map<String, dynamic>)
+          : null,
+      processing: json['Processing'] as bool?,
+      serviceSoftwareOptions: json['ServiceSoftwareOptions'] != null
+          ? ServiceSoftwareOptions.fromJson(
+              json['ServiceSoftwareOptions'] as Map<String, dynamic>)
+          : null,
+      snapshotOptions: json['SnapshotOptions'] != null
+          ? SnapshotOptions.fromJson(
+              json['SnapshotOptions'] as Map<String, dynamic>)
+          : null,
+      upgradeProcessing: json['UpgradeProcessing'] as bool?,
+      vPCOptions: json['VPCOptions'] != null
+          ? VPCDerivedInfo.fromJson(json['VPCOptions'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 class DryRunResults {
-  /// Specifies the deployment mechanism through which the update shall be applied
-  /// on the domain. Possible responses are <code>Blue/Green</code> (The update
-  /// will require a blue/green deployment.) <code>DynamicUpdate</code> (The
-  /// update can be applied in-place without a Blue/Green deployment required.)
-  /// <code>Undetermined</code> (The domain is undergoing an update which needs to
-  /// complete before the deployment type can be predicted.) <code>None</code>
-  /// (The configuration change matches the current configuration and will not
-  /// result in any update.)
+  /// Specifies the way in which Amazon OpenSearch Service applies the update.
+  /// Possible responses are <code>Blue/Green</code> (the update requires a
+  /// blue/green deployment), <code>DynamicUpdate</code> (no blue/green required),
+  /// <code>Undetermined</code> (the domain is undergoing an update and can't
+  /// predict the deployment type; try again after the update is complete), and
+  /// <code>None</code> (the request doesn't include any configuration changes).
   final String? deploymentType;
 
   /// Contains an optional message associated with the DryRunResults.
@@ -3522,20 +4021,21 @@ class DryRunResults {
   }
 }
 
-/// Specifies maintenance schedule duration: duration value and duration unit.
-/// See the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a> for more information.
+/// The maintenance schedule duration: duration value and duration unit. See <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+/// information.
 class Duration {
-  /// Specifies the unit of a maintenance schedule duration. Valid value is HOURS.
-  /// See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// The unit of a maintenance schedule duration. Valid value is HOURS. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final TimeUnit? unit;
 
-  /// Integer to specify the value of a maintenance schedule duration. See the <a
-  /// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-  /// target="_blank">Developer Guide</a> for more information.
+  /// Integer to specify the value of a maintenance schedule duration. See <a
+  /// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+  /// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+  /// information.
   final int? value;
 
   Duration({
@@ -3560,23 +4060,21 @@ class Duration {
 }
 
 /// Options to enable, disable, and specify the properties of EBS storage
-/// volumes. For more information, see <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-ebs"
-/// target="_blank"> Configuring EBS-based Storage</a>.
+/// volumes.
 class EBSOptions {
-  /// Specifies whether EBS-based storage is enabled.
+  /// Whether EBS-based storage is enabled.
   final bool? eBSEnabled;
 
-  /// Specifies the IOPS for Provisioned IOPS And GP3 EBS volume (SSD).
+  /// The IOPS for Provisioned IOPS And GP3 EBS volume (SSD).
   final int? iops;
 
-  /// Specifies the Throughput for GP3 EBS volume (SSD).
+  /// The Throughput for GP3 EBS volume (SSD).
   final int? throughput;
 
   /// Integer to specify the size of an EBS volume.
   final int? volumeSize;
 
-  /// Specifies the volume type for EBS-based storage.
+  /// The volume type for EBS-based storage.
   final VolumeType? volumeType;
 
   EBSOptions({
@@ -3612,13 +4110,12 @@ class EBSOptions {
   }
 }
 
-/// Status of the EBS options for the specified Elasticsearch domain.
+/// Status of the EBS options for the specified domain.
 class EBSOptionsStatus {
-  /// Specifies the EBS options for the specified Elasticsearch domain.
+  /// The EBS options for the specified domain.
   final EBSOptions options;
 
-  /// Specifies the status of the EBS options for the specified Elasticsearch
-  /// domain.
+  /// The status of the EBS options for the specified domain.
   final OptionStatus status;
 
   EBSOptionsStatus({
@@ -3633,845 +4130,12 @@ class EBSOptionsStatus {
   }
 }
 
-enum ESPartitionInstanceType {
-  m3MediumElasticsearch,
-  m3LargeElasticsearch,
-  m3XlargeElasticsearch,
-  m3_2xlargeElasticsearch,
-  m4LargeElasticsearch,
-  m4XlargeElasticsearch,
-  m4_2xlargeElasticsearch,
-  m4_4xlargeElasticsearch,
-  m4_10xlargeElasticsearch,
-  m5LargeElasticsearch,
-  m5XlargeElasticsearch,
-  m5_2xlargeElasticsearch,
-  m5_4xlargeElasticsearch,
-  m5_12xlargeElasticsearch,
-  r5LargeElasticsearch,
-  r5XlargeElasticsearch,
-  r5_2xlargeElasticsearch,
-  r5_4xlargeElasticsearch,
-  r5_12xlargeElasticsearch,
-  c5LargeElasticsearch,
-  c5XlargeElasticsearch,
-  c5_2xlargeElasticsearch,
-  c5_4xlargeElasticsearch,
-  c5_9xlargeElasticsearch,
-  c5_18xlargeElasticsearch,
-  ultrawarm1MediumElasticsearch,
-  ultrawarm1LargeElasticsearch,
-  t2MicroElasticsearch,
-  t2SmallElasticsearch,
-  t2MediumElasticsearch,
-  r3LargeElasticsearch,
-  r3XlargeElasticsearch,
-  r3_2xlargeElasticsearch,
-  r3_4xlargeElasticsearch,
-  r3_8xlargeElasticsearch,
-  i2XlargeElasticsearch,
-  i2_2xlargeElasticsearch,
-  d2XlargeElasticsearch,
-  d2_2xlargeElasticsearch,
-  d2_4xlargeElasticsearch,
-  d2_8xlargeElasticsearch,
-  c4LargeElasticsearch,
-  c4XlargeElasticsearch,
-  c4_2xlargeElasticsearch,
-  c4_4xlargeElasticsearch,
-  c4_8xlargeElasticsearch,
-  r4LargeElasticsearch,
-  r4XlargeElasticsearch,
-  r4_2xlargeElasticsearch,
-  r4_4xlargeElasticsearch,
-  r4_8xlargeElasticsearch,
-  r4_16xlargeElasticsearch,
-  i3LargeElasticsearch,
-  i3XlargeElasticsearch,
-  i3_2xlargeElasticsearch,
-  i3_4xlargeElasticsearch,
-  i3_8xlargeElasticsearch,
-  i3_16xlargeElasticsearch,
-}
-
-extension on ESPartitionInstanceType {
-  String toValue() {
-    switch (this) {
-      case ESPartitionInstanceType.m3MediumElasticsearch:
-        return 'm3.medium.elasticsearch';
-      case ESPartitionInstanceType.m3LargeElasticsearch:
-        return 'm3.large.elasticsearch';
-      case ESPartitionInstanceType.m3XlargeElasticsearch:
-        return 'm3.xlarge.elasticsearch';
-      case ESPartitionInstanceType.m3_2xlargeElasticsearch:
-        return 'm3.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.m4LargeElasticsearch:
-        return 'm4.large.elasticsearch';
-      case ESPartitionInstanceType.m4XlargeElasticsearch:
-        return 'm4.xlarge.elasticsearch';
-      case ESPartitionInstanceType.m4_2xlargeElasticsearch:
-        return 'm4.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.m4_4xlargeElasticsearch:
-        return 'm4.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.m4_10xlargeElasticsearch:
-        return 'm4.10xlarge.elasticsearch';
-      case ESPartitionInstanceType.m5LargeElasticsearch:
-        return 'm5.large.elasticsearch';
-      case ESPartitionInstanceType.m5XlargeElasticsearch:
-        return 'm5.xlarge.elasticsearch';
-      case ESPartitionInstanceType.m5_2xlargeElasticsearch:
-        return 'm5.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.m5_4xlargeElasticsearch:
-        return 'm5.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.m5_12xlargeElasticsearch:
-        return 'm5.12xlarge.elasticsearch';
-      case ESPartitionInstanceType.r5LargeElasticsearch:
-        return 'r5.large.elasticsearch';
-      case ESPartitionInstanceType.r5XlargeElasticsearch:
-        return 'r5.xlarge.elasticsearch';
-      case ESPartitionInstanceType.r5_2xlargeElasticsearch:
-        return 'r5.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.r5_4xlargeElasticsearch:
-        return 'r5.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.r5_12xlargeElasticsearch:
-        return 'r5.12xlarge.elasticsearch';
-      case ESPartitionInstanceType.c5LargeElasticsearch:
-        return 'c5.large.elasticsearch';
-      case ESPartitionInstanceType.c5XlargeElasticsearch:
-        return 'c5.xlarge.elasticsearch';
-      case ESPartitionInstanceType.c5_2xlargeElasticsearch:
-        return 'c5.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.c5_4xlargeElasticsearch:
-        return 'c5.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.c5_9xlargeElasticsearch:
-        return 'c5.9xlarge.elasticsearch';
-      case ESPartitionInstanceType.c5_18xlargeElasticsearch:
-        return 'c5.18xlarge.elasticsearch';
-      case ESPartitionInstanceType.ultrawarm1MediumElasticsearch:
-        return 'ultrawarm1.medium.elasticsearch';
-      case ESPartitionInstanceType.ultrawarm1LargeElasticsearch:
-        return 'ultrawarm1.large.elasticsearch';
-      case ESPartitionInstanceType.t2MicroElasticsearch:
-        return 't2.micro.elasticsearch';
-      case ESPartitionInstanceType.t2SmallElasticsearch:
-        return 't2.small.elasticsearch';
-      case ESPartitionInstanceType.t2MediumElasticsearch:
-        return 't2.medium.elasticsearch';
-      case ESPartitionInstanceType.r3LargeElasticsearch:
-        return 'r3.large.elasticsearch';
-      case ESPartitionInstanceType.r3XlargeElasticsearch:
-        return 'r3.xlarge.elasticsearch';
-      case ESPartitionInstanceType.r3_2xlargeElasticsearch:
-        return 'r3.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.r3_4xlargeElasticsearch:
-        return 'r3.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.r3_8xlargeElasticsearch:
-        return 'r3.8xlarge.elasticsearch';
-      case ESPartitionInstanceType.i2XlargeElasticsearch:
-        return 'i2.xlarge.elasticsearch';
-      case ESPartitionInstanceType.i2_2xlargeElasticsearch:
-        return 'i2.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.d2XlargeElasticsearch:
-        return 'd2.xlarge.elasticsearch';
-      case ESPartitionInstanceType.d2_2xlargeElasticsearch:
-        return 'd2.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.d2_4xlargeElasticsearch:
-        return 'd2.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.d2_8xlargeElasticsearch:
-        return 'd2.8xlarge.elasticsearch';
-      case ESPartitionInstanceType.c4LargeElasticsearch:
-        return 'c4.large.elasticsearch';
-      case ESPartitionInstanceType.c4XlargeElasticsearch:
-        return 'c4.xlarge.elasticsearch';
-      case ESPartitionInstanceType.c4_2xlargeElasticsearch:
-        return 'c4.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.c4_4xlargeElasticsearch:
-        return 'c4.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.c4_8xlargeElasticsearch:
-        return 'c4.8xlarge.elasticsearch';
-      case ESPartitionInstanceType.r4LargeElasticsearch:
-        return 'r4.large.elasticsearch';
-      case ESPartitionInstanceType.r4XlargeElasticsearch:
-        return 'r4.xlarge.elasticsearch';
-      case ESPartitionInstanceType.r4_2xlargeElasticsearch:
-        return 'r4.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.r4_4xlargeElasticsearch:
-        return 'r4.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.r4_8xlargeElasticsearch:
-        return 'r4.8xlarge.elasticsearch';
-      case ESPartitionInstanceType.r4_16xlargeElasticsearch:
-        return 'r4.16xlarge.elasticsearch';
-      case ESPartitionInstanceType.i3LargeElasticsearch:
-        return 'i3.large.elasticsearch';
-      case ESPartitionInstanceType.i3XlargeElasticsearch:
-        return 'i3.xlarge.elasticsearch';
-      case ESPartitionInstanceType.i3_2xlargeElasticsearch:
-        return 'i3.2xlarge.elasticsearch';
-      case ESPartitionInstanceType.i3_4xlargeElasticsearch:
-        return 'i3.4xlarge.elasticsearch';
-      case ESPartitionInstanceType.i3_8xlargeElasticsearch:
-        return 'i3.8xlarge.elasticsearch';
-      case ESPartitionInstanceType.i3_16xlargeElasticsearch:
-        return 'i3.16xlarge.elasticsearch';
-    }
-  }
-}
-
-extension on String {
-  ESPartitionInstanceType toESPartitionInstanceType() {
-    switch (this) {
-      case 'm3.medium.elasticsearch':
-        return ESPartitionInstanceType.m3MediumElasticsearch;
-      case 'm3.large.elasticsearch':
-        return ESPartitionInstanceType.m3LargeElasticsearch;
-      case 'm3.xlarge.elasticsearch':
-        return ESPartitionInstanceType.m3XlargeElasticsearch;
-      case 'm3.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.m3_2xlargeElasticsearch;
-      case 'm4.large.elasticsearch':
-        return ESPartitionInstanceType.m4LargeElasticsearch;
-      case 'm4.xlarge.elasticsearch':
-        return ESPartitionInstanceType.m4XlargeElasticsearch;
-      case 'm4.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.m4_2xlargeElasticsearch;
-      case 'm4.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.m4_4xlargeElasticsearch;
-      case 'm4.10xlarge.elasticsearch':
-        return ESPartitionInstanceType.m4_10xlargeElasticsearch;
-      case 'm5.large.elasticsearch':
-        return ESPartitionInstanceType.m5LargeElasticsearch;
-      case 'm5.xlarge.elasticsearch':
-        return ESPartitionInstanceType.m5XlargeElasticsearch;
-      case 'm5.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.m5_2xlargeElasticsearch;
-      case 'm5.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.m5_4xlargeElasticsearch;
-      case 'm5.12xlarge.elasticsearch':
-        return ESPartitionInstanceType.m5_12xlargeElasticsearch;
-      case 'r5.large.elasticsearch':
-        return ESPartitionInstanceType.r5LargeElasticsearch;
-      case 'r5.xlarge.elasticsearch':
-        return ESPartitionInstanceType.r5XlargeElasticsearch;
-      case 'r5.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.r5_2xlargeElasticsearch;
-      case 'r5.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.r5_4xlargeElasticsearch;
-      case 'r5.12xlarge.elasticsearch':
-        return ESPartitionInstanceType.r5_12xlargeElasticsearch;
-      case 'c5.large.elasticsearch':
-        return ESPartitionInstanceType.c5LargeElasticsearch;
-      case 'c5.xlarge.elasticsearch':
-        return ESPartitionInstanceType.c5XlargeElasticsearch;
-      case 'c5.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.c5_2xlargeElasticsearch;
-      case 'c5.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.c5_4xlargeElasticsearch;
-      case 'c5.9xlarge.elasticsearch':
-        return ESPartitionInstanceType.c5_9xlargeElasticsearch;
-      case 'c5.18xlarge.elasticsearch':
-        return ESPartitionInstanceType.c5_18xlargeElasticsearch;
-      case 'ultrawarm1.medium.elasticsearch':
-        return ESPartitionInstanceType.ultrawarm1MediumElasticsearch;
-      case 'ultrawarm1.large.elasticsearch':
-        return ESPartitionInstanceType.ultrawarm1LargeElasticsearch;
-      case 't2.micro.elasticsearch':
-        return ESPartitionInstanceType.t2MicroElasticsearch;
-      case 't2.small.elasticsearch':
-        return ESPartitionInstanceType.t2SmallElasticsearch;
-      case 't2.medium.elasticsearch':
-        return ESPartitionInstanceType.t2MediumElasticsearch;
-      case 'r3.large.elasticsearch':
-        return ESPartitionInstanceType.r3LargeElasticsearch;
-      case 'r3.xlarge.elasticsearch':
-        return ESPartitionInstanceType.r3XlargeElasticsearch;
-      case 'r3.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.r3_2xlargeElasticsearch;
-      case 'r3.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.r3_4xlargeElasticsearch;
-      case 'r3.8xlarge.elasticsearch':
-        return ESPartitionInstanceType.r3_8xlargeElasticsearch;
-      case 'i2.xlarge.elasticsearch':
-        return ESPartitionInstanceType.i2XlargeElasticsearch;
-      case 'i2.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.i2_2xlargeElasticsearch;
-      case 'd2.xlarge.elasticsearch':
-        return ESPartitionInstanceType.d2XlargeElasticsearch;
-      case 'd2.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.d2_2xlargeElasticsearch;
-      case 'd2.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.d2_4xlargeElasticsearch;
-      case 'd2.8xlarge.elasticsearch':
-        return ESPartitionInstanceType.d2_8xlargeElasticsearch;
-      case 'c4.large.elasticsearch':
-        return ESPartitionInstanceType.c4LargeElasticsearch;
-      case 'c4.xlarge.elasticsearch':
-        return ESPartitionInstanceType.c4XlargeElasticsearch;
-      case 'c4.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.c4_2xlargeElasticsearch;
-      case 'c4.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.c4_4xlargeElasticsearch;
-      case 'c4.8xlarge.elasticsearch':
-        return ESPartitionInstanceType.c4_8xlargeElasticsearch;
-      case 'r4.large.elasticsearch':
-        return ESPartitionInstanceType.r4LargeElasticsearch;
-      case 'r4.xlarge.elasticsearch':
-        return ESPartitionInstanceType.r4XlargeElasticsearch;
-      case 'r4.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.r4_2xlargeElasticsearch;
-      case 'r4.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.r4_4xlargeElasticsearch;
-      case 'r4.8xlarge.elasticsearch':
-        return ESPartitionInstanceType.r4_8xlargeElasticsearch;
-      case 'r4.16xlarge.elasticsearch':
-        return ESPartitionInstanceType.r4_16xlargeElasticsearch;
-      case 'i3.large.elasticsearch':
-        return ESPartitionInstanceType.i3LargeElasticsearch;
-      case 'i3.xlarge.elasticsearch':
-        return ESPartitionInstanceType.i3XlargeElasticsearch;
-      case 'i3.2xlarge.elasticsearch':
-        return ESPartitionInstanceType.i3_2xlargeElasticsearch;
-      case 'i3.4xlarge.elasticsearch':
-        return ESPartitionInstanceType.i3_4xlargeElasticsearch;
-      case 'i3.8xlarge.elasticsearch':
-        return ESPartitionInstanceType.i3_8xlargeElasticsearch;
-      case 'i3.16xlarge.elasticsearch':
-        return ESPartitionInstanceType.i3_16xlargeElasticsearch;
-    }
-    throw Exception('$this is not known in enum ESPartitionInstanceType');
-  }
-}
-
-enum ESWarmPartitionInstanceType {
-  ultrawarm1MediumElasticsearch,
-  ultrawarm1LargeElasticsearch,
-}
-
-extension on ESWarmPartitionInstanceType {
-  String toValue() {
-    switch (this) {
-      case ESWarmPartitionInstanceType.ultrawarm1MediumElasticsearch:
-        return 'ultrawarm1.medium.elasticsearch';
-      case ESWarmPartitionInstanceType.ultrawarm1LargeElasticsearch:
-        return 'ultrawarm1.large.elasticsearch';
-    }
-  }
-}
-
-extension on String {
-  ESWarmPartitionInstanceType toESWarmPartitionInstanceType() {
-    switch (this) {
-      case 'ultrawarm1.medium.elasticsearch':
-        return ESWarmPartitionInstanceType.ultrawarm1MediumElasticsearch;
-      case 'ultrawarm1.large.elasticsearch':
-        return ESWarmPartitionInstanceType.ultrawarm1LargeElasticsearch;
-    }
-    throw Exception('$this is not known in enum ESWarmPartitionInstanceType');
-  }
-}
-
-/// Specifies the configuration for the domain cluster, such as the type and
-/// number of instances.
-class ElasticsearchClusterConfig {
-  /// Specifies the <code>ColdStorageOptions</code> config for Elasticsearch
-  /// Domain
-  final ColdStorageOptions? coldStorageOptions;
-
-  /// Total number of dedicated master nodes, active and on standby, for the
-  /// cluster.
-  final int? dedicatedMasterCount;
-
-  /// A boolean value to indicate whether a dedicated master node is enabled. See
-  /// <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains.html#es-managedomains-dedicatedmasternodes"
-  /// target="_blank">About Dedicated Master Nodes</a> for more information.
-  final bool? dedicatedMasterEnabled;
-
-  /// The instance type for a dedicated master node.
-  final ESPartitionInstanceType? dedicatedMasterType;
-
-  /// The number of instances in the specified domain cluster.
-  final int? instanceCount;
-
-  /// The instance type for an Elasticsearch cluster. UltraWarm instance types are
-  /// not supported for data instances.
-  final ESPartitionInstanceType? instanceType;
-
-  /// The number of warm nodes in the cluster.
-  final int? warmCount;
-
-  /// True to enable warm storage.
-  final bool? warmEnabled;
-
-  /// The instance type for the Elasticsearch cluster's warm nodes.
-  final ESWarmPartitionInstanceType? warmType;
-
-  /// Specifies the zone awareness configuration for a domain when zone awareness
-  /// is enabled.
-  final ZoneAwarenessConfig? zoneAwarenessConfig;
-
-  /// A boolean value to indicate whether zone awareness is enabled. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains.html#es-managedomains-zoneawareness"
-  /// target="_blank">About Zone Awareness</a> for more information.
-  final bool? zoneAwarenessEnabled;
-
-  ElasticsearchClusterConfig({
-    this.coldStorageOptions,
-    this.dedicatedMasterCount,
-    this.dedicatedMasterEnabled,
-    this.dedicatedMasterType,
-    this.instanceCount,
-    this.instanceType,
-    this.warmCount,
-    this.warmEnabled,
-    this.warmType,
-    this.zoneAwarenessConfig,
-    this.zoneAwarenessEnabled,
-  });
-  factory ElasticsearchClusterConfig.fromJson(Map<String, dynamic> json) {
-    return ElasticsearchClusterConfig(
-      coldStorageOptions: json['ColdStorageOptions'] != null
-          ? ColdStorageOptions.fromJson(
-              json['ColdStorageOptions'] as Map<String, dynamic>)
-          : null,
-      dedicatedMasterCount: json['DedicatedMasterCount'] as int?,
-      dedicatedMasterEnabled: json['DedicatedMasterEnabled'] as bool?,
-      dedicatedMasterType:
-          (json['DedicatedMasterType'] as String?)?.toESPartitionInstanceType(),
-      instanceCount: json['InstanceCount'] as int?,
-      instanceType:
-          (json['InstanceType'] as String?)?.toESPartitionInstanceType(),
-      warmCount: json['WarmCount'] as int?,
-      warmEnabled: json['WarmEnabled'] as bool?,
-      warmType: (json['WarmType'] as String?)?.toESWarmPartitionInstanceType(),
-      zoneAwarenessConfig: json['ZoneAwarenessConfig'] != null
-          ? ZoneAwarenessConfig.fromJson(
-              json['ZoneAwarenessConfig'] as Map<String, dynamic>)
-          : null,
-      zoneAwarenessEnabled: json['ZoneAwarenessEnabled'] as bool?,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    final coldStorageOptions = this.coldStorageOptions;
-    final dedicatedMasterCount = this.dedicatedMasterCount;
-    final dedicatedMasterEnabled = this.dedicatedMasterEnabled;
-    final dedicatedMasterType = this.dedicatedMasterType;
-    final instanceCount = this.instanceCount;
-    final instanceType = this.instanceType;
-    final warmCount = this.warmCount;
-    final warmEnabled = this.warmEnabled;
-    final warmType = this.warmType;
-    final zoneAwarenessConfig = this.zoneAwarenessConfig;
-    final zoneAwarenessEnabled = this.zoneAwarenessEnabled;
-    return {
-      if (coldStorageOptions != null) 'ColdStorageOptions': coldStorageOptions,
-      if (dedicatedMasterCount != null)
-        'DedicatedMasterCount': dedicatedMasterCount,
-      if (dedicatedMasterEnabled != null)
-        'DedicatedMasterEnabled': dedicatedMasterEnabled,
-      if (dedicatedMasterType != null)
-        'DedicatedMasterType': dedicatedMasterType.toValue(),
-      if (instanceCount != null) 'InstanceCount': instanceCount,
-      if (instanceType != null) 'InstanceType': instanceType.toValue(),
-      if (warmCount != null) 'WarmCount': warmCount,
-      if (warmEnabled != null) 'WarmEnabled': warmEnabled,
-      if (warmType != null) 'WarmType': warmType.toValue(),
-      if (zoneAwarenessConfig != null)
-        'ZoneAwarenessConfig': zoneAwarenessConfig,
-      if (zoneAwarenessEnabled != null)
-        'ZoneAwarenessEnabled': zoneAwarenessEnabled,
-    };
-  }
-}
-
-/// Specifies the configuration status for the specified Elasticsearch domain.
-class ElasticsearchClusterConfigStatus {
-  /// Specifies the cluster configuration for the specified Elasticsearch domain.
-  final ElasticsearchClusterConfig options;
-
-  /// Specifies the status of the configuration for the specified Elasticsearch
-  /// domain.
-  final OptionStatus status;
-
-  ElasticsearchClusterConfigStatus({
-    required this.options,
-    required this.status,
-  });
-  factory ElasticsearchClusterConfigStatus.fromJson(Map<String, dynamic> json) {
-    return ElasticsearchClusterConfigStatus(
-      options: ElasticsearchClusterConfig.fromJson(
-          json['Options'] as Map<String, dynamic>),
-      status: OptionStatus.fromJson(json['Status'] as Map<String, dynamic>),
-    );
-  }
-}
-
-/// The configuration of an Elasticsearch domain.
-class ElasticsearchDomainConfig {
-  /// IAM access policy as a JSON-formatted string.
-  final AccessPoliciesStatus? accessPolicies;
-
-  /// Specifies the <code>AdvancedOptions</code> for the domain. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-advanced-options"
-  /// target="_blank">Configuring Advanced Options</a> for more information.
-  final AdvancedOptionsStatus? advancedOptions;
-
-  /// Specifies <code>AdvancedSecurityOptions</code> for the domain.
-  final AdvancedSecurityOptionsStatus? advancedSecurityOptions;
-
-  /// Specifies <code>AutoTuneOptions</code> for the domain.
-  final AutoTuneOptionsStatus? autoTuneOptions;
-
-  /// Specifies change details of the domain configuration change.
-  final ChangeProgressDetails? changeProgressDetails;
-
-  /// The <code>CognitoOptions</code> for the specified domain. For more
-  /// information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html"
-  /// target="_blank">Amazon Cognito Authentication for Kibana</a>.
-  final CognitoOptionsStatus? cognitoOptions;
-
-  /// Specifies the <code>DomainEndpointOptions</code> for the Elasticsearch
-  /// domain.
-  final DomainEndpointOptionsStatus? domainEndpointOptions;
-
-  /// Specifies the <code>EBSOptions</code> for the Elasticsearch domain.
-  final EBSOptionsStatus? eBSOptions;
-
-  /// Specifies the <code>ElasticsearchClusterConfig</code> for the Elasticsearch
-  /// domain.
-  final ElasticsearchClusterConfigStatus? elasticsearchClusterConfig;
-
-  /// String of format X.Y to specify version for the Elasticsearch domain.
-  final ElasticsearchVersionStatus? elasticsearchVersion;
-
-  /// Specifies the <code>EncryptionAtRestOptions</code> for the Elasticsearch
-  /// domain.
-  final EncryptionAtRestOptionsStatus? encryptionAtRestOptions;
-
-  /// Log publishing options for the given domain.
-  final LogPublishingOptionsStatus? logPublishingOptions;
-
-  /// Specifies the <code>NodeToNodeEncryptionOptions</code> for the Elasticsearch
-  /// domain.
-  final NodeToNodeEncryptionOptionsStatus? nodeToNodeEncryptionOptions;
-
-  /// Specifies the <code>SnapshotOptions</code> for the Elasticsearch domain.
-  final SnapshotOptionsStatus? snapshotOptions;
-
-  /// The <code>VPCOptions</code> for the specified domain. For more information,
-  /// see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html"
-  /// target="_blank">VPC Endpoints for Amazon Elasticsearch Service Domains</a>.
-  final VPCDerivedInfoStatus? vPCOptions;
-
-  ElasticsearchDomainConfig({
-    this.accessPolicies,
-    this.advancedOptions,
-    this.advancedSecurityOptions,
-    this.autoTuneOptions,
-    this.changeProgressDetails,
-    this.cognitoOptions,
-    this.domainEndpointOptions,
-    this.eBSOptions,
-    this.elasticsearchClusterConfig,
-    this.elasticsearchVersion,
-    this.encryptionAtRestOptions,
-    this.logPublishingOptions,
-    this.nodeToNodeEncryptionOptions,
-    this.snapshotOptions,
-    this.vPCOptions,
-  });
-  factory ElasticsearchDomainConfig.fromJson(Map<String, dynamic> json) {
-    return ElasticsearchDomainConfig(
-      accessPolicies: json['AccessPolicies'] != null
-          ? AccessPoliciesStatus.fromJson(
-              json['AccessPolicies'] as Map<String, dynamic>)
-          : null,
-      advancedOptions: json['AdvancedOptions'] != null
-          ? AdvancedOptionsStatus.fromJson(
-              json['AdvancedOptions'] as Map<String, dynamic>)
-          : null,
-      advancedSecurityOptions: json['AdvancedSecurityOptions'] != null
-          ? AdvancedSecurityOptionsStatus.fromJson(
-              json['AdvancedSecurityOptions'] as Map<String, dynamic>)
-          : null,
-      autoTuneOptions: json['AutoTuneOptions'] != null
-          ? AutoTuneOptionsStatus.fromJson(
-              json['AutoTuneOptions'] as Map<String, dynamic>)
-          : null,
-      changeProgressDetails: json['ChangeProgressDetails'] != null
-          ? ChangeProgressDetails.fromJson(
-              json['ChangeProgressDetails'] as Map<String, dynamic>)
-          : null,
-      cognitoOptions: json['CognitoOptions'] != null
-          ? CognitoOptionsStatus.fromJson(
-              json['CognitoOptions'] as Map<String, dynamic>)
-          : null,
-      domainEndpointOptions: json['DomainEndpointOptions'] != null
-          ? DomainEndpointOptionsStatus.fromJson(
-              json['DomainEndpointOptions'] as Map<String, dynamic>)
-          : null,
-      eBSOptions: json['EBSOptions'] != null
-          ? EBSOptionsStatus.fromJson(
-              json['EBSOptions'] as Map<String, dynamic>)
-          : null,
-      elasticsearchClusterConfig: json['ElasticsearchClusterConfig'] != null
-          ? ElasticsearchClusterConfigStatus.fromJson(
-              json['ElasticsearchClusterConfig'] as Map<String, dynamic>)
-          : null,
-      elasticsearchVersion: json['ElasticsearchVersion'] != null
-          ? ElasticsearchVersionStatus.fromJson(
-              json['ElasticsearchVersion'] as Map<String, dynamic>)
-          : null,
-      encryptionAtRestOptions: json['EncryptionAtRestOptions'] != null
-          ? EncryptionAtRestOptionsStatus.fromJson(
-              json['EncryptionAtRestOptions'] as Map<String, dynamic>)
-          : null,
-      logPublishingOptions: json['LogPublishingOptions'] != null
-          ? LogPublishingOptionsStatus.fromJson(
-              json['LogPublishingOptions'] as Map<String, dynamic>)
-          : null,
-      nodeToNodeEncryptionOptions: json['NodeToNodeEncryptionOptions'] != null
-          ? NodeToNodeEncryptionOptionsStatus.fromJson(
-              json['NodeToNodeEncryptionOptions'] as Map<String, dynamic>)
-          : null,
-      snapshotOptions: json['SnapshotOptions'] != null
-          ? SnapshotOptionsStatus.fromJson(
-              json['SnapshotOptions'] as Map<String, dynamic>)
-          : null,
-      vPCOptions: json['VPCOptions'] != null
-          ? VPCDerivedInfoStatus.fromJson(
-              json['VPCOptions'] as Map<String, dynamic>)
-          : null,
-    );
-  }
-}
-
-/// The current status of an Elasticsearch domain.
-class ElasticsearchDomainStatus {
-  /// The Amazon resource name (ARN) of an Elasticsearch domain. See <a
-  /// href="http://docs.aws.amazon.com/IAM/latest/UserGuide/index.html?Using_Identifiers.html"
-  /// target="_blank">Identifiers for IAM Entities</a> in <i>Using AWS Identity
-  /// and Access Management</i> for more information.
-  final String arn;
-
-  /// The unique identifier for the specified Elasticsearch domain.
-  final String domainId;
-
-  /// The name of an Elasticsearch domain. Domain names are unique across the
-  /// domains owned by an account within an AWS region. Domain names start with a
-  /// letter or number and can contain the following characters: a-z (lowercase),
-  /// 0-9, and - (hyphen).
-  final String domainName;
-
-  /// The type and number of instances in the domain cluster.
-  final ElasticsearchClusterConfig elasticsearchClusterConfig;
-
-  /// IAM access policy as a JSON-formatted string.
-  final String? accessPolicies;
-
-  /// Specifies the status of the <code>AdvancedOptions</code>
-  final Map<String, String>? advancedOptions;
-
-  /// The current status of the Elasticsearch domain's advanced security options.
-  final AdvancedSecurityOptions? advancedSecurityOptions;
-
-  /// The current status of the Elasticsearch domain's Auto-Tune options.
-  final AutoTuneOptionsOutput? autoTuneOptions;
-
-  /// Specifies change details of the domain configuration change.
-  final ChangeProgressDetails? changeProgressDetails;
-
-  /// The <code>CognitoOptions</code> for the specified domain. For more
-  /// information, see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-cognito-auth.html"
-  /// target="_blank">Amazon Cognito Authentication for Kibana</a>.
-  final CognitoOptions? cognitoOptions;
-
-  /// The domain creation status. <code>True</code> if the creation of an
-  /// Elasticsearch domain is complete. <code>False</code> if domain creation is
-  /// still in progress.
-  final bool? created;
-
-  /// The domain deletion status. <code>True</code> if a delete request has been
-  /// received for the domain but resource cleanup is still in progress.
-  /// <code>False</code> if the domain has not been deleted. Once domain deletion
-  /// is complete, the status of the domain is no longer returned.
-  final bool? deleted;
-
-  /// The current status of the Elasticsearch domain's endpoint options.
-  final DomainEndpointOptions? domainEndpointOptions;
-
-  /// The <code>EBSOptions</code> for the specified domain. See <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-ebs"
-  /// target="_blank">Configuring EBS-based Storage</a> for more information.
-  final EBSOptions? eBSOptions;
-  final String? elasticsearchVersion;
-
-  /// Specifies the status of the <code>EncryptionAtRestOptions</code>.
-  final EncryptionAtRestOptions? encryptionAtRestOptions;
-
-  /// The Elasticsearch domain endpoint that you use to submit index and search
-  /// requests.
-  final String? endpoint;
-
-  /// Map containing the Elasticsearch domain endpoints used to submit index and
-  /// search requests. Example <code>key, value</code>:
-  /// <code>'vpc','vpc-endpoint-h2dsd34efgyghrtguk5gt6j2foh4.us-east-1.es.amazonaws.com'</code>.
-  final Map<String, String>? endpoints;
-
-  /// Log publishing options for the given domain.
-  final Map<LogType, LogPublishingOption>? logPublishingOptions;
-
-  /// Specifies the status of the <code>NodeToNodeEncryptionOptions</code>.
-  final NodeToNodeEncryptionOptions? nodeToNodeEncryptionOptions;
-
-  /// The status of the Elasticsearch domain configuration. <code>True</code> if
-  /// Amazon Elasticsearch Service is processing configuration changes.
-  /// <code>False</code> if the configuration is active.
-  final bool? processing;
-
-  /// The current status of the Elasticsearch domain's service software.
-  final ServiceSoftwareOptions? serviceSoftwareOptions;
-
-  /// Specifies the status of the <code>SnapshotOptions</code>
-  final SnapshotOptions? snapshotOptions;
-
-  /// The status of an Elasticsearch domain version upgrade. <code>True</code> if
-  /// Amazon Elasticsearch Service is undergoing a version upgrade.
-  /// <code>False</code> if the configuration is active.
-  final bool? upgradeProcessing;
-
-  /// The <code>VPCOptions</code> for the specified domain. For more information,
-  /// see <a
-  /// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html"
-  /// target="_blank">VPC Endpoints for Amazon Elasticsearch Service Domains</a>.
-  final VPCDerivedInfo? vPCOptions;
-
-  ElasticsearchDomainStatus({
-    required this.arn,
-    required this.domainId,
-    required this.domainName,
-    required this.elasticsearchClusterConfig,
-    this.accessPolicies,
-    this.advancedOptions,
-    this.advancedSecurityOptions,
-    this.autoTuneOptions,
-    this.changeProgressDetails,
-    this.cognitoOptions,
-    this.created,
-    this.deleted,
-    this.domainEndpointOptions,
-    this.eBSOptions,
-    this.elasticsearchVersion,
-    this.encryptionAtRestOptions,
-    this.endpoint,
-    this.endpoints,
-    this.logPublishingOptions,
-    this.nodeToNodeEncryptionOptions,
-    this.processing,
-    this.serviceSoftwareOptions,
-    this.snapshotOptions,
-    this.upgradeProcessing,
-    this.vPCOptions,
-  });
-  factory ElasticsearchDomainStatus.fromJson(Map<String, dynamic> json) {
-    return ElasticsearchDomainStatus(
-      arn: json['ARN'] as String,
-      domainId: json['DomainId'] as String,
-      domainName: json['DomainName'] as String,
-      elasticsearchClusterConfig: ElasticsearchClusterConfig.fromJson(
-          json['ElasticsearchClusterConfig'] as Map<String, dynamic>),
-      accessPolicies: json['AccessPolicies'] as String?,
-      advancedOptions: (json['AdvancedOptions'] as Map<String, dynamic>?)
-          ?.map((k, e) => MapEntry(k, e as String)),
-      advancedSecurityOptions: json['AdvancedSecurityOptions'] != null
-          ? AdvancedSecurityOptions.fromJson(
-              json['AdvancedSecurityOptions'] as Map<String, dynamic>)
-          : null,
-      autoTuneOptions: json['AutoTuneOptions'] != null
-          ? AutoTuneOptionsOutput.fromJson(
-              json['AutoTuneOptions'] as Map<String, dynamic>)
-          : null,
-      changeProgressDetails: json['ChangeProgressDetails'] != null
-          ? ChangeProgressDetails.fromJson(
-              json['ChangeProgressDetails'] as Map<String, dynamic>)
-          : null,
-      cognitoOptions: json['CognitoOptions'] != null
-          ? CognitoOptions.fromJson(
-              json['CognitoOptions'] as Map<String, dynamic>)
-          : null,
-      created: json['Created'] as bool?,
-      deleted: json['Deleted'] as bool?,
-      domainEndpointOptions: json['DomainEndpointOptions'] != null
-          ? DomainEndpointOptions.fromJson(
-              json['DomainEndpointOptions'] as Map<String, dynamic>)
-          : null,
-      eBSOptions: json['EBSOptions'] != null
-          ? EBSOptions.fromJson(json['EBSOptions'] as Map<String, dynamic>)
-          : null,
-      elasticsearchVersion: json['ElasticsearchVersion'] as String?,
-      encryptionAtRestOptions: json['EncryptionAtRestOptions'] != null
-          ? EncryptionAtRestOptions.fromJson(
-              json['EncryptionAtRestOptions'] as Map<String, dynamic>)
-          : null,
-      endpoint: json['Endpoint'] as String?,
-      endpoints: (json['Endpoints'] as Map<String, dynamic>?)
-          ?.map((k, e) => MapEntry(k, e as String)),
-      logPublishingOptions:
-          (json['LogPublishingOptions'] as Map<String, dynamic>?)?.map((k, e) =>
-              MapEntry(k.toLogType(),
-                  LogPublishingOption.fromJson(e as Map<String, dynamic>))),
-      nodeToNodeEncryptionOptions: json['NodeToNodeEncryptionOptions'] != null
-          ? NodeToNodeEncryptionOptions.fromJson(
-              json['NodeToNodeEncryptionOptions'] as Map<String, dynamic>)
-          : null,
-      processing: json['Processing'] as bool?,
-      serviceSoftwareOptions: json['ServiceSoftwareOptions'] != null
-          ? ServiceSoftwareOptions.fromJson(
-              json['ServiceSoftwareOptions'] as Map<String, dynamic>)
-          : null,
-      snapshotOptions: json['SnapshotOptions'] != null
-          ? SnapshotOptions.fromJson(
-              json['SnapshotOptions'] as Map<String, dynamic>)
-          : null,
-      upgradeProcessing: json['UpgradeProcessing'] as bool?,
-      vPCOptions: json['VPCOptions'] != null
-          ? VPCDerivedInfo.fromJson(json['VPCOptions'] as Map<String, dynamic>)
-          : null,
-    );
-  }
-}
-
-/// Status of the Elasticsearch version options for the specified Elasticsearch
-/// domain.
-class ElasticsearchVersionStatus {
-  /// Specifies the Elasticsearch version for the specified Elasticsearch domain.
-  final String options;
-
-  /// Specifies the status of the Elasticsearch version options for the specified
-  /// Elasticsearch domain.
-  final OptionStatus status;
-
-  ElasticsearchVersionStatus({
-    required this.options,
-    required this.status,
-  });
-  factory ElasticsearchVersionStatus.fromJson(Map<String, dynamic> json) {
-    return ElasticsearchVersionStatus(
-      options: json['Options'] as String,
-      status: OptionStatus.fromJson(json['Status'] as Map<String, dynamic>),
-    );
-  }
-}
-
-/// Specifies the Encryption At Rest Options.
+/// Specifies encryption at rest options.
 class EncryptionAtRestOptions {
-  /// Specifies the option to enable Encryption At Rest.
+  /// The option to enable encryption at rest.
   final bool? enabled;
 
-  /// Specifies the KMS Key ID for Encryption At Rest options.
+  /// The KMS key ID for encryption at rest options.
   final String? kmsKeyId;
 
   EncryptionAtRestOptions({
@@ -4495,15 +4159,12 @@ class EncryptionAtRestOptions {
   }
 }
 
-/// Status of the Encryption At Rest options for the specified Elasticsearch
-/// domain.
+/// Status of the encryption At Rest options for the specified domain.
 class EncryptionAtRestOptionsStatus {
-  /// Specifies the Encryption At Rest options for the specified Elasticsearch
-  /// domain.
+  /// The Encryption At Rest options for the specified domain.
   final EncryptionAtRestOptions options;
 
-  /// Specifies the status of the Encryption At Rest options for the specified
-  /// Elasticsearch domain.
+  /// The status of the Encryption At Rest options for the specified domain.
   final OptionStatus status;
 
   EncryptionAtRestOptionsStatus({
@@ -4564,11 +4225,11 @@ class ErrorDetails {
 }
 
 /// A filter used to limit results when describing inbound or outbound
-/// cross-cluster search connections. Multiple values can be specified per
-/// filter. A cross-cluster search connection must match at least one of the
-/// specified values for it to be returned from an operation.
+/// cross-cluster connections. Multiple values can be specified per filter. A
+/// cross-cluster connection must match at least one of the specified values for
+/// it to be returned from an operation.
 class Filter {
-  /// Specifies the name of the filter.
+  /// The name of the filter.
   final String? name;
 
   /// Contains one or more values for the filter.
@@ -4588,21 +4249,19 @@ class Filter {
   }
 }
 
-/// Container for response returned by <code>
-/// <a>GetCompatibleElasticsearchVersions</a> </code> operation.
-class GetCompatibleElasticsearchVersionsResponse {
-  /// A map of compatible Elasticsearch versions returned as part of the <code>
-  /// <a>GetCompatibleElasticsearchVersions</a> </code> operation.
-  final List<CompatibleVersionsMap>? compatibleElasticsearchVersions;
+/// Container for the response returned by the <code>
+/// <a>GetCompatibleVersions</a> </code> operation.
+class GetCompatibleVersionsResponse {
+  /// A map of compatible OpenSearch versions returned as part of the <code>
+  /// <a>GetCompatibleVersions</a> </code> operation.
+  final List<CompatibleVersionsMap>? compatibleVersions;
 
-  GetCompatibleElasticsearchVersionsResponse({
-    this.compatibleElasticsearchVersions,
+  GetCompatibleVersionsResponse({
+    this.compatibleVersions,
   });
-  factory GetCompatibleElasticsearchVersionsResponse.fromJson(
-      Map<String, dynamic> json) {
-    return GetCompatibleElasticsearchVersionsResponse(
-      compatibleElasticsearchVersions: (json['CompatibleElasticsearchVersions']
-              as List?)
+  factory GetCompatibleVersionsResponse.fromJson(Map<String, dynamic> json) {
+    return GetCompatibleVersionsResponse(
+      compatibleVersions: (json['CompatibleVersions'] as List?)
           ?.whereNotNull()
           .map((e) => CompatibleVersionsMap.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -4636,16 +4295,16 @@ class GetPackageVersionHistoryResponse {
   }
 }
 
-/// Container for response returned by <code> <a>GetUpgradeHistory</a> </code>
-/// operation.
+/// Container for the response returned by the <code> <a>GetUpgradeHistory</a>
+/// </code> operation.
 class GetUpgradeHistoryResponse {
   /// Pagination token that needs to be supplied to the next call to get the next
-  /// page of results
+  /// page of results.
   final String? nextToken;
 
   /// A list of <code> <a>UpgradeHistory</a> </code> objects corresponding to each
-  /// Upgrade or Upgrade Eligibility Check performed on a domain returned as part
-  /// of <code> <a>GetUpgradeHistoryResponse</a> </code> object.
+  /// upgrade or upgrade eligibility check performed on a domain returned as part
+  /// of the <code> <a>GetUpgradeHistoryResponse</a> </code> object.
   final List<UpgradeHistory>? upgradeHistories;
 
   GetUpgradeHistoryResponse({
@@ -4663,10 +4322,10 @@ class GetUpgradeHistoryResponse {
   }
 }
 
-/// Container for response returned by <code> <a>GetUpgradeStatus</a> </code>
-/// operation.
+/// Container for the response returned by the <code> <a>GetUpgradeStatus</a>
+/// </code> operation.
 class GetUpgradeStatusResponse {
-  /// One of 4 statuses that a step can go through returned as part of the <code>
+  /// One of four statuses an upgrade have, returned as part of the <code>
   /// <a>GetUpgradeStatusResponse</a> </code> object. The status can take one of
   /// the following values:
   /// <ul>
@@ -4677,11 +4336,10 @@ class GetUpgradeStatusResponse {
   /// </ul>
   final UpgradeStatus? stepStatus;
 
-  /// A string that describes the update briefly
+  /// A string that briefly describes the update.
   final String? upgradeName;
 
-  /// Represents one of 3 steps that an Upgrade or Upgrade Eligibility Check does
-  /// through:
+  /// One of three steps an upgrade or upgrade eligibility check goes through:
   /// <ul>
   /// <li>PreUpgradeCheck</li>
   /// <li>Snapshot</li>
@@ -4703,136 +4361,142 @@ class GetUpgradeStatusResponse {
   }
 }
 
-/// Specifies details of an inbound connection.
-class InboundCrossClusterSearchConnection {
-  /// Specifies the <code><a>InboundCrossClusterSearchConnectionStatus</a></code>
-  /// for the outbound connection.
-  final InboundCrossClusterSearchConnectionStatus? connectionStatus;
+/// Details of an inbound connection.
+class InboundConnection {
+  /// The connection ID for the inbound cross-cluster connection.
+  final String? connectionId;
 
-  /// Specifies the connection id for the inbound cross-cluster search connection.
-  final String? crossClusterSearchConnectionId;
+  /// The <code> <a>InboundConnectionStatus</a> </code> for the outbound
+  /// connection.
+  final InboundConnectionStatus? connectionStatus;
 
-  /// Specifies the <code><a>DomainInformation</a></code> for the destination
-  /// Elasticsearch domain.
-  final DomainInformation? destinationDomainInfo;
+  /// The <code> <a>AWSDomainInformation</a> </code> for the local OpenSearch
+  /// domain.
+  final DomainInformationContainer? localDomainInfo;
 
-  /// Specifies the <code><a>DomainInformation</a></code> for the source
-  /// Elasticsearch domain.
-  final DomainInformation? sourceDomainInfo;
+  /// The <code> <a>AWSDomainInformation</a> </code> for the remote OpenSearch
+  /// domain.
+  final DomainInformationContainer? remoteDomainInfo;
 
-  InboundCrossClusterSearchConnection({
+  InboundConnection({
+    this.connectionId,
     this.connectionStatus,
-    this.crossClusterSearchConnectionId,
-    this.destinationDomainInfo,
-    this.sourceDomainInfo,
+    this.localDomainInfo,
+    this.remoteDomainInfo,
   });
-  factory InboundCrossClusterSearchConnection.fromJson(
-      Map<String, dynamic> json) {
-    return InboundCrossClusterSearchConnection(
+  factory InboundConnection.fromJson(Map<String, dynamic> json) {
+    return InboundConnection(
+      connectionId: json['ConnectionId'] as String?,
       connectionStatus: json['ConnectionStatus'] != null
-          ? InboundCrossClusterSearchConnectionStatus.fromJson(
+          ? InboundConnectionStatus.fromJson(
               json['ConnectionStatus'] as Map<String, dynamic>)
           : null,
-      crossClusterSearchConnectionId:
-          json['CrossClusterSearchConnectionId'] as String?,
-      destinationDomainInfo: json['DestinationDomainInfo'] != null
-          ? DomainInformation.fromJson(
-              json['DestinationDomainInfo'] as Map<String, dynamic>)
+      localDomainInfo: json['LocalDomainInfo'] != null
+          ? DomainInformationContainer.fromJson(
+              json['LocalDomainInfo'] as Map<String, dynamic>)
           : null,
-      sourceDomainInfo: json['SourceDomainInfo'] != null
-          ? DomainInformation.fromJson(
-              json['SourceDomainInfo'] as Map<String, dynamic>)
+      remoteDomainInfo: json['RemoteDomainInfo'] != null
+          ? DomainInformationContainer.fromJson(
+              json['RemoteDomainInfo'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// Specifies the coonection status of an inbound cross-cluster search
-/// connection.
-class InboundCrossClusterSearchConnectionStatus {
-  /// Specifies verbose information for the inbound connection status.
+/// The connection status of an inbound cross-cluster connection.
+class InboundConnectionStatus {
+  /// Verbose information for the inbound connection status.
   final String? message;
 
-  /// The state code for inbound connection. This can be one of the following:
+  /// The state code for the inbound connection. Can be one of the following:
   ///
   /// <ul>
-  /// <li>PENDING_ACCEPTANCE: Inbound connection is not yet accepted by
-  /// destination domain owner.</li>
-  /// <li>APPROVED: Inbound connection is pending acceptance by destination domain
+  /// <li>PENDING_ACCEPTANCE: Inbound connection is not yet accepted by the remote
+  /// domain owner.</li>
+  /// <li>APPROVED: Inbound connection is pending acceptance by the remote domain
   /// owner.</li>
+  /// <li>PROVISIONING: Inbound connection provisioning is in progress.</li>
+  /// <li>ACTIVE: Inbound connection is active and ready to use.</li>
   /// <li>REJECTING: Inbound connection rejection is in process.</li>
   /// <li>REJECTED: Inbound connection is rejected.</li>
   /// <li>DELETING: Inbound connection deletion is in progress.</li>
-  /// <li>DELETED: Inbound connection is deleted and cannot be used further.</li>
+  /// <li>DELETED: Inbound connection is deleted and can no longer be used.</li>
   /// </ul>
-  final InboundCrossClusterSearchConnectionStatusCode? statusCode;
+  final InboundConnectionStatusCode? statusCode;
 
-  InboundCrossClusterSearchConnectionStatus({
+  InboundConnectionStatus({
     this.message,
     this.statusCode,
   });
-  factory InboundCrossClusterSearchConnectionStatus.fromJson(
-      Map<String, dynamic> json) {
-    return InboundCrossClusterSearchConnectionStatus(
+  factory InboundConnectionStatus.fromJson(Map<String, dynamic> json) {
+    return InboundConnectionStatus(
       message: json['Message'] as String?,
-      statusCode: (json['StatusCode'] as String?)
-          ?.toInboundCrossClusterSearchConnectionStatusCode(),
+      statusCode:
+          (json['StatusCode'] as String?)?.toInboundConnectionStatusCode(),
     );
   }
 }
 
-enum InboundCrossClusterSearchConnectionStatusCode {
+enum InboundConnectionStatusCode {
   pendingAcceptance,
   approved,
+  provisioning,
+  active,
   rejecting,
   rejected,
   deleting,
   deleted,
 }
 
-extension on InboundCrossClusterSearchConnectionStatusCode {
+extension on InboundConnectionStatusCode {
   String toValue() {
     switch (this) {
-      case InboundCrossClusterSearchConnectionStatusCode.pendingAcceptance:
+      case InboundConnectionStatusCode.pendingAcceptance:
         return 'PENDING_ACCEPTANCE';
-      case InboundCrossClusterSearchConnectionStatusCode.approved:
+      case InboundConnectionStatusCode.approved:
         return 'APPROVED';
-      case InboundCrossClusterSearchConnectionStatusCode.rejecting:
+      case InboundConnectionStatusCode.provisioning:
+        return 'PROVISIONING';
+      case InboundConnectionStatusCode.active:
+        return 'ACTIVE';
+      case InboundConnectionStatusCode.rejecting:
         return 'REJECTING';
-      case InboundCrossClusterSearchConnectionStatusCode.rejected:
+      case InboundConnectionStatusCode.rejected:
         return 'REJECTED';
-      case InboundCrossClusterSearchConnectionStatusCode.deleting:
+      case InboundConnectionStatusCode.deleting:
         return 'DELETING';
-      case InboundCrossClusterSearchConnectionStatusCode.deleted:
+      case InboundConnectionStatusCode.deleted:
         return 'DELETED';
     }
   }
 }
 
 extension on String {
-  InboundCrossClusterSearchConnectionStatusCode
-      toInboundCrossClusterSearchConnectionStatusCode() {
+  InboundConnectionStatusCode toInboundConnectionStatusCode() {
     switch (this) {
       case 'PENDING_ACCEPTANCE':
-        return InboundCrossClusterSearchConnectionStatusCode.pendingAcceptance;
+        return InboundConnectionStatusCode.pendingAcceptance;
       case 'APPROVED':
-        return InboundCrossClusterSearchConnectionStatusCode.approved;
+        return InboundConnectionStatusCode.approved;
+      case 'PROVISIONING':
+        return InboundConnectionStatusCode.provisioning;
+      case 'ACTIVE':
+        return InboundConnectionStatusCode.active;
       case 'REJECTING':
-        return InboundCrossClusterSearchConnectionStatusCode.rejecting;
+        return InboundConnectionStatusCode.rejecting;
       case 'REJECTED':
-        return InboundCrossClusterSearchConnectionStatusCode.rejected;
+        return InboundConnectionStatusCode.rejected;
       case 'DELETING':
-        return InboundCrossClusterSearchConnectionStatusCode.deleting;
+        return InboundConnectionStatusCode.deleting;
       case 'DELETED':
-        return InboundCrossClusterSearchConnectionStatusCode.deleted;
+        return InboundConnectionStatusCode.deleted;
     }
-    throw Exception(
-        '$this is not known in enum InboundCrossClusterSearchConnectionStatusCode');
+    throw Exception('$this is not known in enum InboundConnectionStatusCode');
   }
 }
 
-/// InstanceCountLimits represents the limits on number of instances that be
-/// created in Amazon Elasticsearch for given InstanceType.
+/// InstanceCountLimits represents the limits on the number of instances that
+/// can be created in Amazon OpenSearch Service for a given InstanceType.
 class InstanceCountLimits {
   final int? maximumInstanceCount;
   final int? minimumInstanceCount;
@@ -4849,8 +4513,8 @@ class InstanceCountLimits {
   }
 }
 
-/// InstanceLimits represents the list of instance related attributes that are
-/// available for given InstanceType.
+/// InstanceLimits represents the list of instance-related attributes that are
+/// available for a given InstanceType.
 class InstanceLimits {
   final InstanceCountLimits? instanceCountLimits;
 
@@ -4867,17 +4531,52 @@ class InstanceLimits {
   }
 }
 
-/// Limits for given InstanceType and for each of it's role. <br/> Limits
-/// contains following <code> <a>StorageTypes,</a> </code> <code>
-/// <a>InstanceLimits</a> </code> and <code> <a>AdditionalLimits</a> </code>
+class InstanceTypeDetails {
+  final bool? advancedSecurityEnabled;
+  final bool? appLogsEnabled;
+  final bool? cognitoEnabled;
+  final bool? encryptionEnabled;
+  final List<String>? instanceRole;
+  final OpenSearchPartitionInstanceType? instanceType;
+  final bool? warmEnabled;
+
+  InstanceTypeDetails({
+    this.advancedSecurityEnabled,
+    this.appLogsEnabled,
+    this.cognitoEnabled,
+    this.encryptionEnabled,
+    this.instanceRole,
+    this.instanceType,
+    this.warmEnabled,
+  });
+  factory InstanceTypeDetails.fromJson(Map<String, dynamic> json) {
+    return InstanceTypeDetails(
+      advancedSecurityEnabled: json['AdvancedSecurityEnabled'] as bool?,
+      appLogsEnabled: json['AppLogsEnabled'] as bool?,
+      cognitoEnabled: json['CognitoEnabled'] as bool?,
+      encryptionEnabled: json['EncryptionEnabled'] as bool?,
+      instanceRole: (json['InstanceRole'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      instanceType: (json['InstanceType'] as String?)
+          ?.toOpenSearchPartitionInstanceType(),
+      warmEnabled: json['WarmEnabled'] as bool?,
+    );
+  }
+}
+
+/// Limits for a given InstanceType and for each of its roles. <br/> Limits
+/// contains the following: <code> <a>StorageTypes</a> </code>, <code>
+/// <a>InstanceLimits</a> </code>, and <code> <a>AdditionalLimits</a> </code>
 class Limits {
   /// List of additional limits that are specific to a given InstanceType and for
-  /// each of it's <code> <a>InstanceRole</a> </code> .
+  /// each of its <code> <a>InstanceRole</a> </code> .
   final List<AdditionalLimit>? additionalLimits;
   final InstanceLimits? instanceLimits;
 
-  /// StorageType represents the list of storage related types and attributes that
-  /// are available for given InstanceType.
+  /// Storage-related types and attributes that are available for a given
+  /// InstanceType.
   final List<StorageType>? storageTypes;
 
   Limits({
@@ -4922,8 +4621,8 @@ class ListDomainNamesResponse {
   }
 }
 
-/// Container for response parameters to <code> <a>ListDomainsForPackage</a>
-/// </code> operation.
+/// Container for the response parameters to the <code>
+/// <a>ListDomainsForPackage</a> </code> operation.
 class ListDomainsForPackageResponse {
   /// List of <code>DomainPackageDetails</code> objects.
   final List<DomainPackageDetails>? domainPackageDetailsList;
@@ -4944,64 +4643,32 @@ class ListDomainsForPackageResponse {
   }
 }
 
-/// Container for the parameters returned by <code>
-/// <a>ListElasticsearchInstanceTypes</a> </code> operation.
-class ListElasticsearchInstanceTypesResponse {
-  /// List of instance types supported by Amazon Elasticsearch service for given
-  /// <code> <a>ElasticsearchVersion</a> </code>
-  final List<ESPartitionInstanceType>? elasticsearchInstanceTypes;
-
-  /// In case if there are more results available NextToken would be present, make
-  /// further request to the same API with received NextToken to paginate
-  /// remaining results.
+class ListInstanceTypeDetailsResponse {
+  final List<InstanceTypeDetails>? instanceTypeDetails;
   final String? nextToken;
 
-  ListElasticsearchInstanceTypesResponse({
-    this.elasticsearchInstanceTypes,
+  ListInstanceTypeDetailsResponse({
+    this.instanceTypeDetails,
     this.nextToken,
   });
-  factory ListElasticsearchInstanceTypesResponse.fromJson(
-      Map<String, dynamic> json) {
-    return ListElasticsearchInstanceTypesResponse(
-      elasticsearchInstanceTypes: (json['ElasticsearchInstanceTypes'] as List?)
+  factory ListInstanceTypeDetailsResponse.fromJson(Map<String, dynamic> json) {
+    return ListInstanceTypeDetailsResponse(
+      instanceTypeDetails: (json['InstanceTypeDetails'] as List?)
           ?.whereNotNull()
-          .map((e) => (e as String).toESPartitionInstanceType())
+          .map((e) => InstanceTypeDetails.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
     );
   }
 }
 
-/// Container for the parameters for response received from <code>
-/// <a>ListElasticsearchVersions</a> </code> operation.
-class ListElasticsearchVersionsResponse {
-  final List<String>? elasticsearchVersions;
-  final String? nextToken;
-
-  ListElasticsearchVersionsResponse({
-    this.elasticsearchVersions,
-    this.nextToken,
-  });
-  factory ListElasticsearchVersionsResponse.fromJson(
-      Map<String, dynamic> json) {
-    return ListElasticsearchVersionsResponse(
-      elasticsearchVersions: (json['ElasticsearchVersions'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
-      nextToken: json['NextToken'] as String?,
-    );
-  }
-}
-
-/// Container for response parameters to <code> <a>ListPackagesForDomain</a>
-/// </code> operation.
+/// Container for the response parameters to the <code>
+/// <a>ListPackagesForDomain</a> </code> operation.
 class ListPackagesForDomainResponse {
   /// List of <code>DomainPackageDetails</code> objects.
   final List<DomainPackageDetails>? domainPackageDetailsList;
 
-  /// Pagination token that needs to be supplied to the next call to get the next
-  /// page of results.
+  /// Pagination token to supply to the next call to get the next page of results.
   final String? nextToken;
 
   ListPackagesForDomainResponse({
@@ -5020,9 +4687,9 @@ class ListPackagesForDomainResponse {
 }
 
 /// The result of a <code>ListTags</code> operation. Contains tags for all
-/// requested Elasticsearch domains.
+/// requested domains.
 class ListTagsResponse {
-  /// List of <code>Tag</code> for the requested Elasticsearch domain.
+  /// List of <code>Tag</code> for the requested domain.
   final List<Tag>? tagList;
 
   ListTagsResponse({
@@ -5038,18 +4705,39 @@ class ListTagsResponse {
   }
 }
 
-/// Log Publishing option that is set for given domain. <br/>Attributes and
+/// Container for the parameters for response received from the <code>
+/// <a>ListVersions</a> </code> operation.
+class ListVersionsResponse {
+  final String? nextToken;
+  final List<String>? versions;
+
+  ListVersionsResponse({
+    this.nextToken,
+    this.versions,
+  });
+  factory ListVersionsResponse.fromJson(Map<String, dynamic> json) {
+    return ListVersionsResponse(
+      nextToken: json['NextToken'] as String?,
+      versions: (json['Versions'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+}
+
+/// Log Publishing option that is set for a given domain. <br/>Attributes and
 /// their details:
 /// <ul>
-/// <li>CloudWatchLogsLogGroupArn: ARN of the Cloudwatch log group to which log
-/// needs to be published.</li>
-/// <li>Enabled: Whether the log publishing for given log type is enabled or
-/// not</li>
+/// <li>CloudWatchLogsLogGroupArn: ARN of the Cloudwatch log group to publish
+/// logs to.</li>
+/// <li>Enabled: Whether the log publishing for a given log type is enabled or
+/// not.</li>
 /// </ul>
 class LogPublishingOption {
   final String? cloudWatchLogsLogGroupArn;
 
-  /// Specifies whether given log publishing option is enabled or not.
+  /// Whether the given log publishing option is enabled or not.
   final bool? enabled;
 
   LogPublishingOption({
@@ -5077,10 +4765,10 @@ class LogPublishingOption {
 /// The configured log publishing options for the domain and their current
 /// status.
 class LogPublishingOptionsStatus {
-  /// The log publishing options configured for the Elasticsearch domain.
+  /// The log publishing options configured for the domain.
   final Map<LogType, LogPublishingOption>? options;
 
-  /// The status of the log publishing options for the Elasticsearch domain. See
+  /// The status of the log publishing options for the domain. See
   /// <code>OptionStatus</code> for the status information that's included.
   final OptionStatus? status;
 
@@ -5100,15 +4788,15 @@ class LogPublishingOptionsStatus {
   }
 }
 
-/// Type of Log File, it can be one of the following:
+/// Type of log file. Can be one of the following:
 /// <ul>
 /// <li>INDEX_SLOW_LOGS: Index slow logs contain insert requests that took more
-/// time than configured index query log threshold to execute.</li>
+/// time than configured index query log threshold to execute. </li>
 /// <li>SEARCH_SLOW_LOGS: Search slow logs contain search queries that took more
-/// time than configured search query log threshold to execute.</li>
-/// <li>ES_APPLICATION_LOGS: Elasticsearch application logs contain information
+/// time than configured search query log threshold to execute. </li>
+/// <li>ES_APPLICATION_LOGS: OpenSearch application logs contain information
 /// about errors and warnings raised during the operation of the service and can
-/// be useful for troubleshooting.</li>
+/// be useful for troubleshooting. </li>
 /// <li>AUDIT_LOGS: Audit logs contain records of user requests for access from
 /// the domain.</li>
 /// </ul>
@@ -5155,12 +4843,12 @@ class MasterUserOptions {
   /// ARN for the master user (if IAM is enabled).
   final String? masterUserARN;
 
-  /// The master user's username, which is stored in the Amazon Elasticsearch
-  /// Service domain's internal database.
+  /// The master user's username, which is stored in the Amazon OpenSearch Service
+  /// domain's internal database.
   final String? masterUserName;
 
-  /// The master user's password, which is stored in the Amazon Elasticsearch
-  /// Service domain's internal database.
+  /// The master user's password, which is stored in the Amazon OpenSearch Service
+  /// domain's internal database.
   final String? masterUserPassword;
 
   MasterUserOptions({
@@ -5180,9 +4868,9 @@ class MasterUserOptions {
   }
 }
 
-/// Specifies the node-to-node encryption options.
+/// The node-to-node encryption options.
 class NodeToNodeEncryptionOptions {
-  /// Specify true to enable node-to-node encryption.
+  /// True to enable node-to-node encryption.
   final bool? enabled;
 
   NodeToNodeEncryptionOptions({
@@ -5202,15 +4890,12 @@ class NodeToNodeEncryptionOptions {
   }
 }
 
-/// Status of the node-to-node encryption options for the specified
-/// Elasticsearch domain.
+/// Status of the node-to-node encryption options for the specified domain.
 class NodeToNodeEncryptionOptionsStatus {
-  /// Specifies the node-to-node encryption options for the specified
-  /// Elasticsearch domain.
+  /// The node-to-node encryption options for the specified domain.
   final NodeToNodeEncryptionOptions options;
 
-  /// Specifies the status of the node-to-node encryption options for the
-  /// specified Elasticsearch domain.
+  /// The status of the node-to-node encryption options for the specified domain.
   final OptionStatus status;
 
   NodeToNodeEncryptionOptionsStatus({
@@ -5227,12 +4912,539 @@ class NodeToNodeEncryptionOptionsStatus {
   }
 }
 
+enum OpenSearchPartitionInstanceType {
+  m3MediumSearch,
+  m3LargeSearch,
+  m3XlargeSearch,
+  m3_2xlargeSearch,
+  m4LargeSearch,
+  m4XlargeSearch,
+  m4_2xlargeSearch,
+  m4_4xlargeSearch,
+  m4_10xlargeSearch,
+  m5LargeSearch,
+  m5XlargeSearch,
+  m5_2xlargeSearch,
+  m5_4xlargeSearch,
+  m5_12xlargeSearch,
+  m5_24xlargeSearch,
+  r5LargeSearch,
+  r5XlargeSearch,
+  r5_2xlargeSearch,
+  r5_4xlargeSearch,
+  r5_12xlargeSearch,
+  r5_24xlargeSearch,
+  c5LargeSearch,
+  c5XlargeSearch,
+  c5_2xlargeSearch,
+  c5_4xlargeSearch,
+  c5_9xlargeSearch,
+  c5_18xlargeSearch,
+  t3NanoSearch,
+  t3MicroSearch,
+  t3SmallSearch,
+  t3MediumSearch,
+  t3LargeSearch,
+  t3XlargeSearch,
+  t3_2xlargeSearch,
+  ultrawarm1MediumSearch,
+  ultrawarm1LargeSearch,
+  ultrawarm1XlargeSearch,
+  t2MicroSearch,
+  t2SmallSearch,
+  t2MediumSearch,
+  r3LargeSearch,
+  r3XlargeSearch,
+  r3_2xlargeSearch,
+  r3_4xlargeSearch,
+  r3_8xlargeSearch,
+  i2XlargeSearch,
+  i2_2xlargeSearch,
+  d2XlargeSearch,
+  d2_2xlargeSearch,
+  d2_4xlargeSearch,
+  d2_8xlargeSearch,
+  c4LargeSearch,
+  c4XlargeSearch,
+  c4_2xlargeSearch,
+  c4_4xlargeSearch,
+  c4_8xlargeSearch,
+  r4LargeSearch,
+  r4XlargeSearch,
+  r4_2xlargeSearch,
+  r4_4xlargeSearch,
+  r4_8xlargeSearch,
+  r4_16xlargeSearch,
+  i3LargeSearch,
+  i3XlargeSearch,
+  i3_2xlargeSearch,
+  i3_4xlargeSearch,
+  i3_8xlargeSearch,
+  i3_16xlargeSearch,
+  r6gLargeSearch,
+  r6gXlargeSearch,
+  r6g_2xlargeSearch,
+  r6g_4xlargeSearch,
+  r6g_8xlargeSearch,
+  r6g_12xlargeSearch,
+  m6gLargeSearch,
+  m6gXlargeSearch,
+  m6g_2xlargeSearch,
+  m6g_4xlargeSearch,
+  m6g_8xlargeSearch,
+  m6g_12xlargeSearch,
+  c6gLargeSearch,
+  c6gXlargeSearch,
+  c6g_2xlargeSearch,
+  c6g_4xlargeSearch,
+  c6g_8xlargeSearch,
+  c6g_12xlargeSearch,
+  r6gdLargeSearch,
+  r6gdXlargeSearch,
+  r6gd_2xlargeSearch,
+  r6gd_4xlargeSearch,
+  r6gd_8xlargeSearch,
+  r6gd_12xlargeSearch,
+  r6gd_16xlargeSearch,
+  t4gSmallSearch,
+  t4gMediumSearch,
+}
+
+extension on OpenSearchPartitionInstanceType {
+  String toValue() {
+    switch (this) {
+      case OpenSearchPartitionInstanceType.m3MediumSearch:
+        return 'm3.medium.search';
+      case OpenSearchPartitionInstanceType.m3LargeSearch:
+        return 'm3.large.search';
+      case OpenSearchPartitionInstanceType.m3XlargeSearch:
+        return 'm3.xlarge.search';
+      case OpenSearchPartitionInstanceType.m3_2xlargeSearch:
+        return 'm3.2xlarge.search';
+      case OpenSearchPartitionInstanceType.m4LargeSearch:
+        return 'm4.large.search';
+      case OpenSearchPartitionInstanceType.m4XlargeSearch:
+        return 'm4.xlarge.search';
+      case OpenSearchPartitionInstanceType.m4_2xlargeSearch:
+        return 'm4.2xlarge.search';
+      case OpenSearchPartitionInstanceType.m4_4xlargeSearch:
+        return 'm4.4xlarge.search';
+      case OpenSearchPartitionInstanceType.m4_10xlargeSearch:
+        return 'm4.10xlarge.search';
+      case OpenSearchPartitionInstanceType.m5LargeSearch:
+        return 'm5.large.search';
+      case OpenSearchPartitionInstanceType.m5XlargeSearch:
+        return 'm5.xlarge.search';
+      case OpenSearchPartitionInstanceType.m5_2xlargeSearch:
+        return 'm5.2xlarge.search';
+      case OpenSearchPartitionInstanceType.m5_4xlargeSearch:
+        return 'm5.4xlarge.search';
+      case OpenSearchPartitionInstanceType.m5_12xlargeSearch:
+        return 'm5.12xlarge.search';
+      case OpenSearchPartitionInstanceType.m5_24xlargeSearch:
+        return 'm5.24xlarge.search';
+      case OpenSearchPartitionInstanceType.r5LargeSearch:
+        return 'r5.large.search';
+      case OpenSearchPartitionInstanceType.r5XlargeSearch:
+        return 'r5.xlarge.search';
+      case OpenSearchPartitionInstanceType.r5_2xlargeSearch:
+        return 'r5.2xlarge.search';
+      case OpenSearchPartitionInstanceType.r5_4xlargeSearch:
+        return 'r5.4xlarge.search';
+      case OpenSearchPartitionInstanceType.r5_12xlargeSearch:
+        return 'r5.12xlarge.search';
+      case OpenSearchPartitionInstanceType.r5_24xlargeSearch:
+        return 'r5.24xlarge.search';
+      case OpenSearchPartitionInstanceType.c5LargeSearch:
+        return 'c5.large.search';
+      case OpenSearchPartitionInstanceType.c5XlargeSearch:
+        return 'c5.xlarge.search';
+      case OpenSearchPartitionInstanceType.c5_2xlargeSearch:
+        return 'c5.2xlarge.search';
+      case OpenSearchPartitionInstanceType.c5_4xlargeSearch:
+        return 'c5.4xlarge.search';
+      case OpenSearchPartitionInstanceType.c5_9xlargeSearch:
+        return 'c5.9xlarge.search';
+      case OpenSearchPartitionInstanceType.c5_18xlargeSearch:
+        return 'c5.18xlarge.search';
+      case OpenSearchPartitionInstanceType.t3NanoSearch:
+        return 't3.nano.search';
+      case OpenSearchPartitionInstanceType.t3MicroSearch:
+        return 't3.micro.search';
+      case OpenSearchPartitionInstanceType.t3SmallSearch:
+        return 't3.small.search';
+      case OpenSearchPartitionInstanceType.t3MediumSearch:
+        return 't3.medium.search';
+      case OpenSearchPartitionInstanceType.t3LargeSearch:
+        return 't3.large.search';
+      case OpenSearchPartitionInstanceType.t3XlargeSearch:
+        return 't3.xlarge.search';
+      case OpenSearchPartitionInstanceType.t3_2xlargeSearch:
+        return 't3.2xlarge.search';
+      case OpenSearchPartitionInstanceType.ultrawarm1MediumSearch:
+        return 'ultrawarm1.medium.search';
+      case OpenSearchPartitionInstanceType.ultrawarm1LargeSearch:
+        return 'ultrawarm1.large.search';
+      case OpenSearchPartitionInstanceType.ultrawarm1XlargeSearch:
+        return 'ultrawarm1.xlarge.search';
+      case OpenSearchPartitionInstanceType.t2MicroSearch:
+        return 't2.micro.search';
+      case OpenSearchPartitionInstanceType.t2SmallSearch:
+        return 't2.small.search';
+      case OpenSearchPartitionInstanceType.t2MediumSearch:
+        return 't2.medium.search';
+      case OpenSearchPartitionInstanceType.r3LargeSearch:
+        return 'r3.large.search';
+      case OpenSearchPartitionInstanceType.r3XlargeSearch:
+        return 'r3.xlarge.search';
+      case OpenSearchPartitionInstanceType.r3_2xlargeSearch:
+        return 'r3.2xlarge.search';
+      case OpenSearchPartitionInstanceType.r3_4xlargeSearch:
+        return 'r3.4xlarge.search';
+      case OpenSearchPartitionInstanceType.r3_8xlargeSearch:
+        return 'r3.8xlarge.search';
+      case OpenSearchPartitionInstanceType.i2XlargeSearch:
+        return 'i2.xlarge.search';
+      case OpenSearchPartitionInstanceType.i2_2xlargeSearch:
+        return 'i2.2xlarge.search';
+      case OpenSearchPartitionInstanceType.d2XlargeSearch:
+        return 'd2.xlarge.search';
+      case OpenSearchPartitionInstanceType.d2_2xlargeSearch:
+        return 'd2.2xlarge.search';
+      case OpenSearchPartitionInstanceType.d2_4xlargeSearch:
+        return 'd2.4xlarge.search';
+      case OpenSearchPartitionInstanceType.d2_8xlargeSearch:
+        return 'd2.8xlarge.search';
+      case OpenSearchPartitionInstanceType.c4LargeSearch:
+        return 'c4.large.search';
+      case OpenSearchPartitionInstanceType.c4XlargeSearch:
+        return 'c4.xlarge.search';
+      case OpenSearchPartitionInstanceType.c4_2xlargeSearch:
+        return 'c4.2xlarge.search';
+      case OpenSearchPartitionInstanceType.c4_4xlargeSearch:
+        return 'c4.4xlarge.search';
+      case OpenSearchPartitionInstanceType.c4_8xlargeSearch:
+        return 'c4.8xlarge.search';
+      case OpenSearchPartitionInstanceType.r4LargeSearch:
+        return 'r4.large.search';
+      case OpenSearchPartitionInstanceType.r4XlargeSearch:
+        return 'r4.xlarge.search';
+      case OpenSearchPartitionInstanceType.r4_2xlargeSearch:
+        return 'r4.2xlarge.search';
+      case OpenSearchPartitionInstanceType.r4_4xlargeSearch:
+        return 'r4.4xlarge.search';
+      case OpenSearchPartitionInstanceType.r4_8xlargeSearch:
+        return 'r4.8xlarge.search';
+      case OpenSearchPartitionInstanceType.r4_16xlargeSearch:
+        return 'r4.16xlarge.search';
+      case OpenSearchPartitionInstanceType.i3LargeSearch:
+        return 'i3.large.search';
+      case OpenSearchPartitionInstanceType.i3XlargeSearch:
+        return 'i3.xlarge.search';
+      case OpenSearchPartitionInstanceType.i3_2xlargeSearch:
+        return 'i3.2xlarge.search';
+      case OpenSearchPartitionInstanceType.i3_4xlargeSearch:
+        return 'i3.4xlarge.search';
+      case OpenSearchPartitionInstanceType.i3_8xlargeSearch:
+        return 'i3.8xlarge.search';
+      case OpenSearchPartitionInstanceType.i3_16xlargeSearch:
+        return 'i3.16xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gLargeSearch:
+        return 'r6g.large.search';
+      case OpenSearchPartitionInstanceType.r6gXlargeSearch:
+        return 'r6g.xlarge.search';
+      case OpenSearchPartitionInstanceType.r6g_2xlargeSearch:
+        return 'r6g.2xlarge.search';
+      case OpenSearchPartitionInstanceType.r6g_4xlargeSearch:
+        return 'r6g.4xlarge.search';
+      case OpenSearchPartitionInstanceType.r6g_8xlargeSearch:
+        return 'r6g.8xlarge.search';
+      case OpenSearchPartitionInstanceType.r6g_12xlargeSearch:
+        return 'r6g.12xlarge.search';
+      case OpenSearchPartitionInstanceType.m6gLargeSearch:
+        return 'm6g.large.search';
+      case OpenSearchPartitionInstanceType.m6gXlargeSearch:
+        return 'm6g.xlarge.search';
+      case OpenSearchPartitionInstanceType.m6g_2xlargeSearch:
+        return 'm6g.2xlarge.search';
+      case OpenSearchPartitionInstanceType.m6g_4xlargeSearch:
+        return 'm6g.4xlarge.search';
+      case OpenSearchPartitionInstanceType.m6g_8xlargeSearch:
+        return 'm6g.8xlarge.search';
+      case OpenSearchPartitionInstanceType.m6g_12xlargeSearch:
+        return 'm6g.12xlarge.search';
+      case OpenSearchPartitionInstanceType.c6gLargeSearch:
+        return 'c6g.large.search';
+      case OpenSearchPartitionInstanceType.c6gXlargeSearch:
+        return 'c6g.xlarge.search';
+      case OpenSearchPartitionInstanceType.c6g_2xlargeSearch:
+        return 'c6g.2xlarge.search';
+      case OpenSearchPartitionInstanceType.c6g_4xlargeSearch:
+        return 'c6g.4xlarge.search';
+      case OpenSearchPartitionInstanceType.c6g_8xlargeSearch:
+        return 'c6g.8xlarge.search';
+      case OpenSearchPartitionInstanceType.c6g_12xlargeSearch:
+        return 'c6g.12xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gdLargeSearch:
+        return 'r6gd.large.search';
+      case OpenSearchPartitionInstanceType.r6gdXlargeSearch:
+        return 'r6gd.xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gd_2xlargeSearch:
+        return 'r6gd.2xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gd_4xlargeSearch:
+        return 'r6gd.4xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gd_8xlargeSearch:
+        return 'r6gd.8xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gd_12xlargeSearch:
+        return 'r6gd.12xlarge.search';
+      case OpenSearchPartitionInstanceType.r6gd_16xlargeSearch:
+        return 'r6gd.16xlarge.search';
+      case OpenSearchPartitionInstanceType.t4gSmallSearch:
+        return 't4g.small.search';
+      case OpenSearchPartitionInstanceType.t4gMediumSearch:
+        return 't4g.medium.search';
+    }
+  }
+}
+
+extension on String {
+  OpenSearchPartitionInstanceType toOpenSearchPartitionInstanceType() {
+    switch (this) {
+      case 'm3.medium.search':
+        return OpenSearchPartitionInstanceType.m3MediumSearch;
+      case 'm3.large.search':
+        return OpenSearchPartitionInstanceType.m3LargeSearch;
+      case 'm3.xlarge.search':
+        return OpenSearchPartitionInstanceType.m3XlargeSearch;
+      case 'm3.2xlarge.search':
+        return OpenSearchPartitionInstanceType.m3_2xlargeSearch;
+      case 'm4.large.search':
+        return OpenSearchPartitionInstanceType.m4LargeSearch;
+      case 'm4.xlarge.search':
+        return OpenSearchPartitionInstanceType.m4XlargeSearch;
+      case 'm4.2xlarge.search':
+        return OpenSearchPartitionInstanceType.m4_2xlargeSearch;
+      case 'm4.4xlarge.search':
+        return OpenSearchPartitionInstanceType.m4_4xlargeSearch;
+      case 'm4.10xlarge.search':
+        return OpenSearchPartitionInstanceType.m4_10xlargeSearch;
+      case 'm5.large.search':
+        return OpenSearchPartitionInstanceType.m5LargeSearch;
+      case 'm5.xlarge.search':
+        return OpenSearchPartitionInstanceType.m5XlargeSearch;
+      case 'm5.2xlarge.search':
+        return OpenSearchPartitionInstanceType.m5_2xlargeSearch;
+      case 'm5.4xlarge.search':
+        return OpenSearchPartitionInstanceType.m5_4xlargeSearch;
+      case 'm5.12xlarge.search':
+        return OpenSearchPartitionInstanceType.m5_12xlargeSearch;
+      case 'm5.24xlarge.search':
+        return OpenSearchPartitionInstanceType.m5_24xlargeSearch;
+      case 'r5.large.search':
+        return OpenSearchPartitionInstanceType.r5LargeSearch;
+      case 'r5.xlarge.search':
+        return OpenSearchPartitionInstanceType.r5XlargeSearch;
+      case 'r5.2xlarge.search':
+        return OpenSearchPartitionInstanceType.r5_2xlargeSearch;
+      case 'r5.4xlarge.search':
+        return OpenSearchPartitionInstanceType.r5_4xlargeSearch;
+      case 'r5.12xlarge.search':
+        return OpenSearchPartitionInstanceType.r5_12xlargeSearch;
+      case 'r5.24xlarge.search':
+        return OpenSearchPartitionInstanceType.r5_24xlargeSearch;
+      case 'c5.large.search':
+        return OpenSearchPartitionInstanceType.c5LargeSearch;
+      case 'c5.xlarge.search':
+        return OpenSearchPartitionInstanceType.c5XlargeSearch;
+      case 'c5.2xlarge.search':
+        return OpenSearchPartitionInstanceType.c5_2xlargeSearch;
+      case 'c5.4xlarge.search':
+        return OpenSearchPartitionInstanceType.c5_4xlargeSearch;
+      case 'c5.9xlarge.search':
+        return OpenSearchPartitionInstanceType.c5_9xlargeSearch;
+      case 'c5.18xlarge.search':
+        return OpenSearchPartitionInstanceType.c5_18xlargeSearch;
+      case 't3.nano.search':
+        return OpenSearchPartitionInstanceType.t3NanoSearch;
+      case 't3.micro.search':
+        return OpenSearchPartitionInstanceType.t3MicroSearch;
+      case 't3.small.search':
+        return OpenSearchPartitionInstanceType.t3SmallSearch;
+      case 't3.medium.search':
+        return OpenSearchPartitionInstanceType.t3MediumSearch;
+      case 't3.large.search':
+        return OpenSearchPartitionInstanceType.t3LargeSearch;
+      case 't3.xlarge.search':
+        return OpenSearchPartitionInstanceType.t3XlargeSearch;
+      case 't3.2xlarge.search':
+        return OpenSearchPartitionInstanceType.t3_2xlargeSearch;
+      case 'ultrawarm1.medium.search':
+        return OpenSearchPartitionInstanceType.ultrawarm1MediumSearch;
+      case 'ultrawarm1.large.search':
+        return OpenSearchPartitionInstanceType.ultrawarm1LargeSearch;
+      case 'ultrawarm1.xlarge.search':
+        return OpenSearchPartitionInstanceType.ultrawarm1XlargeSearch;
+      case 't2.micro.search':
+        return OpenSearchPartitionInstanceType.t2MicroSearch;
+      case 't2.small.search':
+        return OpenSearchPartitionInstanceType.t2SmallSearch;
+      case 't2.medium.search':
+        return OpenSearchPartitionInstanceType.t2MediumSearch;
+      case 'r3.large.search':
+        return OpenSearchPartitionInstanceType.r3LargeSearch;
+      case 'r3.xlarge.search':
+        return OpenSearchPartitionInstanceType.r3XlargeSearch;
+      case 'r3.2xlarge.search':
+        return OpenSearchPartitionInstanceType.r3_2xlargeSearch;
+      case 'r3.4xlarge.search':
+        return OpenSearchPartitionInstanceType.r3_4xlargeSearch;
+      case 'r3.8xlarge.search':
+        return OpenSearchPartitionInstanceType.r3_8xlargeSearch;
+      case 'i2.xlarge.search':
+        return OpenSearchPartitionInstanceType.i2XlargeSearch;
+      case 'i2.2xlarge.search':
+        return OpenSearchPartitionInstanceType.i2_2xlargeSearch;
+      case 'd2.xlarge.search':
+        return OpenSearchPartitionInstanceType.d2XlargeSearch;
+      case 'd2.2xlarge.search':
+        return OpenSearchPartitionInstanceType.d2_2xlargeSearch;
+      case 'd2.4xlarge.search':
+        return OpenSearchPartitionInstanceType.d2_4xlargeSearch;
+      case 'd2.8xlarge.search':
+        return OpenSearchPartitionInstanceType.d2_8xlargeSearch;
+      case 'c4.large.search':
+        return OpenSearchPartitionInstanceType.c4LargeSearch;
+      case 'c4.xlarge.search':
+        return OpenSearchPartitionInstanceType.c4XlargeSearch;
+      case 'c4.2xlarge.search':
+        return OpenSearchPartitionInstanceType.c4_2xlargeSearch;
+      case 'c4.4xlarge.search':
+        return OpenSearchPartitionInstanceType.c4_4xlargeSearch;
+      case 'c4.8xlarge.search':
+        return OpenSearchPartitionInstanceType.c4_8xlargeSearch;
+      case 'r4.large.search':
+        return OpenSearchPartitionInstanceType.r4LargeSearch;
+      case 'r4.xlarge.search':
+        return OpenSearchPartitionInstanceType.r4XlargeSearch;
+      case 'r4.2xlarge.search':
+        return OpenSearchPartitionInstanceType.r4_2xlargeSearch;
+      case 'r4.4xlarge.search':
+        return OpenSearchPartitionInstanceType.r4_4xlargeSearch;
+      case 'r4.8xlarge.search':
+        return OpenSearchPartitionInstanceType.r4_8xlargeSearch;
+      case 'r4.16xlarge.search':
+        return OpenSearchPartitionInstanceType.r4_16xlargeSearch;
+      case 'i3.large.search':
+        return OpenSearchPartitionInstanceType.i3LargeSearch;
+      case 'i3.xlarge.search':
+        return OpenSearchPartitionInstanceType.i3XlargeSearch;
+      case 'i3.2xlarge.search':
+        return OpenSearchPartitionInstanceType.i3_2xlargeSearch;
+      case 'i3.4xlarge.search':
+        return OpenSearchPartitionInstanceType.i3_4xlargeSearch;
+      case 'i3.8xlarge.search':
+        return OpenSearchPartitionInstanceType.i3_8xlargeSearch;
+      case 'i3.16xlarge.search':
+        return OpenSearchPartitionInstanceType.i3_16xlargeSearch;
+      case 'r6g.large.search':
+        return OpenSearchPartitionInstanceType.r6gLargeSearch;
+      case 'r6g.xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gXlargeSearch;
+      case 'r6g.2xlarge.search':
+        return OpenSearchPartitionInstanceType.r6g_2xlargeSearch;
+      case 'r6g.4xlarge.search':
+        return OpenSearchPartitionInstanceType.r6g_4xlargeSearch;
+      case 'r6g.8xlarge.search':
+        return OpenSearchPartitionInstanceType.r6g_8xlargeSearch;
+      case 'r6g.12xlarge.search':
+        return OpenSearchPartitionInstanceType.r6g_12xlargeSearch;
+      case 'm6g.large.search':
+        return OpenSearchPartitionInstanceType.m6gLargeSearch;
+      case 'm6g.xlarge.search':
+        return OpenSearchPartitionInstanceType.m6gXlargeSearch;
+      case 'm6g.2xlarge.search':
+        return OpenSearchPartitionInstanceType.m6g_2xlargeSearch;
+      case 'm6g.4xlarge.search':
+        return OpenSearchPartitionInstanceType.m6g_4xlargeSearch;
+      case 'm6g.8xlarge.search':
+        return OpenSearchPartitionInstanceType.m6g_8xlargeSearch;
+      case 'm6g.12xlarge.search':
+        return OpenSearchPartitionInstanceType.m6g_12xlargeSearch;
+      case 'c6g.large.search':
+        return OpenSearchPartitionInstanceType.c6gLargeSearch;
+      case 'c6g.xlarge.search':
+        return OpenSearchPartitionInstanceType.c6gXlargeSearch;
+      case 'c6g.2xlarge.search':
+        return OpenSearchPartitionInstanceType.c6g_2xlargeSearch;
+      case 'c6g.4xlarge.search':
+        return OpenSearchPartitionInstanceType.c6g_4xlargeSearch;
+      case 'c6g.8xlarge.search':
+        return OpenSearchPartitionInstanceType.c6g_8xlargeSearch;
+      case 'c6g.12xlarge.search':
+        return OpenSearchPartitionInstanceType.c6g_12xlargeSearch;
+      case 'r6gd.large.search':
+        return OpenSearchPartitionInstanceType.r6gdLargeSearch;
+      case 'r6gd.xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gdXlargeSearch;
+      case 'r6gd.2xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gd_2xlargeSearch;
+      case 'r6gd.4xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gd_4xlargeSearch;
+      case 'r6gd.8xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gd_8xlargeSearch;
+      case 'r6gd.12xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gd_12xlargeSearch;
+      case 'r6gd.16xlarge.search':
+        return OpenSearchPartitionInstanceType.r6gd_16xlargeSearch;
+      case 't4g.small.search':
+        return OpenSearchPartitionInstanceType.t4gSmallSearch;
+      case 't4g.medium.search':
+        return OpenSearchPartitionInstanceType.t4gMediumSearch;
+    }
+    throw Exception(
+        '$this is not known in enum OpenSearchPartitionInstanceType');
+  }
+}
+
+enum OpenSearchWarmPartitionInstanceType {
+  ultrawarm1MediumSearch,
+  ultrawarm1LargeSearch,
+  ultrawarm1XlargeSearch,
+}
+
+extension on OpenSearchWarmPartitionInstanceType {
+  String toValue() {
+    switch (this) {
+      case OpenSearchWarmPartitionInstanceType.ultrawarm1MediumSearch:
+        return 'ultrawarm1.medium.search';
+      case OpenSearchWarmPartitionInstanceType.ultrawarm1LargeSearch:
+        return 'ultrawarm1.large.search';
+      case OpenSearchWarmPartitionInstanceType.ultrawarm1XlargeSearch:
+        return 'ultrawarm1.xlarge.search';
+    }
+  }
+}
+
+extension on String {
+  OpenSearchWarmPartitionInstanceType toOpenSearchWarmPartitionInstanceType() {
+    switch (this) {
+      case 'ultrawarm1.medium.search':
+        return OpenSearchWarmPartitionInstanceType.ultrawarm1MediumSearch;
+      case 'ultrawarm1.large.search':
+        return OpenSearchWarmPartitionInstanceType.ultrawarm1LargeSearch;
+      case 'ultrawarm1.xlarge.search':
+        return OpenSearchWarmPartitionInstanceType.ultrawarm1XlargeSearch;
+    }
+    throw Exception(
+        '$this is not known in enum OpenSearchWarmPartitionInstanceType');
+  }
+}
+
 /// The state of a requested change. One of the following:
 ///
 /// <ul>
-/// <li>Processing: The request change is still in-process.</li>
-/// <li>Active: The request change is processed and deployed to the
-/// Elasticsearch domain.</li>
+/// <li>Processing: The request change is still in progress.</li>
+/// <li>Active: The request change is processed and deployed to the domain.</li>
 /// </ul>
 enum OptionState {
   requiresIndexDocuments,
@@ -5269,19 +5481,19 @@ extension on String {
 
 /// Provides the current status of the entity.
 class OptionStatus {
-  /// Timestamp which tells the creation date for the entity.
+  /// The timestamp of when the entity was created.
   final DateTime creationDate;
 
-  /// Provides the <code>OptionState</code> for the Elasticsearch domain.
+  /// Provides the <code>OptionState</code> for the domain.
   final OptionState state;
 
-  /// Timestamp which tells the last updated time for the entity.
+  /// The timestamp of the last time the entity was updated.
   final DateTime updateDate;
 
-  /// Indicates whether the Elasticsearch domain is being deleted.
+  /// Indicates whether the domain is being deleted.
   final bool? pendingDeletion;
 
-  /// Specifies the latest version for the entity.
+  /// The latest version of the entity.
   final int? updateVersion;
 
   OptionStatus({
@@ -5303,150 +5515,155 @@ class OptionStatus {
   }
 }
 
-/// Specifies details of an outbound connection.
-class OutboundCrossClusterSearchConnection {
-  /// Specifies the connection alias for the outbound cross-cluster search
-  /// connection.
+/// Specifies details about an outbound connection.
+class OutboundConnection {
+  /// The connection alias for the outbound cross-cluster connection.
   final String? connectionAlias;
 
-  /// Specifies the <code><a>OutboundCrossClusterSearchConnectionStatus</a></code>
-  /// for the outbound connection.
-  final OutboundCrossClusterSearchConnectionStatus? connectionStatus;
+  /// The connection ID for the outbound cross-cluster connection.
+  final String? connectionId;
 
-  /// Specifies the connection id for the outbound cross-cluster search
+  /// The <code> <a>OutboundConnectionStatus</a> </code> for the outbound
   /// connection.
-  final String? crossClusterSearchConnectionId;
+  final OutboundConnectionStatus? connectionStatus;
 
-  /// Specifies the <code><a>DomainInformation</a></code> for the destination
-  /// Elasticsearch domain.
-  final DomainInformation? destinationDomainInfo;
+  /// The <code> <a>DomainInformation</a> </code> for the local OpenSearch domain.
+  final DomainInformationContainer? localDomainInfo;
 
-  /// Specifies the <code><a>DomainInformation</a></code> for the source
-  /// Elasticsearch domain.
-  final DomainInformation? sourceDomainInfo;
+  /// The <code> <a>DomainInformation</a> </code> for the remote OpenSearch
+  /// domain.
+  final DomainInformationContainer? remoteDomainInfo;
 
-  OutboundCrossClusterSearchConnection({
+  OutboundConnection({
     this.connectionAlias,
+    this.connectionId,
     this.connectionStatus,
-    this.crossClusterSearchConnectionId,
-    this.destinationDomainInfo,
-    this.sourceDomainInfo,
+    this.localDomainInfo,
+    this.remoteDomainInfo,
   });
-  factory OutboundCrossClusterSearchConnection.fromJson(
-      Map<String, dynamic> json) {
-    return OutboundCrossClusterSearchConnection(
+  factory OutboundConnection.fromJson(Map<String, dynamic> json) {
+    return OutboundConnection(
       connectionAlias: json['ConnectionAlias'] as String?,
+      connectionId: json['ConnectionId'] as String?,
       connectionStatus: json['ConnectionStatus'] != null
-          ? OutboundCrossClusterSearchConnectionStatus.fromJson(
+          ? OutboundConnectionStatus.fromJson(
               json['ConnectionStatus'] as Map<String, dynamic>)
           : null,
-      crossClusterSearchConnectionId:
-          json['CrossClusterSearchConnectionId'] as String?,
-      destinationDomainInfo: json['DestinationDomainInfo'] != null
-          ? DomainInformation.fromJson(
-              json['DestinationDomainInfo'] as Map<String, dynamic>)
+      localDomainInfo: json['LocalDomainInfo'] != null
+          ? DomainInformationContainer.fromJson(
+              json['LocalDomainInfo'] as Map<String, dynamic>)
           : null,
-      sourceDomainInfo: json['SourceDomainInfo'] != null
-          ? DomainInformation.fromJson(
-              json['SourceDomainInfo'] as Map<String, dynamic>)
+      remoteDomainInfo: json['RemoteDomainInfo'] != null
+          ? DomainInformationContainer.fromJson(
+              json['RemoteDomainInfo'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// Specifies the connection status of an outbound cross-cluster search
-/// connection.
-class OutboundCrossClusterSearchConnectionStatus {
-  /// Specifies verbose information for the outbound connection status.
+/// The connection status of an outbound cross-cluster connection.
+class OutboundConnectionStatus {
+  /// Verbose information for the outbound connection status.
   final String? message;
 
-  /// The state code for outbound connection. This can be one of the following:
+  /// The state code for the outbound connection. Can be one of the following:
   ///
   /// <ul>
   /// <li>VALIDATING: The outbound connection request is being validated.</li>
   /// <li>VALIDATION_FAILED: Validation failed for the connection request.</li>
   /// <li>PENDING_ACCEPTANCE: Outbound connection request is validated and is not
-  /// yet accepted by destination domain owner.</li>
+  /// yet accepted by the remote domain owner. </li>
+  /// <li>APPROVED: Outbound connection has been approved by the remote domain
+  /// owner for getting provisioned.</li>
   /// <li>PROVISIONING: Outbound connection request is in process.</li>
   /// <li>ACTIVE: Outbound connection is active and ready to use.</li>
-  /// <li>REJECTED: Outbound connection request is rejected by destination domain
+  /// <li>REJECTING: Outbound connection rejection by remote domain owner is in
+  /// progress.</li>
+  /// <li>REJECTED: Outbound connection request is rejected by remote domain
   /// owner.</li>
   /// <li>DELETING: Outbound connection deletion is in progress.</li>
-  /// <li>DELETED: Outbound connection is deleted and cannot be used further.</li>
+  /// <li>DELETED: Outbound connection is deleted and can no longer be used.</li>
   /// </ul>
-  final OutboundCrossClusterSearchConnectionStatusCode? statusCode;
+  final OutboundConnectionStatusCode? statusCode;
 
-  OutboundCrossClusterSearchConnectionStatus({
+  OutboundConnectionStatus({
     this.message,
     this.statusCode,
   });
-  factory OutboundCrossClusterSearchConnectionStatus.fromJson(
-      Map<String, dynamic> json) {
-    return OutboundCrossClusterSearchConnectionStatus(
+  factory OutboundConnectionStatus.fromJson(Map<String, dynamic> json) {
+    return OutboundConnectionStatus(
       message: json['Message'] as String?,
-      statusCode: (json['StatusCode'] as String?)
-          ?.toOutboundCrossClusterSearchConnectionStatusCode(),
+      statusCode:
+          (json['StatusCode'] as String?)?.toOutboundConnectionStatusCode(),
     );
   }
 }
 
-enum OutboundCrossClusterSearchConnectionStatusCode {
-  pendingAcceptance,
+enum OutboundConnectionStatusCode {
   validating,
   validationFailed,
+  pendingAcceptance,
+  approved,
   provisioning,
   active,
+  rejecting,
   rejected,
   deleting,
   deleted,
 }
 
-extension on OutboundCrossClusterSearchConnectionStatusCode {
+extension on OutboundConnectionStatusCode {
   String toValue() {
     switch (this) {
-      case OutboundCrossClusterSearchConnectionStatusCode.pendingAcceptance:
-        return 'PENDING_ACCEPTANCE';
-      case OutboundCrossClusterSearchConnectionStatusCode.validating:
+      case OutboundConnectionStatusCode.validating:
         return 'VALIDATING';
-      case OutboundCrossClusterSearchConnectionStatusCode.validationFailed:
+      case OutboundConnectionStatusCode.validationFailed:
         return 'VALIDATION_FAILED';
-      case OutboundCrossClusterSearchConnectionStatusCode.provisioning:
+      case OutboundConnectionStatusCode.pendingAcceptance:
+        return 'PENDING_ACCEPTANCE';
+      case OutboundConnectionStatusCode.approved:
+        return 'APPROVED';
+      case OutboundConnectionStatusCode.provisioning:
         return 'PROVISIONING';
-      case OutboundCrossClusterSearchConnectionStatusCode.active:
+      case OutboundConnectionStatusCode.active:
         return 'ACTIVE';
-      case OutboundCrossClusterSearchConnectionStatusCode.rejected:
+      case OutboundConnectionStatusCode.rejecting:
+        return 'REJECTING';
+      case OutboundConnectionStatusCode.rejected:
         return 'REJECTED';
-      case OutboundCrossClusterSearchConnectionStatusCode.deleting:
+      case OutboundConnectionStatusCode.deleting:
         return 'DELETING';
-      case OutboundCrossClusterSearchConnectionStatusCode.deleted:
+      case OutboundConnectionStatusCode.deleted:
         return 'DELETED';
     }
   }
 }
 
 extension on String {
-  OutboundCrossClusterSearchConnectionStatusCode
-      toOutboundCrossClusterSearchConnectionStatusCode() {
+  OutboundConnectionStatusCode toOutboundConnectionStatusCode() {
     switch (this) {
-      case 'PENDING_ACCEPTANCE':
-        return OutboundCrossClusterSearchConnectionStatusCode.pendingAcceptance;
       case 'VALIDATING':
-        return OutboundCrossClusterSearchConnectionStatusCode.validating;
+        return OutboundConnectionStatusCode.validating;
       case 'VALIDATION_FAILED':
-        return OutboundCrossClusterSearchConnectionStatusCode.validationFailed;
+        return OutboundConnectionStatusCode.validationFailed;
+      case 'PENDING_ACCEPTANCE':
+        return OutboundConnectionStatusCode.pendingAcceptance;
+      case 'APPROVED':
+        return OutboundConnectionStatusCode.approved;
       case 'PROVISIONING':
-        return OutboundCrossClusterSearchConnectionStatusCode.provisioning;
+        return OutboundConnectionStatusCode.provisioning;
       case 'ACTIVE':
-        return OutboundCrossClusterSearchConnectionStatusCode.active;
+        return OutboundConnectionStatusCode.active;
+      case 'REJECTING':
+        return OutboundConnectionStatusCode.rejecting;
       case 'REJECTED':
-        return OutboundCrossClusterSearchConnectionStatusCode.rejected;
+        return OutboundConnectionStatusCode.rejected;
       case 'DELETING':
-        return OutboundCrossClusterSearchConnectionStatusCode.deleting;
+        return OutboundConnectionStatusCode.deleting;
       case 'DELETED':
-        return OutboundCrossClusterSearchConnectionStatusCode.deleted;
+        return OutboundConnectionStatusCode.deleted;
     }
-    throw Exception(
-        '$this is not known in enum OutboundCrossClusterSearchConnectionStatusCode');
+    throw Exception('$this is not known in enum OutboundConnectionStatusCode');
   }
 }
 
@@ -5493,7 +5710,7 @@ extension on String {
 class PackageDetails {
   final String? availablePackageVersion;
 
-  /// Timestamp which tells creation date of the package.
+  /// The timestamp of when the package was created.
   final DateTime? createdAt;
 
   /// Additional information if the package is in an error state. Null otherwise.
@@ -5506,11 +5723,11 @@ class PackageDetails {
   /// Internal ID of the package.
   final String? packageID;
 
-  /// User specified name of the package.
+  /// User-specified name of the package.
   final String? packageName;
 
-  /// Current state of the package. Values are
-  /// COPYING/COPY_FAILED/AVAILABLE/DELETING/DELETE_FAILED
+  /// Current state of the package. Values are COPYING, COPY_FAILED, AVAILABLE,
+  /// DELETING, and DELETE_FAILED.
   final PackageStatus? packageStatus;
 
   /// Currently supports only TXT-DICTIONARY.
@@ -5544,10 +5761,10 @@ class PackageDetails {
   }
 }
 
-/// The S3 location for importing the package specified as
+/// The Amazon S3 location for importing the package specified as
 /// <code>S3BucketName</code> and <code>S3Key</code>
 class PackageSource {
-  /// Name of the bucket containing the package.
+  /// The name of the Amazon S3 bucket containing the package.
   final String? s3BucketName;
 
   /// Key (file name) of the package.
@@ -5650,13 +5867,13 @@ extension on String {
 
 /// Details of a package version.
 class PackageVersionHistory {
-  /// A message associated with the version.
+  /// A message associated with the package version.
   final String? commitMessage;
 
-  /// Timestamp which tells creation time of the package version.
+  /// The timestamp of when the package was created.
   final DateTime? createdAt;
 
-  /// Version of the package.
+  /// The package version.
   final String? packageVersion;
 
   PackageVersionHistory({
@@ -5673,31 +5890,30 @@ class PackageVersionHistory {
   }
 }
 
-/// Represents the output of a
-/// <code>PurchaseReservedElasticsearchInstanceOffering</code> operation.
-class PurchaseReservedElasticsearchInstanceOfferingResponse {
+/// Represents the output of a <code>PurchaseReservedInstanceOffering</code>
+/// operation.
+class PurchaseReservedInstanceOfferingResponse {
   /// The customer-specified identifier used to track this reservation.
   final String? reservationName;
 
-  /// Details of the reserved Elasticsearch instance which was purchased.
-  final String? reservedElasticsearchInstanceId;
+  /// Details of the reserved OpenSearch instance which was purchased.
+  final String? reservedInstanceId;
 
-  PurchaseReservedElasticsearchInstanceOfferingResponse({
+  PurchaseReservedInstanceOfferingResponse({
     this.reservationName,
-    this.reservedElasticsearchInstanceId,
+    this.reservedInstanceId,
   });
-  factory PurchaseReservedElasticsearchInstanceOfferingResponse.fromJson(
+  factory PurchaseReservedInstanceOfferingResponse.fromJson(
       Map<String, dynamic> json) {
-    return PurchaseReservedElasticsearchInstanceOfferingResponse(
+    return PurchaseReservedInstanceOfferingResponse(
       reservationName: json['ReservationName'] as String?,
-      reservedElasticsearchInstanceId:
-          json['ReservedElasticsearchInstanceId'] as String?,
+      reservedInstanceId: json['ReservedInstanceId'] as String?,
     );
   }
 }
 
 /// Contains the specific price and frequency of a recurring charges for a
-/// reserved Elasticsearch instance, or for a reserved Elasticsearch instance
+/// reserved OpenSearch instance, or for a reserved OpenSearch instance
 /// offering.
 class RecurringCharge {
   /// The monetary amount of the recurring charge.
@@ -5718,49 +5934,48 @@ class RecurringCharge {
   }
 }
 
-/// The result of a
-/// <code><a>RejectInboundCrossClusterSearchConnection</a></code> operation.
-/// Contains details of rejected inbound connection.
-class RejectInboundCrossClusterSearchConnectionResponse {
-  /// Specifies the <code><a>InboundCrossClusterSearchConnection</a></code> of
-  /// rejected inbound connection.
-  final InboundCrossClusterSearchConnection? crossClusterSearchConnection;
+/// The result of a <code> <a>RejectInboundConnection</a> </code> operation.
+/// Contains details about the rejected inbound connection.
+class RejectInboundConnectionResponse {
+  /// The <code> <a>InboundConnection</a> </code> of the rejected inbound
+  /// connection.
+  final InboundConnection? connection;
 
-  RejectInboundCrossClusterSearchConnectionResponse({
-    this.crossClusterSearchConnection,
+  RejectInboundConnectionResponse({
+    this.connection,
   });
-  factory RejectInboundCrossClusterSearchConnectionResponse.fromJson(
-      Map<String, dynamic> json) {
-    return RejectInboundCrossClusterSearchConnectionResponse(
-      crossClusterSearchConnection: json['CrossClusterSearchConnection'] != null
-          ? InboundCrossClusterSearchConnection.fromJson(
-              json['CrossClusterSearchConnection'] as Map<String, dynamic>)
+  factory RejectInboundConnectionResponse.fromJson(Map<String, dynamic> json) {
+    return RejectInboundConnectionResponse(
+      connection: json['Connection'] != null
+          ? InboundConnection.fromJson(
+              json['Connection'] as Map<String, dynamic>)
           : null,
     );
   }
 }
 
-/// Details of a reserved Elasticsearch instance.
-class ReservedElasticsearchInstance {
-  /// The currency code for the reserved Elasticsearch instance offering.
+/// Details of a reserved OpenSearch instance.
+class ReservedInstance {
+  final int? billingSubscriptionId;
+
+  /// The currency code for the reserved OpenSearch instance offering.
   final String? currencyCode;
 
-  /// The duration, in seconds, for which the Elasticsearch instance is reserved.
+  /// The duration, in seconds, for which the OpenSearch instance is reserved.
   final int? duration;
 
-  /// The number of Elasticsearch instances that have been reserved.
-  final int? elasticsearchInstanceCount;
-
-  /// The Elasticsearch instance type offered by the reserved instance offering.
-  final ESPartitionInstanceType? elasticsearchInstanceType;
-
   /// The upfront fixed charge you will paid to purchase the specific reserved
-  /// Elasticsearch instance offering.
+  /// OpenSearch instance offering.
   final double? fixedPrice;
 
-  /// The payment option as defined in the reserved Elasticsearch instance
-  /// offering.
-  final ReservedElasticsearchInstancePaymentOption? paymentOption;
+  /// The number of OpenSearch instances that have been reserved.
+  final int? instanceCount;
+
+  /// The OpenSearch instance type offered by the reserved instance offering.
+  final OpenSearchPartitionInstanceType? instanceType;
+
+  /// The payment option as defined in the reserved OpenSearch instance offering.
+  final ReservedInstancePaymentOption? paymentOption;
 
   /// The charge to your account regardless of whether you are creating any
   /// domains using the instance offering.
@@ -5770,55 +5985,55 @@ class ReservedElasticsearchInstance {
   final String? reservationName;
 
   /// The unique identifier for the reservation.
-  final String? reservedElasticsearchInstanceId;
+  final String? reservedInstanceId;
 
   /// The offering identifier.
-  final String? reservedElasticsearchInstanceOfferingId;
+  final String? reservedInstanceOfferingId;
 
   /// The time the reservation started.
   final DateTime? startTime;
 
-  /// The state of the reserved Elasticsearch instance.
+  /// The state of the reserved OpenSearch instance.
   final String? state;
 
   /// The rate you are charged for each hour for the domain that is using this
   /// reserved instance.
   final double? usagePrice;
 
-  ReservedElasticsearchInstance({
+  ReservedInstance({
+    this.billingSubscriptionId,
     this.currencyCode,
     this.duration,
-    this.elasticsearchInstanceCount,
-    this.elasticsearchInstanceType,
     this.fixedPrice,
+    this.instanceCount,
+    this.instanceType,
     this.paymentOption,
     this.recurringCharges,
     this.reservationName,
-    this.reservedElasticsearchInstanceId,
-    this.reservedElasticsearchInstanceOfferingId,
+    this.reservedInstanceId,
+    this.reservedInstanceOfferingId,
     this.startTime,
     this.state,
     this.usagePrice,
   });
-  factory ReservedElasticsearchInstance.fromJson(Map<String, dynamic> json) {
-    return ReservedElasticsearchInstance(
+  factory ReservedInstance.fromJson(Map<String, dynamic> json) {
+    return ReservedInstance(
+      billingSubscriptionId: json['BillingSubscriptionId'] as int?,
       currencyCode: json['CurrencyCode'] as String?,
       duration: json['Duration'] as int?,
-      elasticsearchInstanceCount: json['ElasticsearchInstanceCount'] as int?,
-      elasticsearchInstanceType: (json['ElasticsearchInstanceType'] as String?)
-          ?.toESPartitionInstanceType(),
       fixedPrice: json['FixedPrice'] as double?,
-      paymentOption: (json['PaymentOption'] as String?)
-          ?.toReservedElasticsearchInstancePaymentOption(),
+      instanceCount: json['InstanceCount'] as int?,
+      instanceType: (json['InstanceType'] as String?)
+          ?.toOpenSearchPartitionInstanceType(),
+      paymentOption:
+          (json['PaymentOption'] as String?)?.toReservedInstancePaymentOption(),
       recurringCharges: (json['RecurringCharges'] as List?)
           ?.whereNotNull()
           .map((e) => RecurringCharge.fromJson(e as Map<String, dynamic>))
           .toList(),
       reservationName: json['ReservationName'] as String?,
-      reservedElasticsearchInstanceId:
-          json['ReservedElasticsearchInstanceId'] as String?,
-      reservedElasticsearchInstanceOfferingId:
-          json['ReservedElasticsearchInstanceOfferingId'] as String?,
+      reservedInstanceId: json['ReservedInstanceId'] as String?,
+      reservedInstanceOfferingId: json['ReservedInstanceOfferingId'] as String?,
       startTime: timeStampFromJson(json['StartTime']),
       state: json['State'] as String?,
       usagePrice: json['UsagePrice'] as double?,
@@ -5826,104 +6041,100 @@ class ReservedElasticsearchInstance {
   }
 }
 
-/// Details of a reserved Elasticsearch instance offering.
-class ReservedElasticsearchInstanceOffering {
-  /// The currency code for the reserved Elasticsearch instance offering.
+/// Details of a reserved OpenSearch instance offering.
+class ReservedInstanceOffering {
+  /// The currency code for the reserved OpenSearch instance offering.
   final String? currencyCode;
 
-  /// The duration, in seconds, for which the offering will reserve the
-  /// Elasticsearch instance.
+  /// The duration, in seconds, for which the offering will reserve the OpenSearch
+  /// instance.
   final int? duration;
 
-  /// The Elasticsearch instance type offered by the reserved instance offering.
-  final ESPartitionInstanceType? elasticsearchInstanceType;
-
   /// The upfront fixed charge you will pay to purchase the specific reserved
-  /// Elasticsearch instance offering.
+  /// OpenSearch instance offering.
   final double? fixedPrice;
 
-  /// Payment option for the reserved Elasticsearch instance offering
-  final ReservedElasticsearchInstancePaymentOption? paymentOption;
+  /// The OpenSearch instance type offered by the reserved instance offering.
+  final OpenSearchPartitionInstanceType? instanceType;
+
+  /// Payment option for the reserved OpenSearch instance offering
+  final ReservedInstancePaymentOption? paymentOption;
 
   /// The charge to your account regardless of whether you are creating any
   /// domains using the instance offering.
   final List<RecurringCharge>? recurringCharges;
 
-  /// The Elasticsearch reserved instance offering identifier.
-  final String? reservedElasticsearchInstanceOfferingId;
+  /// The OpenSearch reserved instance offering identifier.
+  final String? reservedInstanceOfferingId;
 
   /// The rate you are charged for each hour the domain that is using the offering
   /// is running.
   final double? usagePrice;
 
-  ReservedElasticsearchInstanceOffering({
+  ReservedInstanceOffering({
     this.currencyCode,
     this.duration,
-    this.elasticsearchInstanceType,
     this.fixedPrice,
+    this.instanceType,
     this.paymentOption,
     this.recurringCharges,
-    this.reservedElasticsearchInstanceOfferingId,
+    this.reservedInstanceOfferingId,
     this.usagePrice,
   });
-  factory ReservedElasticsearchInstanceOffering.fromJson(
-      Map<String, dynamic> json) {
-    return ReservedElasticsearchInstanceOffering(
+  factory ReservedInstanceOffering.fromJson(Map<String, dynamic> json) {
+    return ReservedInstanceOffering(
       currencyCode: json['CurrencyCode'] as String?,
       duration: json['Duration'] as int?,
-      elasticsearchInstanceType: (json['ElasticsearchInstanceType'] as String?)
-          ?.toESPartitionInstanceType(),
       fixedPrice: json['FixedPrice'] as double?,
-      paymentOption: (json['PaymentOption'] as String?)
-          ?.toReservedElasticsearchInstancePaymentOption(),
+      instanceType: (json['InstanceType'] as String?)
+          ?.toOpenSearchPartitionInstanceType(),
+      paymentOption:
+          (json['PaymentOption'] as String?)?.toReservedInstancePaymentOption(),
       recurringCharges: (json['RecurringCharges'] as List?)
           ?.whereNotNull()
           .map((e) => RecurringCharge.fromJson(e as Map<String, dynamic>))
           .toList(),
-      reservedElasticsearchInstanceOfferingId:
-          json['ReservedElasticsearchInstanceOfferingId'] as String?,
+      reservedInstanceOfferingId: json['ReservedInstanceOfferingId'] as String?,
       usagePrice: json['UsagePrice'] as double?,
     );
   }
 }
 
-enum ReservedElasticsearchInstancePaymentOption {
+enum ReservedInstancePaymentOption {
   allUpfront,
   partialUpfront,
   noUpfront,
 }
 
-extension on ReservedElasticsearchInstancePaymentOption {
+extension on ReservedInstancePaymentOption {
   String toValue() {
     switch (this) {
-      case ReservedElasticsearchInstancePaymentOption.allUpfront:
+      case ReservedInstancePaymentOption.allUpfront:
         return 'ALL_UPFRONT';
-      case ReservedElasticsearchInstancePaymentOption.partialUpfront:
+      case ReservedInstancePaymentOption.partialUpfront:
         return 'PARTIAL_UPFRONT';
-      case ReservedElasticsearchInstancePaymentOption.noUpfront:
+      case ReservedInstancePaymentOption.noUpfront:
         return 'NO_UPFRONT';
     }
   }
 }
 
 extension on String {
-  ReservedElasticsearchInstancePaymentOption
-      toReservedElasticsearchInstancePaymentOption() {
+  ReservedInstancePaymentOption toReservedInstancePaymentOption() {
     switch (this) {
       case 'ALL_UPFRONT':
-        return ReservedElasticsearchInstancePaymentOption.allUpfront;
+        return ReservedInstancePaymentOption.allUpfront;
       case 'PARTIAL_UPFRONT':
-        return ReservedElasticsearchInstancePaymentOption.partialUpfront;
+        return ReservedInstancePaymentOption.partialUpfront;
       case 'NO_UPFRONT':
-        return ReservedElasticsearchInstancePaymentOption.noUpfront;
+        return ReservedInstancePaymentOption.noUpfront;
     }
-    throw Exception(
-        '$this is not known in enum ReservedElasticsearchInstancePaymentOption');
+    throw Exception('$this is not known in enum ReservedInstancePaymentOption');
   }
 }
 
-/// Specifies the rollback state while disabling Auto-Tune for the domain. Valid
-/// values are NO_ROLLBACK, DEFAULT_ROLLBACK.
+/// The rollback state while disabling Auto-Tune for the domain. Valid values
+/// are NO_ROLLBACK and DEFAULT_ROLLBACK.
 enum RollbackOnDisable {
   noRollback,
   defaultRollback,
@@ -5952,12 +6163,12 @@ extension on String {
   }
 }
 
-/// Specifies the SAML Identity Provider's information.
+/// The SAML identity povider's information.
 class SAMLIdp {
-  /// The unique Entity ID of the application in SAML Identity Provider.
+  /// The unique entity ID of the application in SAML identity provider.
   final String entityId;
 
-  /// The Metadata of the SAML application in xml format.
+  /// The metadata of the SAML application in XML format.
   final String metadataContent;
 
   SAMLIdp({
@@ -5981,29 +6192,29 @@ class SAMLIdp {
   }
 }
 
-/// Specifies the SAML application configuration for the domain.
+/// The SAML application configuration for the domain.
 class SAMLOptionsInput {
   /// True if SAML is enabled.
   final bool? enabled;
 
-  /// Specifies the SAML Identity Provider's information.
+  /// The SAML Identity Provider's information.
   final SAMLIdp? idp;
 
-  /// The backend role to which the SAML master user is mapped to.
+  /// The backend role that the SAML master user is mapped to.
   final String? masterBackendRole;
 
-  /// The SAML master username, which is stored in the Amazon Elasticsearch
-  /// Service domain's internal database.
+  /// The SAML master username, which is stored in the Amazon OpenSearch Service
+  /// domain's internal database.
   final String? masterUserName;
 
-  /// The key to use for matching the SAML Roles attribute.
+  /// Element of the SAML assertion to use for backend roles. Default is roles.
   final String? rolesKey;
 
   /// The duration, in minutes, after which a user session becomes inactive.
   /// Acceptable values are between 1 and 1440, and the default value is 60.
   final int? sessionTimeoutMinutes;
 
-  /// The key to use for matching the SAML Subject attribute.
+  /// Element of the SAML assertion to use for username. Default is NameID.
   final String? subjectKey;
 
   SAMLOptionsInput({
@@ -6041,16 +6252,16 @@ class SAMLOptionsOutput {
   /// True if SAML is enabled.
   final bool? enabled;
 
-  /// Describes the SAML Identity Provider's information.
+  /// Describes the SAML identity provider's information.
   final SAMLIdp? idp;
 
-  /// The key used for matching the SAML Roles attribute.
+  /// The key used for matching the SAML roles attribute.
   final String? rolesKey;
 
   /// The duration, in minutes, after which a user session becomes inactive.
   final int? sessionTimeoutMinutes;
 
-  /// The key used for matching the SAML Subject attribute.
+  /// The key used for matching the SAML subject attribute.
   final String? subjectKey;
 
   SAMLOptionsOutput({
@@ -6073,7 +6284,7 @@ class SAMLOptionsOutput {
   }
 }
 
-/// Specifies Auto-Tune action type. Valid values are JVM_HEAP_SIZE_TUNING and
+/// The Auto-Tune action type. Valid values are JVM_HEAP_SIZE_TUNING, and
 /// JVM_YOUNG_GEN_TUNING.
 enum ScheduledAutoTuneActionType {
   jvmHeapSizeTuning,
@@ -6103,21 +6314,22 @@ extension on String {
   }
 }
 
-/// Specifies details of the scheduled Auto-Tune action. See the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a> for more information.
+/// Specifies details about the scheduled Auto-Tune action. See <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+/// information.
 class ScheduledAutoTuneDetails {
-  /// Specifies Auto-Tune action description.
+  /// The Auto-Tune action description.
   final String? action;
 
-  /// Specifies Auto-Tune action type. Valid values are JVM_HEAP_SIZE_TUNING and
+  /// The Auto-Tune action type. Valid values are JVM_HEAP_SIZE_TUNING and
   /// JVM_YOUNG_GEN_TUNING.
   final ScheduledAutoTuneActionType? actionType;
 
-  /// Specifies timestamp for the Auto-Tune action scheduled for the domain.
+  /// The timestamp of the Auto-Tune action scheduled for the domain.
   final DateTime? date;
 
-  /// Specifies Auto-Tune action severity. Valid values are LOW, MEDIUM and HIGH.
+  /// The Auto-Tune action severity. Valid values are LOW, MEDIUM, and HIGH.
   final ScheduledAutoTuneSeverityType? severity;
 
   ScheduledAutoTuneDetails({
@@ -6138,7 +6350,7 @@ class ScheduledAutoTuneDetails {
   }
 }
 
-/// Specifies Auto-Tune action severity. Valid values are LOW, MEDIUM and HIGH.
+/// The Auto-Tune action severity. Valid values are LOW, MEDIUM, and HIGH.
 enum ScheduledAutoTuneSeverityType {
   low,
   medium,
@@ -6172,19 +6384,18 @@ extension on String {
   }
 }
 
-/// The current options of an Elasticsearch domain service software options.
+/// The current options of an domain service software options.
 class ServiceSoftwareOptions {
-  /// Timestamp, in Epoch time, until which you can manually request a service
+  /// The timestamp, in Epoch time, until which you can manually request a service
   /// software update. After this date, we automatically update your service
   /// software.
   final DateTime? automatedUpdateDate;
 
-  /// <code>True</code> if you are able to cancel your service software version
-  /// update. <code>False</code> if you are not able to cancel your service
-  /// software version.
+  /// <code>True</code> if you're able to cancel your service software version
+  /// update. <code>False</code> if you can't cancel your service software update.
   final bool? cancellable;
 
-  /// The current service software version that is present on the domain.
+  /// The current service software version present on the domain.
   final String? currentVersion;
 
   /// The description of the <code>UpdateStatus</code>.
@@ -6198,15 +6409,14 @@ class ServiceSoftwareOptions {
   /// <code>AutomatedUpdateDate</code>.
   final bool? optionalDeployment;
 
-  /// <code>True</code> if you are able to update you service software version.
-  /// <code>False</code> if you are not able to update your service software
-  /// version.
+  /// <code>True</code> if you're able to update your service software version.
+  /// <code>False</code> if you can't update your service software version.
   final bool? updateAvailable;
 
   /// The status of your service software update. This field can take the
-  /// following values: <code>ELIGIBLE</code>, <code>PENDING_UPDATE</code>,
-  /// <code>IN_PROGRESS</code>, <code>COMPLETED</code>, and
-  /// <code>NOT_ELIGIBLE</code>.
+  /// following values: <code> ELIGIBLE</code>, <code>PENDING_UPDATE</code>,
+  /// <code>IN_PROGRESS</code>, <code>COMPLETED</code>, and <code>
+  /// NOT_ELIGIBLE</code>.
   final DeploymentStatus? updateStatus;
 
   ServiceSoftwareOptions({
@@ -6233,13 +6443,11 @@ class ServiceSoftwareOptions {
   }
 }
 
-/// Specifies the time, in UTC format, when the service takes a daily automated
-/// snapshot of the specified Elasticsearch domain. Default value is
-/// <code>0</code> hours.
+/// The time, in UTC format, when the service takes a daily automated snapshot
+/// of the specified domain. Default is <code>0</code> hours.
 class SnapshotOptions {
-  /// Specifies the time, in UTC format, when the service takes a daily automated
-  /// snapshot of the specified Elasticsearch domain. Default value is
-  /// <code>0</code> hours.
+  /// The time, in UTC format, when the service takes a daily automated snapshot
+  /// of the specified domain. Default is <code>0</code> hours.
   final int? automatedSnapshotStartHour;
 
   SnapshotOptions({
@@ -6262,10 +6470,10 @@ class SnapshotOptions {
 
 /// Status of a daily automated snapshot.
 class SnapshotOptionsStatus {
-  /// Specifies the daily snapshot options specified for the Elasticsearch domain.
+  /// The daily snapshot options specified for the domain.
   final SnapshotOptions options;
 
-  /// Specifies the status of a daily automated snapshot.
+  /// The status of a daily automated snapshot.
   final OptionStatus status;
 
   SnapshotOptionsStatus({
@@ -6281,18 +6489,18 @@ class SnapshotOptionsStatus {
   }
 }
 
-/// The result of a <code>StartElasticsearchServiceSoftwareUpdate</code>
-/// operation. Contains the status of the update.
-class StartElasticsearchServiceSoftwareUpdateResponse {
-  /// The current status of the Elasticsearch service software update.
+/// The result of a <code>StartServiceSoftwareUpdate</code> operation. Contains
+/// the status of the update.
+class StartServiceSoftwareUpdateResponse {
+  /// The current status of the OpenSearch service software update.
   final ServiceSoftwareOptions? serviceSoftwareOptions;
 
-  StartElasticsearchServiceSoftwareUpdateResponse({
+  StartServiceSoftwareUpdateResponse({
     this.serviceSoftwareOptions,
   });
-  factory StartElasticsearchServiceSoftwareUpdateResponse.fromJson(
+  factory StartServiceSoftwareUpdateResponse.fromJson(
       Map<String, dynamic> json) {
-    return StartElasticsearchServiceSoftwareUpdateResponse(
+    return StartServiceSoftwareUpdateResponse(
       serviceSoftwareOptions: json['ServiceSoftwareOptions'] != null
           ? ServiceSoftwareOptions.fromJson(
               json['ServiceSoftwareOptions'] as Map<String, dynamic>)
@@ -6301,12 +6509,12 @@ class StartElasticsearchServiceSoftwareUpdateResponse {
   }
 }
 
-/// StorageTypes represents the list of storage related types and their
-/// attributes that are available for given InstanceType.
+/// StorageTypes represents the list of storage-related types and their
+/// attributes that are available for a given InstanceType.
 class StorageType {
   final String? storageSubTypeName;
 
-  /// List of limits that are applicable for given storage type.
+  /// Limits that are applicable for the given storage type.
   final List<StorageTypeLimit>? storageTypeLimits;
   final String? storageTypeName;
 
@@ -6327,23 +6535,23 @@ class StorageType {
   }
 }
 
-/// Limits that are applicable for given storage type.
+/// Limits that are applicable for the given storage type.
 class StorageTypeLimit {
-  /// Name of storage limits that are applicable for given storage type. If <code>
-  /// <a>StorageType</a> </code> is ebs, following storage options are applicable
-  /// <ol>
+  /// Name of storage limits that are applicable for the given storage type. If
+  /// <code> <a>StorageType</a> </code> is "ebs", the following storage options
+  /// are applicable: <ol>
   /// <li>MinimumVolumeSize</li> Minimum amount of volume size that is applicable
-  /// for given storage type.It can be empty if it is not applicable.
+  /// for the given storage type. Can be empty if not applicable.
   /// <li>MaximumVolumeSize</li> Maximum amount of volume size that is applicable
-  /// for given storage type.It can be empty if it is not applicable.
-  /// <li>MaximumIops</li> Maximum amount of Iops that is applicable for given
-  /// storage type.It can be empty if it is not applicable.
-  /// <li>MinimumIops</li> Minimum amount of Iops that is applicable for given
-  /// storage type.It can be empty if it is not applicable.
+  /// for the given storage type. Can be empty if not applicable.
+  /// <li>MaximumIops</li> Maximum amount of Iops that is applicable for given the
+  /// storage type. Can be empty if not applicable.
+  /// <li>MinimumIops</li> Minimum amount of Iops that is applicable for given the
+  /// storage type. Can be empty if not applicable.
   /// <li>MaximumThroughput</li> Maximum amount of Throughput that is applicable
-  /// for given storage type.It can be empty if it is not applicable.
+  /// for given the storage type. Can be empty if not applicable.
   /// <li>MinimumThroughput</li> Minimum amount of Throughput that is applicable
-  /// for given storage type.It can be empty if it is not applicable. </ol>
+  /// for given the storage type. Can be empty if not applicable. </ol>
   final String? limitName;
 
   /// Values for the <code> <a>StorageTypeLimit$LimitName</a> </code> .
@@ -6392,15 +6600,15 @@ extension on String {
   }
 }
 
-/// Specifies a key value pair for a resource tag.
+/// A key value pair for a resource tag.
 class Tag {
-  /// Specifies the <code>TagKey</code>, the name of the tag. Tag keys must be
-  /// unique for the Elasticsearch domain to which they are attached.
+  /// The <code>TagKey</code>, the name of the tag. Tag keys must be unique for
+  /// the domain to which they are attached.
   final String key;
 
-  /// Specifies the <code>TagValue</code>, the value assigned to the corresponding
-  /// tag key. Tag values can be null and do not have to be unique in a tag set.
-  /// For example, you can have a key value pair in a tag set of <code>project :
+  /// The <code>TagValue</code>, the value assigned to the corresponding tag key.
+  /// Tag values can be null and don't have to be unique in a tag set. For
+  /// example, you can have a key value pair in a tag set of <code>project :
   /// Trinity</code> and <code>cost-center : Trinity</code>
   final String value;
 
@@ -6425,10 +6633,10 @@ class Tag {
   }
 }
 
-/// Specifies the unit of a maintenance schedule duration. Valid value is HOUR.
-/// See the <a
-/// href="https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/auto-tune.html"
-/// target="_blank">Developer Guide</a> for more information.
+/// The unit of a maintenance schedule duration. Valid value is HOUR. See <a
+/// href="https://docs.aws.amazon.com/opensearch-service/latest/developerguide/auto-tune.html"
+/// target="_blank"> Auto-Tune for Amazon OpenSearch Service </a> for more
+/// information.
 enum TimeUnit {
   hours,
 }
@@ -6452,24 +6660,23 @@ extension on String {
   }
 }
 
-/// The result of an <code>UpdateElasticsearchDomain</code> request. Contains
-/// the status of the Elasticsearch domain being updated.
-class UpdateElasticsearchDomainConfigResponse {
-  /// The status of the updated Elasticsearch domain.
-  final ElasticsearchDomainConfig domainConfig;
+/// The result of an <code>UpdateDomain</code> request. Contains the status of
+/// the domain being updated.
+class UpdateDomainConfigResponse {
+  /// The status of the updated domain.
+  final DomainConfig domainConfig;
 
   /// Contains result of DryRun.
   final DryRunResults? dryRunResults;
 
-  UpdateElasticsearchDomainConfigResponse({
+  UpdateDomainConfigResponse({
     required this.domainConfig,
     this.dryRunResults,
   });
-  factory UpdateElasticsearchDomainConfigResponse.fromJson(
-      Map<String, dynamic> json) {
-    return UpdateElasticsearchDomainConfigResponse(
-      domainConfig: ElasticsearchDomainConfig.fromJson(
-          json['DomainConfig'] as Map<String, dynamic>),
+  factory UpdateDomainConfigResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateDomainConfigResponse(
+      domainConfig:
+          DomainConfig.fromJson(json['DomainConfig'] as Map<String, dynamic>),
       dryRunResults: json['DryRunResults'] != null
           ? DryRunResults.fromJson(
               json['DryRunResults'] as Map<String, dynamic>)
@@ -6478,10 +6685,10 @@ class UpdateElasticsearchDomainConfigResponse {
   }
 }
 
-/// Container for response returned by <code> <a>UpdatePackage</a> </code>
-/// operation.
+/// Container for the response returned by the <code> <a>UpdatePackage</a>
+/// </code> operation.
 class UpdatePackageResponse {
-  /// Information about the package <code>PackageDetails</code>.
+  /// Information about the package.
   final PackageDetails? packageDetails;
 
   UpdatePackageResponse({
@@ -6497,28 +6704,33 @@ class UpdatePackageResponse {
   }
 }
 
-/// Container for response returned by <code> <a>UpgradeElasticsearchDomain</a>
-/// </code> operation.
-class UpgradeElasticsearchDomainResponse {
+/// Container for response returned by <code> <a>UpgradeDomain</a> </code>
+/// operation.
+class UpgradeDomainResponse {
+  final Map<String, String>? advancedOptions;
   final ChangeProgressDetails? changeProgressDetails;
   final String? domainName;
 
-  /// This flag, when set to True, indicates that an Upgrade Eligibility Check
-  /// needs to be performed. This will not actually perform the Upgrade.
+  /// When true, indicates that an upgrade eligibility check needs to be
+  /// performed. Does not actually perform the upgrade.
   final bool? performCheckOnly;
 
-  /// The version of Elasticsearch that you intend to upgrade the domain to.
+  /// The version of OpenSearch that you intend to upgrade the domain to.
   final String? targetVersion;
+  final String? upgradeId;
 
-  UpgradeElasticsearchDomainResponse({
+  UpgradeDomainResponse({
+    this.advancedOptions,
     this.changeProgressDetails,
     this.domainName,
     this.performCheckOnly,
     this.targetVersion,
+    this.upgradeId,
   });
-  factory UpgradeElasticsearchDomainResponse.fromJson(
-      Map<String, dynamic> json) {
-    return UpgradeElasticsearchDomainResponse(
+  factory UpgradeDomainResponse.fromJson(Map<String, dynamic> json) {
+    return UpgradeDomainResponse(
+      advancedOptions: (json['AdvancedOptions'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
       changeProgressDetails: json['ChangeProgressDetails'] != null
           ? ChangeProgressDetails.fromJson(
               json['ChangeProgressDetails'] as Map<String, dynamic>)
@@ -6526,25 +6738,26 @@ class UpgradeElasticsearchDomainResponse {
       domainName: json['DomainName'] as String?,
       performCheckOnly: json['PerformCheckOnly'] as bool?,
       targetVersion: json['TargetVersion'] as String?,
+      upgradeId: json['UpgradeId'] as String?,
     );
   }
 }
 
-/// History of the last 10 Upgrades and Upgrade Eligibility Checks.
+/// History of the last 10 upgrades and upgrade eligibility checks.
 class UpgradeHistory {
-  /// UTC Timestamp at which the Upgrade API call was made in
+  /// UTC timestamp at which the upgrade API call was made in
   /// "yyyy-MM-ddTHH:mm:ssZ" format.
   final DateTime? startTimestamp;
 
   /// A list of <code> <a>UpgradeStepItem</a> </code> s representing information
-  /// about each step performed as pard of a specific Upgrade or Upgrade
-  /// Eligibility Check.
+  /// about each step performed as part of a specific upgrade or upgrade
+  /// eligibility check.
   final List<UpgradeStepItem>? stepsList;
 
-  /// A string that describes the update briefly
+  /// A string that briefly describes the upgrade.
   final String? upgradeName;
 
-  /// The overall status of the update. The status can take one of the following
+  /// The current status of the upgrade. The status can take one of the following
   /// values:
   /// <ul>
   /// <li>In Progress</li>
@@ -6644,19 +6857,18 @@ extension on String {
   }
 }
 
-/// Represents a single step of the Upgrade or Upgrade Eligibility Check
+/// Represents a single step of the upgrade or upgrade eligibility check
 /// workflow.
 class UpgradeStepItem {
   /// A list of strings containing detailed information about the errors
   /// encountered in a particular step.
   final List<String>? issues;
 
-  /// The Floating point value representing progress percentage of a particular
-  /// step.
+  /// The floating point value representing the progress percentage of a
+  /// particular step.
   final double? progressPercent;
 
-  /// Represents one of 3 steps that an Upgrade or Upgrade Eligibility Check does
-  /// through:
+  /// One of three steps an upgrade or upgrade eligibility check goes through:
   /// <ul>
   /// <li>PreUpgradeCheck</li>
   /// <li>Snapshot</li>
@@ -6664,8 +6876,8 @@ class UpgradeStepItem {
   /// </ul>
   final UpgradeStep? upgradeStep;
 
-  /// The status of a particular step during an upgrade. The status can take one
-  /// of the following values:
+  /// The current status of the upgrade. The status can take one of the following
+  /// values:
   /// <ul>
   /// <li>In Progress</li>
   /// <li>Succeeded</li>
@@ -6694,23 +6906,24 @@ class UpgradeStepItem {
   }
 }
 
-/// Options to specify the subnets and security groups for VPC endpoint. For
+/// Options to specify the subnets and security groups for the VPC endpoint. For
 /// more information, see <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html"
-/// target="_blank"> VPC Endpoints for Amazon Elasticsearch Service Domains</a>.
+/// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html"
+/// target="_blank"> Launching your Amazon OpenSearch Service domains using a
+/// VPC</a>.
 class VPCDerivedInfo {
-  /// The availability zones for the Elasticsearch domain. Exists only if the
-  /// domain was created with VPCOptions.
+  /// The Availability Zones for the domain. Exists only if the domain was created
+  /// with <code>VPCOptions</code>.
   final List<String>? availabilityZones;
 
-  /// Specifies the security groups for VPC endpoint.
+  /// The security groups for the VPC endpoint.
   final List<String>? securityGroupIds;
 
-  /// Specifies the subnets for VPC endpoint.
+  /// The subnets for the VPC endpoint.
   final List<String>? subnetIds;
 
-  /// The VPC Id for the Elasticsearch domain. Exists only if the domain was
-  /// created with VPCOptions.
+  /// The VPC ID for the domain. Exists only if the domain was created with
+  /// <code>VPCOptions</code>.
   final String? vPCId;
 
   VPCDerivedInfo({
@@ -6738,13 +6951,12 @@ class VPCDerivedInfo {
   }
 }
 
-/// Status of the VPC options for the specified Elasticsearch domain.
+/// Status of the VPC options for the specified domain.
 class VPCDerivedInfoStatus {
-  /// Specifies the VPC options for the specified Elasticsearch domain.
+  /// The VPC options for the specified domain.
   final VPCDerivedInfo options;
 
-  /// Specifies the status of the VPC options for the specified Elasticsearch
-  /// domain.
+  /// The status of the VPC options for the specified domain.
   final OptionStatus status;
 
   VPCDerivedInfoStatus({
@@ -6759,15 +6971,16 @@ class VPCDerivedInfoStatus {
   }
 }
 
-/// Options to specify the subnets and security groups for VPC endpoint. For
+/// Options to specify the subnets and security groups for the VPC endpoint. For
 /// more information, see <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html"
-/// target="_blank"> VPC Endpoints for Amazon Elasticsearch Service Domains</a>.
+/// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/vpc.html"
+/// target="_blank"> Launching your Amazon OpenSearch Service domains using a
+/// VPC</a>.
 class VPCOptions {
-  /// Specifies the security groups for VPC endpoint.
+  /// The security groups for the VPC endpoint.
   final List<String>? securityGroupIds;
 
-  /// Specifies the subnets for VPC endpoint.
+  /// The subnets for the VPC endpoint.
   final List<String>? subnetIds;
 
   VPCOptions({
@@ -6784,9 +6997,31 @@ class VPCOptions {
   }
 }
 
+/// The status of the OpenSearch version options for the specified OpenSearch
+/// domain.
+class VersionStatus {
+  /// The OpenSearch version for the specified OpenSearch domain.
+  final String options;
+
+  /// The status of the OpenSearch version options for the specified OpenSearch
+  /// domain.
+  final OptionStatus status;
+
+  VersionStatus({
+    required this.options,
+    required this.status,
+  });
+  factory VersionStatus.fromJson(Map<String, dynamic> json) {
+    return VersionStatus(
+      options: json['Options'] as String,
+      status: OptionStatus.fromJson(json['Status'] as Map<String, dynamic>),
+    );
+  }
+}
+
 /// The type of EBS volume, standard, gp2, gp3 or io1. See <a
-/// href="http://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html#es-createdomain-configure-ebs"
-/// target="_blank">Configuring EBS-based Storage</a>for more information.
+/// href="http://docs.aws.amazon.com/opensearch-service/latest/developerguide/opensearch-createupdatedomains.html#opensearch-createdomain-configure-ebs"
+/// target="_blank">Configuring EBS-based Storage</a> for more information.
 enum VolumeType {
   standard,
   gp2,
@@ -6825,12 +7060,12 @@ extension on String {
   }
 }
 
-/// Specifies the zone awareness configuration for the domain cluster, such as
-/// the number of availability zones.
+/// The zone awareness configuration for the domain cluster, such as the number
+/// of availability zones.
 class ZoneAwarenessConfig {
   /// An integer value to indicate the number of availability zones for a domain
   /// when zone awareness is enabled. This should be equal to number of subnets if
-  /// VPC endpoints is enabled
+  /// VPC endpoints is enabled.
   final int? availabilityZoneCount;
 
   ZoneAwarenessConfig({

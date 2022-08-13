@@ -3,11 +3,12 @@
 **Generated Dart library from API specification**
 
 *About the service:*
-GameLift provides solutions for hosting session-based multiplayer game
-servers in the cloud, including tools for deploying, operating, and scaling
-game servers. Built on AWS global computing infrastructure, GameLift helps
-you deliver high-performance, high-reliability, low-cost game servers while
-dynamically scaling your resource usage to meet player demand.
+Amazon Web Services provides solutions for hosting session-based multiplayer
+game servers in the cloud, including tools for deploying, operating, and
+scaling game servers. Built on Amazon Web Services global computing
+infrastructure, GameLift helps you deliver high-performance,
+high-reliability, low-cost game servers while dynamically scaling your
+resource usage to meet player demand.
 
 ## Links
 

@@ -99,6 +99,10 @@ class RoboMaker {
   }
 
   /// Cancels the specified deployment job.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -107,6 +111,7 @@ class RoboMaker {
   ///
   /// Parameter [job] :
   /// The deployment job ARN to cancel.
+  @Deprecated('Deprecated')
   Future<void> cancelDeploymentJob({
     required String job,
   }) async {
@@ -256,7 +261,9 @@ class RoboMaker {
   }
 
   /// Deploys a specific version of a robot application to robots in a fleet.
-  ///
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
   /// The robot application must have a numbered <code>applicationVersion</code>
   /// for consistency reasons. To create a new version, use
   /// <code>CreateRobotApplicationVersion</code> or see <a
@@ -291,6 +298,7 @@ class RoboMaker {
   /// Parameter [tags] :
   /// A map that contains tag keys and tag values that are attached to the
   /// deployment job.
+  @Deprecated('Deprecated')
   Future<CreateDeploymentJobResponse> createDeploymentJob({
     required List<DeploymentApplicationConfig> deploymentApplicationConfigs,
     required String fleet,
@@ -332,6 +340,9 @@ class RoboMaker {
 
   /// Creates a fleet, a logical group of robots running the same robot
   /// application.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InternalServerException].
@@ -344,6 +355,7 @@ class RoboMaker {
   /// Parameter [tags] :
   /// A map that contains tag keys and tag values that are attached to the
   /// fleet.
+  @Deprecated('Deprecated')
   Future<CreateFleetResponse> createFleet({
     required String name,
     Map<String, String>? tags,
@@ -370,6 +382,9 @@ class RoboMaker {
   }
 
   /// Creates a robot.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InternalServerException].
@@ -389,6 +404,7 @@ class RoboMaker {
   /// Parameter [tags] :
   /// A map that contains tag keys and tag values that are attached to the
   /// robot.
+  @Deprecated('Deprecated')
   Future<CreateRobotResponse> createRobot({
     required Architecture architecture,
     required String greengrassGroupId,
@@ -443,6 +459,10 @@ class RoboMaker {
   /// The robot software suite (ROS distribuition) used by the robot
   /// application.
   ///
+  /// Parameter [environment] :
+  /// The object that contains that URI of the Docker image that you use for
+  /// your robot application.
+  ///
   /// Parameter [sources] :
   /// The sources of the robot application.
   ///
@@ -452,7 +472,8 @@ class RoboMaker {
   Future<CreateRobotApplicationResponse> createRobotApplication({
     required String name,
     required RobotSoftwareSuite robotSoftwareSuite,
-    required List<SourceConfig> sources,
+    Environment? environment,
+    List<SourceConfig>? sources,
     Map<String, String>? tags,
   }) async {
     ArgumentError.checkNotNull(name, 'name');
@@ -464,11 +485,11 @@ class RoboMaker {
       isRequired: true,
     );
     ArgumentError.checkNotNull(robotSoftwareSuite, 'robotSoftwareSuite');
-    ArgumentError.checkNotNull(sources, 'sources');
     final $payload = <String, dynamic>{
       'name': name,
       'robotSoftwareSuite': robotSoftwareSuite,
-      'sources': sources,
+      if (environment != null) 'environment': environment,
+      if (sources != null) 'sources': sources,
       if (tags != null) 'tags': tags,
     };
     final response = await _protocol.send(
@@ -494,9 +515,19 @@ class RoboMaker {
   /// Parameter [currentRevisionId] :
   /// The current revision id for the robot application. If you provide a value
   /// and it matches the latest revision ID, a new version will be created.
+  ///
+  /// Parameter [imageDigest] :
+  /// A SHA256 identifier for the Docker image that you use for your robot
+  /// application.
+  ///
+  /// Parameter [s3Etags] :
+  /// The Amazon S3 identifier for the zip file bundle that you use for your
+  /// robot application.
   Future<CreateRobotApplicationVersionResponse> createRobotApplicationVersion({
     required String application,
     String? currentRevisionId,
+    String? imageDigest,
+    List<String>? s3Etags,
   }) async {
     ArgumentError.checkNotNull(application, 'application');
     _s.validateStringLength(
@@ -512,9 +543,17 @@ class RoboMaker {
       1,
       40,
     );
+    _s.validateStringLength(
+      'imageDigest',
+      imageDigest,
+      0,
+      72,
+    );
     final $payload = <String, dynamic>{
       'application': application,
       if (currentRevisionId != null) 'currentRevisionId': currentRevisionId,
+      if (imageDigest != null) 'imageDigest': imageDigest,
+      if (s3Etags != null) 's3Etags': s3Etags,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -544,11 +583,15 @@ class RoboMaker {
   /// Parameter [simulationSoftwareSuite] :
   /// The simulation software suite used by the simulation application.
   ///
-  /// Parameter [sources] :
-  /// The sources of the simulation application.
+  /// Parameter [environment] :
+  /// The object that contains the Docker image URI used to create your
+  /// simulation application.
   ///
   /// Parameter [renderingEngine] :
   /// The rendering engine for the simulation application.
+  ///
+  /// Parameter [sources] :
+  /// The sources of the simulation application.
   ///
   /// Parameter [tags] :
   /// A map that contains tag keys and tag values that are attached to the
@@ -557,8 +600,9 @@ class RoboMaker {
     required String name,
     required RobotSoftwareSuite robotSoftwareSuite,
     required SimulationSoftwareSuite simulationSoftwareSuite,
-    required List<SourceConfig> sources,
+    Environment? environment,
     RenderingEngine? renderingEngine,
+    List<SourceConfig>? sources,
     Map<String, String>? tags,
   }) async {
     ArgumentError.checkNotNull(name, 'name');
@@ -572,13 +616,13 @@ class RoboMaker {
     ArgumentError.checkNotNull(robotSoftwareSuite, 'robotSoftwareSuite');
     ArgumentError.checkNotNull(
         simulationSoftwareSuite, 'simulationSoftwareSuite');
-    ArgumentError.checkNotNull(sources, 'sources');
     final $payload = <String, dynamic>{
       'name': name,
       'robotSoftwareSuite': robotSoftwareSuite,
       'simulationSoftwareSuite': simulationSoftwareSuite,
-      'sources': sources,
+      if (environment != null) 'environment': environment,
       if (renderingEngine != null) 'renderingEngine': renderingEngine,
+      if (sources != null) 'sources': sources,
       if (tags != null) 'tags': tags,
     };
     final response = await _protocol.send(
@@ -605,10 +649,20 @@ class RoboMaker {
   /// The current revision id for the simulation application. If you provide a
   /// value and it matches the latest revision ID, a new version will be
   /// created.
+  ///
+  /// Parameter [imageDigest] :
+  /// The SHA256 digest used to identify the Docker image URI used to created
+  /// the simulation application.
+  ///
+  /// Parameter [s3Etags] :
+  /// The Amazon S3 eTag identifier for the zip file bundle that you use to
+  /// create the simulation application.
   Future<CreateSimulationApplicationVersionResponse>
       createSimulationApplicationVersion({
     required String application,
     String? currentRevisionId,
+    String? imageDigest,
+    List<String>? s3Etags,
   }) async {
     ArgumentError.checkNotNull(application, 'application');
     _s.validateStringLength(
@@ -624,9 +678,17 @@ class RoboMaker {
       1,
       40,
     );
+    _s.validateStringLength(
+      'imageDigest',
+      imageDigest,
+      0,
+      72,
+    );
     final $payload = <String, dynamic>{
       'application': application,
       if (currentRevisionId != null) 'currentRevisionId': currentRevisionId,
+      if (imageDigest != null) 'imageDigest': imageDigest,
+      if (s3Etags != null) 's3Etags': s3Etags,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -680,7 +742,8 @@ class RoboMaker {
   /// Parameter [failureBehavior] :
   /// The failure behavior the simulation job.
   /// <dl> <dt>Continue</dt> <dd>
-  /// Restart the simulation job in the same host instance.
+  /// Leaves the instance running for its maximum timeout duration after a
+  /// <code>4XX</code> error code.
   /// </dd> <dt>Fail</dt> <dd>
   /// Stop the simulation job and terminate the instance.
   /// </dd> </dl>
@@ -956,6 +1019,10 @@ class RoboMaker {
   }
 
   /// Deletes a fleet.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InternalServerException].
@@ -963,6 +1030,7 @@ class RoboMaker {
   ///
   /// Parameter [fleet] :
   /// The Amazon Resource Name (ARN) of the fleet.
+  @Deprecated('Deprecated')
   Future<void> deleteFleet({
     required String fleet,
   }) async {
@@ -986,6 +1054,10 @@ class RoboMaker {
   }
 
   /// Deletes a robot.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InternalServerException].
@@ -993,6 +1065,7 @@ class RoboMaker {
   ///
   /// Parameter [robot] :
   /// The Amazon Resource Name (ARN) of the robot.
+  @Deprecated('Deprecated')
   Future<void> deleteRobot({
     required String robot,
   }) async {
@@ -1129,6 +1202,10 @@ class RoboMaker {
   }
 
   /// Deregisters a robot.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InternalServerException].
@@ -1140,6 +1217,7 @@ class RoboMaker {
   ///
   /// Parameter [robot] :
   /// The Amazon Resource Name (ARN) of the robot.
+  @Deprecated('Deprecated')
   Future<DeregisterRobotResponse> deregisterRobot({
     required String fleet,
     required String robot,
@@ -1174,6 +1252,10 @@ class RoboMaker {
   }
 
   /// Describes a deployment job.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -1182,6 +1264,7 @@ class RoboMaker {
   ///
   /// Parameter [job] :
   /// The Amazon Resource Name (ARN) of the deployment job.
+  @Deprecated('Deprecated')
   Future<DescribeDeploymentJobResponse> describeDeploymentJob({
     required String job,
   }) async {
@@ -1206,6 +1289,10 @@ class RoboMaker {
   }
 
   /// Describes a fleet.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -1214,6 +1301,7 @@ class RoboMaker {
   ///
   /// Parameter [fleet] :
   /// The Amazon Resource Name (ARN) of the fleet.
+  @Deprecated('Deprecated')
   Future<DescribeFleetResponse> describeFleet({
     required String fleet,
   }) async {
@@ -1238,6 +1326,10 @@ class RoboMaker {
   }
 
   /// Describes a robot.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -1246,6 +1338,7 @@ class RoboMaker {
   ///
   /// Parameter [robot] :
   /// The Amazon Resource Name (ARN) of the robot to be described.
+  @Deprecated('Deprecated')
   Future<DescribeRobotResponse> describeRobot({
     required String robot,
   }) async {
@@ -1589,6 +1682,10 @@ class RoboMaker {
 
   /// Returns a list of deployment jobs for a fleet. You can optionally provide
   /// filters to retrieve specific deployment jobs.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -1622,6 +1719,7 @@ class RoboMaker {
   /// object's <code>nextToken</code> parameter. If there are no remaining
   /// results, the previous response object's NextToken parameter is set to
   /// null.
+  @Deprecated('Deprecated')
   Future<ListDeploymentJobsResponse> listDeploymentJobs({
     List<Filter>? filters,
     int? maxResults,
@@ -1649,6 +1747,10 @@ class RoboMaker {
 
   /// Returns a list of fleets. You can optionally provide filters to retrieve
   /// specific fleets.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -1684,6 +1786,7 @@ class RoboMaker {
   /// This token should be treated as an opaque identifier that is only used to
   /// retrieve the next items in a list and not for other programmatic purposes.
   /// </note>
+  @Deprecated('Deprecated')
   Future<ListFleetsResponse> listFleets({
     List<Filter>? filters,
     int? maxResults,
@@ -1779,6 +1882,10 @@ class RoboMaker {
 
   /// Returns a list of robots. You can optionally provide filters to retrieve
   /// specific robots.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -1812,6 +1919,7 @@ class RoboMaker {
   /// object's <code>nextToken</code> parameter. If there are no remaining
   /// results, the previous response object's NextToken parameter is set to
   /// null.
+  @Deprecated('Deprecated')
   Future<ListRobotsResponse> listRobots({
     List<Filter>? filters,
     int? maxResults,
@@ -2252,6 +2360,9 @@ class RoboMaker {
   }
 
   /// Registers a robot with a fleet.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InternalServerException].
@@ -2264,6 +2375,7 @@ class RoboMaker {
   ///
   /// Parameter [robot] :
   /// The Amazon Resource Name (ARN) of the robot.
+  @Deprecated('Deprecated')
   Future<RegisterRobotResponse> registerRobot({
     required String fleet,
     required String robot,
@@ -2382,6 +2494,10 @@ class RoboMaker {
 
   /// Syncrhonizes robots in a fleet to the latest deployment. This is helpful
   /// if robots were added after a deployment.
+  /// <important>
+  /// This API will no longer be supported as of May 2, 2022. Use it to remove
+  /// resources that were created for Deployment Service.
+  /// </important>
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
@@ -2397,6 +2513,7 @@ class RoboMaker {
   /// Parameter [clientRequestToken] :
   /// Unique, case-sensitive identifier that you provide to ensure the
   /// idempotency of the request.
+  @Deprecated('Deprecated')
   Future<SyncDeploymentJobResponse> syncDeploymentJob({
     required String fleet,
     String? clientRequestToken,
@@ -2533,16 +2650,20 @@ class RoboMaker {
   /// Parameter [robotSoftwareSuite] :
   /// The robot software suite (ROS distribution) used by the robot application.
   ///
-  /// Parameter [sources] :
-  /// The sources of the robot application.
-  ///
   /// Parameter [currentRevisionId] :
   /// The revision id for the robot application.
+  ///
+  /// Parameter [environment] :
+  /// The object that contains the Docker image URI for your robot application.
+  ///
+  /// Parameter [sources] :
+  /// The sources of the robot application.
   Future<UpdateRobotApplicationResponse> updateRobotApplication({
     required String application,
     required RobotSoftwareSuite robotSoftwareSuite,
-    required List<SourceConfig> sources,
     String? currentRevisionId,
+    Environment? environment,
+    List<SourceConfig>? sources,
   }) async {
     ArgumentError.checkNotNull(application, 'application');
     _s.validateStringLength(
@@ -2553,7 +2674,6 @@ class RoboMaker {
       isRequired: true,
     );
     ArgumentError.checkNotNull(robotSoftwareSuite, 'robotSoftwareSuite');
-    ArgumentError.checkNotNull(sources, 'sources');
     _s.validateStringLength(
       'currentRevisionId',
       currentRevisionId,
@@ -2563,8 +2683,9 @@ class RoboMaker {
     final $payload = <String, dynamic>{
       'application': application,
       'robotSoftwareSuite': robotSoftwareSuite,
-      'sources': sources,
       if (currentRevisionId != null) 'currentRevisionId': currentRevisionId,
+      if (environment != null) 'environment': environment,
+      if (sources != null) 'sources': sources,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -2592,21 +2713,26 @@ class RoboMaker {
   /// Parameter [simulationSoftwareSuite] :
   /// The simulation software suite used by the simulation application.
   ///
-  /// Parameter [sources] :
-  /// The sources of the simulation application.
-  ///
   /// Parameter [currentRevisionId] :
   /// The revision id for the robot application.
   ///
+  /// Parameter [environment] :
+  /// The object that contains the Docker image URI for your simulation
+  /// application.
+  ///
   /// Parameter [renderingEngine] :
   /// The rendering engine for the simulation application.
+  ///
+  /// Parameter [sources] :
+  /// The sources of the simulation application.
   Future<UpdateSimulationApplicationResponse> updateSimulationApplication({
     required String application,
     required RobotSoftwareSuite robotSoftwareSuite,
     required SimulationSoftwareSuite simulationSoftwareSuite,
-    required List<SourceConfig> sources,
     String? currentRevisionId,
+    Environment? environment,
     RenderingEngine? renderingEngine,
+    List<SourceConfig>? sources,
   }) async {
     ArgumentError.checkNotNull(application, 'application');
     _s.validateStringLength(
@@ -2619,7 +2745,6 @@ class RoboMaker {
     ArgumentError.checkNotNull(robotSoftwareSuite, 'robotSoftwareSuite');
     ArgumentError.checkNotNull(
         simulationSoftwareSuite, 'simulationSoftwareSuite');
-    ArgumentError.checkNotNull(sources, 'sources');
     _s.validateStringLength(
       'currentRevisionId',
       currentRevisionId,
@@ -2630,9 +2755,10 @@ class RoboMaker {
       'application': application,
       'robotSoftwareSuite': robotSoftwareSuite,
       'simulationSoftwareSuite': simulationSoftwareSuite,
-      'sources': sources,
       if (currentRevisionId != null) 'currentRevisionId': currentRevisionId,
+      if (environment != null) 'environment': environment,
       if (renderingEngine != null) 'renderingEngine': renderingEngine,
+      if (sources != null) 'sources': sources,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -2821,6 +2947,7 @@ class BatchPolicy {
   }
 }
 
+@deprecated
 class CancelDeploymentJobResponse {
   CancelDeploymentJobResponse();
   factory CancelDeploymentJobResponse.fromJson(Map<String, dynamic> _) {
@@ -2858,24 +2985,39 @@ class CancelWorldGenerationJobResponse {
 
 /// Compute information for the simulation job.
 class Compute {
+  /// Compute type information for the simulation job.
+  final ComputeType? computeType;
+
+  /// Compute GPU unit limit for the simulation job. It is the same as the number
+  /// of GPUs allocated to the SimulationJob.
+  final int? gpuUnitLimit;
+
   /// The simulation unit limit. Your simulation is allocated CPU and memory
   /// proportional to the supplied simulation unit limit. A simulation unit is 1
   /// vcpu and 2GB of memory. You are only billed for the SU utilization you
-  /// consume up to the maximim value provided. The default is 15.
+  /// consume up to the maximum value provided. The default is 15.
   final int? simulationUnitLimit;
 
   Compute({
+    this.computeType,
+    this.gpuUnitLimit,
     this.simulationUnitLimit,
   });
   factory Compute.fromJson(Map<String, dynamic> json) {
     return Compute(
+      computeType: (json['computeType'] as String?)?.toComputeType(),
+      gpuUnitLimit: json['gpuUnitLimit'] as int?,
       simulationUnitLimit: json['simulationUnitLimit'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final computeType = this.computeType;
+    final gpuUnitLimit = this.gpuUnitLimit;
     final simulationUnitLimit = this.simulationUnitLimit;
     return {
+      if (computeType != null) 'computeType': computeType.toValue(),
+      if (gpuUnitLimit != null) 'gpuUnitLimit': gpuUnitLimit,
       if (simulationUnitLimit != null)
         'simulationUnitLimit': simulationUnitLimit,
     };
@@ -2884,22 +3026,62 @@ class Compute {
 
 /// Compute information for the simulation job
 class ComputeResponse {
+  /// Compute type response information for the simulation job.
+  final ComputeType? computeType;
+
+  /// Compute GPU unit limit for the simulation job. It is the same as the number
+  /// of GPUs allocated to the SimulationJob.
+  final int? gpuUnitLimit;
+
   /// The simulation unit limit. Your simulation is allocated CPU and memory
   /// proportional to the supplied simulation unit limit. A simulation unit is 1
   /// vcpu and 2GB of memory. You are only billed for the SU utilization you
-  /// consume up to the maximim value provided. The default is 15.
+  /// consume up to the maximum value provided. The default is 15.
   final int? simulationUnitLimit;
 
   ComputeResponse({
+    this.computeType,
+    this.gpuUnitLimit,
     this.simulationUnitLimit,
   });
   factory ComputeResponse.fromJson(Map<String, dynamic> json) {
     return ComputeResponse(
+      computeType: (json['computeType'] as String?)?.toComputeType(),
+      gpuUnitLimit: json['gpuUnitLimit'] as int?,
       simulationUnitLimit: json['simulationUnitLimit'] as int?,
     );
   }
 }
 
+enum ComputeType {
+  cpu,
+  gpuAndCpu,
+}
+
+extension on ComputeType {
+  String toValue() {
+    switch (this) {
+      case ComputeType.cpu:
+        return 'CPU';
+      case ComputeType.gpuAndCpu:
+        return 'GPU_AND_CPU';
+    }
+  }
+}
+
+extension on String {
+  ComputeType toComputeType() {
+    switch (this) {
+      case 'CPU':
+        return ComputeType.cpu;
+      case 'GPU_AND_CPU':
+        return ComputeType.gpuAndCpu;
+    }
+    throw Exception('$this is not known in enum ComputeType');
+  }
+}
+
+@deprecated
 class CreateDeploymentJobResponse {
   /// The Amazon Resource Name (ARN) of the deployment job.
   final String? arn;
@@ -2998,6 +3180,7 @@ class CreateDeploymentJobResponse {
   }
 }
 
+@deprecated
 class CreateFleetResponse {
   /// The Amazon Resource Name (ARN) of the fleet.
   final String? arn;
@@ -3032,6 +3215,10 @@ class CreateRobotApplicationResponse {
   /// The Amazon Resource Name (ARN) of the robot application.
   final String? arn;
 
+  /// An object that contains the Docker image URI used to a create your robot
+  /// application.
+  final Environment? environment;
+
   /// The time, in milliseconds since the epoch, when the robot application was
   /// last updated.
   final DateTime? lastUpdatedAt;
@@ -3056,6 +3243,7 @@ class CreateRobotApplicationResponse {
 
   CreateRobotApplicationResponse({
     this.arn,
+    this.environment,
     this.lastUpdatedAt,
     this.name,
     this.revisionId,
@@ -3067,6 +3255,9 @@ class CreateRobotApplicationResponse {
   factory CreateRobotApplicationResponse.fromJson(Map<String, dynamic> json) {
     return CreateRobotApplicationResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       revisionId: json['revisionId'] as String?,
@@ -3089,6 +3280,10 @@ class CreateRobotApplicationVersionResponse {
   /// The Amazon Resource Name (ARN) of the robot application.
   final String? arn;
 
+  /// The object that contains the Docker image URI used to create your robot
+  /// application.
+  final Environment? environment;
+
   /// The time, in milliseconds since the epoch, when the robot application was
   /// last updated.
   final DateTime? lastUpdatedAt;
@@ -3110,6 +3305,7 @@ class CreateRobotApplicationVersionResponse {
 
   CreateRobotApplicationVersionResponse({
     this.arn,
+    this.environment,
     this.lastUpdatedAt,
     this.name,
     this.revisionId,
@@ -3121,6 +3317,9 @@ class CreateRobotApplicationVersionResponse {
       Map<String, dynamic> json) {
     return CreateRobotApplicationVersionResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       revisionId: json['revisionId'] as String?,
@@ -3137,6 +3336,7 @@ class CreateRobotApplicationVersionResponse {
   }
 }
 
+@deprecated
 class CreateRobotResponse {
   /// The target architecture of the robot.
   final Architecture? architecture;
@@ -3182,6 +3382,10 @@ class CreateSimulationApplicationResponse {
   /// The Amazon Resource Name (ARN) of the simulation application.
   final String? arn;
 
+  /// The object that contains the Docker image URI that you used to create your
+  /// simulation application.
+  final Environment? environment;
+
   /// The time, in milliseconds since the epoch, when the simulation application
   /// was last updated.
   final DateTime? lastUpdatedAt;
@@ -3212,6 +3416,7 @@ class CreateSimulationApplicationResponse {
 
   CreateSimulationApplicationResponse({
     this.arn,
+    this.environment,
     this.lastUpdatedAt,
     this.name,
     this.renderingEngine,
@@ -3226,6 +3431,9 @@ class CreateSimulationApplicationResponse {
       Map<String, dynamic> json) {
     return CreateSimulationApplicationResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       renderingEngine: json['renderingEngine'] != null
@@ -3256,6 +3464,10 @@ class CreateSimulationApplicationVersionResponse {
   /// The Amazon Resource Name (ARN) of the simulation application.
   final String? arn;
 
+  /// The object that contains the Docker image URI used to create the simulation
+  /// application.
+  final Environment? environment;
+
   /// The time, in milliseconds since the epoch, when the simulation application
   /// was last updated.
   final DateTime? lastUpdatedAt;
@@ -3283,6 +3495,7 @@ class CreateSimulationApplicationVersionResponse {
 
   CreateSimulationApplicationVersionResponse({
     this.arn,
+    this.environment,
     this.lastUpdatedAt,
     this.name,
     this.renderingEngine,
@@ -3296,6 +3509,9 @@ class CreateSimulationApplicationVersionResponse {
       Map<String, dynamic> json) {
     return CreateSimulationApplicationVersionResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       renderingEngine: json['renderingEngine'] != null
@@ -3697,6 +3913,22 @@ class CreateWorldTemplateResponse {
 
 /// Information about a data source.
 class DataSource {
+  /// The location where your files are mounted in the container image.
+  ///
+  /// If you've specified the <code>type</code> of the data source as an
+  /// <code>Archive</code>, you must provide an Amazon S3 object key to your
+  /// archive. The object key must point to either a <code>.zip</code> or
+  /// <code>.tar.gz</code> file.
+  ///
+  /// If you've specified the <code>type</code> of the data source as a
+  /// <code>Prefix</code>, you provide the Amazon S3 prefix that points to the
+  /// files that you are using for your data source.
+  ///
+  /// If you've specified the <code>type</code> of the data source as a
+  /// <code>File</code>, you provide the Amazon S3 path to the file that you're
+  /// using as your data source.
+  final String? destination;
+
   /// The name of the data source.
   final String? name;
 
@@ -3706,19 +3938,30 @@ class DataSource {
   /// The list of S3 keys identifying the data source files.
   final List<S3KeyOutput>? s3Keys;
 
+  /// The data type for the data source that you're using for your container image
+  /// or simulation job. You can use this field to specify whether your data
+  /// source is an Archive, an Amazon S3 prefix, or a file.
+  ///
+  /// If you don't specify a field, the default value is <code>File</code>.
+  final DataSourceType? type;
+
   DataSource({
+    this.destination,
     this.name,
     this.s3Bucket,
     this.s3Keys,
+    this.type,
   });
   factory DataSource.fromJson(Map<String, dynamic> json) {
     return DataSource(
+      destination: json['destination'] as String?,
       name: json['name'] as String?,
       s3Bucket: json['s3Bucket'] as String?,
       s3Keys: (json['s3Keys'] as List?)
           ?.whereNotNull()
           .map((e) => S3KeyOutput.fromJson(e as Map<String, dynamic>))
           .toList(),
+      type: (json['type'] as String?)?.toDataSourceType(),
     );
   }
 }
@@ -3734,10 +3977,35 @@ class DataSourceConfig {
   /// The list of S3 keys identifying the data source files.
   final List<String> s3Keys;
 
+  /// The location where your files are mounted in the container image.
+  ///
+  /// If you've specified the <code>type</code> of the data source as an
+  /// <code>Archive</code>, you must provide an Amazon S3 object key to your
+  /// archive. The object key must point to either a <code>.zip</code> or
+  /// <code>.tar.gz</code> file.
+  ///
+  /// If you've specified the <code>type</code> of the data source as a
+  /// <code>Prefix</code>, you provide the Amazon S3 prefix that points to the
+  /// files that you are using for your data source.
+  ///
+  /// If you've specified the <code>type</code> of the data source as a
+  /// <code>File</code>, you provide the Amazon S3 path to the file that you're
+  /// using as your data source.
+  final String? destination;
+
+  /// The data type for the data source that you're using for your container image
+  /// or simulation job. You can use this field to specify whether your data
+  /// source is an Archive, an Amazon S3 prefix, or a file.
+  ///
+  /// If you don't specify a field, the default value is <code>File</code>.
+  final DataSourceType? type;
+
   DataSourceConfig({
     required this.name,
     required this.s3Bucket,
     required this.s3Keys,
+    this.destination,
+    this.type,
   });
   factory DataSourceConfig.fromJson(Map<String, dynamic> json) {
     return DataSourceConfig(
@@ -3747,6 +4015,8 @@ class DataSourceConfig {
           .whereNotNull()
           .map((e) => e as String)
           .toList(),
+      destination: json['destination'] as String?,
+      type: (json['type'] as String?)?.toDataSourceType(),
     );
   }
 
@@ -3754,14 +4024,52 @@ class DataSourceConfig {
     final name = this.name;
     final s3Bucket = this.s3Bucket;
     final s3Keys = this.s3Keys;
+    final destination = this.destination;
+    final type = this.type;
     return {
       'name': name,
       's3Bucket': s3Bucket,
       's3Keys': s3Keys,
+      if (destination != null) 'destination': destination,
+      if (type != null) 'type': type.toValue(),
     };
   }
 }
 
+enum DataSourceType {
+  prefix,
+  archive,
+  file,
+}
+
+extension on DataSourceType {
+  String toValue() {
+    switch (this) {
+      case DataSourceType.prefix:
+        return 'Prefix';
+      case DataSourceType.archive:
+        return 'Archive';
+      case DataSourceType.file:
+        return 'File';
+    }
+  }
+}
+
+extension on String {
+  DataSourceType toDataSourceType() {
+    switch (this) {
+      case 'Prefix':
+        return DataSourceType.prefix;
+      case 'Archive':
+        return DataSourceType.archive;
+      case 'File':
+        return DataSourceType.file;
+    }
+    throw Exception('$this is not known in enum DataSourceType');
+  }
+}
+
+@deprecated
 class DeleteFleetResponse {
   DeleteFleetResponse();
   factory DeleteFleetResponse.fromJson(Map<String, dynamic> _) {
@@ -3776,6 +4084,7 @@ class DeleteRobotApplicationResponse {
   }
 }
 
+@deprecated
 class DeleteRobotResponse {
   DeleteRobotResponse();
   factory DeleteRobotResponse.fromJson(Map<String, dynamic> _) {
@@ -3967,7 +4276,11 @@ enum DeploymentJobErrorCode {
   postLaunchFileFailure,
   badPermissionError,
   downloadConditionFailed,
+  badLambdaAssociated,
   internalServerError,
+  robotApplicationDoesNotExist,
+  deploymentFleetDoesNotExist,
+  fleetDeploymentTimeout,
 }
 
 extension on DeploymentJobErrorCode {
@@ -4011,8 +4324,16 @@ extension on DeploymentJobErrorCode {
         return 'BadPermissionError';
       case DeploymentJobErrorCode.downloadConditionFailed:
         return 'DownloadConditionFailed';
+      case DeploymentJobErrorCode.badLambdaAssociated:
+        return 'BadLambdaAssociated';
       case DeploymentJobErrorCode.internalServerError:
         return 'InternalServerError';
+      case DeploymentJobErrorCode.robotApplicationDoesNotExist:
+        return 'RobotApplicationDoesNotExist';
+      case DeploymentJobErrorCode.deploymentFleetDoesNotExist:
+        return 'DeploymentFleetDoesNotExist';
+      case DeploymentJobErrorCode.fleetDeploymentTimeout:
+        return 'FleetDeploymentTimeout';
     }
   }
 }
@@ -4058,8 +4379,16 @@ extension on String {
         return DeploymentJobErrorCode.badPermissionError;
       case 'DownloadConditionFailed':
         return DeploymentJobErrorCode.downloadConditionFailed;
+      case 'BadLambdaAssociated':
+        return DeploymentJobErrorCode.badLambdaAssociated;
       case 'InternalServerError':
         return DeploymentJobErrorCode.internalServerError;
+      case 'RobotApplicationDoesNotExist':
+        return DeploymentJobErrorCode.robotApplicationDoesNotExist;
+      case 'DeploymentFleetDoesNotExist':
+        return DeploymentJobErrorCode.deploymentFleetDoesNotExist;
+      case 'FleetDeploymentTimeout':
+        return DeploymentJobErrorCode.fleetDeploymentTimeout;
     }
     throw Exception('$this is not known in enum DeploymentJobErrorCode');
   }
@@ -4169,6 +4498,7 @@ extension on String {
   }
 }
 
+@deprecated
 class DeregisterRobotResponse {
   /// The Amazon Resource Name (ARN) of the fleet.
   final String? fleet;
@@ -4188,6 +4518,7 @@ class DeregisterRobotResponse {
   }
 }
 
+@deprecated
 class DescribeDeploymentJobResponse {
   /// The Amazon Resource Name (ARN) of the deployment job.
   final String? arn;
@@ -4260,6 +4591,7 @@ class DescribeDeploymentJobResponse {
   }
 }
 
+@deprecated
 class DescribeFleetResponse {
   /// The Amazon Resource Name (ARN) of the fleet.
   final String? arn;
@@ -4318,6 +4650,14 @@ class DescribeRobotApplicationResponse {
   /// The Amazon Resource Name (ARN) of the robot application.
   final String? arn;
 
+  /// The object that contains the Docker image URI used to create the robot
+  /// application.
+  final Environment? environment;
+
+  /// A SHA256 identifier for the Docker image that you use for your robot
+  /// application.
+  final String? imageDigest;
+
   /// The time, in milliseconds since the epoch, when the robot application was
   /// last updated.
   final DateTime? lastUpdatedAt;
@@ -4342,6 +4682,8 @@ class DescribeRobotApplicationResponse {
 
   DescribeRobotApplicationResponse({
     this.arn,
+    this.environment,
+    this.imageDigest,
     this.lastUpdatedAt,
     this.name,
     this.revisionId,
@@ -4353,6 +4695,10 @@ class DescribeRobotApplicationResponse {
   factory DescribeRobotApplicationResponse.fromJson(Map<String, dynamic> json) {
     return DescribeRobotApplicationResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
+      imageDigest: json['imageDigest'] as String?,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       revisionId: json['revisionId'] as String?,
@@ -4371,6 +4717,7 @@ class DescribeRobotApplicationResponse {
   }
 }
 
+@deprecated
 class DescribeRobotResponse {
   /// The target architecture of the robot application.
   final Architecture? architecture;
@@ -4435,6 +4782,14 @@ class DescribeSimulationApplicationResponse {
   /// The Amazon Resource Name (ARN) of the robot simulation application.
   final String? arn;
 
+  /// The object that contains the Docker image URI used to create the simulation
+  /// application.
+  final Environment? environment;
+
+  /// A SHA256 identifier for the Docker image that you use for your simulation
+  /// application.
+  final String? imageDigest;
+
   /// The time, in milliseconds since the epoch, when the simulation application
   /// was last updated.
   final DateTime? lastUpdatedAt;
@@ -4465,6 +4820,8 @@ class DescribeSimulationApplicationResponse {
 
   DescribeSimulationApplicationResponse({
     this.arn,
+    this.environment,
+    this.imageDigest,
     this.lastUpdatedAt,
     this.name,
     this.renderingEngine,
@@ -4479,6 +4836,10 @@ class DescribeSimulationApplicationResponse {
       Map<String, dynamic> json) {
     return DescribeSimulationApplicationResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
+      imageDigest: json['imageDigest'] as String?,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       renderingEngine: json['renderingEngine'] != null
@@ -5024,12 +5385,16 @@ class DescribeWorldResponse {
   /// The world template.
   final String? template;
 
+  /// Returns the JSON formatted string that describes the contents of your world.
+  final String? worldDescriptionBody;
+
   DescribeWorldResponse({
     this.arn,
     this.createdAt,
     this.generationJob,
     this.tags,
     this.template,
+    this.worldDescriptionBody,
   });
   factory DescribeWorldResponse.fromJson(Map<String, dynamic> json) {
     return DescribeWorldResponse(
@@ -5039,6 +5404,7 @@ class DescribeWorldResponse {
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       template: json['template'] as String?,
+      worldDescriptionBody: json['worldDescriptionBody'] as String?,
     );
   }
 }
@@ -5066,6 +5432,9 @@ class DescribeWorldTemplateResponse {
   /// template.
   final Map<String, String>? tags;
 
+  /// The version of the world template that you're using.
+  final String? version;
+
   DescribeWorldTemplateResponse({
     this.arn,
     this.clientRequestToken,
@@ -5073,6 +5442,7 @@ class DescribeWorldTemplateResponse {
     this.lastUpdatedAt,
     this.name,
     this.tags,
+    this.version,
   });
   factory DescribeWorldTemplateResponse.fromJson(Map<String, dynamic> json) {
     return DescribeWorldTemplateResponse(
@@ -5083,7 +5453,59 @@ class DescribeWorldTemplateResponse {
       name: json['name'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
+      version: json['version'] as String?,
     );
+  }
+}
+
+/// The object that contains the Docker image URI for either your robot or
+/// simulation applications.
+class Environment {
+  /// The Docker image URI for either your robot or simulation applications.
+  final String? uri;
+
+  Environment({
+    this.uri,
+  });
+  factory Environment.fromJson(Map<String, dynamic> json) {
+    return Environment(
+      uri: json['uri'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final uri = this.uri;
+    return {
+      if (uri != null) 'uri': uri,
+    };
+  }
+}
+
+enum ExitBehavior {
+  fail,
+  restart,
+}
+
+extension on ExitBehavior {
+  String toValue() {
+    switch (this) {
+      case ExitBehavior.fail:
+        return 'FAIL';
+      case ExitBehavior.restart:
+        return 'RESTART';
+    }
+  }
+}
+
+extension on String {
+  ExitBehavior toExitBehavior() {
+    switch (this) {
+      case 'FAIL':
+        return ExitBehavior.fail;
+      case 'RESTART':
+        return ExitBehavior.restart;
+    }
+    throw Exception('$this is not known in enum ExitBehavior');
   }
 }
 
@@ -5282,14 +5704,23 @@ class GetWorldTemplateBodyResponse {
 
 /// Information about a launch configuration.
 class LaunchConfig {
-  /// The launch file name.
-  final String launchFile;
-
-  /// The package name.
-  final String packageName;
+  /// If you've specified <code>General</code> as the value for your
+  /// <code>RobotSoftwareSuite</code>, you can use this field to specify a list of
+  /// commands for your container image.
+  ///
+  /// If you've specified <code>SimulationRuntime</code> as the value for your
+  /// <code>SimulationSoftwareSuite</code>, you can use this field to specify a
+  /// list of commands for your container image.
+  final List<String>? command;
 
   /// The environment variables for the application launch.
   final Map<String, String>? environmentVariables;
+
+  /// The launch file name.
+  final String? launchFile;
+
+  /// The package name.
+  final String? packageName;
 
   /// The port forwarding configuration.
   final PortForwardingConfig? portForwardingConfig;
@@ -5297,24 +5728,29 @@ class LaunchConfig {
   /// Boolean indicating whether a streaming session will be configured for the
   /// application. If <code>True</code>, AWS RoboMaker will configure a connection
   /// so you can interact with your application as it is running in the
-  /// simulation. You must configure and luanch the component. It must have a
+  /// simulation. You must configure and launch the component. It must have a
   /// graphical user interface.
   final bool? streamUI;
 
   LaunchConfig({
-    required this.launchFile,
-    required this.packageName,
+    this.command,
     this.environmentVariables,
+    this.launchFile,
+    this.packageName,
     this.portForwardingConfig,
     this.streamUI,
   });
   factory LaunchConfig.fromJson(Map<String, dynamic> json) {
     return LaunchConfig(
-      launchFile: json['launchFile'] as String,
-      packageName: json['packageName'] as String,
+      command: (json['command'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       environmentVariables:
           (json['environmentVariables'] as Map<String, dynamic>?)
               ?.map((k, e) => MapEntry(k, e as String)),
+      launchFile: json['launchFile'] as String?,
+      packageName: json['packageName'] as String?,
       portForwardingConfig: json['portForwardingConfig'] != null
           ? PortForwardingConfig.fromJson(
               json['portForwardingConfig'] as Map<String, dynamic>)
@@ -5324,16 +5760,18 @@ class LaunchConfig {
   }
 
   Map<String, dynamic> toJson() {
+    final command = this.command;
+    final environmentVariables = this.environmentVariables;
     final launchFile = this.launchFile;
     final packageName = this.packageName;
-    final environmentVariables = this.environmentVariables;
     final portForwardingConfig = this.portForwardingConfig;
     final streamUI = this.streamUI;
     return {
-      'launchFile': launchFile,
-      'packageName': packageName,
+      if (command != null) 'command': command,
       if (environmentVariables != null)
         'environmentVariables': environmentVariables,
+      if (launchFile != null) 'launchFile': launchFile,
+      if (packageName != null) 'packageName': packageName,
       if (portForwardingConfig != null)
         'portForwardingConfig': portForwardingConfig,
       if (streamUI != null) 'streamUI': streamUI,
@@ -5341,6 +5779,7 @@ class LaunchConfig {
   }
 }
 
+@deprecated
 class ListDeploymentJobsResponse {
   /// A list of deployment jobs that meet the criteria of the request.
   final List<DeploymentJob>? deploymentJobs;
@@ -5368,6 +5807,7 @@ class ListDeploymentJobsResponse {
   }
 }
 
+@deprecated
 class ListFleetsResponse {
   /// A list of fleet details meeting the request criteria.
   final List<Fleet>? fleetDetails;
@@ -5423,6 +5863,7 @@ class ListRobotApplicationsResponse {
   }
 }
 
+@deprecated
 class ListRobotsResponse {
   /// If the previous paginated request did not return all of the remaining
   /// results, the response object's <code>nextToken</code> parameter value is set
@@ -5665,21 +6106,24 @@ class ListWorldsResponse {
 /// The logging configuration.
 class LoggingConfig {
   /// A boolean indicating whether to record all ROS topics.
-  final bool recordAllRosTopics;
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
+  final bool? recordAllRosTopics;
 
   LoggingConfig({
-    required this.recordAllRosTopics,
+    this.recordAllRosTopics,
   });
   factory LoggingConfig.fromJson(Map<String, dynamic> json) {
     return LoggingConfig(
-      recordAllRosTopics: json['recordAllRosTopics'] as bool,
+      recordAllRosTopics: json['recordAllRosTopics'] as bool?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final recordAllRosTopics = this.recordAllRosTopics;
     return {
-      'recordAllRosTopics': recordAllRosTopics,
+      if (recordAllRosTopics != null) 'recordAllRosTopics': recordAllRosTopics,
     };
   }
 }
@@ -5850,6 +6294,7 @@ class ProgressDetail {
   }
 }
 
+@deprecated
 class RegisterRobotResponse {
   /// The Amazon Resource Name (ARN) of the fleet that the robot will join.
   final String? fleet;
@@ -5994,10 +6439,38 @@ class RobotApplicationConfig {
   /// The version of the robot application.
   final String? applicationVersion;
 
+  /// Information about tools configured for the robot application.
+  final List<Tool>? tools;
+
+  /// The upload configurations for the robot application.
+  final List<UploadConfiguration>? uploadConfigurations;
+
+  /// A Boolean indicating whether to use default robot application tools. The
+  /// default tools are rviz, rqt, terminal and rosbag record. The default is
+  /// <code>False</code>.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
+  final bool? useDefaultTools;
+
+  /// A Boolean indicating whether to use default upload configurations. By
+  /// default, <code>.ros</code> and <code>.gazebo</code> files are uploaded when
+  /// the application terminates and all ROS topics will be recorded.
+  ///
+  /// If you set this value, you must specify an <code>outputLocation</code>.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
+  final bool? useDefaultUploadConfigurations;
+
   RobotApplicationConfig({
     required this.application,
     required this.launchConfig,
     this.applicationVersion,
+    this.tools,
+    this.uploadConfigurations,
+    this.useDefaultTools,
+    this.useDefaultUploadConfigurations,
   });
   factory RobotApplicationConfig.fromJson(Map<String, dynamic> json) {
     return RobotApplicationConfig(
@@ -6005,6 +6478,17 @@ class RobotApplicationConfig {
       launchConfig:
           LaunchConfig.fromJson(json['launchConfig'] as Map<String, dynamic>),
       applicationVersion: json['applicationVersion'] as String?,
+      tools: (json['tools'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tool.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      uploadConfigurations: (json['uploadConfigurations'] as List?)
+          ?.whereNotNull()
+          .map((e) => UploadConfiguration.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      useDefaultTools: json['useDefaultTools'] as bool?,
+      useDefaultUploadConfigurations:
+          json['useDefaultUploadConfigurations'] as bool?,
     );
   }
 
@@ -6012,10 +6496,20 @@ class RobotApplicationConfig {
     final application = this.application;
     final launchConfig = this.launchConfig;
     final applicationVersion = this.applicationVersion;
+    final tools = this.tools;
+    final uploadConfigurations = this.uploadConfigurations;
+    final useDefaultTools = this.useDefaultTools;
+    final useDefaultUploadConfigurations = this.useDefaultUploadConfigurations;
     return {
       'application': application,
       'launchConfig': launchConfig,
       if (applicationVersion != null) 'applicationVersion': applicationVersion,
+      if (tools != null) 'tools': tools,
+      if (uploadConfigurations != null)
+        'uploadConfigurations': uploadConfigurations,
+      if (useDefaultTools != null) 'useDefaultTools': useDefaultTools,
+      if (useDefaultUploadConfigurations != null)
+        'useDefaultUploadConfigurations': useDefaultUploadConfigurations,
     };
   }
 }
@@ -6192,6 +6686,7 @@ class RobotSoftwareSuite {
 enum RobotSoftwareSuiteType {
   ros,
   ros2,
+  general,
 }
 
 extension on RobotSoftwareSuiteType {
@@ -6201,6 +6696,8 @@ extension on RobotSoftwareSuiteType {
         return 'ROS';
       case RobotSoftwareSuiteType.ros2:
         return 'ROS2';
+      case RobotSoftwareSuiteType.general:
+        return 'General';
     }
   }
 }
@@ -6212,6 +6709,8 @@ extension on String {
         return RobotSoftwareSuiteType.ros;
       case 'ROS2':
         return RobotSoftwareSuiteType.ros2;
+      case 'General':
+        return RobotSoftwareSuiteType.general;
     }
     throw Exception('$this is not known in enum RobotSoftwareSuiteType');
   }
@@ -6221,6 +6720,7 @@ enum RobotSoftwareSuiteVersionType {
   kinetic,
   melodic,
   dashing,
+  foxy,
 }
 
 extension on RobotSoftwareSuiteVersionType {
@@ -6232,6 +6732,8 @@ extension on RobotSoftwareSuiteVersionType {
         return 'Melodic';
       case RobotSoftwareSuiteVersionType.dashing:
         return 'Dashing';
+      case RobotSoftwareSuiteVersionType.foxy:
+        return 'Foxy';
     }
   }
 }
@@ -6245,6 +6747,8 @@ extension on String {
         return RobotSoftwareSuiteVersionType.melodic;
       case 'Dashing':
         return RobotSoftwareSuiteVersionType.dashing;
+      case 'Foxy':
+        return RobotSoftwareSuiteVersionType.foxy;
     }
     throw Exception('$this is not known in enum RobotSoftwareSuiteVersionType');
   }
@@ -6370,6 +6874,30 @@ class SimulationApplicationConfig {
   /// The version of the simulation application.
   final String? applicationVersion;
 
+  /// Information about tools configured for the simulation application.
+  final List<Tool>? tools;
+
+  /// Information about upload configurations for the simulation application.
+  final List<UploadConfiguration>? uploadConfigurations;
+
+  /// A Boolean indicating whether to use default simulation application tools.
+  /// The default tools are rviz, rqt, terminal and rosbag record. The default is
+  /// <code>False</code>.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
+  final bool? useDefaultTools;
+
+  /// A Boolean indicating whether to use default upload configurations. By
+  /// default, <code>.ros</code> and <code>.gazebo</code> files are uploaded when
+  /// the application terminates and all ROS topics will be recorded.
+  ///
+  /// If you set this value, you must specify an <code>outputLocation</code>.
+  /// <important>
+  /// This API is no longer supported and will throw an error if used.
+  /// </important>
+  final bool? useDefaultUploadConfigurations;
+
   /// A list of world configurations.
   final List<WorldConfig>? worldConfigs;
 
@@ -6377,6 +6905,10 @@ class SimulationApplicationConfig {
     required this.application,
     required this.launchConfig,
     this.applicationVersion,
+    this.tools,
+    this.uploadConfigurations,
+    this.useDefaultTools,
+    this.useDefaultUploadConfigurations,
     this.worldConfigs,
   });
   factory SimulationApplicationConfig.fromJson(Map<String, dynamic> json) {
@@ -6385,6 +6917,17 @@ class SimulationApplicationConfig {
       launchConfig:
           LaunchConfig.fromJson(json['launchConfig'] as Map<String, dynamic>),
       applicationVersion: json['applicationVersion'] as String?,
+      tools: (json['tools'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tool.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      uploadConfigurations: (json['uploadConfigurations'] as List?)
+          ?.whereNotNull()
+          .map((e) => UploadConfiguration.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      useDefaultTools: json['useDefaultTools'] as bool?,
+      useDefaultUploadConfigurations:
+          json['useDefaultUploadConfigurations'] as bool?,
       worldConfigs: (json['worldConfigs'] as List?)
           ?.whereNotNull()
           .map((e) => WorldConfig.fromJson(e as Map<String, dynamic>))
@@ -6396,11 +6939,21 @@ class SimulationApplicationConfig {
     final application = this.application;
     final launchConfig = this.launchConfig;
     final applicationVersion = this.applicationVersion;
+    final tools = this.tools;
+    final uploadConfigurations = this.uploadConfigurations;
+    final useDefaultTools = this.useDefaultTools;
+    final useDefaultUploadConfigurations = this.useDefaultUploadConfigurations;
     final worldConfigs = this.worldConfigs;
     return {
       'application': application,
       'launchConfig': launchConfig,
       if (applicationVersion != null) 'applicationVersion': applicationVersion,
+      if (tools != null) 'tools': tools,
+      if (uploadConfigurations != null)
+        'uploadConfigurations': uploadConfigurations,
+      if (useDefaultTools != null) 'useDefaultTools': useDefaultTools,
+      if (useDefaultUploadConfigurations != null)
+        'useDefaultUploadConfigurations': useDefaultUploadConfigurations,
       if (worldConfigs != null) 'worldConfigs': worldConfigs,
     };
   }
@@ -6469,7 +7022,8 @@ class SimulationJob {
 
   /// The failure behavior the simulation job.
   /// <dl> <dt>Continue</dt> <dd>
-  /// Restart the simulation job in the same host instance.
+  /// Leaves the host running for its maximum timeout duration after a
+  /// <code>4XX</code> error code.
   /// </dd> <dt>Fail</dt> <dd>
   /// Stop the simulation job and terminate the instance.
   /// </dd> </dl>
@@ -6774,6 +7328,8 @@ enum SimulationJobErrorCode {
   internalServiceError,
   robotApplicationCrash,
   simulationApplicationCrash,
+  robotApplicationHealthCheckFailure,
+  simulationApplicationHealthCheckFailure,
   badPermissionsRobotApplication,
   badPermissionsSimulationApplication,
   badPermissionsS3Object,
@@ -6785,6 +7341,7 @@ enum SimulationJobErrorCode {
   invalidBundleRobotApplication,
   invalidBundleSimulationApplication,
   invalidS3Resource,
+  throttlingError,
   limitExceeded,
   mismatchedEtag,
   robotApplicationVersionMismatchedEtag,
@@ -6798,6 +7355,7 @@ enum SimulationJobErrorCode {
   wrongRegionS3Output,
   wrongRegionRobotApplication,
   wrongRegionSimulationApplication,
+  uploadContentMismatchError,
 }
 
 extension on SimulationJobErrorCode {
@@ -6809,6 +7367,10 @@ extension on SimulationJobErrorCode {
         return 'RobotApplicationCrash';
       case SimulationJobErrorCode.simulationApplicationCrash:
         return 'SimulationApplicationCrash';
+      case SimulationJobErrorCode.robotApplicationHealthCheckFailure:
+        return 'RobotApplicationHealthCheckFailure';
+      case SimulationJobErrorCode.simulationApplicationHealthCheckFailure:
+        return 'SimulationApplicationHealthCheckFailure';
       case SimulationJobErrorCode.badPermissionsRobotApplication:
         return 'BadPermissionsRobotApplication';
       case SimulationJobErrorCode.badPermissionsSimulationApplication:
@@ -6831,6 +7393,8 @@ extension on SimulationJobErrorCode {
         return 'InvalidBundleSimulationApplication';
       case SimulationJobErrorCode.invalidS3Resource:
         return 'InvalidS3Resource';
+      case SimulationJobErrorCode.throttlingError:
+        return 'ThrottlingError';
       case SimulationJobErrorCode.limitExceeded:
         return 'LimitExceeded';
       case SimulationJobErrorCode.mismatchedEtag:
@@ -6857,6 +7421,8 @@ extension on SimulationJobErrorCode {
         return 'WrongRegionRobotApplication';
       case SimulationJobErrorCode.wrongRegionSimulationApplication:
         return 'WrongRegionSimulationApplication';
+      case SimulationJobErrorCode.uploadContentMismatchError:
+        return 'UploadContentMismatchError';
     }
   }
 }
@@ -6870,6 +7436,10 @@ extension on String {
         return SimulationJobErrorCode.robotApplicationCrash;
       case 'SimulationApplicationCrash':
         return SimulationJobErrorCode.simulationApplicationCrash;
+      case 'RobotApplicationHealthCheckFailure':
+        return SimulationJobErrorCode.robotApplicationHealthCheckFailure;
+      case 'SimulationApplicationHealthCheckFailure':
+        return SimulationJobErrorCode.simulationApplicationHealthCheckFailure;
       case 'BadPermissionsRobotApplication':
         return SimulationJobErrorCode.badPermissionsRobotApplication;
       case 'BadPermissionsSimulationApplication':
@@ -6892,6 +7462,8 @@ extension on String {
         return SimulationJobErrorCode.invalidBundleSimulationApplication;
       case 'InvalidS3Resource':
         return SimulationJobErrorCode.invalidS3Resource;
+      case 'ThrottlingError':
+        return SimulationJobErrorCode.throttlingError;
       case 'LimitExceeded':
         return SimulationJobErrorCode.limitExceeded;
       case 'MismatchedEtag':
@@ -6919,6 +7491,8 @@ extension on String {
         return SimulationJobErrorCode.wrongRegionRobotApplication;
       case 'WrongRegionSimulationApplication':
         return SimulationJobErrorCode.wrongRegionSimulationApplication;
+      case 'UploadContentMismatchError':
+        return SimulationJobErrorCode.uploadContentMismatchError;
     }
     throw Exception('$this is not known in enum SimulationJobErrorCode');
   }
@@ -6944,7 +7518,8 @@ class SimulationJobRequest {
 
   /// The failure behavior the simulation job.
   /// <dl> <dt>Continue</dt> <dd>
-  /// Restart the simulation job in the same host instance.
+  /// Leaves the host running for its maximum timeout duration after a
+  /// <code>4XX</code> error code.
   /// </dd> <dt>Fail</dt> <dd>
   /// Stop the simulation job and terminate the instance.
   /// </dd> </dl>
@@ -6967,7 +7542,8 @@ class SimulationJobRequest {
   /// simulation job request.
   final Map<String, String>? tags;
 
-  /// Boolean indicating whether to use default simulation tool applications.
+  /// A Boolean indicating whether to use default applications in the simulation
+  /// job. Default applications include Gazebo, rqt, rviz and terminal access.
   final bool? useDefaultApplications;
   final VPCConfig? vpcConfig;
 
@@ -7130,6 +7706,9 @@ class SimulationJobSummary {
   /// The Amazon Resource Name (ARN) of the simulation job.
   final String? arn;
 
+  /// The compute type for the simulation job summary.
+  final ComputeType? computeType;
+
   /// The names of the data sources.
   final List<String>? dataSourceNames;
 
@@ -7151,6 +7730,7 @@ class SimulationJobSummary {
 
   SimulationJobSummary({
     this.arn,
+    this.computeType,
     this.dataSourceNames,
     this.lastUpdatedAt,
     this.name,
@@ -7161,6 +7741,7 @@ class SimulationJobSummary {
   factory SimulationJobSummary.fromJson(Map<String, dynamic> json) {
     return SimulationJobSummary(
       arn: json['arn'] as String?,
+      computeType: (json['computeType'] as String?)?.toComputeType(),
       dataSourceNames: (json['dataSourceNames'] as List?)
           ?.whereNotNull()
           .map((e) => e as String)
@@ -7212,6 +7793,7 @@ class SimulationSoftwareSuite {
 enum SimulationSoftwareSuiteType {
   gazebo,
   rosbagPlay,
+  simulationRuntime,
 }
 
 extension on SimulationSoftwareSuiteType {
@@ -7221,6 +7803,8 @@ extension on SimulationSoftwareSuiteType {
         return 'Gazebo';
       case SimulationSoftwareSuiteType.rosbagPlay:
         return 'RosbagPlay';
+      case SimulationSoftwareSuiteType.simulationRuntime:
+        return 'SimulationRuntime';
     }
   }
 }
@@ -7232,6 +7816,8 @@ extension on String {
         return SimulationSoftwareSuiteType.gazebo;
       case 'RosbagPlay':
         return SimulationSoftwareSuiteType.rosbagPlay;
+      case 'SimulationRuntime':
+        return SimulationSoftwareSuiteType.simulationRuntime;
     }
     throw Exception('$this is not known in enum SimulationSoftwareSuiteType');
   }
@@ -7410,6 +7996,7 @@ class StartSimulationJobBatchResponse {
   }
 }
 
+@deprecated
 class SyncDeploymentJobResponse {
   /// The Amazon Resource Name (ARN) of the synchronization request.
   final String? arn;
@@ -7542,11 +8129,15 @@ class TemplateSummary {
   /// The name of the template.
   final String? name;
 
+  /// The version of the template that you're using.
+  final String? version;
+
   TemplateSummary({
     this.arn,
     this.createdAt,
     this.lastUpdatedAt,
     this.name,
+    this.version,
   });
   factory TemplateSummary.fromJson(Map<String, dynamic> json) {
     return TemplateSummary(
@@ -7554,7 +8145,66 @@ class TemplateSummary {
       createdAt: timeStampFromJson(json['createdAt']),
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
+      version: json['version'] as String?,
     );
+  }
+}
+
+/// Information about a tool. Tools are used in a simulation job.
+class Tool {
+  /// Command-line arguments for the tool. It must include the tool executable
+  /// name.
+  final String command;
+
+  /// The name of the tool.
+  final String name;
+
+  /// Exit behavior determines what happens when your tool quits running.
+  /// <code>RESTART</code> will cause your tool to be restarted. <code>FAIL</code>
+  /// will cause your job to exit. The default is <code>RESTART</code>.
+  final ExitBehavior? exitBehavior;
+
+  /// Boolean indicating whether logs will be recorded in CloudWatch for the tool.
+  /// The default is <code>False</code>.
+  final bool? streamOutputToCloudWatch;
+
+  /// Boolean indicating whether a streaming session will be configured for the
+  /// tool. If <code>True</code>, AWS RoboMaker will configure a connection so you
+  /// can interact with the tool as it is running in the simulation. It must have
+  /// a graphical user interface. The default is <code>False</code>.
+  final bool? streamUI;
+
+  Tool({
+    required this.command,
+    required this.name,
+    this.exitBehavior,
+    this.streamOutputToCloudWatch,
+    this.streamUI,
+  });
+  factory Tool.fromJson(Map<String, dynamic> json) {
+    return Tool(
+      command: json['command'] as String,
+      name: json['name'] as String,
+      exitBehavior: (json['exitBehavior'] as String?)?.toExitBehavior(),
+      streamOutputToCloudWatch: json['streamOutputToCloudWatch'] as bool?,
+      streamUI: json['streamUI'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final command = this.command;
+    final name = this.name;
+    final exitBehavior = this.exitBehavior;
+    final streamOutputToCloudWatch = this.streamOutputToCloudWatch;
+    final streamUI = this.streamUI;
+    return {
+      'command': command,
+      'name': name,
+      if (exitBehavior != null) 'exitBehavior': exitBehavior.toValue(),
+      if (streamOutputToCloudWatch != null)
+        'streamOutputToCloudWatch': streamOutputToCloudWatch,
+      if (streamUI != null) 'streamUI': streamUI,
+    };
   }
 }
 
@@ -7568,6 +8218,9 @@ class UntagResourceResponse {
 class UpdateRobotApplicationResponse {
   /// The Amazon Resource Name (ARN) of the updated robot application.
   final String? arn;
+
+  /// The object that contains the Docker image URI for your robot application.
+  final Environment? environment;
 
   /// The time, in milliseconds since the epoch, when the robot application was
   /// last updated.
@@ -7590,6 +8243,7 @@ class UpdateRobotApplicationResponse {
 
   UpdateRobotApplicationResponse({
     this.arn,
+    this.environment,
     this.lastUpdatedAt,
     this.name,
     this.revisionId,
@@ -7600,6 +8254,9 @@ class UpdateRobotApplicationResponse {
   factory UpdateRobotApplicationResponse.fromJson(Map<String, dynamic> json) {
     return UpdateRobotApplicationResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       revisionId: json['revisionId'] as String?,
@@ -7619,6 +8276,10 @@ class UpdateRobotApplicationResponse {
 class UpdateSimulationApplicationResponse {
   /// The Amazon Resource Name (ARN) of the updated simulation application.
   final String? arn;
+
+  /// The object that contains the Docker image URI used for your simulation
+  /// application.
+  final Environment? environment;
 
   /// The time, in milliseconds since the epoch, when the simulation application
   /// was last updated.
@@ -7647,6 +8308,7 @@ class UpdateSimulationApplicationResponse {
 
   UpdateSimulationApplicationResponse({
     this.arn,
+    this.environment,
     this.lastUpdatedAt,
     this.name,
     this.renderingEngine,
@@ -7660,6 +8322,9 @@ class UpdateSimulationApplicationResponse {
       Map<String, dynamic> json) {
     return UpdateSimulationApplicationResponse(
       arn: json['arn'] as String?,
+      environment: json['environment'] != null
+          ? Environment.fromJson(json['environment'] as Map<String, dynamic>)
+          : null,
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
       renderingEngine: json['renderingEngine'] != null
@@ -7712,6 +8377,94 @@ class UpdateWorldTemplateResponse {
       lastUpdatedAt: timeStampFromJson(json['lastUpdatedAt']),
       name: json['name'] as String?,
     );
+  }
+}
+
+enum UploadBehavior {
+  uploadOnTerminate,
+  uploadRollingAutoRemove,
+}
+
+extension on UploadBehavior {
+  String toValue() {
+    switch (this) {
+      case UploadBehavior.uploadOnTerminate:
+        return 'UPLOAD_ON_TERMINATE';
+      case UploadBehavior.uploadRollingAutoRemove:
+        return 'UPLOAD_ROLLING_AUTO_REMOVE';
+    }
+  }
+}
+
+extension on String {
+  UploadBehavior toUploadBehavior() {
+    switch (this) {
+      case 'UPLOAD_ON_TERMINATE':
+        return UploadBehavior.uploadOnTerminate;
+      case 'UPLOAD_ROLLING_AUTO_REMOVE':
+        return UploadBehavior.uploadRollingAutoRemove;
+    }
+    throw Exception('$this is not known in enum UploadBehavior');
+  }
+}
+
+/// Provides upload configuration information. Files are uploaded from the
+/// simulation job to a location you specify.
+class UploadConfiguration {
+  /// A prefix that specifies where files will be uploaded in Amazon S3. It is
+  /// appended to the simulation output location to determine the final path.
+  ///
+  /// For example, if your simulation output location is
+  /// <code>s3://my-bucket</code> and your upload configuration name is
+  /// <code>robot-test</code>, your files will be uploaded to
+  /// <code>s3://my-bucket/&lt;simid&gt;/&lt;runid&gt;/robot-test</code>.
+  final String name;
+
+  /// Specifies the path of the file(s) to upload. Standard Unix glob matching
+  /// rules are accepted, with the addition of <code>**</code> as a <i>super
+  /// asterisk</i>. For example, specifying <code>/var/log/**.log</code> causes
+  /// all .log files in the <code>/var/log</code> directory tree to be collected.
+  /// For more examples, see <a href="https://github.com/gobwas/glob">Glob
+  /// Library</a>.
+  final String path;
+
+  /// Specifies when to upload the files:
+  /// <dl> <dt>UPLOAD_ON_TERMINATE</dt> <dd>
+  /// Matching files are uploaded once the simulation enters the
+  /// <code>TERMINATING</code> state. Matching files are not uploaded until all of
+  /// your code (including tools) have stopped.
+  ///
+  /// If there is a problem uploading a file, the upload is retried. If problems
+  /// persist, no further upload attempts will be made.
+  /// </dd> <dt>UPLOAD_ROLLING_AUTO_REMOVE</dt> <dd>
+  /// Matching files are uploaded as they are created. They are deleted after they
+  /// are uploaded. The specified path is checked every 5 seconds. A final check
+  /// is made when all of your code (including tools) have stopped.
+  /// </dd> </dl>
+  final UploadBehavior uploadBehavior;
+
+  UploadConfiguration({
+    required this.name,
+    required this.path,
+    required this.uploadBehavior,
+  });
+  factory UploadConfiguration.fromJson(Map<String, dynamic> json) {
+    return UploadConfiguration(
+      name: json['name'] as String,
+      path: json['path'] as String,
+      uploadBehavior: (json['uploadBehavior'] as String).toUploadBehavior(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final path = this.path;
+    final uploadBehavior = this.uploadBehavior;
+    return {
+      'name': name,
+      'path': path,
+      'uploadBehavior': uploadBehavior.toValue(),
+    };
   }
 }
 
@@ -7961,6 +8714,7 @@ class WorldExportJobSummary {
   /// The time, in milliseconds since the epoch, when the world export job was
   /// created.
   final DateTime? createdAt;
+  final OutputLocation? outputLocation;
 
   /// The status of the world export job.
   /// <dl> <dt>Pending</dt> <dd>
@@ -7985,6 +8739,7 @@ class WorldExportJobSummary {
   WorldExportJobSummary({
     this.arn,
     this.createdAt,
+    this.outputLocation,
     this.status,
     this.worlds,
   });
@@ -7992,6 +8747,10 @@ class WorldExportJobSummary {
     return WorldExportJobSummary(
       arn: json['arn'] as String?,
       createdAt: timeStampFromJson(json['createdAt']),
+      outputLocation: json['outputLocation'] != null
+          ? OutputLocation.fromJson(
+              json['outputLocation'] as Map<String, dynamic>)
+          : null,
       status: (json['status'] as String?)?.toWorldExportJobStatus(),
       worlds: (json['worlds'] as List?)
           ?.whereNotNull()

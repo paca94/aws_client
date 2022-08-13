@@ -20,22 +20,24 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Amazon GuardDuty is a continuous security monitoring service that analyzes
 /// and processes the following data sources: VPC Flow Logs, AWS CloudTrail
-/// event logs, and DNS logs. It uses threat intelligence feeds (such as lists
-/// of malicious IPs and domains) and machine learning to identify unexpected,
-/// potentially unauthorized, and malicious activity within your AWS
+/// management event logs, CloudTrail S3 data event logs, EKS audit logs, and
+/// DNS logs. It uses threat intelligence feeds (such as lists of malicious IPs
+/// and domains) and machine learning to identify unexpected, potentially
+/// unauthorized, and malicious activity within your Amazon Web Services
 /// environment. This can include issues like escalations of privileges, uses of
 /// exposed credentials, or communication with malicious IPs, URLs, or domains.
 /// For example, GuardDuty can detect compromised EC2 instances that serve
 /// malware or mine bitcoin.
 ///
-/// GuardDuty also monitors AWS account access behavior for signs of compromise.
-/// Some examples of this are unauthorized infrastructure deployments such as
-/// EC2 instances deployed in a Region that has never been used, or unusual API
-/// calls like a password policy change to reduce password strength.
+/// GuardDuty also monitors Amazon Web Services account access behavior for
+/// signs of compromise. Some examples of this are unauthorized infrastructure
+/// deployments such as EC2 instances deployed in a Region that has never been
+/// used, or unusual API calls like a password policy change to reduce password
+/// strength.
 ///
-/// GuardDuty informs you of the status of your AWS environment by producing
-/// security findings that you can view in the GuardDuty console or through
-/// Amazon CloudWatch events. For more information, see the <i> <a
+/// GuardDuty informs you of the status of your Amazon Web Services environment
+/// by producing security findings that you can view in the GuardDuty console or
+/// through Amazon CloudWatch events. For more information, see the <i> <a
 /// href="https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html">Amazon
 /// GuardDuty User Guide</a> </i>.
 class GuardDuty {
@@ -67,6 +69,49 @@ class GuardDuty {
     _protocol.close();
   }
 
+  /// Accepts the invitation to be a member account and get monitored by a
+  /// GuardDuty administrator account that sent the invitation.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [administratorId] :
+  /// The account ID of the GuardDuty administrator account whose invitation
+  /// you're accepting.
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector of the GuardDuty member account.
+  ///
+  /// Parameter [invitationId] :
+  /// The value that is used to validate the administrator account to the member
+  /// account.
+  Future<void> acceptAdministratorInvitation({
+    required String administratorId,
+    required String detectorId,
+    required String invitationId,
+  }) async {
+    ArgumentError.checkNotNull(administratorId, 'administratorId');
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(invitationId, 'invitationId');
+    final $payload = <String, dynamic>{
+      'administratorId': administratorId,
+      'invitationId': invitationId,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/detector/${Uri.encodeComponent(detectorId)}/administrator',
+      exceptionFnMap: _exceptionFns,
+    );
+  }
+
   /// Accepts the invitation to be monitored by a GuardDuty administrator
   /// account.
   ///
@@ -83,6 +128,7 @@ class GuardDuty {
   /// Parameter [masterId] :
   /// The account ID of the GuardDuty administrator account whose invitation
   /// you're accepting.
+  @Deprecated('Deprecated')
   Future<void> acceptInvitation({
     required String detectorId,
     required String invitationId,
@@ -301,6 +347,9 @@ class GuardDuty {
   /// service.action.awsApiCallAction.errorCode
   /// </li>
   /// <li>
+  /// service.action.awsApiCallAction.userAgent
+  /// </li>
+  /// <li>
   /// service.action.awsApiCallAction.remoteIpDetails.city.cityName
   /// </li>
   /// <li>
@@ -356,6 +405,21 @@ class GuardDuty {
   /// </li>
   /// <li>
   /// service.additionalInfo.threatListName
+  /// </li>
+  /// <li>
+  /// resource.s3BucketDetails.publicAccess.effectivePermissions
+  /// </li>
+  /// <li>
+  /// resource.s3BucketDetails.name
+  /// </li>
+  /// <li>
+  /// resource.s3BucketDetails.tags.key
+  /// </li>
+  /// <li>
+  /// resource.s3BucketDetails.tags.value
+  /// </li>
+  /// <li>
+  /// resource.s3BucketDetails.type
   /// </li>
   /// <li>
   /// service.archived
@@ -467,9 +531,9 @@ class GuardDuty {
 
   /// Creates a new IPSet, which is called a trusted IP list in the console user
   /// interface. An IPSet is a list of IP addresses that are trusted for secure
-  /// communication with AWS infrastructure and applications. GuardDuty doesn't
-  /// generate findings for IP addresses that are included in IPSets. Only users
-  /// from the administrator account can use this operation.
+  /// communication with Amazon Web Services infrastructure and applications.
+  /// GuardDuty doesn't generate findings for IP addresses that are included in
+  /// IPSets. Only users from the administrator account can use this operation.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
@@ -486,8 +550,7 @@ class GuardDuty {
   /// The format of the file that contains the IPSet.
   ///
   /// Parameter [location] :
-  /// The URI of the file that contains the IPSet. For example:
-  /// https://s3.us-west-2.amazonaws.com/my-bucket/my-object-key.
+  /// The URI of the file that contains the IPSet.
   ///
   /// Parameter [name] :
   /// The user-friendly name to identify the IPSet.
@@ -558,9 +621,10 @@ class GuardDuty {
     return CreateIPSetResponse.fromJson(response);
   }
 
-  /// Creates member accounts of the current AWS account by specifying a list of
-  /// AWS account IDs. This step is a prerequisite for managing the associated
-  /// member accounts either by invitation or through an organization.
+  /// Creates member accounts of the current Amazon Web Services account by
+  /// specifying a list of Amazon Web Services account IDs. This step is a
+  /// prerequisite for managing the associated member accounts either by
+  /// invitation or through an organization.
   ///
   /// When using <code>Create Members</code> as an organizations delegated
   /// administrator this action will enable GuardDuty in the added member
@@ -719,8 +783,7 @@ class GuardDuty {
   /// The format of the file that contains the ThreatIntelSet.
   ///
   /// Parameter [location] :
-  /// The URI of the file that contains the ThreatIntelSet. For example:
-  /// https://s3.us-west-2.amazonaws.com/my-bucket/my-object-key.
+  /// The URI of the file that contains the ThreatIntelSet.
   ///
   /// Parameter [name] :
   /// A user-friendly ThreatIntelSet name displayed in all findings that are
@@ -790,15 +853,16 @@ class GuardDuty {
     return CreateThreatIntelSetResponse.fromJson(response);
   }
 
-  /// Declines invitations sent to the current member account by AWS accounts
-  /// specified by their account IDs.
+  /// Declines invitations sent to the current member account by Amazon Web
+  /// Services accounts specified by their account IDs.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
   ///
   /// Parameter [accountIds] :
-  /// A list of account IDs of the AWS accounts that sent invitations to the
-  /// current member account that you want to decline invitations from.
+  /// A list of account IDs of the Amazon Web Services accounts that sent
+  /// invitations to the current member account that you want to decline
+  /// invitations from.
   Future<DeclineInvitationsResponse> declineInvitations({
     required List<String> accountIds,
   }) async {
@@ -906,15 +970,16 @@ class GuardDuty {
     );
   }
 
-  /// Deletes invitations sent to the current member account by AWS accounts
-  /// specified by their account IDs.
+  /// Deletes invitations sent to the current member account by Amazon Web
+  /// Services accounts specified by their account IDs.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
   ///
   /// Parameter [accountIds] :
-  /// A list of account IDs of the AWS accounts that sent invitations to the
-  /// current member account that you want to delete invitations from.
+  /// A list of account IDs of the Amazon Web Services accounts that sent
+  /// invitations to the current member account that you want to delete
+  /// invitations from.
   Future<DeleteInvitationsResponse> deleteInvitations({
     required List<String> accountIds,
   }) async {
@@ -1035,6 +1100,67 @@ class GuardDuty {
     );
   }
 
+  /// Returns a list of malware scans.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector that the request is associated with.
+  ///
+  /// Parameter [filterCriteria] :
+  /// Represents the criteria to be used in the filter for describing scan
+  /// entries.
+  ///
+  /// Parameter [maxResults] :
+  /// You can use this parameter to indicate the maximum number of items that
+  /// you want in the response. The default value is 50. The maximum value is
+  /// 50.
+  ///
+  /// Parameter [nextToken] :
+  /// You can use this parameter when paginating results. Set the value of this
+  /// parameter to null on your first call to the list action. For subsequent
+  /// calls to the action, fill nextToken in the request with the value of
+  /// NextToken from the previous response to continue listing data.
+  ///
+  /// Parameter [sortCriteria] :
+  /// Represents the criteria used for sorting scan entries.
+  Future<DescribeMalwareScansResponse> describeMalwareScans({
+    required String detectorId,
+    FilterCriteria? filterCriteria,
+    int? maxResults,
+    String? nextToken,
+    SortCriteria? sortCriteria,
+  }) async {
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      50,
+    );
+    final $payload = <String, dynamic>{
+      if (filterCriteria != null) 'filterCriteria': filterCriteria,
+      if (maxResults != null) 'maxResults': maxResults,
+      if (nextToken != null) 'nextToken': nextToken,
+      if (sortCriteria != null) 'sortCriteria': sortCriteria,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/detector/${Uri.encodeComponent(detectorId)}/malware-scans',
+      exceptionFnMap: _exceptionFns,
+    );
+    return DescribeMalwareScansResponse.fromJson(response);
+  }
+
   /// Returns information about the account selected as the delegated
   /// administrator for GuardDuty.
   ///
@@ -1100,15 +1226,15 @@ class GuardDuty {
     return DescribePublishingDestinationResponse.fromJson(response);
   }
 
-  /// Disables an AWS account within the Organization as the GuardDuty delegated
-  /// administrator.
+  /// Disables an Amazon Web Services account within the Organization as the
+  /// GuardDuty delegated administrator.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
   ///
   /// Parameter [adminAccountId] :
-  /// The AWS Account ID for the organizations account to be disabled as a
-  /// GuardDuty delegated administrator.
+  /// The Amazon Web Services Account ID for the organizations account to be
+  /// disabled as a GuardDuty delegated administrator.
   Future<void> disableOrganizationAdminAccount({
     required String adminAccountId,
   }) async {
@@ -1132,6 +1258,35 @@ class GuardDuty {
   ///
   /// Parameter [detectorId] :
   /// The unique ID of the detector of the GuardDuty member account.
+  Future<void> disassociateFromAdministratorAccount({
+    required String detectorId,
+  }) async {
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    final response = await _protocol.send(
+      payload: null,
+      method: 'POST',
+      requestUri:
+          '/detector/${Uri.encodeComponent(detectorId)}/administrator/disassociate',
+      exceptionFnMap: _exceptionFns,
+    );
+  }
+
+  /// Disassociates the current GuardDuty member account from its administrator
+  /// account.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector of the GuardDuty member account.
+  @Deprecated('Deprecated')
   Future<void> disassociateFromMasterAccount({
     required String detectorId,
   }) async {
@@ -1191,15 +1346,15 @@ class GuardDuty {
     return DisassociateMembersResponse.fromJson(response);
   }
 
-  /// Enables an AWS account within the organization as the GuardDuty delegated
-  /// administrator.
+  /// Enables an Amazon Web Services account within the organization as the
+  /// GuardDuty delegated administrator.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
   ///
   /// Parameter [adminAccountId] :
-  /// The AWS Account ID for the organization account to be enabled as a
-  /// GuardDuty delegated administrator.
+  /// The Amazon Web Services Account ID for the organization account to be
+  /// enabled as a GuardDuty delegated administrator.
   Future<void> enableOrganizationAdminAccount({
     required String adminAccountId,
   }) async {
@@ -1213,6 +1368,34 @@ class GuardDuty {
       requestUri: '/admin/enable',
       exceptionFnMap: _exceptionFns,
     );
+  }
+
+  /// Provides the details for the GuardDuty administrator account associated
+  /// with the current GuardDuty member account.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector of the GuardDuty member account.
+  Future<GetAdministratorAccountResponse> getAdministratorAccount({
+    required String detectorId,
+  }) async {
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri: '/detector/${Uri.encodeComponent(detectorId)}/administrator',
+      exceptionFnMap: _exceptionFns,
+    );
+    return GetAdministratorAccountResponse.fromJson(response);
   }
 
   /// Retrieves an Amazon GuardDuty detector specified by the detectorId.
@@ -1407,6 +1590,34 @@ class GuardDuty {
     return GetInvitationsCountResponse.fromJson(response);
   }
 
+  /// Returns the details of the malware scan settings.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector that the scan setting is associated with.
+  Future<GetMalwareScanSettingsResponse> getMalwareScanSettings({
+    required String detectorId,
+  }) async {
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri:
+          '/detector/${Uri.encodeComponent(detectorId)}/malware-scan-settings',
+      exceptionFnMap: _exceptionFns,
+    );
+    return GetMalwareScanSettingsResponse.fromJson(response);
+  }
+
   /// Provides the details for the GuardDuty administrator account associated
   /// with the current GuardDuty member account.
   ///
@@ -1415,6 +1626,7 @@ class GuardDuty {
   ///
   /// Parameter [detectorId] :
   /// The unique ID of the detector of the GuardDuty member account.
+  @Deprecated('Deprecated')
   Future<GetMasterAccountResponse> getMasterAccount({
     required String detectorId,
   }) async {
@@ -1510,6 +1722,42 @@ class GuardDuty {
     return GetMembersResponse.fromJson(response);
   }
 
+  /// Provides the number of days left for each data source used in the free
+  /// trial period.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector of the GuardDuty member account.
+  ///
+  /// Parameter [accountIds] :
+  /// A list of account identifiers of the GuardDuty member account.
+  Future<GetRemainingFreeTrialDaysResponse> getRemainingFreeTrialDays({
+    required String detectorId,
+    List<String>? accountIds,
+  }) async {
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    final $payload = <String, dynamic>{
+      if (accountIds != null) 'accountIds': accountIds,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri:
+          '/detector/${Uri.encodeComponent(detectorId)}/freeTrial/daysRemaining',
+      exceptionFnMap: _exceptionFns,
+    );
+    return GetRemainingFreeTrialDaysResponse.fromJson(response);
+  }
+
   /// Retrieves the ThreatIntelSet that is specified by the ThreatIntelSet ID.
   ///
   /// May throw [BadRequestException].
@@ -1544,10 +1792,10 @@ class GuardDuty {
   }
 
   /// Lists Amazon GuardDuty usage statistics over the last 30 days for the
-  /// specified detector ID. For newly enabled detectors or data sources the
-  /// cost returned will include only the usage so far under 30 days, this may
-  /// differ from the cost metrics in the console, which projects usage over 30
-  /// days to provide a monthly cost estimate. For more information see <a
+  /// specified detector ID. For newly enabled detectors or data sources, the
+  /// cost returned will include only the usage so far under 30 days. This may
+  /// differ from the cost metrics in the console, which project usage over 30
+  /// days to provide a monthly cost estimate. For more information, see <a
   /// href="https://docs.aws.amazon.com/guardduty/latest/ug/monitoring_costs.html#usage-calculations">Understanding
   /// How Usage Costs are Calculated</a>.
   ///
@@ -1617,10 +1865,10 @@ class GuardDuty {
     return GetUsageStatisticsResponse.fromJson(response);
   }
 
-  /// Invites other AWS accounts (created as members of the current AWS account
-  /// by CreateMembers) to enable GuardDuty, and allow the current AWS account
-  /// to view and manage these accounts' findings on their behalf as the
-  /// GuardDuty administrator account.
+  /// Invites other Amazon Web Services accounts (created as members of the
+  /// current Amazon Web Services account by CreateMembers) to enable GuardDuty,
+  /// and allow the current Amazon Web Services account to view and manage these
+  /// accounts' findings on their behalf as the GuardDuty administrator account.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
@@ -1886,9 +2134,6 @@ class GuardDuty {
   /// service.action.networkConnectionAction.protocol
   /// </li>
   /// <li>
-  /// service.action.networkConnectionAction.remoteIpDetails.city.cityName
-  /// </li>
-  /// <li>
   /// service.action.networkConnectionAction.remoteIpDetails.country.countryName
   /// </li>
   /// <li>
@@ -2030,7 +2275,7 @@ class GuardDuty {
   }
 
   /// Lists all GuardDuty membership invitations that were sent to the current
-  /// AWS account.
+  /// Amazon Web Services account.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
@@ -2166,7 +2411,7 @@ class GuardDuty {
   }
 
   /// Returns a list of publishing destinations associated with the specified
-  /// <code>dectectorId</code>.
+  /// <code>detectorId</code>.
   ///
   /// May throw [BadRequestException].
   /// May throw [InternalServerErrorException].
@@ -2640,8 +2885,7 @@ class GuardDuty {
   /// not.
   ///
   /// Parameter [location] :
-  /// The updated URI of the file that contains the IPSet. For example:
-  /// https://s3.us-west-2.amazonaws.com/my-bucket/my-object-key.
+  /// The updated URI of the file that contains the IPSet.
   ///
   /// Parameter [name] :
   /// The unique ID that specifies the IPSet that you want to update.
@@ -2683,6 +2927,49 @@ class GuardDuty {
       method: 'POST',
       requestUri:
           '/detector/${Uri.encodeComponent(detectorId)}/ipset/${Uri.encodeComponent(ipSetId)}',
+      exceptionFnMap: _exceptionFns,
+    );
+  }
+
+  /// Updates the malware scan settings.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  ///
+  /// Parameter [detectorId] :
+  /// The unique ID of the detector that specifies the GuardDuty service where
+  /// you want to update scan settings.
+  ///
+  /// Parameter [ebsSnapshotPreservation] :
+  /// An enum value representing possible snapshot preservations.
+  ///
+  /// Parameter [scanResourceCriteria] :
+  /// Represents the criteria to be used in the filter for selecting resources
+  /// to scan.
+  Future<void> updateMalwareScanSettings({
+    required String detectorId,
+    EbsSnapshotPreservation? ebsSnapshotPreservation,
+    ScanResourceCriteria? scanResourceCriteria,
+  }) async {
+    ArgumentError.checkNotNull(detectorId, 'detectorId');
+    _s.validateStringLength(
+      'detectorId',
+      detectorId,
+      1,
+      300,
+      isRequired: true,
+    );
+    final $payload = <String, dynamic>{
+      if (ebsSnapshotPreservation != null)
+        'ebsSnapshotPreservation': ebsSnapshotPreservation.toValue(),
+      if (scanResourceCriteria != null)
+        'scanResourceCriteria': scanResourceCriteria,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri:
+          '/detector/${Uri.encodeComponent(detectorId)}/malware-scan-settings',
       exceptionFnMap: _exceptionFns,
     );
   }
@@ -2876,6 +3163,15 @@ class GuardDuty {
   }
 }
 
+class AcceptAdministratorInvitationResponse {
+  AcceptAdministratorInvitationResponse();
+  factory AcceptAdministratorInvitationResponse.fromJson(
+      Map<String, dynamic> _) {
+    return AcceptAdministratorInvitationResponse();
+  }
+}
+
+@deprecated
 class AcceptInvitationResponse {
   AcceptInvitationResponse();
   factory AcceptInvitationResponse.fromJson(Map<String, dynamic> _) {
@@ -2957,6 +3253,30 @@ class AccountDetail {
   }
 }
 
+/// Provides details of the GuardDuty member account that uses a free trial
+/// service.
+class AccountFreeTrialInfo {
+  /// The account identifier of the GuardDuty member account.
+  final String? accountId;
+
+  /// Describes the data source enabled for the GuardDuty member account.
+  final DataSourcesFreeTrial? dataSources;
+
+  AccountFreeTrialInfo({
+    this.accountId,
+    this.dataSources,
+  });
+  factory AccountFreeTrialInfo.fromJson(Map<String, dynamic> json) {
+    return AccountFreeTrialInfo(
+      accountId: json['accountId'] as String?,
+      dataSources: json['dataSources'] != null
+          ? DataSourcesFreeTrial.fromJson(
+              json['dataSources'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 /// Contains information about the account level permissions on the S3 bucket.
 class AccountLevelPermissions {
   /// Describes the S3 Block Public Access settings of the bucket's parent
@@ -2987,6 +3307,9 @@ class Action {
   /// Information about the DNS_REQUEST action described in this finding.
   final DnsRequestAction? dnsRequestAction;
 
+  /// Information about the Kubernetes API call action described in this finding.
+  final KubernetesApiCallAction? kubernetesApiCallAction;
+
   /// Information about the NETWORK_CONNECTION action described in this finding.
   final NetworkConnectionAction? networkConnectionAction;
 
@@ -2997,6 +3320,7 @@ class Action {
     this.actionType,
     this.awsApiCallAction,
     this.dnsRequestAction,
+    this.kubernetesApiCallAction,
     this.networkConnectionAction,
     this.portProbeAction,
   });
@@ -3010,6 +3334,10 @@ class Action {
       dnsRequestAction: json['dnsRequestAction'] != null
           ? DnsRequestAction.fromJson(
               json['dnsRequestAction'] as Map<String, dynamic>)
+          : null,
+      kubernetesApiCallAction: json['kubernetesApiCallAction'] != null
+          ? KubernetesApiCallAction.fromJson(
+              json['kubernetesApiCallAction'] as Map<String, dynamic>)
           : null,
       networkConnectionAction: json['networkConnectionAction'] != null
           ? NetworkConnectionAction.fromJson(
@@ -3026,7 +3354,7 @@ class Action {
 /// The account within the organization specified as the GuardDuty delegated
 /// administrator.
 class AdminAccount {
-  /// The AWS account ID for the account.
+  /// The Amazon Web Services account ID for the account.
   final String? adminAccountId;
 
   /// Indicates whether the account is enabled as the delegated administrator.
@@ -3072,6 +3400,38 @@ extension on String {
   }
 }
 
+/// Contains information about the administrator account and invitation.
+class Administrator {
+  /// The ID of the account used as the administrator account.
+  final String? accountId;
+
+  /// The value that is used to validate the administrator account to the member
+  /// account.
+  final String? invitationId;
+
+  /// The timestamp when the invitation was sent.
+  final String? invitedAt;
+
+  /// The status of the relationship between the administrator and member
+  /// accounts.
+  final String? relationshipStatus;
+
+  Administrator({
+    this.accountId,
+    this.invitationId,
+    this.invitedAt,
+    this.relationshipStatus,
+  });
+  factory Administrator.fromJson(Map<String, dynamic> json) {
+    return Administrator(
+      accountId: json['accountId'] as String?,
+      invitationId: json['invitationId'] as String?,
+      invitedAt: json['invitedAt'] as String?,
+      relationshipStatus: json['relationshipStatus'] as String?,
+    );
+  }
+}
+
 class ArchiveFindingsResponse {
   ArchiveFindingsResponse();
   factory ArchiveFindingsResponse.fromJson(Map<String, dynamic> _) {
@@ -3081,34 +3441,51 @@ class ArchiveFindingsResponse {
 
 /// Contains information about the API action.
 class AwsApiCallAction {
-  /// The AWS API name.
+  /// The details of the Amazon Web Services account that made the API call. This
+  /// field identifies the resources that were affected by this API call.
+  final Map<String, String>? affectedResources;
+
+  /// The Amazon Web Services API name.
   final String? api;
 
-  /// The AWS API caller type.
+  /// The Amazon Web Services API caller type.
   final String? callerType;
 
-  /// The domain information for the AWS API call.
+  /// The domain information for the Amazon Web Services API call.
   final DomainDetails? domainDetails;
 
-  /// The error code of the failed AWS API action.
+  /// The error code of the failed Amazon Web Services API action.
   final String? errorCode;
 
-  /// The remote IP information of the connection that initiated the AWS API call.
+  /// The details of the Amazon Web Services account that made the API call. This
+  /// field appears if the call was made from outside your account.
+  final RemoteAccountDetails? remoteAccountDetails;
+
+  /// The remote IP information of the connection that initiated the Amazon Web
+  /// Services API call.
   final RemoteIpDetails? remoteIpDetails;
 
-  /// The AWS service name whose API was invoked.
+  /// The Amazon Web Services service name whose API was invoked.
   final String? serviceName;
 
+  /// The agent through which the API request was made.
+  final String? userAgent;
+
   AwsApiCallAction({
+    this.affectedResources,
     this.api,
     this.callerType,
     this.domainDetails,
     this.errorCode,
+    this.remoteAccountDetails,
     this.remoteIpDetails,
     this.serviceName,
+    this.userAgent,
   });
   factory AwsApiCallAction.fromJson(Map<String, dynamic> json) {
     return AwsApiCallAction(
+      affectedResources: (json['affectedResources'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
       api: json['api'] as String?,
       callerType: json['callerType'] as String?,
       domainDetails: json['domainDetails'] != null
@@ -3116,11 +3493,16 @@ class AwsApiCallAction {
               json['domainDetails'] as Map<String, dynamic>)
           : null,
       errorCode: json['errorCode'] as String?,
+      remoteAccountDetails: json['remoteAccountDetails'] != null
+          ? RemoteAccountDetails.fromJson(
+              json['remoteAccountDetails'] as Map<String, dynamic>)
+          : null,
       remoteIpDetails: json['remoteIpDetails'] != null
           ? RemoteIpDetails.fromJson(
               json['remoteIpDetails'] as Map<String, dynamic>)
           : null,
       serviceName: json['serviceName'] as String?,
+      userAgent: json['userAgent'] as String?,
     );
   }
 }
@@ -3371,6 +3753,61 @@ class Condition {
   }
 }
 
+/// Details of a container.
+class Container {
+  /// The container runtime (such as, Docker or containerd) used to run the
+  /// container.
+  final String? containerRuntime;
+
+  /// Container ID.
+  final String? id;
+
+  /// Container image.
+  final String? image;
+
+  /// Part of the image name before the last slash. For example, imagePrefix for
+  /// public.ecr.aws/amazonlinux/amazonlinux:latest would be
+  /// public.ecr.aws/amazonlinux. If the image name is relative and does not have
+  /// a slash, this field is empty.
+  final String? imagePrefix;
+
+  /// Container name.
+  final String? name;
+
+  /// Container security context.
+  final SecurityContext? securityContext;
+
+  /// Container volume mounts.
+  final List<VolumeMount>? volumeMounts;
+
+  Container({
+    this.containerRuntime,
+    this.id,
+    this.image,
+    this.imagePrefix,
+    this.name,
+    this.securityContext,
+    this.volumeMounts,
+  });
+  factory Container.fromJson(Map<String, dynamic> json) {
+    return Container(
+      containerRuntime: json['containerRuntime'] as String?,
+      id: json['id'] as String?,
+      image: json['image'] as String?,
+      imagePrefix: json['imagePrefix'] as String?,
+      name: json['name'] as String?,
+      securityContext: json['securityContext'] != null
+          ? SecurityContext.fromJson(
+              json['securityContext'] as Map<String, dynamic>)
+          : null,
+      volumeMounts: (json['volumeMounts'] as List?)
+          ?.whereNotNull()
+          .map((e) => VolumeMount.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 /// Contains information about the country where the remote IP address is
 /// located.
 class Country {
@@ -3489,6 +3926,54 @@ class CreateThreatIntelSetResponse {
   }
 }
 
+enum CriterionKey {
+  ec2InstanceArn,
+  scanId,
+  accountId,
+  guarddutyFindingId,
+  scanStartTime,
+  scanStatus,
+}
+
+extension on CriterionKey {
+  String toValue() {
+    switch (this) {
+      case CriterionKey.ec2InstanceArn:
+        return 'EC2_INSTANCE_ARN';
+      case CriterionKey.scanId:
+        return 'SCAN_ID';
+      case CriterionKey.accountId:
+        return 'ACCOUNT_ID';
+      case CriterionKey.guarddutyFindingId:
+        return 'GUARDDUTY_FINDING_ID';
+      case CriterionKey.scanStartTime:
+        return 'SCAN_START_TIME';
+      case CriterionKey.scanStatus:
+        return 'SCAN_STATUS';
+    }
+  }
+}
+
+extension on String {
+  CriterionKey toCriterionKey() {
+    switch (this) {
+      case 'EC2_INSTANCE_ARN':
+        return CriterionKey.ec2InstanceArn;
+      case 'SCAN_ID':
+        return CriterionKey.scanId;
+      case 'ACCOUNT_ID':
+        return CriterionKey.accountId;
+      case 'GUARDDUTY_FINDING_ID':
+        return CriterionKey.guarddutyFindingId;
+      case 'SCAN_START_TIME':
+        return CriterionKey.scanStartTime;
+      case 'SCAN_STATUS':
+        return CriterionKey.scanStatus;
+    }
+    throw Exception('$this is not known in enum CriterionKey');
+  }
+}
+
 /// Contains information on the status of DNS logs as a data source.
 class DNSLogsConfigurationResult {
   /// Denotes whether DNS logs is enabled as a data source.
@@ -3509,6 +3994,8 @@ enum DataSource {
   cloudTrail,
   dnsLogs,
   s3Logs,
+  kubernetesAuditLogs,
+  ec2MalwareScan,
 }
 
 extension on DataSource {
@@ -3522,6 +4009,10 @@ extension on DataSource {
         return 'DNS_LOGS';
       case DataSource.s3Logs:
         return 'S3_LOGS';
+      case DataSource.kubernetesAuditLogs:
+        return 'KUBERNETES_AUDIT_LOGS';
+      case DataSource.ec2MalwareScan:
+        return 'EC2_MALWARE_SCAN';
     }
   }
 }
@@ -3537,6 +4028,10 @@ extension on String {
         return DataSource.dnsLogs;
       case 'S3_LOGS':
         return DataSource.s3Logs;
+      case 'KUBERNETES_AUDIT_LOGS':
+        return DataSource.kubernetesAuditLogs;
+      case 'EC2_MALWARE_SCAN':
+        return DataSource.ec2MalwareScan;
     }
     throw Exception('$this is not known in enum DataSource');
   }
@@ -3544,15 +4039,27 @@ extension on String {
 
 /// Contains information about which data sources are enabled.
 class DataSourceConfigurations {
+  /// Describes whether any Kubernetes logs are enabled as data sources.
+  final KubernetesConfiguration? kubernetes;
+
+  /// Describes whether Malware Protection is enabled as a data source.
+  final MalwareProtectionConfiguration? malwareProtection;
+
   /// Describes whether S3 data event logs are enabled as a data source.
   final S3LogsConfiguration? s3Logs;
 
   DataSourceConfigurations({
+    this.kubernetes,
+    this.malwareProtection,
     this.s3Logs,
   });
   Map<String, dynamic> toJson() {
+    final kubernetes = this.kubernetes;
+    final malwareProtection = this.malwareProtection;
     final s3Logs = this.s3Logs;
     return {
+      if (kubernetes != null) 'kubernetes': kubernetes,
+      if (malwareProtection != null) 'malwareProtection': malwareProtection,
       if (s3Logs != null) 's3Logs': s3Logs,
     };
   }
@@ -3576,11 +4083,20 @@ class DataSourceConfigurationsResult {
   /// data source.
   final S3LogsConfigurationResult s3Logs;
 
+  /// An object that contains information on the status of all Kubernetes data
+  /// sources.
+  final KubernetesConfigurationResult? kubernetes;
+
+  /// Describes the configuration of Malware Protection data sources.
+  final MalwareProtectionConfigurationResult? malwareProtection;
+
   DataSourceConfigurationsResult({
     required this.cloudTrail,
     required this.dNSLogs,
     required this.flowLogs,
     required this.s3Logs,
+    this.kubernetes,
+    this.malwareProtection,
   });
   factory DataSourceConfigurationsResult.fromJson(Map<String, dynamic> json) {
     return DataSourceConfigurationsResult(
@@ -3592,6 +4108,31 @@ class DataSourceConfigurationsResult {
           json['flowLogs'] as Map<String, dynamic>),
       s3Logs: S3LogsConfigurationResult.fromJson(
           json['s3Logs'] as Map<String, dynamic>),
+      kubernetes: json['kubernetes'] != null
+          ? KubernetesConfigurationResult.fromJson(
+              json['kubernetes'] as Map<String, dynamic>)
+          : null,
+      malwareProtection: json['malwareProtection'] != null
+          ? MalwareProtectionConfigurationResult.fromJson(
+              json['malwareProtection'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Contains information about which data sources are enabled for the GuardDuty
+/// member account.
+class DataSourceFreeTrial {
+  /// A value that specifies the number of days left to use each enabled data
+  /// source.
+  final int? freeTrialDaysRemaining;
+
+  DataSourceFreeTrial({
+    this.freeTrialDaysRemaining,
+  });
+  factory DataSourceFreeTrial.fromJson(Map<String, dynamic> json) {
+    return DataSourceFreeTrial(
+      freeTrialDaysRemaining: json['freeTrialDaysRemaining'] as int?,
     );
   }
 }
@@ -3621,6 +4162,65 @@ extension on String {
         return DataSourceStatus.disabled;
     }
     throw Exception('$this is not known in enum DataSourceStatus');
+  }
+}
+
+/// Contains information about which data sources are enabled for the GuardDuty
+/// member account.
+class DataSourcesFreeTrial {
+  /// Describes whether any AWS CloudTrail management event logs are enabled as
+  /// data sources.
+  final DataSourceFreeTrial? cloudTrail;
+
+  /// Describes whether any DNS logs are enabled as data sources.
+  final DataSourceFreeTrial? dnsLogs;
+
+  /// Describes whether any VPC Flow logs are enabled as data sources.
+  final DataSourceFreeTrial? flowLogs;
+
+  /// Describes whether any Kubernetes logs are enabled as data sources.
+  final KubernetesDataSourceFreeTrial? kubernetes;
+
+  /// Describes whether Malware Protection is enabled as a data source.
+  final MalwareProtectionDataSourceFreeTrial? malwareProtection;
+
+  /// Describes whether any S3 data event logs are enabled as data sources.
+  final DataSourceFreeTrial? s3Logs;
+
+  DataSourcesFreeTrial({
+    this.cloudTrail,
+    this.dnsLogs,
+    this.flowLogs,
+    this.kubernetes,
+    this.malwareProtection,
+    this.s3Logs,
+  });
+  factory DataSourcesFreeTrial.fromJson(Map<String, dynamic> json) {
+    return DataSourcesFreeTrial(
+      cloudTrail: json['cloudTrail'] != null
+          ? DataSourceFreeTrial.fromJson(
+              json['cloudTrail'] as Map<String, dynamic>)
+          : null,
+      dnsLogs: json['dnsLogs'] != null
+          ? DataSourceFreeTrial.fromJson(
+              json['dnsLogs'] as Map<String, dynamic>)
+          : null,
+      flowLogs: json['flowLogs'] != null
+          ? DataSourceFreeTrial.fromJson(
+              json['flowLogs'] as Map<String, dynamic>)
+          : null,
+      kubernetes: json['kubernetes'] != null
+          ? KubernetesDataSourceFreeTrial.fromJson(
+              json['kubernetes'] as Map<String, dynamic>)
+          : null,
+      malwareProtection: json['malwareProtection'] != null
+          ? MalwareProtectionDataSourceFreeTrial.fromJson(
+              json['malwareProtection'] as Map<String, dynamic>)
+          : null,
+      s3Logs: json['s3Logs'] != null
+          ? DataSourceFreeTrial.fromJson(json['s3Logs'] as Map<String, dynamic>)
+          : null,
+    );
   }
 }
 
@@ -3736,6 +4336,29 @@ class DeleteThreatIntelSetResponse {
   }
 }
 
+class DescribeMalwareScansResponse {
+  /// Contains information about malware scans.
+  final List<Scan> scans;
+
+  /// The pagination parameter to be used on the next list operation to retrieve
+  /// more items.
+  final String? nextToken;
+
+  DescribeMalwareScansResponse({
+    required this.scans,
+    this.nextToken,
+  });
+  factory DescribeMalwareScansResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeMalwareScansResponse(
+      scans: (json['scans'] as List)
+          .whereNotNull()
+          .map((e) => Scan.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['nextToken'] as String?,
+    );
+  }
+}
+
 class DescribeOrganizationConfigurationResponse {
   /// Indicates whether GuardDuty is automatically enabled for accounts added to
   /// the organization.
@@ -3839,6 +4462,9 @@ class Destination {
 /// findings.
 class DestinationProperties {
   /// The ARN of the resource to publish to.
+  ///
+  /// To specify an S3 bucket folder use the following format:
+  /// <code>arn:aws:s3:::DOC-EXAMPLE-BUCKET/myFolder/</code>
   final String? destinationArn;
 
   /// The ARN of the KMS key to use for encryption.
@@ -3924,6 +4550,15 @@ class DisableOrganizationAdminAccountResponse {
   }
 }
 
+class DisassociateFromAdministratorAccountResponse {
+  DisassociateFromAdministratorAccountResponse();
+  factory DisassociateFromAdministratorAccountResponse.fromJson(
+      Map<String, dynamic> _) {
+    return DisassociateFromAdministratorAccountResponse();
+  }
+}
+
+@deprecated
 class DisassociateFromMasterAccountResponse {
   DisassociateFromMasterAccountResponse();
   factory DisassociateFromMasterAccountResponse.fromJson(
@@ -3952,22 +4587,33 @@ class DisassociateMembersResponse {
 
 /// Contains information about the DNS_REQUEST action described in this finding.
 class DnsRequestAction {
+  /// Indicates whether the targeted port is blocked.
+  final bool? blocked;
+
   /// The domain information for the API request.
   final String? domain;
 
+  /// The network connection protocol observed in the activity that prompted
+  /// GuardDuty to generate the finding.
+  final String? protocol;
+
   DnsRequestAction({
+    this.blocked,
     this.domain,
+    this.protocol,
   });
   factory DnsRequestAction.fromJson(Map<String, dynamic> json) {
     return DnsRequestAction(
+      blocked: json['blocked'] as bool?,
       domain: json['domain'] as String?,
+      protocol: json['protocol'] as String?,
     );
   }
 }
 
 /// Contains information about the domain.
 class DomainDetails {
-  /// The domain information for the AWS API call.
+  /// The domain information for the Amazon Web Services API call.
   final String? domain;
 
   DomainDetails({
@@ -3976,6 +4622,289 @@ class DomainDetails {
   factory DomainDetails.fromJson(Map<String, dynamic> json) {
     return DomainDetails(
       domain: json['domain'] as String?,
+    );
+  }
+}
+
+enum EbsSnapshotPreservation {
+  noRetention,
+  retentionWithFinding,
+}
+
+extension on EbsSnapshotPreservation {
+  String toValue() {
+    switch (this) {
+      case EbsSnapshotPreservation.noRetention:
+        return 'NO_RETENTION';
+      case EbsSnapshotPreservation.retentionWithFinding:
+        return 'RETENTION_WITH_FINDING';
+    }
+  }
+}
+
+extension on String {
+  EbsSnapshotPreservation toEbsSnapshotPreservation() {
+    switch (this) {
+      case 'NO_RETENTION':
+        return EbsSnapshotPreservation.noRetention;
+      case 'RETENTION_WITH_FINDING':
+        return EbsSnapshotPreservation.retentionWithFinding;
+    }
+    throw Exception('$this is not known in enum EbsSnapshotPreservation');
+  }
+}
+
+/// Contains list of scanned and skipped EBS volumes with details.
+class EbsVolumeDetails {
+  /// List of EBS volumes that were scanned.
+  final List<VolumeDetail>? scannedVolumeDetails;
+
+  /// List of EBS volumes that were skipped from the malware scan.
+  final List<VolumeDetail>? skippedVolumeDetails;
+
+  EbsVolumeDetails({
+    this.scannedVolumeDetails,
+    this.skippedVolumeDetails,
+  });
+  factory EbsVolumeDetails.fromJson(Map<String, dynamic> json) {
+    return EbsVolumeDetails(
+      scannedVolumeDetails: (json['scannedVolumeDetails'] as List?)
+          ?.whereNotNull()
+          .map((e) => VolumeDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      skippedVolumeDetails: (json['skippedVolumeDetails'] as List?)
+          ?.whereNotNull()
+          .map((e) => VolumeDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+/// Contains details from the malware scan that created a finding.
+class EbsVolumeScanDetails {
+  /// Returns the completion date and time of the malware scan.
+  final DateTime? scanCompletedAt;
+
+  /// Contains a complete view providing malware scan result details.
+  final ScanDetections? scanDetections;
+
+  /// Unique Id of the malware scan that generated the finding.
+  final String? scanId;
+
+  /// Returns the start date and time of the malware scan.
+  final DateTime? scanStartedAt;
+
+  /// Contains list of threat intelligence sources used to detect threats.
+  final List<String>? sources;
+
+  /// GuardDuty finding ID that triggered a malware scan.
+  final String? triggerFindingId;
+
+  EbsVolumeScanDetails({
+    this.scanCompletedAt,
+    this.scanDetections,
+    this.scanId,
+    this.scanStartedAt,
+    this.sources,
+    this.triggerFindingId,
+  });
+  factory EbsVolumeScanDetails.fromJson(Map<String, dynamic> json) {
+    return EbsVolumeScanDetails(
+      scanCompletedAt: timeStampFromJson(json['scanCompletedAt']),
+      scanDetections: json['scanDetections'] != null
+          ? ScanDetections.fromJson(
+              json['scanDetections'] as Map<String, dynamic>)
+          : null,
+      scanId: json['scanId'] as String?,
+      scanStartedAt: timeStampFromJson(json['scanStartedAt']),
+      sources: (json['sources'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      triggerFindingId: json['triggerFindingId'] as String?,
+    );
+  }
+}
+
+/// Describes the configuration of scanning EBS volumes as a data source.
+class EbsVolumesResult {
+  /// Describes whether scanning EBS volumes is enabled as a data source.
+  final DataSourceStatus? status;
+
+  EbsVolumesResult({
+    this.status,
+  });
+  factory EbsVolumesResult.fromJson(Map<String, dynamic> json) {
+    return EbsVolumesResult(
+      status: (json['status'] as String?)?.toDataSourceStatus(),
+    );
+  }
+}
+
+/// Contains information about the details of the ECS Cluster.
+class EcsClusterDetails {
+  /// The number of services that are running on the cluster in an ACTIVE state.
+  final int? activeServicesCount;
+
+  /// The Amazon Resource Name (ARN) that identifies the cluster.
+  final String? arn;
+
+  /// The name of the ECS Cluster.
+  final String? name;
+
+  /// The number of container instances registered into the cluster.
+  final int? registeredContainerInstancesCount;
+
+  /// The number of tasks in the cluster that are in the RUNNING state.
+  final int? runningTasksCount;
+
+  /// The status of the ECS cluster.
+  final String? status;
+
+  /// The tags of the ECS Cluster.
+  final List<Tag>? tags;
+
+  /// Contains information about the details of the ECS Task.
+  final EcsTaskDetails? taskDetails;
+
+  EcsClusterDetails({
+    this.activeServicesCount,
+    this.arn,
+    this.name,
+    this.registeredContainerInstancesCount,
+    this.runningTasksCount,
+    this.status,
+    this.tags,
+    this.taskDetails,
+  });
+  factory EcsClusterDetails.fromJson(Map<String, dynamic> json) {
+    return EcsClusterDetails(
+      activeServicesCount: json['activeServicesCount'] as int?,
+      arn: json['arn'] as String?,
+      name: json['name'] as String?,
+      registeredContainerInstancesCount:
+          json['registeredContainerInstancesCount'] as int?,
+      runningTasksCount: json['runningTasksCount'] as int?,
+      status: json['status'] as String?,
+      tags: (json['tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      taskDetails: json['taskDetails'] != null
+          ? EcsTaskDetails.fromJson(json['taskDetails'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Contains information about the task in an ECS cluster.
+class EcsTaskDetails {
+  /// The Amazon Resource Name (ARN) of the task.
+  final String? arn;
+
+  /// The containers that's associated with the task.
+  final List<Container>? containers;
+
+  /// The ARN of the task definition that creates the task.
+  final String? definitionArn;
+
+  /// The name of the task group that's associated with the task.
+  final String? group;
+
+  /// The Unix timestamp for the time when the task started.
+  final DateTime? startedAt;
+
+  /// Contains the tag specified when a task is started.
+  final String? startedBy;
+
+  /// The tags of the ECS Task.
+  final List<Tag>? tags;
+
+  /// The Unix timestamp for the time when the task was created.
+  final DateTime? taskCreatedAt;
+
+  /// The version counter for the task.
+  final String? version;
+
+  /// The list of data volume definitions for the task.
+  final List<Volume>? volumes;
+
+  EcsTaskDetails({
+    this.arn,
+    this.containers,
+    this.definitionArn,
+    this.group,
+    this.startedAt,
+    this.startedBy,
+    this.tags,
+    this.taskCreatedAt,
+    this.version,
+    this.volumes,
+  });
+  factory EcsTaskDetails.fromJson(Map<String, dynamic> json) {
+    return EcsTaskDetails(
+      arn: json['arn'] as String?,
+      containers: (json['containers'] as List?)
+          ?.whereNotNull()
+          .map((e) => Container.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      definitionArn: json['definitionArn'] as String?,
+      group: json['group'] as String?,
+      startedAt: timeStampFromJson(json['startedAt']),
+      startedBy: json['startedBy'] as String?,
+      tags: (json['tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      taskCreatedAt: timeStampFromJson(json['createdAt']),
+      version: json['version'] as String?,
+      volumes: (json['volumes'] as List?)
+          ?.whereNotNull()
+          .map((e) => Volume.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+/// Details about the EKS cluster involved in a Kubernetes finding.
+class EksClusterDetails {
+  /// EKS cluster ARN.
+  final String? arn;
+
+  /// The timestamp when the EKS cluster was created.
+  final DateTime? createdAt;
+
+  /// EKS cluster name.
+  final String? name;
+
+  /// The EKS cluster status.
+  final String? status;
+
+  /// The EKS cluster tags.
+  final List<Tag>? tags;
+
+  /// The VPC ID to which the EKS cluster is attached.
+  final String? vpcId;
+
+  EksClusterDetails({
+    this.arn,
+    this.createdAt,
+    this.name,
+    this.status,
+    this.tags,
+    this.vpcId,
+  });
+  factory EksClusterDetails.fromJson(Map<String, dynamic> json) {
+    return EksClusterDetails(
+      arn: json['arn'] as String?,
+      createdAt: timeStampFromJson(json['createdAt']),
+      name: json['name'] as String?,
+      status: json['status'] as String?,
+      tags: (json['tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      vpcId: json['vpcId'] as String?,
     );
   }
 }
@@ -4060,6 +4989,79 @@ extension on String {
         return FilterAction.archive;
     }
     throw Exception('$this is not known in enum FilterAction');
+  }
+}
+
+/// Contains information about the condition.
+class FilterCondition {
+  /// Represents an <i>equal</i> <b/> condition to be applied to a single field
+  /// when querying for scan entries.
+  final String? equalsValue;
+
+  /// Represents a <i>greater than</i> condition to be applied to a single field
+  /// when querying for scan entries.
+  final int? greaterThan;
+
+  /// Represents a <i>less than</i> condition to be applied to a single field when
+  /// querying for scan entries.
+  final int? lessThan;
+
+  FilterCondition({
+    this.equalsValue,
+    this.greaterThan,
+    this.lessThan,
+  });
+  Map<String, dynamic> toJson() {
+    final equalsValue = this.equalsValue;
+    final greaterThan = this.greaterThan;
+    final lessThan = this.lessThan;
+    return {
+      if (equalsValue != null) 'equalsValue': equalsValue,
+      if (greaterThan != null) 'greaterThan': greaterThan,
+      if (lessThan != null) 'lessThan': lessThan,
+    };
+  }
+}
+
+/// Represents the criteria to be used in the filter for describing scan
+/// entries.
+class FilterCriteria {
+  /// Represents a condition that when matched will be added to the response of
+  /// the operation.
+  final List<FilterCriterion>? filterCriterion;
+
+  FilterCriteria({
+    this.filterCriterion,
+  });
+  Map<String, dynamic> toJson() {
+    final filterCriterion = this.filterCriterion;
+    return {
+      if (filterCriterion != null) 'filterCriterion': filterCriterion,
+    };
+  }
+}
+
+/// Represents a condition that when matched will be added to the response of
+/// the operation.
+class FilterCriterion {
+  /// An enum value representing possible scan properties to match with given scan
+  /// entries.
+  final CriterionKey? criterionKey;
+
+  /// Contains information about the condition.
+  final FilterCondition? filterCondition;
+
+  FilterCriterion({
+    this.criterionKey,
+    this.filterCondition,
+  });
+  Map<String, dynamic> toJson() {
+    final criterionKey = this.criterionKey;
+    final filterCondition = this.filterCondition;
+    return {
+      if (criterionKey != null) 'criterionKey': criterionKey.toValue(),
+      if (filterCondition != null) 'filterCondition': filterCondition,
+    };
   }
 }
 
@@ -4278,6 +5280,21 @@ class GeoLocation {
   }
 }
 
+class GetAdministratorAccountResponse {
+  /// The administrator account details.
+  final Administrator administrator;
+
+  GetAdministratorAccountResponse({
+    required this.administrator,
+  });
+  factory GetAdministratorAccountResponse.fromJson(Map<String, dynamic> json) {
+    return GetAdministratorAccountResponse(
+      administrator:
+          Administrator.fromJson(json['administrator'] as Map<String, dynamic>),
+    );
+  }
+}
+
 class GetDetectorResponse {
   /// The GuardDuty service role.
   final String serviceRole;
@@ -4407,8 +5424,7 @@ class GetIPSetResponse {
   /// The format of the file that contains the IPSet.
   final IpSetFormat format;
 
-  /// The URI of the file that contains the IPSet. For example:
-  /// https://s3.us-west-2.amazonaws.com/my-bucket/my-object-key.
+  /// The URI of the file that contains the IPSet.
   final String location;
 
   /// The user-friendly name for the IPSet.
@@ -4453,6 +5469,30 @@ class GetInvitationsCountResponse {
   }
 }
 
+class GetMalwareScanSettingsResponse {
+  /// An enum value representing possible snapshot preservations.
+  final EbsSnapshotPreservation? ebsSnapshotPreservation;
+
+  /// Represents the criteria to be used in the filter for scanning resources.
+  final ScanResourceCriteria? scanResourceCriteria;
+
+  GetMalwareScanSettingsResponse({
+    this.ebsSnapshotPreservation,
+    this.scanResourceCriteria,
+  });
+  factory GetMalwareScanSettingsResponse.fromJson(Map<String, dynamic> json) {
+    return GetMalwareScanSettingsResponse(
+      ebsSnapshotPreservation: (json['ebsSnapshotPreservation'] as String?)
+          ?.toEbsSnapshotPreservation(),
+      scanResourceCriteria: json['scanResourceCriteria'] != null
+          ? ScanResourceCriteria.fromJson(
+              json['scanResourceCriteria'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+@deprecated
 class GetMasterAccountResponse {
   /// The administrator account details.
   final Master master;
@@ -4521,12 +5561,39 @@ class GetMembersResponse {
   }
 }
 
+class GetRemainingFreeTrialDaysResponse {
+  /// The member accounts which were included in a request and were processed
+  /// successfully.
+  final List<AccountFreeTrialInfo>? accounts;
+
+  /// The member account that was included in a request but for which the request
+  /// could not be processed.
+  final List<UnprocessedAccount>? unprocessedAccounts;
+
+  GetRemainingFreeTrialDaysResponse({
+    this.accounts,
+    this.unprocessedAccounts,
+  });
+  factory GetRemainingFreeTrialDaysResponse.fromJson(
+      Map<String, dynamic> json) {
+    return GetRemainingFreeTrialDaysResponse(
+      accounts: (json['accounts'] as List?)
+          ?.whereNotNull()
+          .map((e) => AccountFreeTrialInfo.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      unprocessedAccounts: (json['unprocessedAccounts'] as List?)
+          ?.whereNotNull()
+          .map((e) => UnprocessedAccount.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 class GetThreatIntelSetResponse {
   /// The format of the threatIntelSet.
   final ThreatIntelSetFormat format;
 
-  /// The URI of the file that contains the ThreatIntelSet. For example:
-  /// https://s3.us-west-2.amazonaws.com/my-bucket/my-object-key.
+  /// The URI of the file that contains the ThreatIntelSet.
   final String location;
 
   /// A user-friendly ThreatIntelSet name displayed in all findings that are
@@ -4583,6 +5650,49 @@ class GetUsageStatisticsResponse {
   }
 }
 
+/// Contains details of the highest severity threat detected during scan and
+/// number of infected files.
+class HighestSeverityThreatDetails {
+  /// Total number of infected files with the highest severity threat detected.
+  final int? count;
+
+  /// Severity level of the highest severity threat detected.
+  final String? severity;
+
+  /// Threat name of the highest severity threat detected as part of the malware
+  /// scan.
+  final String? threatName;
+
+  HighestSeverityThreatDetails({
+    this.count,
+    this.severity,
+    this.threatName,
+  });
+  factory HighestSeverityThreatDetails.fromJson(Map<String, dynamic> json) {
+    return HighestSeverityThreatDetails(
+      count: json['count'] as int?,
+      severity: json['severity'] as String?,
+      threatName: json['threatName'] as String?,
+    );
+  }
+}
+
+/// Represents a pre-existing file or directory on the host machine that the
+/// volume maps to.
+class HostPath {
+  /// Path of the file or directory on the host that the volume maps to.
+  final String? path;
+
+  HostPath({
+    this.path,
+  });
+  factory HostPath.fromJson(Map<String, dynamic> json) {
+    return HostPath(
+      path: json['path'] as String?,
+    );
+  }
+}
+
 /// Contains information about the EC2 instance profile.
 class IamInstanceProfile {
   /// The profile ARN of the EC2 instance.
@@ -4632,8 +5742,8 @@ class InstanceDetails {
   /// The elastic network interface information of the EC2 instance.
   final List<NetworkInterface>? networkInterfaces;
 
-  /// The Amazon Resource Name (ARN) of the AWS Outpost. Only applicable to AWS
-  /// Outposts instances.
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Outpost. Only
+  /// applicable to Amazon Web Services Outposts instances.
   final String? outpostArn;
 
   /// The platform of the EC2 instance.
@@ -4838,6 +5948,247 @@ extension on String {
         return IpSetStatus.deleted;
     }
     throw Exception('$this is not known in enum IpSetStatus');
+  }
+}
+
+/// Information about the Kubernetes API call action described in this finding.
+class KubernetesApiCallAction {
+  /// Parameters related to the Kubernetes API call action.
+  final String? parameters;
+  final RemoteIpDetails? remoteIpDetails;
+
+  /// The Kubernetes API request URI.
+  final String? requestUri;
+
+  /// The IP of the Kubernetes API caller and the IPs of any proxies or load
+  /// balancers between the caller and the API endpoint.
+  final List<String>? sourceIps;
+
+  /// The resulting HTTP response code of the Kubernetes API call action.
+  final int? statusCode;
+
+  /// The user agent of the caller of the Kubernetes API.
+  final String? userAgent;
+
+  /// The Kubernetes API request HTTP verb.
+  final String? verb;
+
+  KubernetesApiCallAction({
+    this.parameters,
+    this.remoteIpDetails,
+    this.requestUri,
+    this.sourceIps,
+    this.statusCode,
+    this.userAgent,
+    this.verb,
+  });
+  factory KubernetesApiCallAction.fromJson(Map<String, dynamic> json) {
+    return KubernetesApiCallAction(
+      parameters: json['parameters'] as String?,
+      remoteIpDetails: json['remoteIpDetails'] != null
+          ? RemoteIpDetails.fromJson(
+              json['remoteIpDetails'] as Map<String, dynamic>)
+          : null,
+      requestUri: json['requestUri'] as String?,
+      sourceIps: (json['sourceIps'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      statusCode: json['statusCode'] as int?,
+      userAgent: json['userAgent'] as String?,
+      verb: json['verb'] as String?,
+    );
+  }
+}
+
+/// Describes whether Kubernetes audit logs are enabled as a data source.
+class KubernetesAuditLogsConfiguration {
+  /// The status of Kubernetes audit logs as a data source.
+  final bool enable;
+
+  KubernetesAuditLogsConfiguration({
+    required this.enable,
+  });
+  Map<String, dynamic> toJson() {
+    final enable = this.enable;
+    return {
+      'enable': enable,
+    };
+  }
+}
+
+/// Describes whether Kubernetes audit logs are enabled as a data source.
+class KubernetesAuditLogsConfigurationResult {
+  /// A value that describes whether Kubernetes audit logs are enabled as a data
+  /// source.
+  final DataSourceStatus status;
+
+  KubernetesAuditLogsConfigurationResult({
+    required this.status,
+  });
+  factory KubernetesAuditLogsConfigurationResult.fromJson(
+      Map<String, dynamic> json) {
+    return KubernetesAuditLogsConfigurationResult(
+      status: (json['status'] as String).toDataSourceStatus(),
+    );
+  }
+}
+
+/// Describes whether any Kubernetes data sources are enabled.
+class KubernetesConfiguration {
+  /// The status of Kubernetes audit logs as a data source.
+  final KubernetesAuditLogsConfiguration auditLogs;
+
+  KubernetesConfiguration({
+    required this.auditLogs,
+  });
+  Map<String, dynamic> toJson() {
+    final auditLogs = this.auditLogs;
+    return {
+      'auditLogs': auditLogs,
+    };
+  }
+}
+
+/// Describes whether any Kubernetes logs will be enabled as a data source.
+class KubernetesConfigurationResult {
+  /// Describes whether Kubernetes audit logs are enabled as a data source.
+  final KubernetesAuditLogsConfigurationResult auditLogs;
+
+  KubernetesConfigurationResult({
+    required this.auditLogs,
+  });
+  factory KubernetesConfigurationResult.fromJson(Map<String, dynamic> json) {
+    return KubernetesConfigurationResult(
+      auditLogs: KubernetesAuditLogsConfigurationResult.fromJson(
+          json['auditLogs'] as Map<String, dynamic>),
+    );
+  }
+}
+
+/// Provides details about the Kubernetes resources when it is enabled as a data
+/// source.
+class KubernetesDataSourceFreeTrial {
+  /// Describes whether Kubernetes audit logs are enabled as a data source.
+  final DataSourceFreeTrial? auditLogs;
+
+  KubernetesDataSourceFreeTrial({
+    this.auditLogs,
+  });
+  factory KubernetesDataSourceFreeTrial.fromJson(Map<String, dynamic> json) {
+    return KubernetesDataSourceFreeTrial(
+      auditLogs: json['auditLogs'] != null
+          ? DataSourceFreeTrial.fromJson(
+              json['auditLogs'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Details about Kubernetes resources such as a Kubernetes user or workload
+/// resource involved in a Kubernetes finding.
+class KubernetesDetails {
+  /// Details about the Kubernetes user involved in a Kubernetes finding.
+  final KubernetesUserDetails? kubernetesUserDetails;
+
+  /// Details about the Kubernetes workload involved in a Kubernetes finding.
+  final KubernetesWorkloadDetails? kubernetesWorkloadDetails;
+
+  KubernetesDetails({
+    this.kubernetesUserDetails,
+    this.kubernetesWorkloadDetails,
+  });
+  factory KubernetesDetails.fromJson(Map<String, dynamic> json) {
+    return KubernetesDetails(
+      kubernetesUserDetails: json['kubernetesUserDetails'] != null
+          ? KubernetesUserDetails.fromJson(
+              json['kubernetesUserDetails'] as Map<String, dynamic>)
+          : null,
+      kubernetesWorkloadDetails: json['kubernetesWorkloadDetails'] != null
+          ? KubernetesWorkloadDetails.fromJson(
+              json['kubernetesWorkloadDetails'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Details about the Kubernetes user involved in a Kubernetes finding.
+class KubernetesUserDetails {
+  /// The groups that include the user who called the Kubernetes API.
+  final List<String>? groups;
+
+  /// The user ID of the user who called the Kubernetes API.
+  final String? uid;
+
+  /// The username of the user who called the Kubernetes API.
+  final String? username;
+
+  KubernetesUserDetails({
+    this.groups,
+    this.uid,
+    this.username,
+  });
+  factory KubernetesUserDetails.fromJson(Map<String, dynamic> json) {
+    return KubernetesUserDetails(
+      groups: (json['groups'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      uid: json['uid'] as String?,
+      username: json['username'] as String?,
+    );
+  }
+}
+
+/// Details about the Kubernetes workload involved in a Kubernetes finding.
+class KubernetesWorkloadDetails {
+  /// Containers running as part of the Kubernetes workload.
+  final List<Container>? containers;
+
+  /// Whether the hostNetwork flag is enabled for the pods included in the
+  /// workload.
+  final bool? hostNetwork;
+
+  /// Kubernetes workload name.
+  final String? name;
+
+  /// Kubernetes namespace that the workload is part of.
+  final String? namespace;
+
+  /// Kubernetes workload type (e.g. Pod, Deployment, etc.).
+  final String? type;
+
+  /// Kubernetes workload ID.
+  final String? uid;
+
+  /// Volumes used by the Kubernetes workload.
+  final List<Volume>? volumes;
+
+  KubernetesWorkloadDetails({
+    this.containers,
+    this.hostNetwork,
+    this.name,
+    this.namespace,
+    this.type,
+    this.uid,
+    this.volumes,
+  });
+  factory KubernetesWorkloadDetails.fromJson(Map<String, dynamic> json) {
+    return KubernetesWorkloadDetails(
+      containers: (json['containers'] as List?)
+          ?.whereNotNull()
+          .map((e) => Container.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      hostNetwork: json['hostNetwork'] as bool?,
+      name: json['name'] as String?,
+      namespace: json['namespace'] as String?,
+      type: json['type'] as String?,
+      uid: json['uid'] as String?,
+      volumes: (json['volumes'] as List?)
+          ?.whereNotNull()
+          .map((e) => Volume.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
   }
 }
 
@@ -5103,6 +6454,71 @@ class LocalPortDetails {
   }
 }
 
+/// Describes whether Malware Protection will be enabled as a data source.
+class MalwareProtectionConfiguration {
+  /// Describes the configuration of Malware Protection for EC2 instances with
+  /// findings.
+  final ScanEc2InstanceWithFindings? scanEc2InstanceWithFindings;
+
+  MalwareProtectionConfiguration({
+    this.scanEc2InstanceWithFindings,
+  });
+  Map<String, dynamic> toJson() {
+    final scanEc2InstanceWithFindings = this.scanEc2InstanceWithFindings;
+    return {
+      if (scanEc2InstanceWithFindings != null)
+        'scanEc2InstanceWithFindings': scanEc2InstanceWithFindings,
+    };
+  }
+}
+
+/// An object that contains information on the status of all Malware Protection
+/// data sources.
+class MalwareProtectionConfigurationResult {
+  /// Describes the configuration of Malware Protection for EC2 instances with
+  /// findings.
+  final ScanEc2InstanceWithFindingsResult? scanEc2InstanceWithFindings;
+
+  /// The GuardDuty Malware Protection service role.
+  final String? serviceRole;
+
+  MalwareProtectionConfigurationResult({
+    this.scanEc2InstanceWithFindings,
+    this.serviceRole,
+  });
+  factory MalwareProtectionConfigurationResult.fromJson(
+      Map<String, dynamic> json) {
+    return MalwareProtectionConfigurationResult(
+      scanEc2InstanceWithFindings: json['scanEc2InstanceWithFindings'] != null
+          ? ScanEc2InstanceWithFindingsResult.fromJson(
+              json['scanEc2InstanceWithFindings'] as Map<String, dynamic>)
+          : null,
+      serviceRole: json['serviceRole'] as String?,
+    );
+  }
+}
+
+/// Provides details about Malware Protection when it is enabled as a data
+/// source.
+class MalwareProtectionDataSourceFreeTrial {
+  /// Describes whether Malware Protection for EC2 instances with findings is
+  /// enabled as a data source.
+  final DataSourceFreeTrial? scanEc2InstanceWithFindings;
+
+  MalwareProtectionDataSourceFreeTrial({
+    this.scanEc2InstanceWithFindings,
+  });
+  factory MalwareProtectionDataSourceFreeTrial.fromJson(
+      Map<String, dynamic> json) {
+    return MalwareProtectionDataSourceFreeTrial(
+      scanEc2InstanceWithFindings: json['scanEc2InstanceWithFindings'] != null
+          ? DataSourceFreeTrial.fromJson(
+              json['scanEc2InstanceWithFindings'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 /// Contains information about the administrator account and invitation.
 class Master {
   /// The ID of the account used as the administrator account.
@@ -5151,6 +6567,9 @@ class Member {
   /// The last-updated timestamp of the member.
   final String updatedAt;
 
+  /// The administrator account ID.
+  final String? administratorId;
+
   /// The detector ID of the member account.
   final String? detectorId;
 
@@ -5163,6 +6582,7 @@ class Member {
     required this.masterId,
     required this.relationshipStatus,
     required this.updatedAt,
+    this.administratorId,
     this.detectorId,
     this.invitedAt,
   });
@@ -5173,6 +6593,7 @@ class Member {
       masterId: json['masterId'] as String,
       relationshipStatus: json['relationshipStatus'] as String,
       updatedAt: json['updatedAt'] as String,
+      administratorId: json['administratorId'] as String?,
       detectorId: json['detectorId'] as String?,
       invitedAt: json['invitedAt'] as String?,
     );
@@ -5391,16 +6812,30 @@ class Organization {
 /// An object that contains information on which data sources will be configured
 /// to be automatically enabled for new members within the organization.
 class OrganizationDataSourceConfigurations {
+  /// Describes the configuration of Kubernetes data sources for new members of
+  /// the organization.
+  final OrganizationKubernetesConfiguration? kubernetes;
+
+  /// Describes the configuration of Malware Protection for new members of the
+  /// organization.
+  final OrganizationMalwareProtectionConfiguration? malwareProtection;
+
   /// Describes whether S3 data event logs are enabled for new members of the
   /// organization.
   final OrganizationS3LogsConfiguration? s3Logs;
 
   OrganizationDataSourceConfigurations({
+    this.kubernetes,
+    this.malwareProtection,
     this.s3Logs,
   });
   Map<String, dynamic> toJson() {
+    final kubernetes = this.kubernetes;
+    final malwareProtection = this.malwareProtection;
     final s3Logs = this.s3Logs;
     return {
+      if (kubernetes != null) 'kubernetes': kubernetes,
+      if (malwareProtection != null) 'malwareProtection': malwareProtection,
       if (s3Logs != null) 's3Logs': s3Logs,
     };
   }
@@ -5412,14 +6847,176 @@ class OrganizationDataSourceConfigurationsResult {
   /// Describes whether S3 data event logs are enabled as a data source.
   final OrganizationS3LogsConfigurationResult s3Logs;
 
+  /// Describes the configuration of Kubernetes data sources.
+  final OrganizationKubernetesConfigurationResult? kubernetes;
+
+  /// Describes the configuration of Malware Protection data source for an
+  /// organization.
+  final OrganizationMalwareProtectionConfigurationResult? malwareProtection;
+
   OrganizationDataSourceConfigurationsResult({
     required this.s3Logs,
+    this.kubernetes,
+    this.malwareProtection,
   });
   factory OrganizationDataSourceConfigurationsResult.fromJson(
       Map<String, dynamic> json) {
     return OrganizationDataSourceConfigurationsResult(
       s3Logs: OrganizationS3LogsConfigurationResult.fromJson(
           json['s3Logs'] as Map<String, dynamic>),
+      kubernetes: json['kubernetes'] != null
+          ? OrganizationKubernetesConfigurationResult.fromJson(
+              json['kubernetes'] as Map<String, dynamic>)
+          : null,
+      malwareProtection: json['malwareProtection'] != null
+          ? OrganizationMalwareProtectionConfigurationResult.fromJson(
+              json['malwareProtection'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Organization-wide EBS volumes scan configuration.
+class OrganizationEbsVolumes {
+  /// Whether scanning EBS volumes should be auto-enabled for new members joining
+  /// the organization.
+  final bool? autoEnable;
+
+  OrganizationEbsVolumes({
+    this.autoEnable,
+  });
+  Map<String, dynamic> toJson() {
+    final autoEnable = this.autoEnable;
+    return {
+      if (autoEnable != null) 'autoEnable': autoEnable,
+    };
+  }
+}
+
+/// An object that contains information on the status of whether EBS volumes
+/// scanning will be enabled as a data source for an organization.
+class OrganizationEbsVolumesResult {
+  /// An object that contains the status of whether scanning EBS volumes should be
+  /// auto-enabled for new members joining the organization.
+  final bool? autoEnable;
+
+  OrganizationEbsVolumesResult({
+    this.autoEnable,
+  });
+  factory OrganizationEbsVolumesResult.fromJson(Map<String, dynamic> json) {
+    return OrganizationEbsVolumesResult(
+      autoEnable: json['autoEnable'] as bool?,
+    );
+  }
+}
+
+/// Organization-wide Kubernetes audit logs configuration.
+class OrganizationKubernetesAuditLogsConfiguration {
+  /// A value that contains information on whether Kubernetes audit logs should be
+  /// enabled automatically as a data source for the organization.
+  final bool autoEnable;
+
+  OrganizationKubernetesAuditLogsConfiguration({
+    required this.autoEnable,
+  });
+  Map<String, dynamic> toJson() {
+    final autoEnable = this.autoEnable;
+    return {
+      'autoEnable': autoEnable,
+    };
+  }
+}
+
+/// The current configuration of Kubernetes audit logs as a data source for the
+/// organization.
+class OrganizationKubernetesAuditLogsConfigurationResult {
+  /// Whether Kubernetes audit logs data source should be auto-enabled for new
+  /// members joining the organization.
+  final bool autoEnable;
+
+  OrganizationKubernetesAuditLogsConfigurationResult({
+    required this.autoEnable,
+  });
+  factory OrganizationKubernetesAuditLogsConfigurationResult.fromJson(
+      Map<String, dynamic> json) {
+    return OrganizationKubernetesAuditLogsConfigurationResult(
+      autoEnable: json['autoEnable'] as bool,
+    );
+  }
+}
+
+/// Organization-wide Kubernetes data sources configurations.
+class OrganizationKubernetesConfiguration {
+  /// Whether Kubernetes audit logs data source should be auto-enabled for new
+  /// members joining the organization.
+  final OrganizationKubernetesAuditLogsConfiguration auditLogs;
+
+  OrganizationKubernetesConfiguration({
+    required this.auditLogs,
+  });
+  Map<String, dynamic> toJson() {
+    final auditLogs = this.auditLogs;
+    return {
+      'auditLogs': auditLogs,
+    };
+  }
+}
+
+/// The current configuration of all Kubernetes data sources for the
+/// organization.
+class OrganizationKubernetesConfigurationResult {
+  /// The current configuration of Kubernetes audit logs as a data source for the
+  /// organization.
+  final OrganizationKubernetesAuditLogsConfigurationResult auditLogs;
+
+  OrganizationKubernetesConfigurationResult({
+    required this.auditLogs,
+  });
+  factory OrganizationKubernetesConfigurationResult.fromJson(
+      Map<String, dynamic> json) {
+    return OrganizationKubernetesConfigurationResult(
+      auditLogs: OrganizationKubernetesAuditLogsConfigurationResult.fromJson(
+          json['auditLogs'] as Map<String, dynamic>),
+    );
+  }
+}
+
+/// Organization-wide Malware Protection configurations.
+class OrganizationMalwareProtectionConfiguration {
+  /// Whether Malware Protection for EC2 instances with findings should be
+  /// auto-enabled for new members joining the organization.
+  final OrganizationScanEc2InstanceWithFindings? scanEc2InstanceWithFindings;
+
+  OrganizationMalwareProtectionConfiguration({
+    this.scanEc2InstanceWithFindings,
+  });
+  Map<String, dynamic> toJson() {
+    final scanEc2InstanceWithFindings = this.scanEc2InstanceWithFindings;
+    return {
+      if (scanEc2InstanceWithFindings != null)
+        'scanEc2InstanceWithFindings': scanEc2InstanceWithFindings,
+    };
+  }
+}
+
+/// An object that contains information on the status of all Malware Protection
+/// data source for an organization.
+class OrganizationMalwareProtectionConfigurationResult {
+  /// Describes the configuration for scanning EC2 instances with findings for an
+  /// organization.
+  final OrganizationScanEc2InstanceWithFindingsResult?
+      scanEc2InstanceWithFindings;
+
+  OrganizationMalwareProtectionConfigurationResult({
+    this.scanEc2InstanceWithFindings,
+  });
+  factory OrganizationMalwareProtectionConfigurationResult.fromJson(
+      Map<String, dynamic> json) {
+    return OrganizationMalwareProtectionConfigurationResult(
+      scanEc2InstanceWithFindings: json['scanEc2InstanceWithFindings'] != null
+          ? OrganizationScanEc2InstanceWithFindingsResult.fromJson(
+              json['scanEc2InstanceWithFindings'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -5456,6 +7053,43 @@ class OrganizationS3LogsConfigurationResult {
       Map<String, dynamic> json) {
     return OrganizationS3LogsConfigurationResult(
       autoEnable: json['autoEnable'] as bool,
+    );
+  }
+}
+
+/// Organization-wide EC2 instances with findings scan configuration.
+class OrganizationScanEc2InstanceWithFindings {
+  /// Whether scanning EBS volumes should be auto-enabled for new members joining
+  /// the organization.
+  final OrganizationEbsVolumes? ebsVolumes;
+
+  OrganizationScanEc2InstanceWithFindings({
+    this.ebsVolumes,
+  });
+  Map<String, dynamic> toJson() {
+    final ebsVolumes = this.ebsVolumes;
+    return {
+      if (ebsVolumes != null) 'ebsVolumes': ebsVolumes,
+    };
+  }
+}
+
+/// An object that contains information on the status of scanning EC2 instances
+/// with findings for an organization.
+class OrganizationScanEc2InstanceWithFindingsResult {
+  /// Describes the configuration for scanning EBS volumes for an organization.
+  final OrganizationEbsVolumesResult? ebsVolumes;
+
+  OrganizationScanEc2InstanceWithFindingsResult({
+    this.ebsVolumes,
+  });
+  factory OrganizationScanEc2InstanceWithFindingsResult.fromJson(
+      Map<String, dynamic> json) {
+    return OrganizationScanEc2InstanceWithFindingsResult(
+      ebsVolumes: json['ebsVolumes'] != null
+          ? OrganizationEbsVolumesResult.fromJson(
+              json['ebsVolumes'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -5596,8 +7230,8 @@ class ProductCode {
   });
   factory ProductCode.fromJson(Map<String, dynamic> json) {
     return ProductCode(
-      code: json['code'] as String?,
-      productType: json['productType'] as String?,
+      code: json['productCodeId'] as String?,
+      productType: json['productCodeType'] as String?,
     );
   }
 }
@@ -5664,6 +7298,30 @@ extension on String {
   }
 }
 
+/// Contains details about the remote Amazon Web Services account that made the
+/// API call.
+class RemoteAccountDetails {
+  /// The Amazon Web Services account ID of the remote API caller.
+  final String? accountId;
+
+  /// Details on whether the Amazon Web Services account of the remote API caller
+  /// is related to your GuardDuty environment. If this value is <code>True</code>
+  /// the API caller is affiliated to your account in some way. If it is
+  /// <code>False</code> the API caller is from outside your environment.
+  final bool? affiliated;
+
+  RemoteAccountDetails({
+    this.accountId,
+    this.affiliated,
+  });
+  factory RemoteAccountDetails.fromJson(Map<String, dynamic> json) {
+    return RemoteAccountDetails(
+      accountId: json['accountId'] as String?,
+      affiliated: json['affiliated'] as bool?,
+    );
+  }
+}
+
 /// Contains information about the remote IP address of the connection.
 class RemoteIpDetails {
   /// The city information of the remote IP address.
@@ -5727,18 +7385,32 @@ class RemotePortDetails {
   }
 }
 
-/// Contains information about the AWS resource associated with the activity
-/// that prompted GuardDuty to generate a finding.
+/// Contains information about the Amazon Web Services resource associated with
+/// the activity that prompted GuardDuty to generate a finding.
 class Resource {
   /// The IAM access key details (IAM user information) of a user that engaged in
   /// the activity that prompted GuardDuty to generate a finding.
   final AccessKeyDetails? accessKeyDetails;
+  final Container? containerDetails;
+
+  /// Contains list of scanned and skipped EBS volumes with details.
+  final EbsVolumeDetails? ebsVolumeDetails;
+
+  /// Contains information about the details of the ECS Cluster.
+  final EcsClusterDetails? ecsClusterDetails;
+
+  /// Details about the EKS cluster involved in a Kubernetes finding.
+  final EksClusterDetails? eksClusterDetails;
 
   /// The information about the EC2 instance associated with the activity that
   /// prompted GuardDuty to generate a finding.
   final InstanceDetails? instanceDetails;
 
-  /// The type of AWS resource.
+  /// Details about the Kubernetes user and workload involved in a Kubernetes
+  /// finding.
+  final KubernetesDetails? kubernetesDetails;
+
+  /// The type of Amazon Web Services resource.
   final String? resourceType;
 
   /// Contains information on the S3 bucket.
@@ -5746,7 +7418,12 @@ class Resource {
 
   Resource({
     this.accessKeyDetails,
+    this.containerDetails,
+    this.ebsVolumeDetails,
+    this.ecsClusterDetails,
+    this.eksClusterDetails,
     this.instanceDetails,
+    this.kubernetesDetails,
     this.resourceType,
     this.s3BucketDetails,
   });
@@ -5756,15 +7433,49 @@ class Resource {
           ? AccessKeyDetails.fromJson(
               json['accessKeyDetails'] as Map<String, dynamic>)
           : null,
+      containerDetails: json['containerDetails'] != null
+          ? Container.fromJson(json['containerDetails'] as Map<String, dynamic>)
+          : null,
+      ebsVolumeDetails: json['ebsVolumeDetails'] != null
+          ? EbsVolumeDetails.fromJson(
+              json['ebsVolumeDetails'] as Map<String, dynamic>)
+          : null,
+      ecsClusterDetails: json['ecsClusterDetails'] != null
+          ? EcsClusterDetails.fromJson(
+              json['ecsClusterDetails'] as Map<String, dynamic>)
+          : null,
+      eksClusterDetails: json['eksClusterDetails'] != null
+          ? EksClusterDetails.fromJson(
+              json['eksClusterDetails'] as Map<String, dynamic>)
+          : null,
       instanceDetails: json['instanceDetails'] != null
           ? InstanceDetails.fromJson(
               json['instanceDetails'] as Map<String, dynamic>)
+          : null,
+      kubernetesDetails: json['kubernetesDetails'] != null
+          ? KubernetesDetails.fromJson(
+              json['kubernetesDetails'] as Map<String, dynamic>)
           : null,
       resourceType: json['resourceType'] as String?,
       s3BucketDetails: (json['s3BucketDetails'] as List?)
           ?.whereNotNull()
           .map((e) => S3BucketDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
+    );
+  }
+}
+
+/// Represents the resources that were scanned in the scan entry.
+class ResourceDetails {
+  /// InstanceArn that was scanned in the scan entry.
+  final String? instanceArn;
+
+  ResourceDetails({
+    this.instanceArn,
+  });
+  factory ResourceDetails.fromJson(Map<String, dynamic> json) {
+    return ResourceDetails(
+      instanceArn: json['instanceArn'] as String?,
     );
   }
 }
@@ -5861,6 +7572,479 @@ class S3LogsConfigurationResult {
   }
 }
 
+/// Contains information about a malware scan.
+class Scan {
+  /// The ID for the account that belongs to the scan.
+  final String? accountId;
+
+  /// The unique detector ID of the administrator account that the request is
+  /// associated with. Note that this value will be the same as the one used for
+  /// <code>DetectorId</code> if the account is an administrator.
+  final String? adminDetectorId;
+
+  /// List of volumes that were attached to the original instance to be scanned.
+  final List<VolumeDetail>? attachedVolumes;
+
+  /// The unique ID of the detector that the request is associated with.
+  final String? detectorId;
+
+  /// Represents the reason for FAILED scan status.
+  final String? failureReason;
+
+  /// Represents the number of files that were scanned.
+  final int? fileCount;
+
+  /// Represents the resources that were scanned in the scan entry.
+  final ResourceDetails? resourceDetails;
+
+  /// The timestamp of when the scan was finished.
+  final DateTime? scanEndTime;
+
+  /// The unique scan ID associated with a scan entry.
+  final String? scanId;
+
+  /// Represents the result of the scan.
+  final ScanResultDetails? scanResultDetails;
+
+  /// The timestamp of when the scan was triggered.
+  final DateTime? scanStartTime;
+
+  /// An enum value representing possible scan statuses.
+  final ScanStatus? scanStatus;
+
+  /// Represents total bytes that were scanned.
+  final int? totalBytes;
+
+  /// Represents the reason the scan was triggered.
+  final TriggerDetails? triggerDetails;
+
+  Scan({
+    this.accountId,
+    this.adminDetectorId,
+    this.attachedVolumes,
+    this.detectorId,
+    this.failureReason,
+    this.fileCount,
+    this.resourceDetails,
+    this.scanEndTime,
+    this.scanId,
+    this.scanResultDetails,
+    this.scanStartTime,
+    this.scanStatus,
+    this.totalBytes,
+    this.triggerDetails,
+  });
+  factory Scan.fromJson(Map<String, dynamic> json) {
+    return Scan(
+      accountId: json['accountId'] as String?,
+      adminDetectorId: json['adminDetectorId'] as String?,
+      attachedVolumes: (json['attachedVolumes'] as List?)
+          ?.whereNotNull()
+          .map((e) => VolumeDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      detectorId: json['detectorId'] as String?,
+      failureReason: json['failureReason'] as String?,
+      fileCount: json['fileCount'] as int?,
+      resourceDetails: json['resourceDetails'] != null
+          ? ResourceDetails.fromJson(
+              json['resourceDetails'] as Map<String, dynamic>)
+          : null,
+      scanEndTime: timeStampFromJson(json['scanEndTime']),
+      scanId: json['scanId'] as String?,
+      scanResultDetails: json['scanResultDetails'] != null
+          ? ScanResultDetails.fromJson(
+              json['scanResultDetails'] as Map<String, dynamic>)
+          : null,
+      scanStartTime: timeStampFromJson(json['scanStartTime']),
+      scanStatus: (json['scanStatus'] as String?)?.toScanStatus(),
+      totalBytes: json['totalBytes'] as int?,
+      triggerDetails: json['triggerDetails'] != null
+          ? TriggerDetails.fromJson(
+              json['triggerDetails'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Contains information about the condition.
+class ScanCondition {
+  /// Represents an <i>mapEqual</i> <b/> condition to be applied to a single field
+  /// when triggering for malware scan.
+  final List<ScanConditionPair> mapEquals;
+
+  ScanCondition({
+    required this.mapEquals,
+  });
+  factory ScanCondition.fromJson(Map<String, dynamic> json) {
+    return ScanCondition(
+      mapEquals: (json['mapEquals'] as List)
+          .whereNotNull()
+          .map((e) => ScanConditionPair.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final mapEquals = this.mapEquals;
+    return {
+      'mapEquals': mapEquals,
+    };
+  }
+}
+
+/// Represents key, value pair to be matched against given resource property.
+class ScanConditionPair {
+  /// Represents <i>key</i> <b/> in the map condition.
+  final String key;
+
+  /// Represents optional <i>value</i> <b/> in the map condition. If not
+  /// specified, only <i>key</i> <b/> will be matched.
+  final String? value;
+
+  ScanConditionPair({
+    required this.key,
+    this.value,
+  });
+  factory ScanConditionPair.fromJson(Map<String, dynamic> json) {
+    return ScanConditionPair(
+      key: json['key'] as String,
+      value: json['value'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final key = this.key;
+    final value = this.value;
+    return {
+      'key': key,
+      if (value != null) 'value': value,
+    };
+  }
+}
+
+/// An enum value representing possible resource properties to match with given
+/// scan condition.
+enum ScanCriterionKey {
+  ec2InstanceTag,
+}
+
+extension on ScanCriterionKey {
+  String toValue() {
+    switch (this) {
+      case ScanCriterionKey.ec2InstanceTag:
+        return 'EC2_INSTANCE_TAG';
+    }
+  }
+}
+
+extension on String {
+  ScanCriterionKey toScanCriterionKey() {
+    switch (this) {
+      case 'EC2_INSTANCE_TAG':
+        return ScanCriterionKey.ec2InstanceTag;
+    }
+    throw Exception('$this is not known in enum ScanCriterionKey');
+  }
+}
+
+/// Contains a complete view providing malware scan result details.
+class ScanDetections {
+  /// Details of the highest severity threat detected during malware scan and
+  /// number of infected files.
+  final HighestSeverityThreatDetails? highestSeverityThreatDetails;
+
+  /// Total number of scanned files.
+  final ScannedItemCount? scannedItemCount;
+
+  /// Contains details about identified threats organized by threat name.
+  final ThreatDetectedByName? threatDetectedByName;
+
+  /// Total number of infected files.
+  final ThreatsDetectedItemCount? threatsDetectedItemCount;
+
+  ScanDetections({
+    this.highestSeverityThreatDetails,
+    this.scannedItemCount,
+    this.threatDetectedByName,
+    this.threatsDetectedItemCount,
+  });
+  factory ScanDetections.fromJson(Map<String, dynamic> json) {
+    return ScanDetections(
+      highestSeverityThreatDetails: json['highestSeverityThreatDetails'] != null
+          ? HighestSeverityThreatDetails.fromJson(
+              json['highestSeverityThreatDetails'] as Map<String, dynamic>)
+          : null,
+      scannedItemCount: json['scannedItemCount'] != null
+          ? ScannedItemCount.fromJson(
+              json['scannedItemCount'] as Map<String, dynamic>)
+          : null,
+      threatDetectedByName: json['threatDetectedByName'] != null
+          ? ThreatDetectedByName.fromJson(
+              json['threatDetectedByName'] as Map<String, dynamic>)
+          : null,
+      threatsDetectedItemCount: json['threatsDetectedItemCount'] != null
+          ? ThreatsDetectedItemCount.fromJson(
+              json['threatsDetectedItemCount'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Describes whether Malware Protection for EC2 instances with findings will be
+/// enabled as a data source.
+class ScanEc2InstanceWithFindings {
+  /// Describes the configuration for scanning EBS volumes as data source.
+  final bool? ebsVolumes;
+
+  ScanEc2InstanceWithFindings({
+    this.ebsVolumes,
+  });
+  Map<String, dynamic> toJson() {
+    final ebsVolumes = this.ebsVolumes;
+    return {
+      if (ebsVolumes != null) 'ebsVolumes': ebsVolumes,
+    };
+  }
+}
+
+/// An object that contains information on the status of whether Malware
+/// Protection for EC2 instances with findings will be enabled as a data source.
+class ScanEc2InstanceWithFindingsResult {
+  /// Describes the configuration of scanning EBS volumes as a data source.
+  final EbsVolumesResult? ebsVolumes;
+
+  ScanEc2InstanceWithFindingsResult({
+    this.ebsVolumes,
+  });
+  factory ScanEc2InstanceWithFindingsResult.fromJson(
+      Map<String, dynamic> json) {
+    return ScanEc2InstanceWithFindingsResult(
+      ebsVolumes: json['ebsVolumes'] != null
+          ? EbsVolumesResult.fromJson(
+              json['ebsVolumes'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Contains details of infected file including name, file path and hash.
+class ScanFilePath {
+  /// File name of the infected file.
+  final String? fileName;
+
+  /// The file path of the infected file.
+  final String? filePath;
+
+  /// The hash value of the infected file.
+  final String? hash;
+
+  /// EBS volume Arn details of the infected file.
+  final String? volumeArn;
+
+  ScanFilePath({
+    this.fileName,
+    this.filePath,
+    this.hash,
+    this.volumeArn,
+  });
+  factory ScanFilePath.fromJson(Map<String, dynamic> json) {
+    return ScanFilePath(
+      fileName: json['fileName'] as String?,
+      filePath: json['filePath'] as String?,
+      hash: json['hash'] as String?,
+      volumeArn: json['volumeArn'] as String?,
+    );
+  }
+}
+
+/// Contains information about criteria used to filter resources before
+/// triggering malware scan.
+class ScanResourceCriteria {
+  /// Represents condition that when matched will prevent a malware scan for a
+  /// certain resource.
+  final Map<ScanCriterionKey, ScanCondition>? exclude;
+
+  /// Represents condition that when matched will allow a malware scan for a
+  /// certain resource.
+  final Map<ScanCriterionKey, ScanCondition>? include;
+
+  ScanResourceCriteria({
+    this.exclude,
+    this.include,
+  });
+  factory ScanResourceCriteria.fromJson(Map<String, dynamic> json) {
+    return ScanResourceCriteria(
+      exclude: (json['exclude'] as Map<String, dynamic>?)?.map((k, e) =>
+          MapEntry(k.toScanCriterionKey(),
+              ScanCondition.fromJson(e as Map<String, dynamic>))),
+      include: (json['include'] as Map<String, dynamic>?)?.map((k, e) =>
+          MapEntry(k.toScanCriterionKey(),
+              ScanCondition.fromJson(e as Map<String, dynamic>))),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exclude = this.exclude;
+    final include = this.include;
+    return {
+      if (exclude != null)
+        'exclude': exclude.map((k, e) => MapEntry(k.toValue(), e)),
+      if (include != null)
+        'include': include.map((k, e) => MapEntry(k.toValue(), e)),
+    };
+  }
+}
+
+enum ScanResult {
+  clean,
+  infected,
+}
+
+extension on ScanResult {
+  String toValue() {
+    switch (this) {
+      case ScanResult.clean:
+        return 'CLEAN';
+      case ScanResult.infected:
+        return 'INFECTED';
+    }
+  }
+}
+
+extension on String {
+  ScanResult toScanResult() {
+    switch (this) {
+      case 'CLEAN':
+        return ScanResult.clean;
+      case 'INFECTED':
+        return ScanResult.infected;
+    }
+    throw Exception('$this is not known in enum ScanResult');
+  }
+}
+
+/// Represents the result of the scan.
+class ScanResultDetails {
+  /// An enum value representing possible scan results.
+  final ScanResult? scanResult;
+
+  ScanResultDetails({
+    this.scanResult,
+  });
+  factory ScanResultDetails.fromJson(Map<String, dynamic> json) {
+    return ScanResultDetails(
+      scanResult: (json['scanResult'] as String?)?.toScanResult(),
+    );
+  }
+}
+
+enum ScanStatus {
+  running,
+  completed,
+  failed,
+}
+
+extension on ScanStatus {
+  String toValue() {
+    switch (this) {
+      case ScanStatus.running:
+        return 'RUNNING';
+      case ScanStatus.completed:
+        return 'COMPLETED';
+      case ScanStatus.failed:
+        return 'FAILED';
+    }
+  }
+}
+
+extension on String {
+  ScanStatus toScanStatus() {
+    switch (this) {
+      case 'RUNNING':
+        return ScanStatus.running;
+      case 'COMPLETED':
+        return ScanStatus.completed;
+      case 'FAILED':
+        return ScanStatus.failed;
+    }
+    throw Exception('$this is not known in enum ScanStatus');
+  }
+}
+
+/// Contains files infected with the given threat providing details of malware
+/// name and severity.
+class ScanThreatName {
+  /// List of infected files in EBS volume with details.
+  final List<ScanFilePath>? filePaths;
+
+  /// Total number of files infected with given threat.
+  final int? itemCount;
+
+  /// The name of the identified threat.
+  final String? name;
+
+  /// Severity of threat identified as part of the malware scan.
+  final String? severity;
+
+  ScanThreatName({
+    this.filePaths,
+    this.itemCount,
+    this.name,
+    this.severity,
+  });
+  factory ScanThreatName.fromJson(Map<String, dynamic> json) {
+    return ScanThreatName(
+      filePaths: (json['filePaths'] as List?)
+          ?.whereNotNull()
+          .map((e) => ScanFilePath.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      itemCount: json['itemCount'] as int?,
+      name: json['name'] as String?,
+      severity: json['severity'] as String?,
+    );
+  }
+}
+
+/// Total number of scanned files.
+class ScannedItemCount {
+  /// Number of files scanned.
+  final int? files;
+
+  /// Total GB of files scanned for malware.
+  final int? totalGb;
+
+  /// Total number of scanned volumes.
+  final int? volumes;
+
+  ScannedItemCount({
+    this.files,
+    this.totalGb,
+    this.volumes,
+  });
+  factory ScannedItemCount.fromJson(Map<String, dynamic> json) {
+    return ScannedItemCount(
+      files: json['files'] as int?,
+      totalGb: json['totalGb'] as int?,
+      volumes: json['volumes'] as int?,
+    );
+  }
+}
+
+/// Container security context.
+class SecurityContext {
+  /// Whether the container is privileged.
+  final bool? privileged;
+
+  SecurityContext({
+    this.privileged,
+  });
+  factory SecurityContext.fromJson(Map<String, dynamic> json) {
+    return SecurityContext(
+      privileged: json['privileged'] as bool?,
+    );
+  }
+}
+
 /// Contains information about the security groups associated with the EC2
 /// instance.
 class SecurityGroup {
@@ -5887,6 +8071,9 @@ class Service {
   /// Information about the activity that is described in a finding.
   final Action? action;
 
+  /// Contains additional information about the generated finding.
+  final ServiceAdditionalInfo? additionalInfo;
+
   /// Indicates whether this finding is archived.
   final bool? archived;
 
@@ -5895,6 +8082,9 @@ class Service {
 
   /// The detector ID for the GuardDuty service.
   final String? detectorId;
+
+  /// Returns details from the malware scan that created a finding.
+  final EbsVolumeScanDetails? ebsVolumeScanDetails;
 
   /// The first-seen timestamp of the activity that prompted GuardDuty to generate
   /// this finding.
@@ -5907,10 +8097,14 @@ class Service {
   /// An evidence object associated with the service.
   final Evidence? evidence;
 
+  /// The name of the feature that generated a finding.
+  final String? featureName;
+
   /// The resource role information for this finding.
   final String? resourceRole;
 
-  /// The name of the AWS service (GuardDuty) that generated a finding.
+  /// The name of the Amazon Web Services service (GuardDuty) that generated a
+  /// finding.
   final String? serviceName;
 
   /// Feedback that was submitted about the finding.
@@ -5918,12 +8112,15 @@ class Service {
 
   Service({
     this.action,
+    this.additionalInfo,
     this.archived,
     this.count,
     this.detectorId,
+    this.ebsVolumeScanDetails,
     this.eventFirstSeen,
     this.eventLastSeen,
     this.evidence,
+    this.featureName,
     this.resourceRole,
     this.serviceName,
     this.userFeedback,
@@ -5933,17 +8130,46 @@ class Service {
       action: json['action'] != null
           ? Action.fromJson(json['action'] as Map<String, dynamic>)
           : null,
+      additionalInfo: json['additionalInfo'] != null
+          ? ServiceAdditionalInfo.fromJson(
+              json['additionalInfo'] as Map<String, dynamic>)
+          : null,
       archived: json['archived'] as bool?,
       count: json['count'] as int?,
       detectorId: json['detectorId'] as String?,
+      ebsVolumeScanDetails: json['ebsVolumeScanDetails'] != null
+          ? EbsVolumeScanDetails.fromJson(
+              json['ebsVolumeScanDetails'] as Map<String, dynamic>)
+          : null,
       eventFirstSeen: json['eventFirstSeen'] as String?,
       eventLastSeen: json['eventLastSeen'] as String?,
       evidence: json['evidence'] != null
           ? Evidence.fromJson(json['evidence'] as Map<String, dynamic>)
           : null,
+      featureName: json['featureName'] as String?,
       resourceRole: json['resourceRole'] as String?,
       serviceName: json['serviceName'] as String?,
       userFeedback: json['userFeedback'] as String?,
+    );
+  }
+}
+
+/// Additional information about the generated finding.
+class ServiceAdditionalInfo {
+  /// Describes the type of the additional information.
+  final String? type;
+
+  /// This field specifies the value of the additional information.
+  final String? value;
+
+  ServiceAdditionalInfo({
+    this.type,
+    this.value,
+  });
+  factory ServiceAdditionalInfo.fromJson(Map<String, dynamic> json) {
+    return ServiceAdditionalInfo(
+      type: json['type'] as String?,
+      value: json['value'] as String?,
     );
   }
 }
@@ -6032,6 +8258,41 @@ class TagResourceResponse {
   TagResourceResponse();
   factory TagResourceResponse.fromJson(Map<String, dynamic> _) {
     return TagResourceResponse();
+  }
+}
+
+/// Contains details about identified threats organized by threat name.
+class ThreatDetectedByName {
+  /// Total number of infected files identified.
+  final int? itemCount;
+
+  /// Flag to determine if the finding contains every single infected file-path
+  /// and/or every threat.
+  final bool? shortened;
+
+  /// List of identified threats with details, organized by threat name.
+  final List<ScanThreatName>? threatNames;
+
+  /// Total number of unique threats by name identified, as part of the malware
+  /// scan.
+  final int? uniqueThreatNameCount;
+
+  ThreatDetectedByName({
+    this.itemCount,
+    this.shortened,
+    this.threatNames,
+    this.uniqueThreatNameCount,
+  });
+  factory ThreatDetectedByName.fromJson(Map<String, dynamic> json) {
+    return ThreatDetectedByName(
+      itemCount: json['itemCount'] as int?,
+      shortened: json['shortened'] as bool?,
+      threatNames: (json['threatNames'] as List?)
+          ?.whereNotNull()
+          .map((e) => ScanThreatName.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      uniqueThreatNameCount: json['uniqueThreatNameCount'] as int?,
+    );
   }
 }
 
@@ -6161,6 +8422,21 @@ class ThreatIntelligenceDetail {
   }
 }
 
+/// Contains total number of infected files.
+class ThreatsDetectedItemCount {
+  /// Total number of infected files.
+  final int? files;
+
+  ThreatsDetectedItemCount({
+    this.files,
+  });
+  factory ThreatsDetectedItemCount.fromJson(Map<String, dynamic> json) {
+    return ThreatsDetectedItemCount(
+      files: json['files'] as int?,
+    );
+  }
+}
+
 /// Contains the total usage with the corresponding currency unit for that
 /// value.
 class Total {
@@ -6182,6 +8458,26 @@ class Total {
   }
 }
 
+/// Represents the reason the scan was triggered.
+class TriggerDetails {
+  /// The description of the scan trigger.
+  final String? description;
+
+  /// The ID of the GuardDuty finding that triggered the BirdDog scan.
+  final String? guardDutyFindingId;
+
+  TriggerDetails({
+    this.description,
+    this.guardDutyFindingId,
+  });
+  factory TriggerDetails.fromJson(Map<String, dynamic> json) {
+    return TriggerDetails(
+      description: json['description'] as String?,
+      guardDutyFindingId: json['guardDutyFindingId'] as String?,
+    );
+  }
+}
+
 class UnarchiveFindingsResponse {
   UnarchiveFindingsResponse();
   factory UnarchiveFindingsResponse.fromJson(Map<String, dynamic> _) {
@@ -6191,7 +8487,7 @@ class UnarchiveFindingsResponse {
 
 /// Contains information about the accounts that weren't processed.
 class UnprocessedAccount {
-  /// The AWS account ID.
+  /// The Amazon Web Services account ID.
   final String accountId;
 
   /// A reason why the account hasn't been processed.
@@ -6248,6 +8544,13 @@ class UpdateIPSetResponse {
   UpdateIPSetResponse();
   factory UpdateIPSetResponse.fromJson(Map<String, dynamic> _) {
     return UpdateIPSetResponse();
+  }
+}
+
+class UpdateMalwareScanSettingsResponse {
+  UpdateMalwareScanSettingsResponse();
+  factory UpdateMalwareScanSettingsResponse.fromJson(Map<String, dynamic> _) {
+    return UpdateMalwareScanSettingsResponse();
   }
 }
 
@@ -6364,9 +8667,10 @@ class UsageDataSourceResult {
   }
 }
 
-/// Contains information on the sum of usage based on an AWS resource.
+/// Contains information on the sum of usage based on an Amazon Web Services
+/// resource.
 class UsageResourceResult {
-  /// The AWS resource that generated usage.
+  /// The Amazon Web Services resource that generated usage.
   final String? resource;
 
   /// Represents the sum total of usage for the specified resource type.
@@ -6464,6 +8768,94 @@ class UsageStatistics {
           ?.whereNotNull()
           .map((e) => UsageResourceResult.fromJson(e as Map<String, dynamic>))
           .toList(),
+    );
+  }
+}
+
+/// Volume used by the Kubernetes workload.
+class Volume {
+  /// Represents a pre-existing file or directory on the host machine that the
+  /// volume maps to.
+  final HostPath? hostPath;
+
+  /// Volume name.
+  final String? name;
+
+  Volume({
+    this.hostPath,
+    this.name,
+  });
+  factory Volume.fromJson(Map<String, dynamic> json) {
+    return Volume(
+      hostPath: json['hostPath'] != null
+          ? HostPath.fromJson(json['hostPath'] as Map<String, dynamic>)
+          : null,
+      name: json['name'] as String?,
+    );
+  }
+}
+
+/// Contains EBS volume details.
+class VolumeDetail {
+  /// The device name for the EBS volume.
+  final String? deviceName;
+
+  /// EBS volume encryption type.
+  final String? encryptionType;
+
+  /// KMS key Arn used to encrypt the EBS volume.
+  final String? kmsKeyArn;
+
+  /// Snapshot Arn of the EBS volume.
+  final String? snapshotArn;
+
+  /// EBS volume Arn information.
+  final String? volumeArn;
+
+  /// EBS volume size in GB.
+  final int? volumeSizeInGB;
+
+  /// The EBS volume type.
+  final String? volumeType;
+
+  VolumeDetail({
+    this.deviceName,
+    this.encryptionType,
+    this.kmsKeyArn,
+    this.snapshotArn,
+    this.volumeArn,
+    this.volumeSizeInGB,
+    this.volumeType,
+  });
+  factory VolumeDetail.fromJson(Map<String, dynamic> json) {
+    return VolumeDetail(
+      deviceName: json['deviceName'] as String?,
+      encryptionType: json['encryptionType'] as String?,
+      kmsKeyArn: json['kmsKeyArn'] as String?,
+      snapshotArn: json['snapshotArn'] as String?,
+      volumeArn: json['volumeArn'] as String?,
+      volumeSizeInGB: json['volumeSizeInGB'] as int?,
+      volumeType: json['volumeType'] as String?,
+    );
+  }
+}
+
+/// Container volume mount.
+class VolumeMount {
+  /// Volume mount path.
+  final String? mountPath;
+
+  /// Volume mount name.
+  final String? name;
+
+  VolumeMount({
+    this.mountPath,
+    this.name,
+  });
+  factory VolumeMount.fromJson(Map<String, dynamic> json) {
+    return VolumeMount(
+      mountPath: json['mountPath'] as String?,
+      name: json['name'] as String?,
     );
   }
 }

@@ -22,6 +22,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "flattened": false
   },
   "ActivityStreamMode": {"type": "string", "flattened": false},
+  "ActivityStreamModeList": {
+    "type": "list",
+    "member": {"shape": "String"},
+    "flattened": false
+  },
+  "ActivityStreamPolicyStatus": {"type": "string", "flattened": false},
   "ActivityStreamStatus": {"type": "string", "flattened": false},
   "AddRoleToDBClusterMessage": {
     "type": "structure",
@@ -89,6 +95,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "String", "locationName": "AttributeValue"},
     "flattened": false
   },
+  "AuditPolicyState": {"type": "string", "flattened": false},
   "AuthScheme": {"type": "string", "flattened": false},
   "AuthorizeDBSecurityGroupIngressMessage": {
     "type": "structure",
@@ -108,6 +115,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "AutomationMode": {"type": "string", "flattened": false},
   "AvailabilityZone": {
     "type": "structure",
     "members": {
@@ -142,6 +150,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "AwsBackupRecoveryPointArn": {"type": "string", "flattened": false},
   "BacktrackDBClusterMessage": {
     "type": "structure",
     "members": {
@@ -157,6 +166,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
   },
   "Boolean": {"type": "boolean", "flattened": false},
   "BooleanOptional": {"type": "boolean", "flattened": false},
+  "BucketName": {"type": "string", "flattened": false},
   "CancelExportTaskMessage": {
     "type": "structure",
     "members": {
@@ -372,23 +382,26 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
-  "CreateCustomAvailabilityZoneMessage": {
+  "CreateCustomDBEngineVersionMessage": {
     "type": "structure",
     "members": {
-      "CustomAvailabilityZoneName": {"shape": "String", "flattened": false},
-      "ExistingVpnId": {"shape": "String", "flattened": false},
-      "NewVpnTunnelName": {"shape": "String", "flattened": false},
-      "VpnTunnelOriginatorIP": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
-  "CreateCustomAvailabilityZoneResult": {
-    "type": "structure",
-    "members": {
-      "CustomAvailabilityZone": {
-        "shape": "CustomAvailabilityZone",
+      "Engine": {"shape": "CustomEngineName", "flattened": false},
+      "EngineVersion": {"shape": "CustomEngineVersion", "flattened": false},
+      "DatabaseInstallationFilesS3BucketName": {
+        "shape": "BucketName",
         "flattened": false
-      }
+      },
+      "DatabaseInstallationFilesS3Prefix": {
+        "shape": "String255",
+        "flattened": false
+      },
+      "KMSKeyId": {"shape": "KmsKeyIdOrArn", "flattened": false},
+      "Description": {"shape": "Description", "flattened": false},
+      "Manifest": {
+        "shape": "CustomDBEngineVersionManifest",
+        "flattened": false
+      },
+      "Tags": {"shape": "TagList", "flattened": false}
     },
     "flattened": false
   },
@@ -453,6 +466,30 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DomainIAMRoleName": {"shape": "String", "flattened": false},
       "EnableGlobalWriteForwarding": {
         "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "DBClusterInstanceClass": {"shape": "String", "flattened": false},
+      "AllocatedStorage": {"shape": "IntegerOptional", "flattened": false},
+      "StorageType": {"shape": "String", "flattened": false},
+      "Iops": {"shape": "IntegerOptional", "flattened": false},
+      "PubliclyAccessible": {"shape": "BooleanOptional", "flattened": false},
+      "AutoMinorVersionUpgrade": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "MonitoringInterval": {"shape": "IntegerOptional", "flattened": false},
+      "MonitoringRoleArn": {"shape": "String", "flattened": false},
+      "EnablePerformanceInsights": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "PerformanceInsightsKMSKeyId": {"shape": "String", "flattened": false},
+      "PerformanceInsightsRetentionPeriod": {
+        "shape": "IntegerOptional",
+        "flattened": false
+      },
+      "ServerlessV2ScalingConfiguration": {
+        "shape": "ServerlessV2ScalingConfiguration",
         "flattened": false
       },
       "SourceRegion": {"shape": "String", "flattened": false}
@@ -576,7 +613,10 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       },
       "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
       "MaxAllocatedStorage": {"shape": "IntegerOptional", "flattened": false},
-      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false}
+      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false},
+      "CustomIamInstanceProfile": {"shape": "String", "flattened": false},
+      "BackupTarget": {"shape": "String", "flattened": false},
+      "NetworkType": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -639,6 +679,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DomainIAMRoleName": {"shape": "String", "flattened": false},
       "ReplicaMode": {"shape": "ReplicaMode", "flattened": false},
       "MaxAllocatedStorage": {"shape": "IntegerOptional", "flattened": false},
+      "CustomIamInstanceProfile": {"shape": "String", "flattened": false},
+      "NetworkType": {"shape": "String", "flattened": false},
       "SourceRegion": {"shape": "String", "flattened": false}
     },
     "flattened": false
@@ -671,6 +713,28 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "type": "structure",
     "members": {
       "DBParameterGroup": {"shape": "DBParameterGroup", "flattened": false}
+    },
+    "flattened": false
+  },
+  "CreateDBProxyEndpointRequest": {
+    "type": "structure",
+    "members": {
+      "DBProxyName": {"shape": "DBProxyName", "flattened": false},
+      "DBProxyEndpointName": {
+        "shape": "DBProxyEndpointName",
+        "flattened": false
+      },
+      "VpcSubnetIds": {"shape": "StringList", "flattened": false},
+      "VpcSecurityGroupIds": {"shape": "StringList", "flattened": false},
+      "TargetRole": {"shape": "DBProxyEndpointTargetRole", "flattened": false},
+      "Tags": {"shape": "TagList", "flattened": false}
+    },
+    "flattened": false
+  },
+  "CreateDBProxyEndpointResponse": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpoint": {"shape": "DBProxyEndpoint", "flattened": false}
     },
     "flattened": false
   },
@@ -804,35 +868,10 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
-  "CustomAvailabilityZone": {
-    "type": "structure",
-    "members": {
-      "CustomAvailabilityZoneId": {"shape": "String", "flattened": false},
-      "CustomAvailabilityZoneName": {"shape": "String", "flattened": false},
-      "CustomAvailabilityZoneStatus": {"shape": "String", "flattened": false},
-      "VpnDetails": {"shape": "VpnDetails", "flattened": false}
-    },
-    "flattened": false
-  },
-  "CustomAvailabilityZoneList": {
-    "type": "list",
-    "member": {
-      "shape": "CustomAvailabilityZone",
-      "locationName": "CustomAvailabilityZone"
-    },
-    "flattened": false
-  },
-  "CustomAvailabilityZoneMessage": {
-    "type": "structure",
-    "members": {
-      "Marker": {"shape": "String", "flattened": false},
-      "CustomAvailabilityZones": {
-        "shape": "CustomAvailabilityZoneList",
-        "flattened": false
-      }
-    },
-    "flattened": false
-  },
+  "CustomDBEngineVersionManifest": {"type": "string", "flattened": false},
+  "CustomEngineName": {"type": "string", "flattened": false},
+  "CustomEngineVersion": {"type": "string", "flattened": false},
+  "CustomEngineVersionStatus": {"type": "string", "flattened": false},
   "DBCluster": {
     "type": "structure",
     "members": {
@@ -845,6 +884,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DBClusterParameterGroup": {"shape": "String", "flattened": false},
       "DBSubnetGroup": {"shape": "String", "flattened": false},
       "Status": {"shape": "String", "flattened": false},
+      "AutomaticRestartTime": {"shape": "TStamp", "flattened": false},
       "PercentProgress": {"shape": "String", "flattened": false},
       "EarliestRestorableTime": {"shape": "TStamp", "flattened": false},
       "Endpoint": {"shape": "String", "flattened": false},
@@ -930,6 +970,26 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "PendingModifiedValues": {
         "shape": "ClusterPendingModifiedValues",
         "flattened": false
+      },
+      "DBClusterInstanceClass": {"shape": "String", "flattened": false},
+      "StorageType": {"shape": "String", "flattened": false},
+      "Iops": {"shape": "IntegerOptional", "flattened": false},
+      "PubliclyAccessible": {"shape": "BooleanOptional", "flattened": false},
+      "AutoMinorVersionUpgrade": {"shape": "Boolean", "flattened": false},
+      "MonitoringInterval": {"shape": "IntegerOptional", "flattened": false},
+      "MonitoringRoleArn": {"shape": "String", "flattened": false},
+      "PerformanceInsightsEnabled": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "PerformanceInsightsKMSKeyId": {"shape": "String", "flattened": false},
+      "PerformanceInsightsRetentionPeriod": {
+        "shape": "IntegerOptional",
+        "flattened": false
+      },
+      "ServerlessV2ScalingConfiguration": {
+        "shape": "ServerlessV2ScalingConfigurationInfo",
+        "flattened": false
       }
     },
     "flattened": false
@@ -1014,6 +1074,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "DBClusterIdentifier": {"type": "string", "flattened": false},
   "DBClusterList": {
     "type": "list",
     "member": {"shape": "DBCluster", "locationName": "DBCluster"},
@@ -1124,6 +1185,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DBClusterIdentifier": {"shape": "String", "flattened": false},
       "SnapshotCreateTime": {"shape": "TStamp", "flattened": false},
       "Engine": {"shape": "String", "flattened": false},
+      "EngineMode": {"shape": "String", "flattened": false},
       "AllocatedStorage": {"shape": "Integer", "flattened": false},
       "Status": {"shape": "String", "flattened": false},
       "Port": {"shape": "Integer", "flattened": false},
@@ -1227,7 +1289,21 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "SupportedFeatureNames": {"shape": "FeatureNameList", "flattened": false},
       "Status": {"shape": "String", "flattened": false},
       "SupportsParallelQuery": {"shape": "Boolean", "flattened": false},
-      "SupportsGlobalDatabases": {"shape": "Boolean", "flattened": false}
+      "SupportsGlobalDatabases": {"shape": "Boolean", "flattened": false},
+      "MajorEngineVersion": {"shape": "String", "flattened": false},
+      "DatabaseInstallationFilesS3BucketName": {
+        "shape": "String",
+        "flattened": false
+      },
+      "DatabaseInstallationFilesS3Prefix": {
+        "shape": "String",
+        "flattened": false
+      },
+      "DBEngineVersionArn": {"shape": "String", "flattened": false},
+      "KMSKeyId": {"shape": "String", "flattened": false},
+      "CreateTime": {"shape": "TStamp", "flattened": false},
+      "TagList": {"shape": "TagList", "flattened": false},
+      "SupportsBabelfish": {"shape": "Boolean", "flattened": false}
     },
     "flattened": false
   },
@@ -1251,6 +1327,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DBInstanceClass": {"shape": "String", "flattened": false},
       "Engine": {"shape": "String", "flattened": false},
       "DBInstanceStatus": {"shape": "String", "flattened": false},
+      "AutomaticRestartTime": {"shape": "TStamp", "flattened": false},
       "MasterUsername": {"shape": "String", "flattened": false},
       "DBName": {"shape": "String", "flattened": false},
       "Endpoint": {"shape": "Endpoint", "flattened": false},
@@ -1354,7 +1431,34 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "shape": "DBInstanceAutomatedBackupsReplicationList",
         "flattened": false
       },
-      "CustomerOwnedIpEnabled": {"shape": "BooleanOptional", "flattened": false}
+      "CustomerOwnedIpEnabled": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "AwsBackupRecoveryPointArn": {"shape": "String", "flattened": false},
+      "ActivityStreamStatus": {
+        "shape": "ActivityStreamStatus",
+        "flattened": false
+      },
+      "ActivityStreamKmsKeyId": {"shape": "String", "flattened": false},
+      "ActivityStreamKinesisStreamName": {
+        "shape": "String",
+        "flattened": false
+      },
+      "ActivityStreamMode": {"shape": "ActivityStreamMode", "flattened": false},
+      "ActivityStreamEngineNativeAuditFieldsIncluded": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "AutomationMode": {"shape": "AutomationMode", "flattened": false},
+      "ResumeFullAutomationModeTime": {"shape": "TStamp", "flattened": false},
+      "CustomIamInstanceProfile": {"shape": "String", "flattened": false},
+      "BackupTarget": {"shape": "String", "flattened": false},
+      "NetworkType": {"shape": "String", "flattened": false},
+      "ActivityStreamPolicyStatus": {
+        "shape": "ActivityStreamPolicyStatus",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -1392,7 +1496,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DBInstanceAutomatedBackupsReplications": {
         "shape": "DBInstanceAutomatedBackupsReplicationList",
         "flattened": false
-      }
+      },
+      "BackupTarget": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -1536,6 +1641,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DBProxyArn": {"shape": "String", "flattened": false},
       "Status": {"shape": "DBProxyStatus", "flattened": false},
       "EngineFamily": {"shape": "String", "flattened": false},
+      "VpcId": {"shape": "String", "flattened": false},
       "VpcSecurityGroupIds": {"shape": "StringList", "flattened": false},
       "VpcSubnetIds": {"shape": "StringList", "flattened": false},
       "Auth": {"shape": "UserAuthConfigInfoList", "flattened": false},
@@ -1549,11 +1655,37 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "DBProxyEndpoint": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpointName": {"shape": "String", "flattened": false},
+      "DBProxyEndpointArn": {"shape": "String", "flattened": false},
+      "DBProxyName": {"shape": "String", "flattened": false},
+      "Status": {"shape": "DBProxyEndpointStatus", "flattened": false},
+      "VpcId": {"shape": "String", "flattened": false},
+      "VpcSecurityGroupIds": {"shape": "StringList", "flattened": false},
+      "VpcSubnetIds": {"shape": "StringList", "flattened": false},
+      "Endpoint": {"shape": "String", "flattened": false},
+      "CreatedDate": {"shape": "TStamp", "flattened": false},
+      "TargetRole": {"shape": "DBProxyEndpointTargetRole", "flattened": false},
+      "IsDefault": {"shape": "Boolean", "flattened": false}
+    },
+    "flattened": false
+  },
+  "DBProxyEndpointList": {
+    "type": "list",
+    "member": {"shape": "DBProxyEndpoint"},
+    "flattened": false
+  },
+  "DBProxyEndpointName": {"type": "string", "flattened": false},
+  "DBProxyEndpointStatus": {"type": "string", "flattened": false},
+  "DBProxyEndpointTargetRole": {"type": "string", "flattened": false},
   "DBProxyList": {
     "type": "list",
     "member": {"shape": "DBProxy"},
     "flattened": false
   },
+  "DBProxyName": {"type": "string", "flattened": false},
   "DBProxyStatus": {"type": "string", "flattened": false},
   "DBProxyTarget": {
     "type": "structure",
@@ -1564,6 +1696,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "RdsResourceId": {"shape": "String", "flattened": false},
       "Port": {"shape": "Integer", "flattened": false},
       "Type": {"shape": "TargetType", "flattened": false},
+      "Role": {"shape": "TargetRole", "flattened": false},
       "TargetHealth": {"shape": "TargetHealth", "flattened": false}
     },
     "flattened": false
@@ -1672,7 +1805,9 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "flattened": false
       },
       "DbiResourceId": {"shape": "String", "flattened": false},
-      "TagList": {"shape": "TagList", "flattened": false}
+      "TagList": {"shape": "TagList", "flattened": false},
+      "OriginalSnapshotCreateTime": {"shape": "TStamp", "flattened": false},
+      "SnapshotTarget": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -1724,7 +1859,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "VpcId": {"shape": "String", "flattened": false},
       "SubnetGroupStatus": {"shape": "String", "flattened": false},
       "Subnets": {"shape": "SubnetList", "flattened": false},
-      "DBSubnetGroupArn": {"shape": "String", "flattened": false}
+      "DBSubnetGroupArn": {"shape": "String", "flattened": false},
+      "SupportedNetworkTypes": {"shape": "StringList", "flattened": false}
     },
     "flattened": false
   },
@@ -1741,20 +1877,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "DBSubnetGroup", "locationName": "DBSubnetGroup"},
     "flattened": false
   },
-  "DeleteCustomAvailabilityZoneMessage": {
+  "DeleteCustomDBEngineVersionMessage": {
     "type": "structure",
     "members": {
-      "CustomAvailabilityZoneId": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
-  "DeleteCustomAvailabilityZoneResult": {
-    "type": "structure",
-    "members": {
-      "CustomAvailabilityZone": {
-        "shape": "CustomAvailabilityZone",
-        "flattened": false
-      }
+      "Engine": {"shape": "CustomEngineName", "flattened": false},
+      "EngineVersion": {"shape": "CustomEngineVersion", "flattened": false}
     },
     "flattened": false
   },
@@ -1844,6 +1971,23 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "DeleteDBProxyEndpointRequest": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpointName": {
+        "shape": "DBProxyEndpointName",
+        "flattened": false
+      }
+    },
+    "flattened": false
+  },
+  "DeleteDBProxyEndpointResponse": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpoint": {"shape": "DBProxyEndpoint", "flattened": false}
+    },
+    "flattened": false
+  },
   "DeleteDBProxyRequest": {
     "type": "structure",
     "members": {
@@ -1914,13 +2058,6 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
-  "DeleteInstallationMediaMessage": {
-    "type": "structure",
-    "members": {
-      "InstallationMediaId": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
   "DeleteOptionGroupMessage": {
     "type": "structure",
     "members": {
@@ -1952,16 +2089,6 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "type": "structure",
     "members": {
       "CertificateIdentifier": {"shape": "String", "flattened": false},
-      "Filters": {"shape": "FilterList", "flattened": false},
-      "MaxRecords": {"shape": "IntegerOptional", "flattened": false},
-      "Marker": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
-  "DescribeCustomAvailabilityZonesMessage": {
-    "type": "structure",
-    "members": {
-      "CustomAvailabilityZoneId": {"shape": "String", "flattened": false},
       "Filters": {"shape": "FilterList", "flattened": false},
       "MaxRecords": {"shape": "IntegerOptional", "flattened": false},
       "Marker": {"shape": "String", "flattened": false}
@@ -2177,6 +2304,28 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "DescribeDBProxyEndpointsRequest": {
+    "type": "structure",
+    "members": {
+      "DBProxyName": {"shape": "DBProxyName", "flattened": false},
+      "DBProxyEndpointName": {
+        "shape": "DBProxyEndpointName",
+        "flattened": false
+      },
+      "Filters": {"shape": "FilterList", "flattened": false},
+      "Marker": {"shape": "String", "flattened": false},
+      "MaxRecords": {"shape": "MaxRecords", "flattened": false}
+    },
+    "flattened": false
+  },
+  "DescribeDBProxyEndpointsResponse": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpoints": {"shape": "DBProxyEndpointList", "flattened": false},
+      "Marker": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
   "DescribeDBProxyTargetGroupsRequest": {
     "type": "structure",
     "members": {
@@ -2355,16 +2504,6 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
-  "DescribeInstallationMediaMessage": {
-    "type": "structure",
-    "members": {
-      "InstallationMediaId": {"shape": "String", "flattened": false},
-      "Filters": {"shape": "FilterList", "flattened": false},
-      "MaxRecords": {"shape": "IntegerOptional", "flattened": false},
-      "Marker": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
   "DescribeOptionGroupOptionsMessage": {
     "type": "structure",
     "members": {
@@ -2472,6 +2611,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "Description": {"type": "string", "flattened": false},
   "DomainMembership": {
     "type": "structure",
     "members": {
@@ -2703,6 +2843,37 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "FailoverGlobalClusterMessage": {
+    "type": "structure",
+    "members": {
+      "GlobalClusterIdentifier": {
+        "shape": "GlobalClusterIdentifier",
+        "flattened": false
+      },
+      "TargetDbClusterIdentifier": {
+        "shape": "DBClusterIdentifier",
+        "flattened": false
+      }
+    },
+    "flattened": false
+  },
+  "FailoverGlobalClusterResult": {
+    "type": "structure",
+    "members": {
+      "GlobalCluster": {"shape": "GlobalCluster", "flattened": false}
+    },
+    "flattened": false
+  },
+  "FailoverState": {
+    "type": "structure",
+    "members": {
+      "Status": {"shape": "FailoverStatus", "flattened": false},
+      "FromDbClusterArn": {"shape": "String", "flattened": false},
+      "ToDbClusterArn": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
+  "FailoverStatus": {"type": "string", "flattened": false},
   "FeatureNameList": {
     "type": "list",
     "member": {"shape": "String"},
@@ -2741,10 +2912,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "GlobalClusterMembers": {
         "shape": "GlobalClusterMemberList",
         "flattened": false
-      }
+      },
+      "FailoverState": {"shape": "FailoverState", "flattened": false}
     },
     "flattened": false
   },
+  "GlobalClusterIdentifier": {"type": "string", "flattened": false},
   "GlobalClusterList": {
     "type": "list",
     "member": {"shape": "GlobalCluster", "locationName": "GlobalClusterMember"},
@@ -2793,60 +2966,6 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "IPRange", "locationName": "IPRange"},
     "flattened": false
   },
-  "ImportInstallationMediaMessage": {
-    "type": "structure",
-    "members": {
-      "CustomAvailabilityZoneId": {"shape": "String", "flattened": false},
-      "Engine": {"shape": "String", "flattened": false},
-      "EngineVersion": {"shape": "String", "flattened": false},
-      "EngineInstallationMediaPath": {"shape": "String", "flattened": false},
-      "OSInstallationMediaPath": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
-  "InstallationMedia": {
-    "type": "structure",
-    "members": {
-      "InstallationMediaId": {"shape": "String", "flattened": false},
-      "CustomAvailabilityZoneId": {"shape": "String", "flattened": false},
-      "Engine": {"shape": "String", "flattened": false},
-      "EngineVersion": {"shape": "String", "flattened": false},
-      "EngineInstallationMediaPath": {"shape": "String", "flattened": false},
-      "OSInstallationMediaPath": {"shape": "String", "flattened": false},
-      "Status": {"shape": "String", "flattened": false},
-      "FailureCause": {
-        "shape": "InstallationMediaFailureCause",
-        "flattened": false
-      }
-    },
-    "flattened": false
-  },
-  "InstallationMediaFailureCause": {
-    "type": "structure",
-    "members": {
-      "Message": {"shape": "String", "flattened": false}
-    },
-    "flattened": false
-  },
-  "InstallationMediaList": {
-    "type": "list",
-    "member": {
-      "shape": "InstallationMedia",
-      "locationName": "InstallationMedia"
-    },
-    "flattened": false
-  },
-  "InstallationMediaMessage": {
-    "type": "structure",
-    "members": {
-      "Marker": {"shape": "String", "flattened": false},
-      "InstallationMedia": {
-        "shape": "InstallationMediaList",
-        "flattened": false
-      }
-    },
-    "flattened": false
-  },
   "Integer": {"type": "integer", "flattened": false},
   "IntegerOptional": {"type": "integer", "flattened": false},
   "KeyList": {
@@ -2854,6 +2973,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "String"},
     "flattened": false
   },
+  "KmsKeyIdOrArn": {"type": "string", "flattened": false},
   "ListTagsForResourceMessage": {
     "type": "structure",
     "members": {
@@ -2886,6 +3006,32 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     },
     "flattened": false
   },
+  "ModifyActivityStreamRequest": {
+    "type": "structure",
+    "members": {
+      "ResourceArn": {"shape": "String", "flattened": false},
+      "AuditPolicyState": {"shape": "AuditPolicyState", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ModifyActivityStreamResponse": {
+    "type": "structure",
+    "members": {
+      "KmsKeyId": {"shape": "String", "flattened": false},
+      "KinesisStreamName": {"shape": "String", "flattened": false},
+      "Status": {"shape": "ActivityStreamStatus", "flattened": false},
+      "Mode": {"shape": "ActivityStreamMode", "flattened": false},
+      "EngineNativeAuditFieldsIncluded": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "PolicyStatus": {
+        "shape": "ActivityStreamPolicyStatus",
+        "flattened": false
+      }
+    },
+    "flattened": false
+  },
   "ModifyCertificatesMessage": {
     "type": "structure",
     "members": {
@@ -2908,6 +3054,16 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "Capacity": {"shape": "IntegerOptional", "flattened": false},
       "SecondsBeforeTimeout": {"shape": "IntegerOptional", "flattened": false},
       "TimeoutAction": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ModifyCustomDBEngineVersionMessage": {
+    "type": "structure",
+    "members": {
+      "Engine": {"shape": "CustomEngineName", "flattened": false},
+      "EngineVersion": {"shape": "CustomEngineVersion", "flattened": false},
+      "Description": {"shape": "Description", "flattened": false},
+      "Status": {"shape": "CustomEngineVersionStatus", "flattened": false}
     },
     "flattened": false
   },
@@ -2961,6 +3117,29 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "CopyTagsToSnapshot": {"shape": "BooleanOptional", "flattened": false},
       "EnableGlobalWriteForwarding": {
         "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "DBClusterInstanceClass": {"shape": "String", "flattened": false},
+      "AllocatedStorage": {"shape": "IntegerOptional", "flattened": false},
+      "StorageType": {"shape": "String", "flattened": false},
+      "Iops": {"shape": "IntegerOptional", "flattened": false},
+      "AutoMinorVersionUpgrade": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "MonitoringInterval": {"shape": "IntegerOptional", "flattened": false},
+      "MonitoringRoleArn": {"shape": "String", "flattened": false},
+      "EnablePerformanceInsights": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "PerformanceInsightsKMSKeyId": {"shape": "String", "flattened": false},
+      "PerformanceInsightsRetentionPeriod": {
+        "shape": "IntegerOptional",
+        "flattened": false
+      },
+      "ServerlessV2ScalingConfiguration": {
+        "shape": "ServerlessV2ScalingConfiguration",
         "flattened": false
       }
     },
@@ -3077,7 +3256,17 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "flattened": false
       },
       "ReplicaMode": {"shape": "ReplicaMode", "flattened": false},
-      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false}
+      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false},
+      "AwsBackupRecoveryPointArn": {
+        "shape": "AwsBackupRecoveryPointArn",
+        "flattened": false
+      },
+      "AutomationMode": {"shape": "AutomationMode", "flattened": false},
+      "ResumeFullAutomationModeMinutes": {
+        "shape": "IntegerOptional",
+        "flattened": false
+      },
+      "NetworkType": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -3093,6 +3282,28 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "DBParameterGroupName": {"shape": "String", "flattened": false},
       "Parameters": {"shape": "ParametersList", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ModifyDBProxyEndpointRequest": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpointName": {
+        "shape": "DBProxyEndpointName",
+        "flattened": false
+      },
+      "NewDBProxyEndpointName": {
+        "shape": "DBProxyEndpointName",
+        "flattened": false
+      },
+      "VpcSecurityGroupIds": {"shape": "StringList", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ModifyDBProxyEndpointResponse": {
+    "type": "structure",
+    "members": {
+      "DBProxyEndpoint": {"shape": "DBProxyEndpoint", "flattened": false}
     },
     "flattened": false
   },
@@ -3212,7 +3423,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "members": {
       "GlobalClusterIdentifier": {"shape": "String", "flattened": false},
       "NewGlobalClusterIdentifier": {"shape": "String", "flattened": false},
-      "DeletionProtection": {"shape": "BooleanOptional", "flattened": false}
+      "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
+      "EngineVersion": {"shape": "String", "flattened": false},
+      "AllowMajorVersionUpgrade": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -3525,7 +3741,13 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "flattened": false
       },
       "OutpostCapable": {"shape": "Boolean", "flattened": false},
-      "SupportsGlobalDatabases": {"shape": "Boolean", "flattened": false}
+      "SupportedActivityStreamModes": {
+        "shape": "ActivityStreamModeList",
+        "flattened": false
+      },
+      "SupportsGlobalDatabases": {"shape": "Boolean", "flattened": false},
+      "SupportsClusters": {"shape": "Boolean", "flattened": false},
+      "SupportedNetworkTypes": {"shape": "StringList", "flattened": false}
     },
     "flattened": false
   },
@@ -3651,7 +3873,9 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "IAMDatabaseAuthenticationEnabled": {
         "shape": "BooleanOptional",
         "flattened": false
-      }
+      },
+      "AutomationMode": {"shape": "AutomationMode", "flattened": false},
+      "ResumeFullAutomationModeTime": {"shape": "TStamp", "flattened": false}
     },
     "flattened": false
   },
@@ -3753,6 +3977,20 @@ const Map<String, Map<String, dynamic>> shapesJson = {
   "ReadersArnList": {
     "type": "list",
     "member": {"shape": "String"},
+    "flattened": false
+  },
+  "RebootDBClusterMessage": {
+    "type": "structure",
+    "members": {
+      "DBClusterIdentifier": {"shape": "String", "flattened": false}
+    },
+    "flattened": false
+  },
+  "RebootDBClusterResult": {
+    "type": "structure",
+    "members": {
+      "DBCluster": {"shape": "DBCluster", "flattened": false}
+    },
     "flattened": false
   },
   "RebootDBInstanceMessage": {
@@ -4004,7 +4242,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
       "CopyTagsToSnapshot": {"shape": "BooleanOptional", "flattened": false},
       "Domain": {"shape": "String", "flattened": false},
-      "DomainIAMRoleName": {"shape": "String", "flattened": false}
+      "DomainIAMRoleName": {"shape": "String", "flattened": false},
+      "ServerlessV2ScalingConfiguration": {
+        "shape": "ServerlessV2ScalingConfiguration",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -4051,7 +4293,15 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
       "CopyTagsToSnapshot": {"shape": "BooleanOptional", "flattened": false},
       "Domain": {"shape": "String", "flattened": false},
-      "DomainIAMRoleName": {"shape": "String", "flattened": false}
+      "DomainIAMRoleName": {"shape": "String", "flattened": false},
+      "DBClusterInstanceClass": {"shape": "String", "flattened": false},
+      "StorageType": {"shape": "String", "flattened": false},
+      "Iops": {"shape": "IntegerOptional", "flattened": false},
+      "PubliclyAccessible": {"shape": "BooleanOptional", "flattened": false},
+      "ServerlessV2ScalingConfiguration": {
+        "shape": "ServerlessV2ScalingConfiguration",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -4092,7 +4342,20 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
       "CopyTagsToSnapshot": {"shape": "BooleanOptional", "flattened": false},
       "Domain": {"shape": "String", "flattened": false},
-      "DomainIAMRoleName": {"shape": "String", "flattened": false}
+      "DomainIAMRoleName": {"shape": "String", "flattened": false},
+      "ScalingConfiguration": {
+        "shape": "ScalingConfiguration",
+        "flattened": false
+      },
+      "EngineMode": {"shape": "String", "flattened": false},
+      "DBClusterInstanceClass": {"shape": "String", "flattened": false},
+      "StorageType": {"shape": "String", "flattened": false},
+      "PubliclyAccessible": {"shape": "BooleanOptional", "flattened": false},
+      "Iops": {"shape": "IntegerOptional", "flattened": false},
+      "ServerlessV2ScalingConfiguration": {
+        "shape": "ServerlessV2ScalingConfiguration",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -4152,7 +4415,10 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       },
       "DBParameterGroupName": {"shape": "String", "flattened": false},
       "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
-      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false}
+      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false},
+      "CustomIamInstanceProfile": {"shape": "String", "flattened": false},
+      "BackupTarget": {"shape": "String", "flattened": false},
+      "NetworkType": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -4236,7 +4502,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "flattened": false
       },
       "DeletionProtection": {"shape": "BooleanOptional", "flattened": false},
-      "MaxAllocatedStorage": {"shape": "IntegerOptional", "flattened": false}
+      "MaxAllocatedStorage": {"shape": "IntegerOptional", "flattened": false},
+      "NetworkType": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -4304,7 +4571,10 @@ const Map<String, Map<String, dynamic>> shapesJson = {
         "shape": "String",
         "flattened": false
       },
-      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false}
+      "EnableCustomerOwnedIp": {"shape": "BooleanOptional", "flattened": false},
+      "CustomIamInstanceProfile": {"shape": "String", "flattened": false},
+      "BackupTarget": {"shape": "String", "flattened": false},
+      "NetworkType": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },
@@ -4348,7 +4618,8 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "MaxCapacity": {"shape": "IntegerOptional", "flattened": false},
       "AutoPause": {"shape": "BooleanOptional", "flattened": false},
       "SecondsUntilAutoPause": {"shape": "IntegerOptional", "flattened": false},
-      "TimeoutAction": {"shape": "String", "flattened": false}
+      "TimeoutAction": {"shape": "String", "flattened": false},
+      "SecondsBeforeTimeout": {"shape": "IntegerOptional", "flattened": false}
     },
     "flattened": false
   },
@@ -4359,7 +4630,24 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "MaxCapacity": {"shape": "IntegerOptional", "flattened": false},
       "AutoPause": {"shape": "BooleanOptional", "flattened": false},
       "SecondsUntilAutoPause": {"shape": "IntegerOptional", "flattened": false},
-      "TimeoutAction": {"shape": "String", "flattened": false}
+      "TimeoutAction": {"shape": "String", "flattened": false},
+      "SecondsBeforeTimeout": {"shape": "IntegerOptional", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ServerlessV2ScalingConfiguration": {
+    "type": "structure",
+    "members": {
+      "MinCapacity": {"shape": "DoubleOptional", "flattened": false},
+      "MaxCapacity": {"shape": "DoubleOptional", "flattened": false}
+    },
+    "flattened": false
+  },
+  "ServerlessV2ScalingConfigurationInfo": {
+    "type": "structure",
+    "members": {
+      "MinCapacity": {"shape": "DoubleOptional", "flattened": false},
+      "MaxCapacity": {"shape": "DoubleOptional", "flattened": false}
     },
     "flattened": false
   },
@@ -4401,7 +4689,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "ResourceArn": {"shape": "String", "flattened": false},
       "Mode": {"shape": "ActivityStreamMode", "flattened": false},
       "KmsKeyId": {"shape": "String", "flattened": false},
-      "ApplyImmediately": {"shape": "BooleanOptional", "flattened": false}
+      "ApplyImmediately": {"shape": "BooleanOptional", "flattened": false},
+      "EngineNativeAuditFieldsIncluded": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -4412,7 +4704,11 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "KinesisStreamName": {"shape": "String", "flattened": false},
       "Status": {"shape": "ActivityStreamStatus", "flattened": false},
       "Mode": {"shape": "ActivityStreamMode", "flattened": false},
-      "ApplyImmediately": {"shape": "Boolean", "flattened": false}
+      "ApplyImmediately": {"shape": "Boolean", "flattened": false},
+      "EngineNativeAuditFieldsIncluded": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      }
     },
     "flattened": false
   },
@@ -4541,12 +4837,12 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "flattened": false
   },
   "String": {"type": "string", "flattened": false},
+  "String255": {"type": "string", "flattened": false},
   "StringList": {
     "type": "list",
     "member": {"shape": "String"},
     "flattened": false
   },
-  "StringSensitive": {"type": "string", "flattened": false},
   "Subnet": {
     "type": "structure",
     "members": {
@@ -4621,6 +4917,7 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {"shape": "DBProxyTarget"},
     "flattened": false
   },
+  "TargetRole": {"type": "string", "flattened": false},
   "TargetState": {"type": "string", "flattened": false},
   "TargetType": {"type": "string", "flattened": false},
   "Timezone": {
@@ -4637,7 +4934,14 @@ const Map<String, Map<String, dynamic>> shapesJson = {
       "EngineVersion": {"shape": "String", "flattened": false},
       "Description": {"shape": "String", "flattened": false},
       "AutoUpgrade": {"shape": "Boolean", "flattened": false},
-      "IsMajorVersionUpgrade": {"shape": "Boolean", "flattened": false}
+      "IsMajorVersionUpgrade": {"shape": "Boolean", "flattened": false},
+      "SupportedEngineModes": {"shape": "EngineModeList", "flattened": false},
+      "SupportsParallelQuery": {"shape": "BooleanOptional", "flattened": false},
+      "SupportsGlobalDatabases": {
+        "shape": "BooleanOptional",
+        "flattened": false
+      },
+      "SupportsBabelfish": {"shape": "BooleanOptional", "flattened": false}
     },
     "flattened": false
   },
@@ -4726,18 +5030,6 @@ const Map<String, Map<String, dynamic>> shapesJson = {
     "member": {
       "shape": "VpcSecurityGroupMembership",
       "locationName": "VpcSecurityGroupMembership"
-    },
-    "flattened": false
-  },
-  "VpnDetails": {
-    "type": "structure",
-    "members": {
-      "VpnId": {"shape": "String", "flattened": false},
-      "VpnTunnelOriginatorIP": {"shape": "String", "flattened": false},
-      "VpnGatewayIp": {"shape": "String", "flattened": false},
-      "VpnPSK": {"shape": "StringSensitive", "flattened": false},
-      "VpnName": {"shape": "String", "flattened": false},
-      "VpnState": {"shape": "String", "flattened": false}
     },
     "flattened": false
   },

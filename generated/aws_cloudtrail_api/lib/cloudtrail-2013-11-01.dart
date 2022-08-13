@@ -48,13 +48,14 @@ class CloudTrail {
     _protocol.close();
   }
 
-  /// Adds one or more tags to a trail, up to a limit of 50. Overwrites an
-  /// existing tag's value when a new value is specified for an existing tag
-  /// key. Tag key names must be unique for a trail; you cannot have two keys
-  /// with the same name but different values. If you specify a key without a
-  /// value, the tag will be created with the specified key and a value of null.
-  /// You can tag a trail that applies to all AWS Regions only from the Region
-  /// in which the trail was created (also known as its home region).
+  /// Adds one or more tags to a trail or event data store, up to a limit of 50.
+  /// Overwrites an existing tag's value when a new value is specified for an
+  /// existing tag key. Tag key names must be unique for a trail; you cannot
+  /// have two keys with the same name but different values. If you specify a
+  /// key without a value, the tag will be created with the specified key and a
+  /// value of null. You can tag a trail or event data store that applies to all
+  /// Amazon Web Services Regions only from the Region in which the trail or
+  /// event data store was created (also known as its home region).
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [CloudTrailARNInvalidException].
@@ -62,23 +63,27 @@ class CloudTrail {
   /// May throw [TagsLimitExceededException].
   /// May throw [InvalidTrailNameException].
   /// May throw [InvalidTagParameterException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [EventDataStoreNotFoundException].
   /// May throw [UnsupportedOperationException].
   /// May throw [OperationNotPermittedException].
   /// May throw [NotOrganizationMasterAccountException].
+  /// May throw [ConflictException].
   ///
   /// Parameter [resourceId] :
-  /// Specifies the ARN of the trail to which one or more tags will be added.
-  /// The format of a trail ARN is:
+  /// Specifies the ARN of the trail or event data store to which one or more
+  /// tags will be added. The format of a trail ARN is:
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   ///
   /// Parameter [tagsList] :
-  /// Contains a list of CloudTrail tags, up to a limit of 50
+  /// Contains a list of tags, up to a limit of 50
   Future<void> addTags({
     required String resourceId,
-    List<Tag>? tagsList,
+    required List<Tag> tagsList,
   }) async {
     ArgumentError.checkNotNull(resourceId, 'resourceId');
+    ArgumentError.checkNotNull(tagsList, 'tagsList');
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target':
@@ -92,9 +97,167 @@ class CloudTrail {
       headers: headers,
       payload: {
         'ResourceId': resourceId,
-        if (tagsList != null) 'TagsList': tagsList,
+        'TagsList': tagsList,
       },
     );
+  }
+
+  /// Cancels a query if the query is not in a terminated state, such as
+  /// <code>CANCELLED</code>, <code>FAILED</code>, <code>TIMED_OUT</code>, or
+  /// <code>FINISHED</code>. You must specify an ARN value for
+  /// <code>EventDataStore</code>. The ID of the query that you want to cancel
+  /// is also required. When you run <code>CancelQuery</code>, the query status
+  /// might show as <code>CANCELLED</code> even if the operation is not yet
+  /// finished.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [InactiveQueryException].
+  /// May throw [InvalidParameterException].
+  /// May throw [QueryIdNotFoundException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  /// May throw [ConflictException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or the ID suffix of the ARN) of an event data store on which the
+  /// specified query is running.
+  ///
+  /// Parameter [queryId] :
+  /// The ID of the query that you want to cancel. The <code>QueryId</code>
+  /// comes from the response of a <code>StartQuery</code> operation.
+  Future<CancelQueryResponse> cancelQuery({
+    required String eventDataStore,
+    required String queryId,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(queryId, 'queryId');
+    _s.validateStringLength(
+      'queryId',
+      queryId,
+      36,
+      36,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.CancelQuery'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+        'QueryId': queryId,
+      },
+    );
+
+    return CancelQueryResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Creates a new event data store.
+  ///
+  /// May throw [EventDataStoreAlreadyExistsException].
+  /// May throw [EventDataStoreMaxLimitExceededException].
+  /// May throw [InvalidParameterException].
+  /// May throw [InvalidTagParameterException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  /// May throw [ConflictException].
+  /// May throw [CloudTrailAccessNotEnabledException].
+  /// May throw [InsufficientDependencyServiceAccessPermissionException].
+  /// May throw [NotOrganizationMasterAccountException].
+  /// May throw [OrganizationsNotInUseException].
+  /// May throw [OrganizationNotInAllFeaturesModeException].
+  ///
+  /// Parameter [name] :
+  /// The name of the event data store.
+  ///
+  /// Parameter [advancedEventSelectors] :
+  /// The advanced event selectors to use to select the events for the data
+  /// store. For more information about how to use advanced event selectors, see
+  /// <a
+  /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html#creating-data-event-selectors-advanced">Log
+  /// events by using advanced event selectors</a> in the CloudTrail User Guide.
+  ///
+  /// Parameter [multiRegionEnabled] :
+  /// Specifies whether the event data store includes events from all regions,
+  /// or only from the region in which the event data store is created.
+  ///
+  /// Parameter [organizationEnabled] :
+  /// Specifies whether an event data store collects events logged for an
+  /// organization in Organizations.
+  ///
+  /// Parameter [retentionPeriod] :
+  /// The retention period of the event data store, in days. You can set a
+  /// retention period of up to 2555 days, the equivalent of seven years.
+  ///
+  /// Parameter [terminationProtectionEnabled] :
+  /// Specifies whether termination protection is enabled for the event data
+  /// store. If termination protection is enabled, you cannot delete the event
+  /// data store until termination protection is disabled.
+  Future<CreateEventDataStoreResponse> createEventDataStore({
+    required String name,
+    List<AdvancedEventSelector>? advancedEventSelectors,
+    bool? multiRegionEnabled,
+    bool? organizationEnabled,
+    int? retentionPeriod,
+    List<Tag>? tagsList,
+    bool? terminationProtectionEnabled,
+  }) async {
+    ArgumentError.checkNotNull(name, 'name');
+    _s.validateStringLength(
+      'name',
+      name,
+      3,
+      128,
+      isRequired: true,
+    );
+    _s.validateNumRange(
+      'retentionPeriod',
+      retentionPeriod,
+      7,
+      2557,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.CreateEventDataStore'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'Name': name,
+        if (advancedEventSelectors != null)
+          'AdvancedEventSelectors': advancedEventSelectors,
+        if (multiRegionEnabled != null)
+          'MultiRegionEnabled': multiRegionEnabled,
+        if (organizationEnabled != null)
+          'OrganizationEnabled': organizationEnabled,
+        if (retentionPeriod != null) 'RetentionPeriod': retentionPeriod,
+        if (tagsList != null) 'TagsList': tagsList,
+        if (terminationProtectionEnabled != null)
+          'TerminationProtectionEnabled': terminationProtectionEnabled,
+      },
+    );
+
+    return CreateEventDataStoreResponse.fromJson(jsonResponse.body);
   }
 
   /// Creates a trail that specifies the settings for delivery of log data to an
@@ -128,6 +291,7 @@ class CloudTrail {
   /// May throw [OrganizationsNotInUseException].
   /// May throw [OrganizationNotInAllFeaturesModeException].
   /// May throw [CloudTrailInvalidClientTokenIdException].
+  /// May throw [ConflictException].
   ///
   /// Parameter [name] :
   /// Specifies the name of the trail. The name must meet the following
@@ -146,7 +310,7 @@ class CloudTrail {
   /// </li>
   /// <li>
   /// Have no adjacent periods, underscores or dashes. Names like
-  /// <code>my-_namespace</code> and <code>my--namespace</code> are invalid.
+  /// <code>my-_namespace</code> and <code>my--namespace</code> are not valid.
   /// </li>
   /// <li>
   /// Not be in IP address format (for example, 192.168.5.4)
@@ -162,7 +326,8 @@ class CloudTrail {
   /// Parameter [cloudWatchLogsLogGroupArn] :
   /// Specifies a log group name using an Amazon Resource Name (ARN), a unique
   /// identifier that represents the log group to which CloudTrail logs will be
-  /// delivered. Not required unless you specify CloudWatchLogsRoleArn.
+  /// delivered. Not required unless you specify
+  /// <code>CloudWatchLogsRoleArn</code>.
   ///
   /// Parameter [cloudWatchLogsRoleArn] :
   /// Specifies the role for the CloudWatch Logs endpoint to assume to write to
@@ -173,7 +338,7 @@ class CloudTrail {
   /// false.
   /// <note>
   /// When you disable log file integrity validation, the chain of digest files
-  /// is broken after one hour. CloudTrail will not create digest files for log
+  /// is broken after one hour. CloudTrail does not create digest files for log
   /// files that were delivered during a period in which log file integrity
   /// validation was disabled. For example, if you enable log file integrity
   /// validation at noon on January 1, disable it at noon on January 2, and
@@ -194,16 +359,22 @@ class CloudTrail {
   ///
   /// Parameter [isOrganizationTrail] :
   /// Specifies whether the trail is created for all accounts in an organization
-  /// in AWS Organizations, or only for the current AWS account. The default is
-  /// false, and cannot be true unless the call is made on behalf of an AWS
-  /// account that is the master account for an organization in AWS
-  /// Organizations.
+  /// in Organizations, or only for the current Amazon Web Services account. The
+  /// default is false, and cannot be true unless the call is made on behalf of
+  /// an Amazon Web Services account that is the management account for an
+  /// organization in Organizations.
   ///
   /// Parameter [kmsKeyId] :
   /// Specifies the KMS key ID to use to encrypt the logs delivered by
   /// CloudTrail. The value can be an alias name prefixed by "alias/", a fully
   /// specified ARN to an alias, a fully specified ARN to a key, or a globally
   /// unique identifier.
+  ///
+  /// CloudTrail also supports KMS multi-Region keys. For more information about
+  /// multi-Region keys, see <a
+  /// href="https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html">Using
+  /// multi-Region keys</a> in the <i>Key Management Service Developer
+  /// Guide</i>.
   ///
   /// Examples:
   ///
@@ -283,6 +454,60 @@ class CloudTrail {
     return CreateTrailResponse.fromJson(jsonResponse.body);
   }
 
+  /// Disables the event data store specified by <code>EventDataStore</code>,
+  /// which accepts an event data store ARN. After you run
+  /// <code>DeleteEventDataStore</code>, the event data store enters a
+  /// <code>PENDING_DELETION</code> state, and is automatically deleted after a
+  /// wait period of seven days. <code>TerminationProtectionEnabled</code> must
+  /// be set to <code>False</code> on the event data store; this operation
+  /// cannot work if <code>TerminationProtectionEnabled</code> is
+  /// <code>True</code>.
+  ///
+  /// After you run <code>DeleteEventDataStore</code> on an event data store,
+  /// you cannot run <code>ListQueries</code>, <code>DescribeQuery</code>, or
+  /// <code>GetQueryResults</code> on queries that are using an event data store
+  /// in a <code>PENDING_DELETION</code> state. An event data store in the
+  /// <code>PENDING_DELETION</code> state does not incur costs.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [EventDataStoreTerminationProtectedException].
+  /// May throw [InvalidParameterException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  /// May throw [NotOrganizationMasterAccountException].
+  /// May throw [InsufficientDependencyServiceAccessPermissionException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or the ID suffix of the ARN) of the event data store to delete.
+  Future<void> deleteEventDataStore({
+    required String eventDataStore,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.DeleteEventDataStore'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+      },
+    );
+  }
+
   /// Deletes a trail. This operation must be called from the region in which
   /// the trail was created. <code>DeleteTrail</code> cannot be called on the
   /// shadow trails (replicated trails in other regions) of a trail that is
@@ -295,10 +520,11 @@ class CloudTrail {
   /// May throw [OperationNotPermittedException].
   /// May throw [NotOrganizationMasterAccountException].
   /// May throw [InsufficientDependencyServiceAccessPermissionException].
+  /// May throw [ConflictException].
   ///
   /// Parameter [name] :
   /// Specifies the name or the CloudTrail ARN of the trail to be deleted. The
-  /// format of a trail ARN is:
+  /// following is the format of a trail ARN.
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   Future<void> deleteTrail({
     required String name,
@@ -319,6 +545,65 @@ class CloudTrail {
         'Name': name,
       },
     );
+  }
+
+  /// Returns metadata about a query, including query run time in milliseconds,
+  /// number of events scanned and matched, and query status. You must specify
+  /// an ARN for <code>EventDataStore</code>, and a value for
+  /// <code>QueryID</code>.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [InvalidParameterException].
+  /// May throw [QueryIdNotFoundException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or the ID suffix of the ARN) of an event data store on which the
+  /// specified query was run.
+  ///
+  /// Parameter [queryId] :
+  /// The query ID.
+  Future<DescribeQueryResponse> describeQuery({
+    required String eventDataStore,
+    required String queryId,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(queryId, 'queryId');
+    _s.validateStringLength(
+      'queryId',
+      queryId,
+      36,
+      36,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.DescribeQuery'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+        'QueryId': queryId,
+      },
+    );
+
+    return DescribeQueryResponse.fromJson(jsonResponse.body);
   }
 
   /// Retrieves settings for one or more trails associated with the current
@@ -386,6 +671,48 @@ class CloudTrail {
     return DescribeTrailsResponse.fromJson(jsonResponse.body);
   }
 
+  /// Returns information about an event data store specified as either an ARN
+  /// or the ID portion of the ARN.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InvalidParameterException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or ID suffix of the ARN) of the event data store about which you
+  /// want information.
+  Future<GetEventDataStoreResponse> getEventDataStore({
+    required String eventDataStore,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.GetEventDataStore'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+      },
+    );
+
+    return GetEventDataStoreResponse.fromJson(jsonResponse.body);
+  }
+
   /// Describes the settings for the event selectors that you configured for
   /// your trail. The information returned for your event selectors includes the
   /// following:
@@ -399,13 +726,13 @@ class CloudTrail {
   /// If your event selector includes management events.
   /// </li>
   /// <li>
-  /// If your event selector includes data events, the Amazon S3 objects or AWS
-  /// Lambda functions that you are logging for data events.
+  /// If your event selector includes data events, the resources on which you
+  /// are logging data events.
   /// </li>
   /// </ul>
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-and-data-events-with-cloudtrail.html">Logging
-  /// Data and Management Events for Trails </a> in the <i>AWS CloudTrail User
+  /// Data and Management Events for Trails </a> in the <i>CloudTrail User
   /// Guide</i>.
   ///
   /// May throw [TrailNotFoundException].
@@ -472,7 +799,7 @@ class CloudTrail {
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-insights-events-with-cloudtrail.html">Logging
-  /// CloudTrail Insights Events for Trails </a> in the <i>AWS CloudTrail User
+  /// CloudTrail Insights Events for Trails </a> in the <i>CloudTrail User
   /// Guide</i>.
   ///
   /// May throw [TrailNotFoundException].
@@ -530,6 +857,88 @@ class CloudTrail {
     return GetInsightSelectorsResponse.fromJson(jsonResponse.body);
   }
 
+  /// Gets event data results of a query. You must specify the
+  /// <code>QueryID</code> value returned by the <code>StartQuery</code>
+  /// operation, and an ARN for <code>EventDataStore</code>.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [InvalidMaxResultsException].
+  /// May throw [InvalidNextTokenException].
+  /// May throw [InvalidParameterException].
+  /// May throw [QueryIdNotFoundException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or ID suffix of the ARN) of the event data store against which
+  /// the query was run.
+  ///
+  /// Parameter [queryId] :
+  /// The ID of the query for which you want to get results.
+  ///
+  /// Parameter [maxQueryResults] :
+  /// The maximum number of query results to display on a single page.
+  ///
+  /// Parameter [nextToken] :
+  /// A token you can use to get the next page of query results.
+  Future<GetQueryResultsResponse> getQueryResults({
+    required String eventDataStore,
+    required String queryId,
+    int? maxQueryResults,
+    String? nextToken,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(queryId, 'queryId');
+    _s.validateStringLength(
+      'queryId',
+      queryId,
+      36,
+      36,
+      isRequired: true,
+    );
+    _s.validateNumRange(
+      'maxQueryResults',
+      maxQueryResults,
+      1,
+      1000,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      4,
+      1000,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.GetQueryResults'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+        'QueryId': queryId,
+        if (maxQueryResults != null) 'MaxQueryResults': maxQueryResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return GetQueryResultsResponse.fromJson(jsonResponse.body);
+  }
+
   /// Returns settings information for a specified trail.
   ///
   /// May throw [TrailNotFoundException].
@@ -577,8 +986,8 @@ class CloudTrail {
   /// Parameter [name] :
   /// Specifies the name or the CloudTrail ARN of the trail for which you are
   /// requesting status. To get the status of a shadow trail (a replication of
-  /// the trail in another region), you must specify its ARN. The format of a
-  /// trail ARN is:
+  /// the trail in another region), you must specify its ARN. The following is
+  /// the format of a trail ARN.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   Future<GetTrailStatusResponse> getTrailStatus({
@@ -604,14 +1013,63 @@ class CloudTrail {
     return GetTrailStatusResponse.fromJson(jsonResponse.body);
   }
 
+  /// Returns information about all event data stores in the account, in the
+  /// current region.
+  ///
+  /// May throw [InvalidMaxResultsException].
+  /// May throw [InvalidNextTokenException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of event data stores to display on a single page.
+  ///
+  /// Parameter [nextToken] :
+  /// A token you can use to get the next page of event data store results.
+  Future<ListEventDataStoresResponse> listEventDataStores({
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      1000,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      4,
+      1000,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.ListEventDataStores'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListEventDataStoresResponse.fromJson(jsonResponse.body);
+  }
+
   /// Returns all public keys whose private keys were used to sign the digest
   /// files within the specified time range. The public key is needed to
   /// validate digest files that were signed with its corresponding private key.
   /// <note>
-  /// CloudTrail uses different private/public key pairs per region. Each digest
-  /// file is signed with a private key unique to its region. Therefore, when
-  /// you validate a digest file from a particular region, you must look in the
-  /// same region for its corresponding public key.
+  /// CloudTrail uses different private and public key pairs per region. Each
+  /// digest file is signed with a private key unique to its region. When you
+  /// validate a digest file from a specific region, you must look in the same
+  /// region for its corresponding public key.
   /// </note>
   ///
   /// May throw [InvalidTimeRangeException].
@@ -657,21 +1115,118 @@ class CloudTrail {
     return ListPublicKeysResponse.fromJson(jsonResponse.body);
   }
 
-  /// Lists the tags for the trail in the current region.
+  /// Returns a list of queries and query statuses for the past seven days. You
+  /// must specify an ARN value for <code>EventDataStore</code>. Optionally, to
+  /// shorten the list of results, you can specify a time range, formatted as
+  /// timestamps, by adding <code>StartTime</code> and <code>EndTime</code>
+  /// parameters, and a <code>QueryStatus</code> value. Valid values for
+  /// <code>QueryStatus</code> include <code>QUEUED</code>,
+  /// <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>,
+  /// <code>TIMED_OUT</code>, or <code>CANCELLED</code>.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [InvalidDateRangeException].
+  /// May throw [InvalidMaxResultsException].
+  /// May throw [InvalidNextTokenException].
+  /// May throw [InvalidParameterException].
+  /// May throw [InvalidQueryStatusException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or the ID suffix of the ARN) of an event data store on which
+  /// queries were run.
+  ///
+  /// Parameter [endTime] :
+  /// Use with <code>StartTime</code> to bound a <code>ListQueries</code>
+  /// request, and limit its results to only those queries run within a
+  /// specified time period.
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of queries to show on a page.
+  ///
+  /// Parameter [nextToken] :
+  /// A token you can use to get the next page of results.
+  ///
+  /// Parameter [queryStatus] :
+  /// The status of queries that you want to return in results. Valid values for
+  /// <code>QueryStatus</code> include <code>QUEUED</code>,
+  /// <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>,
+  /// <code>TIMED_OUT</code>, or <code>CANCELLED</code>.
+  ///
+  /// Parameter [startTime] :
+  /// Use with <code>EndTime</code> to bound a <code>ListQueries</code> request,
+  /// and limit its results to only those queries run within a specified time
+  /// period.
+  Future<ListQueriesResponse> listQueries({
+    required String eventDataStore,
+    DateTime? endTime,
+    int? maxResults,
+    String? nextToken,
+    QueryStatus? queryStatus,
+    DateTime? startTime,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      1000,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      4,
+      1000,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.ListQueries'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+        if (endTime != null) 'EndTime': unixTimestampToJson(endTime),
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+        if (queryStatus != null) 'QueryStatus': queryStatus.toValue(),
+        if (startTime != null) 'StartTime': unixTimestampToJson(startTime),
+      },
+    );
+
+    return ListQueriesResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Lists the tags for the trail or event data store in the current region.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [CloudTrailARNInvalidException].
   /// May throw [ResourceTypeNotSupportedException].
   /// May throw [InvalidTrailNameException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [EventDataStoreNotFoundException].
   /// May throw [UnsupportedOperationException].
   /// May throw [OperationNotPermittedException].
   /// May throw [InvalidTokenException].
   ///
   /// Parameter [resourceIdList] :
-  /// Specifies a list of trail ARNs whose tags will be listed. The list has a
-  /// limit of 20 ARNs. The format of a trail ARN is:
-  ///
-  /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
+  /// Specifies a list of trail and event data store ARNs whose tags will be
+  /// listed. The list has a limit of 20 ARNs.
   ///
   /// Parameter [nextToken] :
   /// Reserved for future use.
@@ -743,7 +1298,7 @@ class CloudTrail {
   ///
   /// <ul>
   /// <li>
-  /// AWS access key
+  /// Amazon Web Services access key
   /// </li>
   /// <li>
   /// Event ID
@@ -906,7 +1461,7 @@ class CloudTrail {
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-and-data-events-with-cloudtrail.html">Logging
   /// data and management events for trails </a> and <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/WhatIsCloudTrail-Limits.html">Quotas
-  /// in AWS CloudTrail</a> in the <i>AWS CloudTrail User Guide</i>.
+  /// in CloudTrail</a> in the <i>CloudTrail User Guide</i>.
   ///
   /// You can add advanced event selectors, and conditions for your advanced
   /// event selectors, up to a maximum of 500 values for all conditions and
@@ -916,7 +1471,7 @@ class CloudTrail {
   /// existing <code>EventSelectors</code> are overwritten. For more information
   /// about advanced event selectors, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html">Logging
-  /// data events for trails</a> in the <i>AWS CloudTrail User Guide</i>.
+  /// data events for trails</a> in the <i>CloudTrail User Guide</i>.
   ///
   /// May throw [TrailNotFoundException].
   /// May throw [InvalidTrailNameException].
@@ -944,13 +1499,13 @@ class CloudTrail {
   /// </li>
   /// <li>
   /// Have no adjacent periods, underscores or dashes. Names like
-  /// <code>my-_namespace</code> and <code>my--namespace</code> are invalid.
+  /// <code>my-_namespace</code> and <code>my--namespace</code> are not valid.
   /// </li>
   /// <li>
   /// Not be in IP address format (for example, 192.168.5.4)
   /// </li>
   /// </ul>
-  /// If you specify a trail ARN, it must be in the format:
+  /// If you specify a trail ARN, it must be in the following format.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   ///
@@ -964,7 +1519,7 @@ class CloudTrail {
   /// <code>EventSelectors</code> are overwritten. For more information about
   /// advanced event selectors, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html">Logging
-  /// data events for trails</a> in the <i>AWS CloudTrail User Guide</i>.
+  /// data events for trails</a> in the <i>CloudTrail User Guide</i>.
   ///
   /// Parameter [eventSelectors] :
   /// Specifies the settings for your event selectors. You can configure up to
@@ -1004,8 +1559,9 @@ class CloudTrail {
   /// Lets you enable Insights event logging by specifying the Insights
   /// selectors that you want to enable on an existing trail. You also use
   /// <code>PutInsightSelectors</code> to turn off Insights event logging, by
-  /// passing an empty list of insight types. In this release, only
-  /// <code>ApiCallRateInsight</code> is supported as an Insights selector.
+  /// passing an empty list of insight types. The valid Insights event types in
+  /// this release are <code>ApiErrorRateInsight</code> and
+  /// <code>ApiCallRateInsight</code>.
   ///
   /// May throw [TrailNotFoundException].
   /// May throw [InvalidTrailNameException].
@@ -1013,14 +1569,16 @@ class CloudTrail {
   /// May throw [InvalidInsightSelectorsException].
   /// May throw [InsufficientS3BucketPolicyException].
   /// May throw [InsufficientEncryptionPolicyException].
+  /// May throw [S3BucketDoesNotExistException].
+  /// May throw [KmsException].
   /// May throw [UnsupportedOperationException].
   /// May throw [OperationNotPermittedException].
   /// May throw [NotOrganizationMasterAccountException].
   ///
   /// Parameter [insightSelectors] :
   /// A JSON string that contains the insight types you want to log on a trail.
-  /// In this release, only <code>ApiCallRateInsight</code> is supported as an
-  /// insight type.
+  /// <code>ApiCallRateInsight</code> and <code>ApiErrorRateInsight</code> are
+  /// valid insight types.
   ///
   /// Parameter [trailName] :
   /// The name of the CloudTrail trail for which you want to change or add
@@ -1051,30 +1609,37 @@ class CloudTrail {
     return PutInsightSelectorsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Removes the specified tags from a trail.
+  /// Removes the specified tags from a trail or event data store.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [CloudTrailARNInvalidException].
   /// May throw [ResourceTypeNotSupportedException].
   /// May throw [InvalidTrailNameException].
   /// May throw [InvalidTagParameterException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [EventDataStoreNotFoundException].
   /// May throw [UnsupportedOperationException].
   /// May throw [OperationNotPermittedException].
   /// May throw [NotOrganizationMasterAccountException].
   ///
   /// Parameter [resourceId] :
-  /// Specifies the ARN of the trail from which tags should be removed. The
-  /// format of a trail ARN is:
+  /// Specifies the ARN of the trail or event data store from which tags should
+  /// be removed.
   ///
+  /// Example trail ARN format:
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
+  ///
+  /// Example event data store ARN format:
+  /// <code>arn:aws:cloudtrail:us-east-2:12345678910:eventdatastore/EXAMPLE-f852-4e8f-8bd1-bcf6cEXAMPLE</code>
   ///
   /// Parameter [tagsList] :
   /// Specifies a list of tags to be removed.
   Future<void> removeTags({
     required String resourceId,
-    List<Tag>? tagsList,
+    required List<Tag> tagsList,
   }) async {
     ArgumentError.checkNotNull(resourceId, 'resourceId');
+    ArgumentError.checkNotNull(tagsList, 'tagsList');
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target':
@@ -1088,16 +1653,68 @@ class CloudTrail {
       headers: headers,
       payload: {
         'ResourceId': resourceId,
-        if (tagsList != null) 'TagsList': tagsList,
+        'TagsList': tagsList,
       },
     );
   }
 
-  /// Starts the recording of AWS API calls and log file delivery for a trail.
-  /// For a trail that is enabled in all regions, this operation must be called
-  /// from the region in which the trail was created. This operation cannot be
-  /// called on the shadow trails (replicated trails in other regions) of a
-  /// trail that is enabled in all regions.
+  /// Restores a deleted event data store specified by
+  /// <code>EventDataStore</code>, which accepts an event data store ARN. You
+  /// can only restore a deleted event data store within the seven-day wait
+  /// period after deletion. Restoring an event data store can take several
+  /// minutes, depending on the size of the event data store.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [EventDataStoreMaxLimitExceededException].
+  /// May throw [InvalidEventDataStoreStatusException].
+  /// May throw [InvalidParameterException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  /// May throw [CloudTrailAccessNotEnabledException].
+  /// May throw [InsufficientDependencyServiceAccessPermissionException].
+  /// May throw [OrganizationsNotInUseException].
+  /// May throw [NotOrganizationMasterAccountException].
+  /// May throw [OrganizationNotInAllFeaturesModeException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or the ID suffix of the ARN) of the event data store that you
+  /// want to restore.
+  Future<RestoreEventDataStoreResponse> restoreEventDataStore({
+    required String eventDataStore,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.RestoreEventDataStore'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+      },
+    );
+
+    return RestoreEventDataStoreResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Starts the recording of Amazon Web Services API calls and log file
+  /// delivery for a trail. For a trail that is enabled in all regions, this
+  /// operation must be called from the region in which the trail was created.
+  /// This operation cannot be called on the shadow trails (replicated trails in
+  /// other regions) of a trail that is enabled in all regions.
   ///
   /// May throw [TrailNotFoundException].
   /// May throw [InvalidTrailNameException].
@@ -1109,7 +1726,8 @@ class CloudTrail {
   ///
   /// Parameter [name] :
   /// Specifies the name or the CloudTrail ARN of the trail for which CloudTrail
-  /// logs AWS API calls. The format of a trail ARN is:
+  /// logs Amazon Web Services API calls. The following is the format of a trail
+  /// ARN.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   Future<void> startLogging({
@@ -1133,14 +1751,58 @@ class CloudTrail {
     );
   }
 
-  /// Suspends the recording of AWS API calls and log file delivery for the
-  /// specified trail. Under most circumstances, there is no need to use this
-  /// action. You can update a trail without stopping it first. This action is
-  /// the only way to stop recording. For a trail enabled in all regions, this
-  /// operation must be called from the region in which the trail was created,
-  /// or an <code>InvalidHomeRegionException</code> will occur. This operation
-  /// cannot be called on the shadow trails (replicated trails in other regions)
-  /// of a trail enabled in all regions.
+  /// Starts a CloudTrail Lake query. The required <code>QueryStatement</code>
+  /// parameter provides your SQL query, enclosed in single quotation marks.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [InvalidParameterException].
+  /// May throw [InvalidQueryStatementException].
+  /// May throw [MaxConcurrentQueriesException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  ///
+  /// Parameter [queryStatement] :
+  /// The SQL code of your query.
+  Future<StartQueryResponse> startQuery({
+    required String queryStatement,
+  }) async {
+    ArgumentError.checkNotNull(queryStatement, 'queryStatement');
+    _s.validateStringLength(
+      'queryStatement',
+      queryStatement,
+      1,
+      10000,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.StartQuery'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'QueryStatement': queryStatement,
+      },
+    );
+
+    return StartQueryResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Suspends the recording of Amazon Web Services API calls and log file
+  /// delivery for the specified trail. Under most circumstances, there is no
+  /// need to use this action. You can update a trail without stopping it first.
+  /// This action is the only way to stop recording. For a trail enabled in all
+  /// regions, this operation must be called from the region in which the trail
+  /// was created, or an <code>InvalidHomeRegionException</code> will occur.
+  /// This operation cannot be called on the shadow trails (replicated trails in
+  /// other regions) of a trail enabled in all regions.
   ///
   /// May throw [TrailNotFoundException].
   /// May throw [InvalidTrailNameException].
@@ -1152,7 +1814,8 @@ class CloudTrail {
   ///
   /// Parameter [name] :
   /// Specifies the name or the CloudTrail ARN of the trail for which CloudTrail
-  /// will stop logging AWS API calls. The format of a trail ARN is:
+  /// will stop logging Amazon Web Services API calls. The following is the
+  /// format of a trail ARN.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   Future<void> stopLogging({
@@ -1176,13 +1839,120 @@ class CloudTrail {
     );
   }
 
-  /// Updates the settings that specify delivery of log files. Changes to a
-  /// trail do not require stopping the CloudTrail service. Use this action to
-  /// designate an existing bucket for log delivery. If the existing bucket has
-  /// previously been a target for CloudTrail log files, an IAM policy exists
-  /// for the bucket. <code>UpdateTrail</code> must be called from the region in
-  /// which the trail was created; otherwise, an
-  /// <code>InvalidHomeRegionException</code> is thrown.
+  /// Updates an event data store. The required <code>EventDataStore</code>
+  /// value is an ARN or the ID portion of the ARN. Other parameters are
+  /// optional, but at least one optional parameter must be specified, or
+  /// CloudTrail throws an error. <code>RetentionPeriod</code> is in days, and
+  /// valid values are integers between 90 and 2555. By default,
+  /// <code>TerminationProtection</code> is enabled.
+  /// <code>AdvancedEventSelectors</code> includes or excludes management and
+  /// data events in your event data store; for more information about
+  /// <code>AdvancedEventSelectors</code>, see
+  /// <a>PutEventSelectorsRequest$AdvancedEventSelectors</a>.
+  ///
+  /// May throw [EventDataStoreARNInvalidException].
+  /// May throw [EventDataStoreNotFoundException].
+  /// May throw [InactiveEventDataStoreException].
+  /// May throw [InvalidParameterException].
+  /// May throw [OperationNotPermittedException].
+  /// May throw [UnsupportedOperationException].
+  /// May throw [CloudTrailAccessNotEnabledException].
+  /// May throw [InsufficientDependencyServiceAccessPermissionException].
+  /// May throw [OrganizationsNotInUseException].
+  /// May throw [NotOrganizationMasterAccountException].
+  /// May throw [OrganizationNotInAllFeaturesModeException].
+  ///
+  /// Parameter [eventDataStore] :
+  /// The ARN (or the ID suffix of the ARN) of the event data store that you
+  /// want to update.
+  ///
+  /// Parameter [advancedEventSelectors] :
+  /// The advanced event selectors used to select events for the event data
+  /// store.
+  ///
+  /// Parameter [multiRegionEnabled] :
+  /// Specifies whether an event data store collects events from all regions, or
+  /// only from the region in which it was created.
+  ///
+  /// Parameter [name] :
+  /// The event data store name.
+  ///
+  /// Parameter [organizationEnabled] :
+  /// Specifies whether an event data store collects events logged for an
+  /// organization in Organizations.
+  ///
+  /// Parameter [retentionPeriod] :
+  /// The retention period, in days.
+  ///
+  /// Parameter [terminationProtectionEnabled] :
+  /// Indicates that termination protection is enabled and the event data store
+  /// cannot be automatically deleted.
+  Future<UpdateEventDataStoreResponse> updateEventDataStore({
+    required String eventDataStore,
+    List<AdvancedEventSelector>? advancedEventSelectors,
+    bool? multiRegionEnabled,
+    String? name,
+    bool? organizationEnabled,
+    int? retentionPeriod,
+    bool? terminationProtectionEnabled,
+  }) async {
+    ArgumentError.checkNotNull(eventDataStore, 'eventDataStore');
+    _s.validateStringLength(
+      'eventDataStore',
+      eventDataStore,
+      3,
+      256,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'name',
+      name,
+      3,
+      128,
+    );
+    _s.validateNumRange(
+      'retentionPeriod',
+      retentionPeriod,
+      7,
+      2557,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.UpdateEventDataStore'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'EventDataStore': eventDataStore,
+        if (advancedEventSelectors != null)
+          'AdvancedEventSelectors': advancedEventSelectors,
+        if (multiRegionEnabled != null)
+          'MultiRegionEnabled': multiRegionEnabled,
+        if (name != null) 'Name': name,
+        if (organizationEnabled != null)
+          'OrganizationEnabled': organizationEnabled,
+        if (retentionPeriod != null) 'RetentionPeriod': retentionPeriod,
+        if (terminationProtectionEnabled != null)
+          'TerminationProtectionEnabled': terminationProtectionEnabled,
+      },
+    );
+
+    return UpdateEventDataStoreResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Updates trail settings that control what events you are logging, and how
+  /// to handle log files. Changes to a trail do not require stopping the
+  /// CloudTrail service. Use this action to designate an existing bucket for
+  /// log delivery. If the existing bucket has previously been a target for
+  /// CloudTrail log files, an IAM policy exists for the bucket.
+  /// <code>UpdateTrail</code> must be called from the region in which the trail
+  /// was created; otherwise, an <code>InvalidHomeRegionException</code> is
+  /// thrown.
   ///
   /// May throw [S3BucketDoesNotExistException].
   /// May throw [InsufficientS3BucketPolicyException].
@@ -1230,20 +2000,21 @@ class CloudTrail {
   /// </li>
   /// <li>
   /// Have no adjacent periods, underscores or dashes. Names like
-  /// <code>my-_namespace</code> and <code>my--namespace</code> are invalid.
+  /// <code>my-_namespace</code> and <code>my--namespace</code> are not valid.
   /// </li>
   /// <li>
   /// Not be in IP address format (for example, 192.168.5.4)
   /// </li>
   /// </ul>
-  /// If <code>Name</code> is a trail ARN, it must be in the format:
+  /// If <code>Name</code> is a trail ARN, it must be in the following format.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   ///
   /// Parameter [cloudWatchLogsLogGroupArn] :
   /// Specifies a log group name using an Amazon Resource Name (ARN), a unique
-  /// identifier that represents the log group to which CloudTrail logs will be
-  /// delivered. Not required unless you specify CloudWatchLogsRoleArn.
+  /// identifier that represents the log group to which CloudTrail logs are
+  /// delivered. Not required unless you specify
+  /// <code>CloudWatchLogsRoleArn</code>.
   ///
   /// Parameter [cloudWatchLogsRoleArn] :
   /// Specifies the role for the CloudWatch Logs endpoint to assume to write to
@@ -1253,7 +2024,7 @@ class CloudTrail {
   /// Specifies whether log file validation is enabled. The default is false.
   /// <note>
   /// When you disable log file integrity validation, the chain of digest files
-  /// is broken after one hour. CloudTrail will not create digest files for log
+  /// is broken after one hour. CloudTrail does not create digest files for log
   /// files that were delivered during a period in which log file integrity
   /// validation was disabled. For example, if you enable log file integrity
   /// validation at noon on January 1, disable it at noon on January 2, and
@@ -1278,20 +2049,27 @@ class CloudTrail {
   ///
   /// Parameter [isOrganizationTrail] :
   /// Specifies whether the trail is applied to all accounts in an organization
-  /// in AWS Organizations, or only for the current AWS account. The default is
-  /// false, and cannot be true unless the call is made on behalf of an AWS
-  /// account that is the master account for an organization in AWS
-  /// Organizations. If the trail is not an organization trail and this is set
-  /// to true, the trail will be created in all AWS accounts that belong to the
-  /// organization. If the trail is an organization trail and this is set to
-  /// false, the trail will remain in the current AWS account but be deleted
-  /// from all member accounts in the organization.
+  /// in Organizations, or only for the current Amazon Web Services account. The
+  /// default is false, and cannot be true unless the call is made on behalf of
+  /// an Amazon Web Services account that is the management account for an
+  /// organization in Organizations. If the trail is not an organization trail
+  /// and this is set to <code>true</code>, the trail will be created in all
+  /// Amazon Web Services accounts that belong to the organization. If the trail
+  /// is an organization trail and this is set to <code>false</code>, the trail
+  /// will remain in the current Amazon Web Services account but be deleted from
+  /// all member accounts in the organization.
   ///
   /// Parameter [kmsKeyId] :
   /// Specifies the KMS key ID to use to encrypt the logs delivered by
   /// CloudTrail. The value can be an alias name prefixed by "alias/", a fully
   /// specified ARN to an alias, a fully specified ARN to a key, or a globally
   /// unique identifier.
+  ///
+  /// CloudTrail also supports KMS multi-Region keys. For more information about
+  /// multi-Region keys, see <a
+  /// href="https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html">Using
+  /// multi-Region keys</a> in the <i>Key Management Service Developer
+  /// Guide</i>.
   ///
   /// Examples:
   ///
@@ -1375,8 +2153,7 @@ class CloudTrail {
   }
 }
 
-/// Returns the objects or data listed below if successful. Otherwise, returns
-/// an error.
+/// Returns the objects or data if successful. Otherwise, returns an error.
 class AddTagsResponse {
   AddTagsResponse();
   factory AddTagsResponse.fromJson(Map<String, dynamic> _) {
@@ -1385,11 +2162,11 @@ class AddTagsResponse {
 }
 
 /// Advanced event selectors let you create fine-grained selectors for the
-/// following AWS CloudTrail event record ﬁelds. They help you control costs by
+/// following CloudTrail event record ﬁelds. They help you control costs by
 /// logging only those events that are important to you. For more information
 /// about advanced event selectors, see <a
 /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html">Logging
-/// data events for trails</a> in the <i>AWS CloudTrail User Guide</i>.
+/// data events for trails</a> in the <i>CloudTrail User Guide</i>.
 ///
 /// <ul>
 /// <li>
@@ -1455,9 +2232,10 @@ class AdvancedFieldSelector {
   /// <ul>
   /// <li>
   /// <b> <code>readOnly</code> </b> - Optional. Can be set to <code>Equals</code>
-  /// a value of <code>true</code> or <code>false</code>. A value of
-  /// <code>false</code> logs both <code>read</code> and <code>write</code>
-  /// events.
+  /// a value of <code>true</code> or <code>false</code>. If you do not add this
+  /// field, CloudTrail logs both both <code>read</code> and <code>write</code>
+  /// events. A value of <code>true</code> logs only <code>read</code> events. A
+  /// value of <code>false</code> logs only <code>write</code> events.
   /// </li>
   /// <li>
   /// <b> <code>eventSource</code> </b> - For filtering management events only.
@@ -1467,8 +2245,8 @@ class AdvancedFieldSelector {
   /// <li>
   /// <b> <code>eventName</code> </b> - Can use any operator. You can use it to
   /// ﬁlter in or ﬁlter out any data event logged to CloudTrail, such as
-  /// <code>PutBucket</code>. You can have multiple values for this ﬁeld,
-  /// separated by commas.
+  /// <code>PutBucket</code> or <code>GetSnapshotBlock</code>. You can have
+  /// multiple values for this ﬁeld, separated by commas.
   /// </li>
   /// <li>
   /// <b> <code>eventCategory</code> </b> - This is required. It must be set to
@@ -1478,26 +2256,79 @@ class AdvancedFieldSelector {
   /// <li>
   /// <b> <code>resources.type</code> </b> - This ﬁeld is required.
   /// <code>resources.type</code> can only use the <code>Equals</code> operator,
-  /// and the value can be one of the following: <code>AWS::S3::Object</code> or
-  /// <code>AWS::Lambda::Function</code>. You can have only one
-  /// <code>resources.type</code> ﬁeld per selector. To log data events on more
-  /// than one resource type, add another selector.
-  /// </li>
-  /// <li>
-  /// <b> <code>resources.ARN</code> </b> - You can use any operator with
-  /// resources.ARN, but if you use <code>Equals</code> or <code>NotEquals</code>,
-  /// the value must exactly match the ARN of a valid resource of the type you've
-  /// speciﬁed in the template as the value of resources.type. For example, if
-  /// resources.type equals <code>AWS::S3::Object</code>, the ARN must be in one
-  /// of the following formats. The trailing slash is intentional; do not exclude
-  /// it.
+  /// and the value can be one of the following:
   ///
   /// <ul>
   /// <li>
-  /// <code>arn:partition:s3:::bucket_name/</code>
+  /// <code>AWS::S3::Object</code>
   /// </li>
   /// <li>
-  /// <code>arn:partition:s3:::bucket_name/object_or_file_name/</code>
+  /// <code>AWS::Lambda::Function</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::DynamoDB::Table</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::S3Outposts::Object</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::ManagedBlockchain::Node</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::S3ObjectLambda::AccessPoint</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::EC2::Snapshot</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::S3::AccessPoint</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::DynamoDB::Stream</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::Glue::Table</code>
+  /// </li>
+  /// </ul>
+  /// You can have only one <code>resources.type</code> ﬁeld per selector. To log
+  /// data events on more than one resource type, add another selector.
+  /// </li>
+  /// <li>
+  /// <b> <code>resources.ARN</code> </b> - You can use any operator with
+  /// <code>resources.ARN</code>, but if you use <code>Equals</code> or
+  /// <code>NotEquals</code>, the value must exactly match the ARN of a valid
+  /// resource of the type you've speciﬁed in the template as the value of
+  /// resources.type. For example, if resources.type equals
+  /// <code>AWS::S3::Object</code>, the ARN must be in one of the following
+  /// formats. To log all data events for all objects in a specific S3 bucket, use
+  /// the <code>StartsWith</code> operator, and include only the bucket ARN as the
+  /// matching value.
+  ///
+  /// The trailing slash is intentional; do not exclude it. Replace the text
+  /// between less than and greater than symbols (&lt;&gt;) with resource-specific
+  /// information.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:s3:::&lt;bucket_name&gt;/</code>
+  /// </li>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:s3:::&lt;bucket_name&gt;/&lt;object_path&gt;/</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals <code>AWS::S3::AccessPoint</code>,
+  /// and the operator is set to <code>Equals</code> or <code>NotEquals</code>,
+  /// the ARN must be in one of the following formats. To log events on all
+  /// objects in an S3 access point, we recommend that you use only the access
+  /// point ARN, don’t include the object path, and use the
+  /// <code>StartsWith</code> or <code>NotStartsWith</code> operators.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:s3:&lt;region&gt;:&lt;account_ID&gt;:accesspoint/&lt;access_point_name&gt;</code>
+  /// </li>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:s3:&lt;region&gt;:&lt;account_ID&gt;:accesspoint/&lt;access_point_name&gt;/object/&lt;object_path&gt;</code>
   /// </li>
   /// </ul>
   /// When resources.type equals <code>AWS::Lambda::Function</code>, and the
@@ -1506,7 +2337,73 @@ class AdvancedFieldSelector {
   ///
   /// <ul>
   /// <li>
-  /// <code>arn:partition:lambda:region:account_ID:function:function_name</code>
+  /// <code>arn:&lt;partition&gt;:lambda:&lt;region&gt;:&lt;account_ID&gt;:function:&lt;function_name&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When resources.type equals <code>AWS::DynamoDB::Table</code>, and the
+  /// operator is set to <code>Equals</code> or <code>NotEquals</code>, the ARN
+  /// must be in the following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:dynamodb:&lt;region&gt;:&lt;account_ID&gt;:table/&lt;table_name&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals
+  /// <code>AWS::S3Outposts::Object</code>, and the operator is set to
+  /// <code>Equals</code> or <code>NotEquals</code>, the ARN must be in the
+  /// following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:s3-outposts:&lt;region&gt;:&lt;account_ID&gt;:&lt;object_path&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals
+  /// <code>AWS::ManagedBlockchain::Node</code>, and the operator is set to
+  /// <code>Equals</code> or <code>NotEquals</code>, the ARN must be in the
+  /// following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:managedblockchain:&lt;region&gt;:&lt;account_ID&gt;:nodes/&lt;node_ID&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals
+  /// <code>AWS::S3ObjectLambda::AccessPoint</code>, and the operator is set to
+  /// <code>Equals</code> or <code>NotEquals</code>, the ARN must be in the
+  /// following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:s3-object-lambda:&lt;region&gt;:&lt;account_ID&gt;:accesspoint/&lt;access_point_name&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals <code>AWS::EC2::Snapshot</code>, and
+  /// the operator is set to <code>Equals</code> or <code>NotEquals</code>, the
+  /// ARN must be in the following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:ec2:&lt;region&gt;::snapshot/&lt;snapshot_ID&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals <code>AWS::DynamoDB::Stream</code>,
+  /// and the operator is set to <code>Equals</code> or <code>NotEquals</code>,
+  /// the ARN must be in the following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:dynamodb:&lt;region&gt;:&lt;account_ID&gt;:table/&lt;table_name&gt;/stream/&lt;date_time&gt;</code>
+  /// </li>
+  /// </ul>
+  /// When <code>resources.type</code> equals <code>AWS::Glue::Table</code>, and
+  /// the operator is set to <code>Equals</code> or <code>NotEquals</code>, the
+  /// ARN must be in the following format:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>arn:&lt;partition&gt;:glue:&lt;region&gt;:&lt;account_ID&gt;:table/&lt;database_name&gt;/&lt;table_name&gt;</code>
   /// </li>
   /// </ul> </li>
   /// </ul>
@@ -1597,6 +2494,102 @@ class AdvancedFieldSelector {
   }
 }
 
+class CancelQueryResponse {
+  /// The ID of the canceled query.
+  final String queryId;
+
+  /// Shows the status of a query after a <code>CancelQuery</code> request.
+  /// Typically, the values shown are either <code>RUNNING</code> or
+  /// <code>CANCELLED</code>.
+  final QueryStatus queryStatus;
+
+  CancelQueryResponse({
+    required this.queryId,
+    required this.queryStatus,
+  });
+  factory CancelQueryResponse.fromJson(Map<String, dynamic> json) {
+    return CancelQueryResponse(
+      queryId: json['QueryId'] as String,
+      queryStatus: (json['QueryStatus'] as String).toQueryStatus(),
+    );
+  }
+}
+
+class CreateEventDataStoreResponse {
+  /// The advanced event selectors that were used to select the events for the
+  /// data store.
+  final List<AdvancedEventSelector>? advancedEventSelectors;
+
+  /// The timestamp that shows when the event data store was created.
+  final DateTime? createdTimestamp;
+
+  /// The ARN of the event data store.
+  final String? eventDataStoreArn;
+
+  /// Indicates whether the event data store collects events from all regions, or
+  /// only from the region in which it was created.
+  final bool? multiRegionEnabled;
+
+  /// The name of the event data store.
+  final String? name;
+
+  /// Indicates whether an event data store is collecting logged events for an
+  /// organization in Organizations.
+  final bool? organizationEnabled;
+
+  /// The retention period of an event data store, in days.
+  final int? retentionPeriod;
+
+  /// The status of event data store creation.
+  final EventDataStoreStatus? status;
+  final List<Tag>? tagsList;
+
+  /// Indicates whether termination protection is enabled for the event data
+  /// store.
+  final bool? terminationProtectionEnabled;
+
+  /// The timestamp that shows when an event data store was updated, if
+  /// applicable. <code>UpdatedTimestamp</code> is always either the same or newer
+  /// than the time shown in <code>CreatedTimestamp</code>.
+  final DateTime? updatedTimestamp;
+
+  CreateEventDataStoreResponse({
+    this.advancedEventSelectors,
+    this.createdTimestamp,
+    this.eventDataStoreArn,
+    this.multiRegionEnabled,
+    this.name,
+    this.organizationEnabled,
+    this.retentionPeriod,
+    this.status,
+    this.tagsList,
+    this.terminationProtectionEnabled,
+    this.updatedTimestamp,
+  });
+  factory CreateEventDataStoreResponse.fromJson(Map<String, dynamic> json) {
+    return CreateEventDataStoreResponse(
+      advancedEventSelectors: (json['AdvancedEventSelectors'] as List?)
+          ?.whereNotNull()
+          .map((e) => AdvancedEventSelector.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      createdTimestamp: timeStampFromJson(json['CreatedTimestamp']),
+      eventDataStoreArn: json['EventDataStoreArn'] as String?,
+      multiRegionEnabled: json['MultiRegionEnabled'] as bool?,
+      name: json['Name'] as String?,
+      organizationEnabled: json['OrganizationEnabled'] as bool?,
+      retentionPeriod: json['RetentionPeriod'] as int?,
+      status: (json['Status'] as String?)?.toEventDataStoreStatus(),
+      tagsList: (json['TagsList'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      terminationProtectionEnabled:
+          json['TerminationProtectionEnabled'] as bool?,
+      updatedTimestamp: timeStampFromJson(json['UpdatedTimestamp']),
+    );
+  }
+}
+
 /// Returns the objects or data listed below if successful. Otherwise, returns
 /// an error.
 class CreateTrailResponse {
@@ -1619,7 +2612,7 @@ class CreateTrailResponse {
   final bool? isOrganizationTrail;
 
   /// Specifies the KMS key ID that encrypts the logs delivered by CloudTrail. The
-  /// value is a fully specified ARN to a KMS key in the format:
+  /// value is a fully specified ARN to a KMS key in the following format.
   ///
   /// <code>arn:aws:kms:us-east-2:123456789012:key/12345678-1234-1234-1234-123456789012</code>
   final String? kmsKeyId;
@@ -1689,11 +2682,11 @@ class CreateTrailResponse {
   }
 }
 
-/// The Amazon S3 buckets or AWS Lambda functions that you specify in your event
-/// selectors for your trail to log data events. Data events provide information
-/// about the resource operations performed on or within a resource itself.
-/// These are also known as data plane operations. You can specify up to 250
-/// data resources for a trail.
+/// The Amazon S3 buckets, Lambda functions, or Amazon DynamoDB tables that you
+/// specify in your event selectors for your trail to log data events. Data
+/// events provide information about the resource operations performed on or
+/// within a resource itself. These are also known as data plane operations. You
+/// can specify up to 250 data resources for a trail.
 /// <note>
 /// The total number of allowed data resources is 250. This number can be
 /// distributed between 1 and 5 event selectors, but the total cannot exceed 250
@@ -1727,15 +2720,15 @@ class CreateTrailResponse {
 /// doesn’t log the event.
 /// </li> </ol>
 /// The following example demonstrates how logging works when you configure
-/// logging of AWS Lambda data events for a Lambda function named
-/// <i>MyLambdaFunction</i>, but not for all AWS Lambda functions.
+/// logging of Lambda data events for a Lambda function named
+/// <i>MyLambdaFunction</i>, but not for all Lambda functions.
 /// <ol>
 /// <li>
 /// A user runs a script that includes a call to the <i>MyLambdaFunction</i>
 /// function and the <i>MyOtherLambdaFunction</i> function.
 /// </li>
 /// <li>
-/// The <code>Invoke</code> API operation on <i>MyLambdaFunction</i> is an AWS
+/// The <code>Invoke</code> API operation on <i>MyLambdaFunction</i> is an
 /// Lambda API. It is recorded as a data event in CloudTrail. Because the
 /// CloudTrail user specified logging data events for <i>MyLambdaFunction</i>,
 /// any invocations of that function are logged. The trail processes and logs
@@ -1743,15 +2736,55 @@ class CreateTrailResponse {
 /// </li>
 /// <li>
 /// The <code>Invoke</code> API operation on <i>MyOtherLambdaFunction</i> is an
-/// AWS Lambda API. Because the CloudTrail user did not specify logging data
-/// events for all Lambda functions, the <code>Invoke</code> operation for
+/// Lambda API. Because the CloudTrail user did not specify logging data events
+/// for all Lambda functions, the <code>Invoke</code> operation for
 /// <i>MyOtherLambdaFunction</i> does not match the function specified for the
 /// trail. The trail doesn’t log the event.
 /// </li> </ol>
 class DataResource {
-  /// The resource type in which you want to log data events. You can specify
-  /// <code>AWS::S3::Object</code> or <code>AWS::Lambda::Function</code>
-  /// resources.
+  /// The resource type in which you want to log data events. You can specify the
+  /// following <i>basic</i> event selector resource types:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>AWS::S3::Object</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::Lambda::Function</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::DynamoDB::Table</code>
+  /// </li>
+  /// </ul>
+  /// The following resource types are also availble through <i>advanced</i> event
+  /// selectors. Basic event selector resource types are valid in advanced event
+  /// selectors, but advanced event selector resource types are not valid in basic
+  /// event selectors. For more information, see
+  /// <a>AdvancedFieldSelector$Field</a>.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>AWS::S3Outposts::Object</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::ManagedBlockchain::Node</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::S3ObjectLambda::AccessPoint</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::EC2::Snapshot</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::S3::AccessPoint</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::DynamoDB::Stream</code>
+  /// </li>
+  /// <li>
+  /// <code>AWS::Glue::Table</code>
+  /// </li>
+  /// </ul>
   final String? type;
 
   /// An array of Amazon Resource Name (ARN) strings or partial ARN strings for
@@ -1759,12 +2792,12 @@ class DataResource {
   ///
   /// <ul>
   /// <li>
-  /// To log data events for all objects in all S3 buckets in your AWS account,
-  /// specify the prefix as <code>arn:aws:s3:::</code>.
+  /// To log data events for all objects in all S3 buckets in your Amazon Web
+  /// Services account, specify the prefix as <code>arn:aws:s3:::</code>.
   /// <note>
-  /// This will also enable logging of data event activity performed by any user
-  /// or role in your AWS account, even if that activity is performed on a bucket
-  /// that belongs to another AWS account.
+  /// This also enables logging of data event activity performed by any user or
+  /// role in your Amazon Web Services account, even if that activity is performed
+  /// on a bucket that belongs to another Amazon Web Services account.
   /// </note> </li>
   /// <li>
   /// To log data events for all objects in an S3 bucket, specify the bucket and
@@ -1777,12 +2810,12 @@ class DataResource {
   /// logs data events for objects in this S3 bucket that match the prefix.
   /// </li>
   /// <li>
-  /// To log data events for all functions in your AWS account, specify the prefix
-  /// as <code>arn:aws:lambda</code>.
+  /// To log data events for all Lambda functions in your Amazon Web Services
+  /// account, specify the prefix as <code>arn:aws:lambda</code>.
   /// <note>
-  /// This will also enable logging of <code>Invoke</code> activity performed by
-  /// any user or role in your AWS account, even if that activity is performed on
-  /// a function that belongs to another AWS account.
+  /// This also enables logging of <code>Invoke</code> activity performed by any
+  /// user or role in your Amazon Web Services account, even if that activity is
+  /// performed on a function that belongs to another Amazon Web Services account.
   /// </note> </li>
   /// <li>
   /// To log data events for a specific Lambda function, specify the function ARN.
@@ -1794,6 +2827,10 @@ class DataResource {
   /// not be logged for
   /// <i>arn:aws:lambda:us-west-2:111111111111:function:helloworld2</i>.
   /// </note> </li>
+  /// <li>
+  /// To log data events for all DynamoDB tables in your Amazon Web Services
+  /// account, specify the prefix as <code>arn:aws:dynamodb</code>.
+  /// </li>
   /// </ul>
   final List<String>? values;
 
@@ -1821,12 +2858,60 @@ class DataResource {
   }
 }
 
+class DeleteEventDataStoreResponse {
+  DeleteEventDataStoreResponse();
+  factory DeleteEventDataStoreResponse.fromJson(Map<String, dynamic> _) {
+    return DeleteEventDataStoreResponse();
+  }
+}
+
 /// Returns the objects or data listed below if successful. Otherwise, returns
 /// an error.
 class DeleteTrailResponse {
   DeleteTrailResponse();
   factory DeleteTrailResponse.fromJson(Map<String, dynamic> _) {
     return DeleteTrailResponse();
+  }
+}
+
+class DescribeQueryResponse {
+  /// The error message returned if a query failed.
+  final String? errorMessage;
+
+  /// The ID of the query.
+  final String? queryId;
+
+  /// Metadata about a query, including the number of events that were matched,
+  /// the total number of events scanned, the query run time in milliseconds, and
+  /// the query's creation time.
+  final QueryStatisticsForDescribeQuery? queryStatistics;
+
+  /// The status of a query. Values for <code>QueryStatus</code> include
+  /// <code>QUEUED</code>, <code>RUNNING</code>, <code>FINISHED</code>,
+  /// <code>FAILED</code>, <code>TIMED_OUT</code>, or <code>CANCELLED</code>
+  final QueryStatus? queryStatus;
+
+  /// The SQL code of a query.
+  final String? queryString;
+
+  DescribeQueryResponse({
+    this.errorMessage,
+    this.queryId,
+    this.queryStatistics,
+    this.queryStatus,
+    this.queryString,
+  });
+  factory DescribeQueryResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeQueryResponse(
+      errorMessage: json['ErrorMessage'] as String?,
+      queryId: json['QueryId'] as String?,
+      queryStatistics: json['QueryStatistics'] != null
+          ? QueryStatisticsForDescribeQuery.fromJson(
+              json['QueryStatistics'] as Map<String, dynamic>)
+          : null,
+      queryStatus: (json['QueryStatus'] as String?)?.toQueryStatus(),
+      queryString: json['QueryString'] as String?,
+    );
   }
 }
 
@@ -1838,7 +2923,7 @@ class DescribeTrailsResponse {
   /// example, <code>SNSTopicName</code> and <code>SNSTopicARN</code> are only
   /// returned in results if a trail is configured to send SNS notifications.
   /// Similarly, <code>KMSKeyId</code> only appears in results if a trail's log
-  /// files are encrypted with AWS KMS-managed keys.
+  /// files are encrypted with KMS customer managed keys.
   final List<Trail>? trailList;
 
   DescribeTrailsResponse({
@@ -1857,9 +2942,9 @@ class DescribeTrailsResponse {
 /// Contains information about an event that was returned by a lookup request.
 /// The result includes a representation of a CloudTrail event.
 class Event {
-  /// The AWS access key ID that was used to sign the request. If the request was
-  /// made with temporary security credentials, this is the access key ID of the
-  /// temporary credentials.
+  /// The Amazon Web Services access key ID that was used to sign the request. If
+  /// the request was made with temporary security credentials, this is the access
+  /// key ID of the temporary credentials.
   final String? accessKeyId;
 
   /// A JSON string that contains a representation of the event returned.
@@ -1871,7 +2956,7 @@ class Event {
   /// The name of the event returned.
   final String? eventName;
 
-  /// The AWS service that the request was made to.
+  /// The Amazon Web Services service to which the request was made.
   final String? eventSource;
 
   /// The date and time of the event returned.
@@ -1939,6 +3024,118 @@ extension on String {
   }
 }
 
+/// A storage lake of event data against which you can run complex SQL-based
+/// queries. An event data store can include events that you have logged on your
+/// account from the last 90 to 2555 days (about three months to up to seven
+/// years). To select events for an event data store, use <a
+/// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html#creating-data-event-selectors-advanced">advanced
+/// event selectors</a>.
+class EventDataStore {
+  /// This field is being deprecated. The advanced event selectors that were used
+  /// to select events for the data store.
+  final List<AdvancedEventSelector>? advancedEventSelectors;
+
+  /// This field is being deprecated. The timestamp of the event data store's
+  /// creation.
+  final DateTime? createdTimestamp;
+
+  /// The ARN of the event data store.
+  final String? eventDataStoreArn;
+
+  /// This field is being deprecated. Indicates whether the event data store
+  /// includes events from all regions, or only from the region in which it was
+  /// created.
+  final bool? multiRegionEnabled;
+
+  /// The name of the event data store.
+  final String? name;
+
+  /// This field is being deprecated. Indicates that an event data store is
+  /// collecting logged events for an organization.
+  final bool? organizationEnabled;
+
+  /// This field is being deprecated. The retention period, in days.
+  final int? retentionPeriod;
+
+  /// This field is being deprecated. The status of an event data store. Values
+  /// are <code>ENABLED</code> and <code>PENDING_DELETION</code>.
+  final EventDataStoreStatus? status;
+
+  /// This field is being deprecated. Indicates whether the event data store is
+  /// protected from termination.
+  final bool? terminationProtectionEnabled;
+
+  /// This field is being deprecated. The timestamp showing when an event data
+  /// store was updated, if applicable. <code>UpdatedTimestamp</code> is always
+  /// either the same or newer than the time shown in
+  /// <code>CreatedTimestamp</code>.
+  final DateTime? updatedTimestamp;
+
+  EventDataStore({
+    this.advancedEventSelectors,
+    this.createdTimestamp,
+    this.eventDataStoreArn,
+    this.multiRegionEnabled,
+    this.name,
+    this.organizationEnabled,
+    this.retentionPeriod,
+    this.status,
+    this.terminationProtectionEnabled,
+    this.updatedTimestamp,
+  });
+  factory EventDataStore.fromJson(Map<String, dynamic> json) {
+    return EventDataStore(
+      advancedEventSelectors: (json['AdvancedEventSelectors'] as List?)
+          ?.whereNotNull()
+          .map((e) => AdvancedEventSelector.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      createdTimestamp: timeStampFromJson(json['CreatedTimestamp']),
+      eventDataStoreArn: json['EventDataStoreArn'] as String?,
+      multiRegionEnabled: json['MultiRegionEnabled'] as bool?,
+      name: json['Name'] as String?,
+      organizationEnabled: json['OrganizationEnabled'] as bool?,
+      retentionPeriod: json['RetentionPeriod'] as int?,
+      status: (json['Status'] as String?)?.toEventDataStoreStatus(),
+      terminationProtectionEnabled:
+          json['TerminationProtectionEnabled'] as bool?,
+      updatedTimestamp: timeStampFromJson(json['UpdatedTimestamp']),
+    );
+  }
+}
+
+enum EventDataStoreStatus {
+  created,
+  enabled,
+  pendingDeletion,
+}
+
+extension on EventDataStoreStatus {
+  String toValue() {
+    switch (this) {
+      case EventDataStoreStatus.created:
+        return 'CREATED';
+      case EventDataStoreStatus.enabled:
+        return 'ENABLED';
+      case EventDataStoreStatus.pendingDeletion:
+        return 'PENDING_DELETION';
+    }
+  }
+}
+
+extension on String {
+  EventDataStoreStatus toEventDataStoreStatus() {
+    switch (this) {
+      case 'CREATED':
+        return EventDataStoreStatus.created;
+      case 'ENABLED':
+        return EventDataStoreStatus.enabled;
+      case 'PENDING_DELETION':
+        return EventDataStoreStatus.pendingDeletion;
+    }
+    throw Exception('$this is not known in enum EventDataStoreStatus');
+  }
+}
+
 /// Use event selectors to further specify the management and data event
 /// settings for your trail. By default, trails created without specific event
 /// selectors will be configured to log all read and write management events,
@@ -1952,25 +3149,28 @@ extension on String {
 /// You cannot apply both event selectors and advanced event selectors to a
 /// trail.
 class EventSelector {
-  /// CloudTrail supports data event logging for Amazon S3 objects and AWS Lambda
-  /// functions. You can specify up to 250 resources for an individual event
-  /// selector, but the total number of data resources cannot exceed 250 across
-  /// all event selectors in a trail. This limit does not apply if you configure
-  /// resource logging for all data events.
+  /// CloudTrail supports data event logging for Amazon S3 objects, Lambda
+  /// functions, and Amazon DynamoDB tables with basic event selectors. You can
+  /// specify up to 250 resources for an individual event selector, but the total
+  /// number of data resources cannot exceed 250 across all event selectors in a
+  /// trail. This limit does not apply if you configure resource logging for all
+  /// data events.
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-and-data-events-with-cloudtrail.html#logging-data-events">Data
   /// Events</a> and <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/WhatIsCloudTrail-Limits.html">Limits
-  /// in AWS CloudTrail</a> in the <i>AWS CloudTrail User Guide</i>.
+  /// in CloudTrail</a> in the <i>CloudTrail User Guide</i>.
   final List<DataResource>? dataResources;
 
   /// An optional list of service event sources from which you do not want
   /// management events to be logged on your trail. In this release, the list can
-  /// be empty (disables the filter), or it can filter out AWS Key Management
-  /// Service events by containing <code>"kms.amazonaws.com"</code>. By default,
-  /// <code>ExcludeManagementEventSources</code> is empty, and AWS KMS events are
-  /// included in events that are logged to your trail.
+  /// be empty (disables the filter), or it can filter out Key Management Service
+  /// or Amazon RDS Data API events by containing <code>kms.amazonaws.com</code>
+  /// or <code>rdsdata.amazonaws.com</code>. By default,
+  /// <code>ExcludeManagementEventSources</code> is empty, and KMS and Amazon RDS
+  /// Data API events are logged to your trail. You can exclude management event
+  /// sources only in regions that support the event source.
   final List<String>? excludeManagementEventSources;
 
   /// Specify if you want your event selector to include management events for
@@ -1978,14 +3178,14 @@ class EventSelector {
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-management-and-data-events-with-cloudtrail.html#logging-management-events">Management
-  /// Events</a> in the <i>AWS CloudTrail User Guide</i>.
+  /// Events</a> in the <i>CloudTrail User Guide</i>.
   ///
   /// By default, the value is <code>true</code>.
   ///
   /// The first copy of management events is free. You are charged for additional
   /// copies of management events that you are logging on any subsequent trail in
   /// the same region. For more information about CloudTrail pricing, see <a
-  /// href="http://aws.amazon.com/cloudtrail/pricing/">AWS CloudTrail Pricing</a>.
+  /// href="http://aws.amazon.com/cloudtrail/pricing/">CloudTrail Pricing</a>.
   final bool? includeManagementEvents;
 
   /// Specify if you want your trail to log read-only events, write-only events,
@@ -2033,6 +3233,74 @@ class EventSelector {
   }
 }
 
+class GetEventDataStoreResponse {
+  /// The advanced event selectors used to select events for the data store.
+  final List<AdvancedEventSelector>? advancedEventSelectors;
+
+  /// The timestamp of the event data store's creation.
+  final DateTime? createdTimestamp;
+
+  /// The event data store Amazon Resource Number (ARN).
+  final String? eventDataStoreArn;
+
+  /// Indicates whether the event data store includes events from all regions, or
+  /// only from the region in which it was created.
+  final bool? multiRegionEnabled;
+
+  /// The name of the event data store.
+  final String? name;
+
+  /// Indicates whether an event data store is collecting logged events for an
+  /// organization in Organizations.
+  final bool? organizationEnabled;
+
+  /// The retention period of the event data store, in days.
+  final int? retentionPeriod;
+
+  /// The status of an event data store. Values can be <code>ENABLED</code> and
+  /// <code>PENDING_DELETION</code>.
+  final EventDataStoreStatus? status;
+
+  /// Indicates that termination protection is enabled.
+  final bool? terminationProtectionEnabled;
+
+  /// Shows the time that an event data store was updated, if applicable.
+  /// <code>UpdatedTimestamp</code> is always either the same or newer than the
+  /// time shown in <code>CreatedTimestamp</code>.
+  final DateTime? updatedTimestamp;
+
+  GetEventDataStoreResponse({
+    this.advancedEventSelectors,
+    this.createdTimestamp,
+    this.eventDataStoreArn,
+    this.multiRegionEnabled,
+    this.name,
+    this.organizationEnabled,
+    this.retentionPeriod,
+    this.status,
+    this.terminationProtectionEnabled,
+    this.updatedTimestamp,
+  });
+  factory GetEventDataStoreResponse.fromJson(Map<String, dynamic> json) {
+    return GetEventDataStoreResponse(
+      advancedEventSelectors: (json['AdvancedEventSelectors'] as List?)
+          ?.whereNotNull()
+          .map((e) => AdvancedEventSelector.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      createdTimestamp: timeStampFromJson(json['CreatedTimestamp']),
+      eventDataStoreArn: json['EventDataStoreArn'] as String?,
+      multiRegionEnabled: json['MultiRegionEnabled'] as bool?,
+      name: json['Name'] as String?,
+      organizationEnabled: json['OrganizationEnabled'] as bool?,
+      retentionPeriod: json['RetentionPeriod'] as int?,
+      status: (json['Status'] as String?)?.toEventDataStoreStatus(),
+      terminationProtectionEnabled:
+          json['TerminationProtectionEnabled'] as bool?,
+      updatedTimestamp: timeStampFromJson(json['UpdatedTimestamp']),
+    );
+  }
+}
+
 class GetEventSelectorsResponse {
   /// The advanced event selectors that are configured for the trail.
   final List<AdvancedEventSelector>? advancedEventSelectors;
@@ -2065,8 +3333,8 @@ class GetEventSelectorsResponse {
 
 class GetInsightSelectorsResponse {
   /// A JSON string that contains the insight types you want to log on a trail. In
-  /// this release, only <code>ApiCallRateInsight</code> is supported as an
-  /// insight type.
+  /// this release, <code>ApiErrorRateInsight</code> and
+  /// <code>ApiCallRateInsight</code> are supported as insight types.
   final List<InsightSelector>? insightSelectors;
 
   /// The Amazon Resource Name (ARN) of a trail for which you want to get Insights
@@ -2084,6 +3352,52 @@ class GetInsightSelectorsResponse {
           .map((e) => InsightSelector.fromJson(e as Map<String, dynamic>))
           .toList(),
       trailARN: json['TrailARN'] as String?,
+    );
+  }
+}
+
+class GetQueryResultsResponse {
+  /// The error message returned if a query failed.
+  final String? errorMessage;
+
+  /// A token you can use to get the next page of query results.
+  final String? nextToken;
+
+  /// Contains the individual event results of the query.
+  final List<List<Map<String, String>>>? queryResultRows;
+
+  /// Shows the count of query results.
+  final QueryStatistics? queryStatistics;
+
+  /// The status of the query. Values include <code>QUEUED</code>,
+  /// <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>,
+  /// <code>TIMED_OUT</code>, or <code>CANCELLED</code>.
+  final QueryStatus? queryStatus;
+
+  GetQueryResultsResponse({
+    this.errorMessage,
+    this.nextToken,
+    this.queryResultRows,
+    this.queryStatistics,
+    this.queryStatus,
+  });
+  factory GetQueryResultsResponse.fromJson(Map<String, dynamic> json) {
+    return GetQueryResultsResponse(
+      errorMessage: json['ErrorMessage'] as String?,
+      nextToken: json['NextToken'] as String?,
+      queryResultRows: (json['QueryResultRows'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as List)
+              .whereNotNull()
+              .map((e) => (e as Map<String, dynamic>)
+                  .map((k, e) => MapEntry(k, e as String)))
+              .toList())
+          .toList(),
+      queryStatistics: json['QueryStatistics'] != null
+          ? QueryStatistics.fromJson(
+              json['QueryStatistics'] as Map<String, dynamic>)
+          : null,
+      queryStatus: (json['QueryStatus'] as String?)?.toQueryStatus(),
     );
   }
 }
@@ -2106,7 +3420,8 @@ class GetTrailResponse {
 /// Returns the objects or data listed below if successful. Otherwise, returns
 /// an error.
 class GetTrailStatusResponse {
-  /// Whether the CloudTrail is currently logging AWS API calls.
+  /// Whether the CloudTrail trail is currently logging Amazon Web Services API
+  /// calls.
   final bool? isLogging;
 
   /// Displays any CloudWatch Logs error that CloudTrail encountered when
@@ -2124,15 +3439,15 @@ class GetTrailStatusResponse {
   final String? latestDeliveryAttemptTime;
 
   /// Displays any Amazon S3 error that CloudTrail encountered when attempting to
-  /// deliver log files to the designated bucket. For more information see the
-  /// topic <a
+  /// deliver log files to the designated bucket. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html">Error
   /// Responses</a> in the Amazon S3 API Reference.
   /// <note>
   /// This error occurs only when there is a problem with the destination S3
-  /// bucket and will not occur for timeouts. To resolve the issue, create a new
-  /// bucket and call <code>UpdateTrail</code> to specify the new bucket, or fix
-  /// the existing objects so that CloudTrail can again write to the bucket.
+  /// bucket, and does not occur for requests that time out. To resolve the issue,
+  /// create a new bucket, and then call <code>UpdateTrail</code> to specify the
+  /// new bucket; or fix the existing objects so that CloudTrail can again write
+  /// to the bucket.
   /// </note>
   final String? latestDeliveryError;
 
@@ -2141,15 +3456,15 @@ class GetTrailStatusResponse {
   final DateTime? latestDeliveryTime;
 
   /// Displays any Amazon S3 error that CloudTrail encountered when attempting to
-  /// deliver a digest file to the designated bucket. For more information see the
-  /// topic <a
+  /// deliver a digest file to the designated bucket. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html">Error
   /// Responses</a> in the Amazon S3 API Reference.
   /// <note>
   /// This error occurs only when there is a problem with the destination S3
-  /// bucket and will not occur for timeouts. To resolve the issue, create a new
-  /// bucket and call <code>UpdateTrail</code> to specify the new bucket, or fix
-  /// the existing objects so that CloudTrail can again write to the bucket.
+  /// bucket, and does not occur for requests that time out. To resolve the issue,
+  /// create a new bucket, and then call <code>UpdateTrail</code> to specify the
+  /// new bucket; or fix the existing objects so that CloudTrail can again write
+  /// to the bucket.
   /// </note>
   final String? latestDigestDeliveryError;
 
@@ -2174,11 +3489,11 @@ class GetTrailStatusResponse {
   final DateTime? latestNotificationTime;
 
   /// Specifies the most recent date and time when CloudTrail started recording
-  /// API calls for an AWS account.
+  /// API calls for an Amazon Web Services account.
   final DateTime? startLoggingTime;
 
   /// Specifies the most recent date and time when CloudTrail stopped recording
-  /// API calls for an AWS account.
+  /// API calls for an Amazon Web Services account.
   final DateTime? stopLoggingTime;
 
   /// This field is no longer in use.
@@ -2238,8 +3553,8 @@ class GetTrailStatusResponse {
 /// A JSON string that contains a list of insight types that are logged on a
 /// trail.
 class InsightSelector {
-  /// The type of insights to log on a trail. In this release, only
-  /// <code>ApiCallRateInsight</code> is supported as an insight type.
+  /// The type of insights to log on a trail. <code>ApiCallRateInsight</code> and
+  /// <code>ApiErrorRateInsight</code> are valid insight types.
   final InsightType? insightType;
 
   InsightSelector({
@@ -2261,6 +3576,7 @@ class InsightSelector {
 
 enum InsightType {
   apiCallRateInsight,
+  apiErrorRateInsight,
 }
 
 extension on InsightType {
@@ -2268,6 +3584,8 @@ extension on InsightType {
     switch (this) {
       case InsightType.apiCallRateInsight:
         return 'ApiCallRateInsight';
+      case InsightType.apiErrorRateInsight:
+        return 'ApiErrorRateInsight';
     }
   }
 }
@@ -2277,8 +3595,33 @@ extension on String {
     switch (this) {
       case 'ApiCallRateInsight':
         return InsightType.apiCallRateInsight;
+      case 'ApiErrorRateInsight':
+        return InsightType.apiErrorRateInsight;
     }
     throw Exception('$this is not known in enum InsightType');
+  }
+}
+
+class ListEventDataStoresResponse {
+  /// Contains information about event data stores in the account, in the current
+  /// region.
+  final List<EventDataStore>? eventDataStores;
+
+  /// A token you can use to get the next page of results.
+  final String? nextToken;
+
+  ListEventDataStoresResponse({
+    this.eventDataStores,
+    this.nextToken,
+  });
+  factory ListEventDataStoresResponse.fromJson(Map<String, dynamic> json) {
+    return ListEventDataStoresResponse(
+      eventDataStores: (json['EventDataStores'] as List?)
+          ?.whereNotNull()
+          .map((e) => EventDataStore.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
   }
 }
 
@@ -2304,6 +3647,29 @@ class ListPublicKeysResponse {
       publicKeyList: (json['PublicKeyList'] as List?)
           ?.whereNotNull()
           .map((e) => PublicKey.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class ListQueriesResponse {
+  /// A token you can use to get the next page of results.
+  final String? nextToken;
+
+  /// Lists matching query results, and shows query ID, status, and creation time
+  /// of each query.
+  final List<Query>? queries;
+
+  ListQueriesResponse({
+    this.nextToken,
+    this.queries,
+  });
+  factory ListQueriesResponse.fromJson(Map<String, dynamic> json) {
+    return ListQueriesResponse(
+      nextToken: json['NextToken'] as String?,
+      queries: (json['Queries'] as List?)
+          ?.whereNotNull()
+          .map((e) => Query.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -2508,7 +3874,7 @@ class PutEventSelectorsResponse {
   final List<EventSelector>? eventSelectors;
 
   /// Specifies the ARN of the trail that was updated with event selectors. The
-  /// format of a trail ARN is:
+  /// following is the format of a trail ARN.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   final String? trailARN;
@@ -2534,9 +3900,9 @@ class PutEventSelectorsResponse {
 }
 
 class PutInsightSelectorsResponse {
-  /// A JSON string that contains the insight types you want to log on a trail. In
-  /// this release, only <code>ApiCallRateInsight</code> is supported as an
-  /// insight type.
+  /// A JSON string that contains the Insights event types that you want to log on
+  /// a trail. The valid Insights types in this release are
+  /// <code>ApiErrorRateInsight</code> and <code>ApiCallRateInsight</code>.
   final List<InsightSelector>? insightSelectors;
 
   /// The Amazon Resource Name (ARN) of a trail for which you want to change or
@@ -2555,6 +3921,148 @@ class PutInsightSelectorsResponse {
           .toList(),
       trailARN: json['TrailARN'] as String?,
     );
+  }
+}
+
+/// A SQL string of criteria about events that you want to collect in an event
+/// data store.
+class Query {
+  /// The creation time of a query.
+  final DateTime? creationTime;
+
+  /// The ID of a query.
+  final String? queryId;
+
+  /// The status of the query. This can be <code>QUEUED</code>,
+  /// <code>RUNNING</code>, <code>FINISHED</code>, <code>FAILED</code>,
+  /// <code>TIMED_OUT</code>, or <code>CANCELLED</code>.
+  final QueryStatus? queryStatus;
+
+  Query({
+    this.creationTime,
+    this.queryId,
+    this.queryStatus,
+  });
+  factory Query.fromJson(Map<String, dynamic> json) {
+    return Query(
+      creationTime: timeStampFromJson(json['CreationTime']),
+      queryId: json['QueryId'] as String?,
+      queryStatus: (json['QueryStatus'] as String?)?.toQueryStatus(),
+    );
+  }
+}
+
+/// Metadata about a query, such as the number of results.
+class QueryStatistics {
+  /// The total bytes that the query scanned in the event data store. This value
+  /// matches the number of bytes for which your account is billed for the query,
+  /// unless the query is still running.
+  final int? bytesScanned;
+
+  /// The number of results returned.
+  final int? resultsCount;
+
+  /// The total number of results returned by a query.
+  final int? totalResultsCount;
+
+  QueryStatistics({
+    this.bytesScanned,
+    this.resultsCount,
+    this.totalResultsCount,
+  });
+  factory QueryStatistics.fromJson(Map<String, dynamic> json) {
+    return QueryStatistics(
+      bytesScanned: json['BytesScanned'] as int?,
+      resultsCount: json['ResultsCount'] as int?,
+      totalResultsCount: json['TotalResultsCount'] as int?,
+    );
+  }
+}
+
+/// Gets metadata about a query, including the number of events that were
+/// matched, the total number of events scanned, the query run time in
+/// milliseconds, and the query's creation time.
+class QueryStatisticsForDescribeQuery {
+  /// The total bytes that the query scanned in the event data store. This value
+  /// matches the number of bytes for which your account is billed for the query,
+  /// unless the query is still running.
+  final int? bytesScanned;
+
+  /// The creation time of the query.
+  final DateTime? creationTime;
+
+  /// The number of events that matched a query.
+  final int? eventsMatched;
+
+  /// The number of events that the query scanned in the event data store.
+  final int? eventsScanned;
+
+  /// The query's run time, in milliseconds.
+  final int? executionTimeInMillis;
+
+  QueryStatisticsForDescribeQuery({
+    this.bytesScanned,
+    this.creationTime,
+    this.eventsMatched,
+    this.eventsScanned,
+    this.executionTimeInMillis,
+  });
+  factory QueryStatisticsForDescribeQuery.fromJson(Map<String, dynamic> json) {
+    return QueryStatisticsForDescribeQuery(
+      bytesScanned: json['BytesScanned'] as int?,
+      creationTime: timeStampFromJson(json['CreationTime']),
+      eventsMatched: json['EventsMatched'] as int?,
+      eventsScanned: json['EventsScanned'] as int?,
+      executionTimeInMillis: json['ExecutionTimeInMillis'] as int?,
+    );
+  }
+}
+
+enum QueryStatus {
+  queued,
+  running,
+  finished,
+  failed,
+  cancelled,
+  timedOut,
+}
+
+extension on QueryStatus {
+  String toValue() {
+    switch (this) {
+      case QueryStatus.queued:
+        return 'QUEUED';
+      case QueryStatus.running:
+        return 'RUNNING';
+      case QueryStatus.finished:
+        return 'FINISHED';
+      case QueryStatus.failed:
+        return 'FAILED';
+      case QueryStatus.cancelled:
+        return 'CANCELLED';
+      case QueryStatus.timedOut:
+        return 'TIMED_OUT';
+    }
+  }
+}
+
+extension on String {
+  QueryStatus toQueryStatus() {
+    switch (this) {
+      case 'QUEUED':
+        return QueryStatus.queued;
+      case 'RUNNING':
+        return QueryStatus.running;
+      case 'FINISHED':
+        return QueryStatus.finished;
+      case 'FAILED':
+        return QueryStatus.failed;
+      case 'CANCELLED':
+        return QueryStatus.cancelled;
+      case 'TIMED_OUT':
+        return QueryStatus.timedOut;
+    }
+    throw Exception('$this is not known in enum QueryStatus');
   }
 }
 
@@ -2611,8 +4119,9 @@ class Resource {
   /// The type of a resource referenced by the event returned. When the resource
   /// type cannot be determined, null is returned. Some examples of resource types
   /// are: <b>Instance</b> for EC2, <b>Trail</b> for CloudTrail, <b>DBInstance</b>
-  /// for RDS, and <b>AccessKey</b> for IAM. To learn more about how to look up
-  /// and filter events by the resource types supported for a service, see <a
+  /// for Amazon RDS, and <b>AccessKey</b> for IAM. To learn more about how to
+  /// look up and filter events by the resource types supported for a service, see
+  /// <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events-console.html#filtering-cloudtrail-events">Filtering
   /// CloudTrail Events</a>.
   final String? resourceType;
@@ -2652,12 +4161,94 @@ class ResourceTag {
   }
 }
 
+class RestoreEventDataStoreResponse {
+  /// The advanced event selectors that were used to select events.
+  final List<AdvancedEventSelector>? advancedEventSelectors;
+
+  /// The timestamp of an event data store's creation.
+  final DateTime? createdTimestamp;
+
+  /// The event data store ARN.
+  final String? eventDataStoreArn;
+
+  /// Indicates whether the event data store is collecting events from all
+  /// regions, or only from the region in which the event data store was created.
+  final bool? multiRegionEnabled;
+
+  /// The name of the event data store.
+  final String? name;
+
+  /// Indicates whether an event data store is collecting logged events for an
+  /// organization in Organizations.
+  final bool? organizationEnabled;
+
+  /// The retention period, in days.
+  final int? retentionPeriod;
+
+  /// The status of the event data store.
+  final EventDataStoreStatus? status;
+
+  /// Indicates that termination protection is enabled and the event data store
+  /// cannot be automatically deleted.
+  final bool? terminationProtectionEnabled;
+
+  /// The timestamp that shows when an event data store was updated, if
+  /// applicable. <code>UpdatedTimestamp</code> is always either the same or newer
+  /// than the time shown in <code>CreatedTimestamp</code>.
+  final DateTime? updatedTimestamp;
+
+  RestoreEventDataStoreResponse({
+    this.advancedEventSelectors,
+    this.createdTimestamp,
+    this.eventDataStoreArn,
+    this.multiRegionEnabled,
+    this.name,
+    this.organizationEnabled,
+    this.retentionPeriod,
+    this.status,
+    this.terminationProtectionEnabled,
+    this.updatedTimestamp,
+  });
+  factory RestoreEventDataStoreResponse.fromJson(Map<String, dynamic> json) {
+    return RestoreEventDataStoreResponse(
+      advancedEventSelectors: (json['AdvancedEventSelectors'] as List?)
+          ?.whereNotNull()
+          .map((e) => AdvancedEventSelector.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      createdTimestamp: timeStampFromJson(json['CreatedTimestamp']),
+      eventDataStoreArn: json['EventDataStoreArn'] as String?,
+      multiRegionEnabled: json['MultiRegionEnabled'] as bool?,
+      name: json['Name'] as String?,
+      organizationEnabled: json['OrganizationEnabled'] as bool?,
+      retentionPeriod: json['RetentionPeriod'] as int?,
+      status: (json['Status'] as String?)?.toEventDataStoreStatus(),
+      terminationProtectionEnabled:
+          json['TerminationProtectionEnabled'] as bool?,
+      updatedTimestamp: timeStampFromJson(json['UpdatedTimestamp']),
+    );
+  }
+}
+
 /// Returns the objects or data listed below if successful. Otherwise, returns
 /// an error.
 class StartLoggingResponse {
   StartLoggingResponse();
   factory StartLoggingResponse.fromJson(Map<String, dynamic> _) {
     return StartLoggingResponse();
+  }
+}
+
+class StartQueryResponse {
+  /// The ID of the started query.
+  final String? queryId;
+
+  StartQueryResponse({
+    this.queryId,
+  });
+  factory StartQueryResponse.fromJson(Map<String, dynamic> json) {
+    return StartQueryResponse(
+      queryId: json['QueryId'] as String?,
+    );
   }
 }
 
@@ -2723,8 +4314,8 @@ class Trail {
   /// The region in which the trail was created.
   final String? homeRegion;
 
-  /// Set to <b>True</b> to include AWS API calls from AWS global services such as
-  /// IAM. Otherwise, <b>False</b>.
+  /// Set to <b>True</b> to include Amazon Web Services API calls from Amazon Web
+  /// Services global services such as IAM. Otherwise, <b>False</b>.
   final bool? includeGlobalServiceEvents;
 
   /// Specifies whether the trail exists only in one region or exists in all
@@ -2735,7 +4326,7 @@ class Trail {
   final bool? isOrganizationTrail;
 
   /// Specifies the KMS key ID that encrypts the logs delivered by CloudTrail. The
-  /// value is a fully specified ARN to a KMS key in the format:
+  /// value is a fully specified ARN to a KMS key in the following format.
   ///
   /// <code>arn:aws:kms:us-east-2:123456789012:key/12345678-1234-1234-1234-123456789012</code>
   final String? kmsKeyId;
@@ -2756,11 +4347,12 @@ class Trail {
   /// Specifies the Amazon S3 key prefix that comes after the name of the bucket
   /// you have designated for log file delivery. For more information, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-find-log-files.html">Finding
-  /// Your CloudTrail Log Files</a>.The maximum length is 200 characters.
+  /// Your CloudTrail Log Files</a>. The maximum length is 200 characters.
   final String? s3KeyPrefix;
 
   /// Specifies the ARN of the Amazon SNS topic that CloudTrail uses to send
-  /// notifications when log files are delivered. The format of a topic ARN is:
+  /// notifications when log files are delivered. The following is the format of a
+  /// topic ARN.
   ///
   /// <code>arn:aws:sns:us-east-2:123456789012:MyTopic</code>
   final String? snsTopicARN;
@@ -2768,7 +4360,7 @@ class Trail {
   /// This field is no longer in use. Use SnsTopicARN.
   final String? snsTopicName;
 
-  /// Specifies the ARN of the trail. The format of a trail ARN is:
+  /// Specifies the ARN of the trail. The following is the format of a trail ARN.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   final String? trailARN;
@@ -2816,7 +4408,7 @@ class Trail {
 /// Information about a CloudTrail trail, including the trail's name, home
 /// region, and Amazon Resource Name (ARN).
 class TrailInfo {
-  /// The AWS region in which a trail was created.
+  /// The Amazon Web Services Region in which a trail was created.
   final String? homeRegion;
 
   /// The name of a trail.
@@ -2839,11 +4431,80 @@ class TrailInfo {
   }
 }
 
+class UpdateEventDataStoreResponse {
+  /// The advanced event selectors that are applied to the event data store.
+  final List<AdvancedEventSelector>? advancedEventSelectors;
+
+  /// The timestamp that shows when an event data store was first created.
+  final DateTime? createdTimestamp;
+
+  /// The ARN of the event data store.
+  final String? eventDataStoreArn;
+
+  /// Indicates whether the event data store includes events from all regions, or
+  /// only from the region in which it was created.
+  final bool? multiRegionEnabled;
+
+  /// The name of the event data store.
+  final String? name;
+
+  /// Indicates whether an event data store is collecting logged events for an
+  /// organization in Organizations.
+  final bool? organizationEnabled;
+
+  /// The retention period, in days.
+  final int? retentionPeriod;
+
+  /// The status of an event data store. Values can be <code>ENABLED</code> and
+  /// <code>PENDING_DELETION</code>.
+  final EventDataStoreStatus? status;
+
+  /// Indicates whether termination protection is enabled for the event data
+  /// store.
+  final bool? terminationProtectionEnabled;
+
+  /// The timestamp that shows when the event data store was last updated.
+  /// <code>UpdatedTimestamp</code> is always either the same or newer than the
+  /// time shown in <code>CreatedTimestamp</code>.
+  final DateTime? updatedTimestamp;
+
+  UpdateEventDataStoreResponse({
+    this.advancedEventSelectors,
+    this.createdTimestamp,
+    this.eventDataStoreArn,
+    this.multiRegionEnabled,
+    this.name,
+    this.organizationEnabled,
+    this.retentionPeriod,
+    this.status,
+    this.terminationProtectionEnabled,
+    this.updatedTimestamp,
+  });
+  factory UpdateEventDataStoreResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateEventDataStoreResponse(
+      advancedEventSelectors: (json['AdvancedEventSelectors'] as List?)
+          ?.whereNotNull()
+          .map((e) => AdvancedEventSelector.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      createdTimestamp: timeStampFromJson(json['CreatedTimestamp']),
+      eventDataStoreArn: json['EventDataStoreArn'] as String?,
+      multiRegionEnabled: json['MultiRegionEnabled'] as bool?,
+      name: json['Name'] as String?,
+      organizationEnabled: json['OrganizationEnabled'] as bool?,
+      retentionPeriod: json['RetentionPeriod'] as int?,
+      status: (json['Status'] as String?)?.toEventDataStoreStatus(),
+      terminationProtectionEnabled:
+          json['TerminationProtectionEnabled'] as bool?,
+      updatedTimestamp: timeStampFromJson(json['UpdatedTimestamp']),
+    );
+  }
+}
+
 /// Returns the objects or data listed below if successful. Otherwise, returns
 /// an error.
 class UpdateTrailResponse {
   /// Specifies the Amazon Resource Name (ARN) of the log group to which
-  /// CloudTrail logs will be delivered.
+  /// CloudTrail logs are delivered.
   final String? cloudWatchLogsLogGroupArn;
 
   /// Specifies the role for the CloudWatch Logs endpoint to assume to write to a
@@ -2861,7 +4522,7 @@ class UpdateTrailResponse {
   final bool? isOrganizationTrail;
 
   /// Specifies the KMS key ID that encrypts the logs delivered by CloudTrail. The
-  /// value is a fully specified ARN to a KMS key in the format:
+  /// value is a fully specified ARN to a KMS key in the following format.
   ///
   /// <code>arn:aws:kms:us-east-2:123456789012:key/12345678-1234-1234-1234-123456789012</code>
   final String? kmsKeyId;
@@ -2879,20 +4540,21 @@ class UpdateTrailResponse {
   /// Specifies the Amazon S3 key prefix that comes after the name of the bucket
   /// you have designated for log file delivery. For more information, see <a
   /// href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-find-log-files.html">Finding
-  /// Your CloudTrail Log Files</a>.
+  /// Your IAM Log Files</a>.
   final String? s3KeyPrefix;
 
   /// Specifies the ARN of the Amazon SNS topic that CloudTrail uses to send
-  /// notifications when log files are delivered. The format of a topic ARN is:
+  /// notifications when log files are delivered. The following is the format of a
+  /// topic ARN.
   ///
   /// <code>arn:aws:sns:us-east-2:123456789012:MyTopic</code>
   final String? snsTopicARN;
 
-  /// This field is no longer in use. Use SnsTopicARN.
+  /// This field is no longer in use. Use <a>UpdateTrailResponse$SnsTopicARN</a>.
   final String? snsTopicName;
 
-  /// Specifies the ARN of the trail that was updated. The format of a trail ARN
-  /// is:
+  /// Specifies the ARN of the trail that was updated. The following is the format
+  /// of a trail ARN.
   ///
   /// <code>arn:aws:cloudtrail:us-east-2:123456789012:trail/MyTrail</code>
   final String? trailARN;
@@ -2964,6 +4626,65 @@ class CloudWatchLogsDeliveryUnavailableException
             message: message);
 }
 
+class ConflictException extends _s.GenericAwsException {
+  ConflictException({String? type, String? message})
+      : super(type: type, code: 'ConflictException', message: message);
+}
+
+class EventDataStoreARNInvalidException extends _s.GenericAwsException {
+  EventDataStoreARNInvalidException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EventDataStoreARNInvalidException',
+            message: message);
+}
+
+class EventDataStoreAlreadyExistsException extends _s.GenericAwsException {
+  EventDataStoreAlreadyExistsException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EventDataStoreAlreadyExistsException',
+            message: message);
+}
+
+class EventDataStoreMaxLimitExceededException extends _s.GenericAwsException {
+  EventDataStoreMaxLimitExceededException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EventDataStoreMaxLimitExceededException',
+            message: message);
+}
+
+class EventDataStoreNotFoundException extends _s.GenericAwsException {
+  EventDataStoreNotFoundException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EventDataStoreNotFoundException',
+            message: message);
+}
+
+class EventDataStoreTerminationProtectedException
+    extends _s.GenericAwsException {
+  EventDataStoreTerminationProtectedException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'EventDataStoreTerminationProtectedException',
+            message: message);
+}
+
+class InactiveEventDataStoreException extends _s.GenericAwsException {
+  InactiveEventDataStoreException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'InactiveEventDataStoreException',
+            message: message);
+}
+
+class InactiveQueryException extends _s.GenericAwsException {
+  InactiveQueryException({String? type, String? message})
+      : super(type: type, code: 'InactiveQueryException', message: message);
+}
+
 class InsightNotEnabledException extends _s.GenericAwsException {
   InsightNotEnabledException({String? type, String? message})
       : super(type: type, code: 'InsightNotEnabledException', message: message);
@@ -3019,11 +4740,24 @@ class InvalidCloudWatchLogsRoleArnException extends _s.GenericAwsException {
             message: message);
 }
 
+class InvalidDateRangeException extends _s.GenericAwsException {
+  InvalidDateRangeException({String? type, String? message})
+      : super(type: type, code: 'InvalidDateRangeException', message: message);
+}
+
 class InvalidEventCategoryException extends _s.GenericAwsException {
   InvalidEventCategoryException({String? type, String? message})
       : super(
             type: type,
             code: 'InvalidEventCategoryException',
+            message: message);
+}
+
+class InvalidEventDataStoreStatusException extends _s.GenericAwsException {
+  InvalidEventDataStoreStatusException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'InvalidEventDataStoreStatusException',
             message: message);
 }
 
@@ -3079,6 +4813,25 @@ class InvalidParameterCombinationException extends _s.GenericAwsException {
             message: message);
 }
 
+class InvalidParameterException extends _s.GenericAwsException {
+  InvalidParameterException({String? type, String? message})
+      : super(type: type, code: 'InvalidParameterException', message: message);
+}
+
+class InvalidQueryStatementException extends _s.GenericAwsException {
+  InvalidQueryStatementException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'InvalidQueryStatementException',
+            message: message);
+}
+
+class InvalidQueryStatusException extends _s.GenericAwsException {
+  InvalidQueryStatusException({String? type, String? message})
+      : super(
+            type: type, code: 'InvalidQueryStatusException', message: message);
+}
+
 class InvalidS3BucketNameException extends _s.GenericAwsException {
   InvalidS3BucketNameException({String? type, String? message})
       : super(
@@ -3132,6 +4885,14 @@ class KmsKeyNotFoundException extends _s.GenericAwsException {
       : super(type: type, code: 'KmsKeyNotFoundException', message: message);
 }
 
+class MaxConcurrentQueriesException extends _s.GenericAwsException {
+  MaxConcurrentQueriesException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'MaxConcurrentQueriesException',
+            message: message);
+}
+
 class MaximumNumberOfTrailsExceededException extends _s.GenericAwsException {
   MaximumNumberOfTrailsExceededException({String? type, String? message})
       : super(
@@ -3170,6 +4931,11 @@ class OrganizationsNotInUseException extends _s.GenericAwsException {
             type: type,
             code: 'OrganizationsNotInUseException',
             message: message);
+}
+
+class QueryIdNotFoundException extends _s.GenericAwsException {
+  QueryIdNotFoundException({String? type, String? message})
+      : super(type: type, code: 'QueryIdNotFoundException', message: message);
 }
 
 class ResourceNotFoundException extends _s.GenericAwsException {
@@ -3231,6 +4997,22 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       CloudTrailInvalidClientTokenIdException(type: type, message: message),
   'CloudWatchLogsDeliveryUnavailableException': (type, message) =>
       CloudWatchLogsDeliveryUnavailableException(type: type, message: message),
+  'ConflictException': (type, message) =>
+      ConflictException(type: type, message: message),
+  'EventDataStoreARNInvalidException': (type, message) =>
+      EventDataStoreARNInvalidException(type: type, message: message),
+  'EventDataStoreAlreadyExistsException': (type, message) =>
+      EventDataStoreAlreadyExistsException(type: type, message: message),
+  'EventDataStoreMaxLimitExceededException': (type, message) =>
+      EventDataStoreMaxLimitExceededException(type: type, message: message),
+  'EventDataStoreNotFoundException': (type, message) =>
+      EventDataStoreNotFoundException(type: type, message: message),
+  'EventDataStoreTerminationProtectedException': (type, message) =>
+      EventDataStoreTerminationProtectedException(type: type, message: message),
+  'InactiveEventDataStoreException': (type, message) =>
+      InactiveEventDataStoreException(type: type, message: message),
+  'InactiveQueryException': (type, message) =>
+      InactiveQueryException(type: type, message: message),
   'InsightNotEnabledException': (type, message) =>
       InsightNotEnabledException(type: type, message: message),
   'InsufficientDependencyServiceAccessPermissionException': (type, message) =>
@@ -3246,8 +5028,12 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       InvalidCloudWatchLogsLogGroupArnException(type: type, message: message),
   'InvalidCloudWatchLogsRoleArnException': (type, message) =>
       InvalidCloudWatchLogsRoleArnException(type: type, message: message),
+  'InvalidDateRangeException': (type, message) =>
+      InvalidDateRangeException(type: type, message: message),
   'InvalidEventCategoryException': (type, message) =>
       InvalidEventCategoryException(type: type, message: message),
+  'InvalidEventDataStoreStatusException': (type, message) =>
+      InvalidEventDataStoreStatusException(type: type, message: message),
   'InvalidEventSelectorsException': (type, message) =>
       InvalidEventSelectorsException(type: type, message: message),
   'InvalidHomeRegionException': (type, message) =>
@@ -3264,6 +5050,12 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       InvalidNextTokenException(type: type, message: message),
   'InvalidParameterCombinationException': (type, message) =>
       InvalidParameterCombinationException(type: type, message: message),
+  'InvalidParameterException': (type, message) =>
+      InvalidParameterException(type: type, message: message),
+  'InvalidQueryStatementException': (type, message) =>
+      InvalidQueryStatementException(type: type, message: message),
+  'InvalidQueryStatusException': (type, message) =>
+      InvalidQueryStatusException(type: type, message: message),
   'InvalidS3BucketNameException': (type, message) =>
       InvalidS3BucketNameException(type: type, message: message),
   'InvalidS3PrefixException': (type, message) =>
@@ -3283,6 +5075,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       KmsKeyDisabledException(type: type, message: message),
   'KmsKeyNotFoundException': (type, message) =>
       KmsKeyNotFoundException(type: type, message: message),
+  'MaxConcurrentQueriesException': (type, message) =>
+      MaxConcurrentQueriesException(type: type, message: message),
   'MaximumNumberOfTrailsExceededException': (type, message) =>
       MaximumNumberOfTrailsExceededException(type: type, message: message),
   'NotOrganizationMasterAccountException': (type, message) =>
@@ -3293,6 +5087,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       OrganizationNotInAllFeaturesModeException(type: type, message: message),
   'OrganizationsNotInUseException': (type, message) =>
       OrganizationsNotInUseException(type: type, message: message),
+  'QueryIdNotFoundException': (type, message) =>
+      QueryIdNotFoundException(type: type, message: message),
   'ResourceNotFoundException': (type, message) =>
       ResourceNotFoundException(type: type, message: message),
   'ResourceTypeNotSupportedException': (type, message) =>

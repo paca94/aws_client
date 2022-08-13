@@ -48,6 +48,34 @@ class MediaPackageVod {
     _protocol.close();
   }
 
+  /// Changes the packaging group's properities to configure log subscription
+  ///
+  /// May throw [UnprocessableEntityException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceUnavailableException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [id] :
+  /// The ID of a MediaPackage VOD PackagingGroup resource.
+  Future<ConfigureLogsResponse> configureLogs({
+    required String id,
+    EgressAccessLogs? egressAccessLogs,
+  }) async {
+    ArgumentError.checkNotNull(id, 'id');
+    final $payload = <String, dynamic>{
+      if (egressAccessLogs != null) 'egressAccessLogs': egressAccessLogs,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'PUT',
+      requestUri: '/packaging_groups/${Uri.encodeComponent(id)}/configure_logs',
+      exceptionFnMap: _exceptionFns,
+    );
+    return ConfigureLogsResponse.fromJson(response);
+  }
+
   /// Creates a new MediaPackage VOD Asset resource.
   ///
   /// May throw [UnprocessableEntityException].
@@ -157,12 +185,14 @@ class MediaPackageVod {
   Future<CreatePackagingGroupResponse> createPackagingGroup({
     required String id,
     Authorization? authorization,
+    EgressAccessLogs? egressAccessLogs,
     Map<String, String>? tags,
   }) async {
     ArgumentError.checkNotNull(id, 'id');
     final $payload = <String, dynamic>{
       'id': id,
       if (authorization != null) 'authorization': authorization,
+      if (egressAccessLogs != null) 'egressAccessLogs': egressAccessLogs,
       if (tags != null) 'tags': tags,
     };
     final response = await _protocol.send(
@@ -660,20 +690,31 @@ class Authorization {
 class CmafEncryption {
   final SpekeKeyProvider spekeKeyProvider;
 
+  /// An optional 128-bit, 16-byte hex value represented by a 32-character string,
+  /// used in conjunction with the key for encrypting blocks. If you don't specify
+  /// a value, then MediaPackage creates the constant initialization vector (IV).
+  final String? constantInitializationVector;
+
   CmafEncryption({
     required this.spekeKeyProvider,
+    this.constantInitializationVector,
   });
   factory CmafEncryption.fromJson(Map<String, dynamic> json) {
     return CmafEncryption(
       spekeKeyProvider: SpekeKeyProvider.fromJson(
           json['spekeKeyProvider'] as Map<String, dynamic>),
+      constantInitializationVector:
+          json['constantInitializationVector'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final spekeKeyProvider = this.spekeKeyProvider;
+    final constantInitializationVector = this.constantInitializationVector;
     return {
       'spekeKeyProvider': spekeKeyProvider,
+      if (constantInitializationVector != null)
+        'constantInitializationVector': constantInitializationVector,
     };
   }
 }
@@ -684,6 +725,13 @@ class CmafPackage {
   final List<HlsManifest> hlsManifests;
   final CmafEncryption? encryption;
 
+  /// When includeEncoderConfigurationInSegments is set to true, MediaPackage
+  /// places your encoder's Sequence Parameter Set (SPS), Picture Parameter Set
+  /// (PPS), and Video Parameter Set (VPS) metadata in every video segment instead
+  /// of in the init fragment. This lets you use different SPS/PPS/VPS settings
+  /// for your assets during content playback.
+  final bool? includeEncoderConfigurationInSegments;
+
   /// Duration (in seconds) of each fragment. Actual fragments will be
   /// rounded to the nearest multiple of the source fragment duration.
   final int? segmentDurationSeconds;
@@ -691,6 +739,7 @@ class CmafPackage {
   CmafPackage({
     required this.hlsManifests,
     this.encryption,
+    this.includeEncoderConfigurationInSegments,
     this.segmentDurationSeconds,
   });
   factory CmafPackage.fromJson(Map<String, dynamic> json) {
@@ -702,6 +751,8 @@ class CmafPackage {
       encryption: json['encryption'] != null
           ? CmafEncryption.fromJson(json['encryption'] as Map<String, dynamic>)
           : null,
+      includeEncoderConfigurationInSegments:
+          json['includeEncoderConfigurationInSegments'] as bool?,
       segmentDurationSeconds: json['segmentDurationSeconds'] as int?,
     );
   }
@@ -709,13 +760,58 @@ class CmafPackage {
   Map<String, dynamic> toJson() {
     final hlsManifests = this.hlsManifests;
     final encryption = this.encryption;
+    final includeEncoderConfigurationInSegments =
+        this.includeEncoderConfigurationInSegments;
     final segmentDurationSeconds = this.segmentDurationSeconds;
     return {
       'hlsManifests': hlsManifests,
       if (encryption != null) 'encryption': encryption,
+      if (includeEncoderConfigurationInSegments != null)
+        'includeEncoderConfigurationInSegments':
+            includeEncoderConfigurationInSegments,
       if (segmentDurationSeconds != null)
         'segmentDurationSeconds': segmentDurationSeconds,
     };
+  }
+}
+
+class ConfigureLogsResponse {
+  /// The ARN of the PackagingGroup.
+  final String? arn;
+  final Authorization? authorization;
+
+  /// The fully qualified domain name for Assets in the PackagingGroup.
+  final String? domainName;
+  final EgressAccessLogs? egressAccessLogs;
+
+  /// The ID of the PackagingGroup.
+  final String? id;
+  final Map<String, String>? tags;
+
+  ConfigureLogsResponse({
+    this.arn,
+    this.authorization,
+    this.domainName,
+    this.egressAccessLogs,
+    this.id,
+    this.tags,
+  });
+  factory ConfigureLogsResponse.fromJson(Map<String, dynamic> json) {
+    return ConfigureLogsResponse(
+      arn: json['arn'] as String?,
+      authorization: json['authorization'] != null
+          ? Authorization.fromJson(
+              json['authorization'] as Map<String, dynamic>)
+          : null,
+      domainName: json['domainName'] as String?,
+      egressAccessLogs: json['egressAccessLogs'] != null
+          ? EgressAccessLogs.fromJson(
+              json['egressAccessLogs'] as Map<String, dynamic>)
+          : null,
+      id: json['id'] as String?,
+      tags: (json['tags'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+    );
   }
 }
 
@@ -831,6 +927,7 @@ class CreatePackagingGroupResponse {
 
   /// The fully qualified domain name for Assets in the PackagingGroup.
   final String? domainName;
+  final EgressAccessLogs? egressAccessLogs;
 
   /// The ID of the PackagingGroup.
   final String? id;
@@ -840,6 +937,7 @@ class CreatePackagingGroupResponse {
     this.arn,
     this.authorization,
     this.domainName,
+    this.egressAccessLogs,
     this.id,
     this.tags,
   });
@@ -851,6 +949,10 @@ class CreatePackagingGroupResponse {
               json['authorization'] as Map<String, dynamic>)
           : null,
       domainName: json['domainName'] as String?,
+      egressAccessLogs: json['egressAccessLogs'] != null
+          ? EgressAccessLogs.fromJson(
+              json['egressAccessLogs'] as Map<String, dynamic>)
+          : null,
       id: json['id'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -898,6 +1000,11 @@ class DashManifest {
   /// The Dynamic Adaptive Streaming over HTTP (DASH) profile type.  When set to
   /// "HBBTV_1_5", HbbTV 1.5 compliant output is enabled.
   final Profile? profile;
+
+  /// The source of scte markers used. When set to SEGMENTS, the scte markers are
+  /// sourced from the segments of the ingested content. When set to MANIFEST, the
+  /// scte markers are sourced from the manifest of the ingested content.
+  final ScteMarkersSource? scteMarkersSource;
   final StreamSelection? streamSelection;
 
   DashManifest({
@@ -905,6 +1012,7 @@ class DashManifest {
     this.manifestName,
     this.minBufferTimeSeconds,
     this.profile,
+    this.scteMarkersSource,
     this.streamSelection,
   });
   factory DashManifest.fromJson(Map<String, dynamic> json) {
@@ -913,6 +1021,8 @@ class DashManifest {
       manifestName: json['manifestName'] as String?,
       minBufferTimeSeconds: json['minBufferTimeSeconds'] as int?,
       profile: (json['profile'] as String?)?.toProfile(),
+      scteMarkersSource:
+          (json['scteMarkersSource'] as String?)?.toScteMarkersSource(),
       streamSelection: json['streamSelection'] != null
           ? StreamSelection.fromJson(
               json['streamSelection'] as Map<String, dynamic>)
@@ -925,6 +1035,7 @@ class DashManifest {
     final manifestName = this.manifestName;
     final minBufferTimeSeconds = this.minBufferTimeSeconds;
     final profile = this.profile;
+    final scteMarkersSource = this.scteMarkersSource;
     final streamSelection = this.streamSelection;
     return {
       if (manifestLayout != null) 'manifestLayout': manifestLayout.toValue(),
@@ -932,6 +1043,8 @@ class DashManifest {
       if (minBufferTimeSeconds != null)
         'minBufferTimeSeconds': minBufferTimeSeconds,
       if (profile != null) 'profile': profile.toValue(),
+      if (scteMarkersSource != null)
+        'scteMarkersSource': scteMarkersSource.toValue(),
       if (streamSelection != null) 'streamSelection': streamSelection,
     };
   }
@@ -942,6 +1055,13 @@ class DashPackage {
   /// A list of DASH manifest configurations.
   final List<DashManifest> dashManifests;
   final DashEncryption? encryption;
+
+  /// When includeEncoderConfigurationInSegments is set to true, MediaPackage
+  /// places your encoder's Sequence Parameter Set (SPS), Picture Parameter Set
+  /// (PPS), and Video Parameter Set (VPS) metadata in every video segment instead
+  /// of in the init fragment. This lets you use different SPS/PPS/VPS settings
+  /// for your assets during content playback.
+  final bool? includeEncoderConfigurationInSegments;
 
   /// A list of triggers that controls when the outgoing Dynamic Adaptive
   /// Streaming over HTTP (DASH)
@@ -967,6 +1087,7 @@ class DashPackage {
   DashPackage({
     required this.dashManifests,
     this.encryption,
+    this.includeEncoderConfigurationInSegments,
     this.periodTriggers,
     this.segmentDurationSeconds,
     this.segmentTemplateFormat,
@@ -980,6 +1101,8 @@ class DashPackage {
       encryption: json['encryption'] != null
           ? DashEncryption.fromJson(json['encryption'] as Map<String, dynamic>)
           : null,
+      includeEncoderConfigurationInSegments:
+          json['includeEncoderConfigurationInSegments'] as bool?,
       periodTriggers: (json['periodTriggers'] as List?)
           ?.whereNotNull()
           .map((e) => (e as String).toPeriodTriggersElement())
@@ -993,12 +1116,17 @@ class DashPackage {
   Map<String, dynamic> toJson() {
     final dashManifests = this.dashManifests;
     final encryption = this.encryption;
+    final includeEncoderConfigurationInSegments =
+        this.includeEncoderConfigurationInSegments;
     final periodTriggers = this.periodTriggers;
     final segmentDurationSeconds = this.segmentDurationSeconds;
     final segmentTemplateFormat = this.segmentTemplateFormat;
     return {
       'dashManifests': dashManifests,
       if (encryption != null) 'encryption': encryption,
+      if (includeEncoderConfigurationInSegments != null)
+        'includeEncoderConfigurationInSegments':
+            includeEncoderConfigurationInSegments,
       if (periodTriggers != null)
         'periodTriggers': periodTriggers.map((e) => e.toValue()).toList(),
       if (segmentDurationSeconds != null)
@@ -1143,6 +1271,7 @@ class DescribePackagingGroupResponse {
 
   /// The fully qualified domain name for Assets in the PackagingGroup.
   final String? domainName;
+  final EgressAccessLogs? egressAccessLogs;
 
   /// The ID of the PackagingGroup.
   final String? id;
@@ -1152,6 +1281,7 @@ class DescribePackagingGroupResponse {
     this.arn,
     this.authorization,
     this.domainName,
+    this.egressAccessLogs,
     this.id,
     this.tags,
   });
@@ -1163,10 +1293,36 @@ class DescribePackagingGroupResponse {
               json['authorization'] as Map<String, dynamic>)
           : null,
       domainName: json['domainName'] as String?,
+      egressAccessLogs: json['egressAccessLogs'] != null
+          ? EgressAccessLogs.fromJson(
+              json['egressAccessLogs'] as Map<String, dynamic>)
+          : null,
       id: json['id'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
+  }
+}
+
+/// Configure egress access logging.
+class EgressAccessLogs {
+  /// Customize the log group name.
+  final String? logGroupName;
+
+  EgressAccessLogs({
+    this.logGroupName,
+  });
+  factory EgressAccessLogs.fromJson(Map<String, dynamic> json) {
+    return EgressAccessLogs(
+      logGroupName: json['logGroupName'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final logGroupName = this.logGroupName;
+    return {
+      if (logGroupName != null) 'logGroupName': logGroupName,
+    };
   }
 }
 
@@ -1175,16 +1331,24 @@ class EgressEndpoint {
   /// The ID of the PackagingConfiguration being applied to the Asset.
   final String? packagingConfigurationId;
 
+  /// The current processing status of the asset used for the packaging
+  /// configuration. The status can be either QUEUED, PROCESSING, PLAYABLE, or
+  /// FAILED. Status information won't be available for most assets ingested
+  /// before 2021-09-30.
+  final String? status;
+
   /// The URL of the parent manifest for the repackaged Asset.
   final String? url;
 
   EgressEndpoint({
     this.packagingConfigurationId,
+    this.status,
     this.url,
   });
   factory EgressEndpoint.fromJson(Map<String, dynamic> json) {
     return EgressEndpoint(
       packagingConfigurationId: json['packagingConfigurationId'] as String?,
+      status: json['status'] as String?,
       url: json['url'] as String?,
     );
   }
@@ -1342,6 +1506,10 @@ class HlsPackage {
   final List<HlsManifest> hlsManifests;
   final HlsEncryption? encryption;
 
+  /// When enabled, MediaPackage passes through digital video broadcasting (DVB)
+  /// subtitles into the output.
+  final bool? includeDvbSubtitles;
+
   /// Duration (in seconds) of each fragment. Actual fragments will be
   /// rounded to the nearest multiple of the source fragment duration.
   final int? segmentDurationSeconds;
@@ -1353,6 +1521,7 @@ class HlsPackage {
   HlsPackage({
     required this.hlsManifests,
     this.encryption,
+    this.includeDvbSubtitles,
     this.segmentDurationSeconds,
     this.useAudioRenditionGroup,
   });
@@ -1365,6 +1534,7 @@ class HlsPackage {
       encryption: json['encryption'] != null
           ? HlsEncryption.fromJson(json['encryption'] as Map<String, dynamic>)
           : null,
+      includeDvbSubtitles: json['includeDvbSubtitles'] as bool?,
       segmentDurationSeconds: json['segmentDurationSeconds'] as int?,
       useAudioRenditionGroup: json['useAudioRenditionGroup'] as bool?,
     );
@@ -1373,11 +1543,14 @@ class HlsPackage {
   Map<String, dynamic> toJson() {
     final hlsManifests = this.hlsManifests;
     final encryption = this.encryption;
+    final includeDvbSubtitles = this.includeDvbSubtitles;
     final segmentDurationSeconds = this.segmentDurationSeconds;
     final useAudioRenditionGroup = this.useAudioRenditionGroup;
     return {
       'hlsManifests': hlsManifests,
       if (encryption != null) 'encryption': encryption,
+      if (includeDvbSubtitles != null)
+        'includeDvbSubtitles': includeDvbSubtitles,
       if (segmentDurationSeconds != null)
         'segmentDurationSeconds': segmentDurationSeconds,
       if (useAudioRenditionGroup != null)
@@ -1649,6 +1822,7 @@ class PackagingGroup {
 
   /// The fully qualified domain name for Assets in the PackagingGroup.
   final String? domainName;
+  final EgressAccessLogs? egressAccessLogs;
 
   /// The ID of the PackagingGroup.
   final String? id;
@@ -1658,6 +1832,7 @@ class PackagingGroup {
     this.arn,
     this.authorization,
     this.domainName,
+    this.egressAccessLogs,
     this.id,
     this.tags,
   });
@@ -1669,6 +1844,10 @@ class PackagingGroup {
               json['authorization'] as Map<String, dynamic>)
           : null,
       domainName: json['domainName'] as String?,
+      egressAccessLogs: json['egressAccessLogs'] != null
+          ? EgressAccessLogs.fromJson(
+              json['egressAccessLogs'] as Map<String, dynamic>)
+          : null,
       id: json['id'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -1701,6 +1880,34 @@ extension on String {
         return Profile.hbbtv_1_5;
     }
     throw Exception('$this is not known in enum Profile');
+  }
+}
+
+enum ScteMarkersSource {
+  segments,
+  manifest,
+}
+
+extension on ScteMarkersSource {
+  String toValue() {
+    switch (this) {
+      case ScteMarkersSource.segments:
+        return 'SEGMENTS';
+      case ScteMarkersSource.manifest:
+        return 'MANIFEST';
+    }
+  }
+}
+
+extension on String {
+  ScteMarkersSource toScteMarkersSource() {
+    switch (this) {
+      case 'SEGMENTS':
+        return ScteMarkersSource.segments;
+      case 'MANIFEST':
+        return ScteMarkersSource.manifest;
+    }
+    throw Exception('$this is not known in enum ScteMarkersSource');
   }
 }
 
@@ -1856,6 +2063,7 @@ class UpdatePackagingGroupResponse {
 
   /// The fully qualified domain name for Assets in the PackagingGroup.
   final String? domainName;
+  final EgressAccessLogs? egressAccessLogs;
 
   /// The ID of the PackagingGroup.
   final String? id;
@@ -1865,6 +2073,7 @@ class UpdatePackagingGroupResponse {
     this.arn,
     this.authorization,
     this.domainName,
+    this.egressAccessLogs,
     this.id,
     this.tags,
   });
@@ -1876,6 +2085,10 @@ class UpdatePackagingGroupResponse {
               json['authorization'] as Map<String, dynamic>)
           : null,
       domainName: json['domainName'] as String?,
+      egressAccessLogs: json['egressAccessLogs'] != null
+          ? EgressAccessLogs.fromJson(
+              json['egressAccessLogs'] as Map<String, dynamic>)
+          : null,
       id: json['id'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),

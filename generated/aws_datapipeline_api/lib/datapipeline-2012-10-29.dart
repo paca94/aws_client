@@ -1430,38 +1430,6 @@ class InstanceIdentity {
   }
 }
 
-/// An internal service error occurred.
-class InternalServiceError implements _s.AwsException {
-  /// Description of the error message.
-  final String? message;
-
-  InternalServiceError({
-    this.message,
-  });
-  factory InternalServiceError.fromJson(Map<String, dynamic> json) {
-    return InternalServiceError(
-      message: json['message'] as String?,
-    );
-  }
-}
-
-/// The request was not valid. Verify that your request was properly formatted,
-/// that the signature was generated with the correct credentials, and that you
-/// haven't exceeded any of the service limits for your account.
-class InvalidRequestException implements _s.AwsException {
-  /// Description of the error message.
-  final String? message;
-
-  InvalidRequestException({
-    this.message,
-  });
-  factory InvalidRequestException.fromJson(Map<String, dynamic> json) {
-    return InvalidRequestException(
-      message: json['message'] as String?,
-    );
-  }
-}
-
 /// Contains the output of ListPipelines.
 class ListPipelinesOutput {
   /// The pipeline identifiers. If you require additional information about the
@@ -1686,21 +1654,6 @@ class ParameterValue {
   }
 }
 
-/// The specified pipeline has been deleted.
-class PipelineDeletedException implements _s.AwsException {
-  /// Description of the error message.
-  final String? message;
-
-  PipelineDeletedException({
-    this.message,
-  });
-  factory PipelineDeletedException.fromJson(Map<String, dynamic> json) {
-    return PipelineDeletedException(
-      message: json['message'] as String?,
-    );
-  }
-}
-
 /// Contains pipeline metadata.
 class PipelineDescription {
   /// A list of read-only fields that contain metadata about the pipeline:
@@ -1765,22 +1718,6 @@ class PipelineIdName {
     return PipelineIdName(
       id: json['id'] as String?,
       name: json['name'] as String?,
-    );
-  }
-}
-
-/// The specified pipeline was not found. Verify that you used the correct user
-/// and account identifiers.
-class PipelineNotFoundException implements _s.AwsException {
-  /// Description of the error message.
-  final String? message;
-
-  PipelineNotFoundException({
-    this.message,
-  });
-  factory PipelineNotFoundException.fromJson(Map<String, dynamic> json) {
-    return PipelineNotFoundException(
-      message: json['message'] as String?,
     );
   }
 }
@@ -2042,21 +1979,6 @@ class Tag {
   }
 }
 
-/// The specified task was not found.
-class TaskNotFoundException implements _s.AwsException {
-  /// Description of the error message.
-  final String? message;
-
-  TaskNotFoundException({
-    this.message,
-  });
-  factory TaskNotFoundException.fromJson(Map<String, dynamic> json) {
-    return TaskNotFoundException(
-      message: json['message'] as String?,
-    );
-  }
-}
-
 /// Contains information about a pipeline task that is assigned to a task
 /// runner.
 class TaskObject {
@@ -2206,15 +2128,40 @@ class ValidationWarning {
   }
 }
 
+class InternalServiceError extends _s.GenericAwsException {
+  InternalServiceError({String? type, String? message})
+      : super(type: type, code: 'InternalServiceError', message: message);
+}
+
+class InvalidRequestException extends _s.GenericAwsException {
+  InvalidRequestException({String? type, String? message})
+      : super(type: type, code: 'InvalidRequestException', message: message);
+}
+
+class PipelineDeletedException extends _s.GenericAwsException {
+  PipelineDeletedException({String? type, String? message})
+      : super(type: type, code: 'PipelineDeletedException', message: message);
+}
+
+class PipelineNotFoundException extends _s.GenericAwsException {
+  PipelineNotFoundException({String? type, String? message})
+      : super(type: type, code: 'PipelineNotFoundException', message: message);
+}
+
+class TaskNotFoundException extends _s.GenericAwsException {
+  TaskNotFoundException({String? type, String? message})
+      : super(type: type, code: 'TaskNotFoundException', message: message);
+}
+
 final _exceptionFns = <String, _s.AwsExceptionFn>{
   'InternalServiceError': (type, message) =>
-      InternalServiceError(message: message),
+      InternalServiceError(type: type, message: message),
   'InvalidRequestException': (type, message) =>
-      InvalidRequestException(message: message),
+      InvalidRequestException(type: type, message: message),
   'PipelineDeletedException': (type, message) =>
-      PipelineDeletedException(message: message),
+      PipelineDeletedException(type: type, message: message),
   'PipelineNotFoundException': (type, message) =>
-      PipelineNotFoundException(message: message),
+      PipelineNotFoundException(type: type, message: message),
   'TaskNotFoundException': (type, message) =>
-      TaskNotFoundException(message: message),
+      TaskNotFoundException(type: type, message: message),
 };

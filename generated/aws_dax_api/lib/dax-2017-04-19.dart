@@ -70,6 +70,7 @@ class DAX {
   /// May throw [ServiceLinkedRoleNotFoundFault].
   /// May throw [InvalidParameterValueException].
   /// May throw [InvalidParameterCombinationException].
+  /// May throw [ServiceQuotaExceededException].
   ///
   /// Parameter [clusterName] :
   /// The cluster identifier. This parameter is stored as a lowercase string.
@@ -114,6 +115,18 @@ class DAX {
   /// list must equal the <code>ReplicationFactor</code> parameter. If you omit
   /// this parameter, DAX will spread the nodes across Availability Zones for
   /// the highest availability.
+  ///
+  /// Parameter [clusterEndpointEncryptionType] :
+  /// The type of encryption the cluster's endpoint should support. Values are:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>NONE</code> for no encryption
+  /// </li>
+  /// <li>
+  /// <code>TLS</code> for Transport Layer Security
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [description] :
   /// A description of the cluster.
@@ -190,6 +203,7 @@ class DAX {
     required String nodeType,
     required int replicationFactor,
     List<String>? availabilityZones,
+    ClusterEndpointEncryptionType? clusterEndpointEncryptionType,
     String? description,
     String? notificationTopicArn,
     String? parameterGroupName,
@@ -219,6 +233,9 @@ class DAX {
         'NodeType': nodeType,
         'ReplicationFactor': replicationFactor,
         if (availabilityZones != null) 'AvailabilityZones': availabilityZones,
+        if (clusterEndpointEncryptionType != null)
+          'ClusterEndpointEncryptionType':
+              clusterEndpointEncryptionType.toValue(),
         if (description != null) 'Description': description,
         if (notificationTopicArn != null)
           'NotificationTopicArn': notificationTopicArn,
@@ -1045,7 +1062,9 @@ class DAX {
   /// The Amazon Resource Name (ARN) that identifies the topic.
   ///
   /// Parameter [notificationTopicStatus] :
-  /// The current state of the topic.
+  /// The current state of the topic. A value of “active” means that
+  /// notifications will be sent to the topic. A value of “inactive” means that
+  /// notifications will not be sent to the topic.
   ///
   /// Parameter [parameterGroupName] :
   /// The name of a parameter group for this cluster.
@@ -1114,6 +1133,12 @@ class DAX {
   /// Parameter [parameterNameValues] :
   /// An array of name-value pairs for the parameters in the group. Each element
   /// in the array represents a single parameter.
+  /// <note>
+  /// <code>record-ttl-millis</code> and <code>query-ttl-millis</code> are the
+  /// only supported parameter names. For more details, see <a
+  /// href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.cluster-management.html#DAX.cluster-management.custom-settings.ttl">Configuring
+  /// TTL Settings</a>.
+  /// </note>
   Future<UpdateParameterGroupResponse> updateParameterGroup({
     required String parameterGroupName,
     required List<ParameterNameValue> parameterNameValues,
@@ -1219,11 +1244,21 @@ class Cluster {
   /// The Amazon Resource Name (ARN) that uniquely identifies the cluster.
   final String? clusterArn;
 
-  /// The configuration endpoint for this DAX cluster, consisting of a DNS name
-  /// and a port number. Client applications can specify this endpoint, rather
-  /// than an individual node endpoint, and allow the DAX client software to
-  /// intelligently route requests and responses to nodes in the DAX cluster.
+  /// The endpoint for this DAX cluster, consisting of a DNS name, a port number,
+  /// and a URL. Applications should use the URL to configure the DAX client to
+  /// find their cluster.
   final Endpoint? clusterDiscoveryEndpoint;
+
+  /// The type of encryption supported by the cluster's endpoint. Values are:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>NONE</code> for no encryption
+  ///
+  /// <code>TLS</code> for Transport Layer Security
+  /// </li>
+  /// </ul>
+  final ClusterEndpointEncryptionType? clusterEndpointEncryptionType;
 
   /// The name of the DAX cluster.
   final String? clusterName;
@@ -1281,6 +1316,7 @@ class Cluster {
     this.activeNodes,
     this.clusterArn,
     this.clusterDiscoveryEndpoint,
+    this.clusterEndpointEncryptionType,
     this.clusterName,
     this.description,
     this.iamRoleArn,
@@ -1304,6 +1340,9 @@ class Cluster {
           ? Endpoint.fromJson(
               json['ClusterDiscoveryEndpoint'] as Map<String, dynamic>)
           : null,
+      clusterEndpointEncryptionType:
+          (json['ClusterEndpointEncryptionType'] as String?)
+              ?.toClusterEndpointEncryptionType(),
       clusterName: json['ClusterName'] as String?,
       description: json['Description'] as String?,
       iamRoleArn: json['IamRoleArn'] as String?,
@@ -1338,6 +1377,34 @@ class Cluster {
       subnetGroup: json['SubnetGroup'] as String?,
       totalNodes: json['TotalNodes'] as int?,
     );
+  }
+}
+
+enum ClusterEndpointEncryptionType {
+  none,
+  tls,
+}
+
+extension on ClusterEndpointEncryptionType {
+  String toValue() {
+    switch (this) {
+      case ClusterEndpointEncryptionType.none:
+        return 'NONE';
+      case ClusterEndpointEncryptionType.tls:
+        return 'TLS';
+    }
+  }
+}
+
+extension on String {
+  ClusterEndpointEncryptionType toClusterEndpointEncryptionType() {
+    switch (this) {
+      case 'NONE':
+        return ClusterEndpointEncryptionType.none;
+      case 'TLS':
+        return ClusterEndpointEncryptionType.tls;
+    }
+    throw Exception('$this is not known in enum ClusterEndpointEncryptionType');
   }
 }
 
@@ -1592,8 +1659,7 @@ class DescribeSubnetGroupsResponse {
 }
 
 /// Represents the information required for client programs to connect to the
-/// configuration endpoint for a DAX cluster, or to an individual node within
-/// the cluster.
+/// endpoint for a DAX cluster.
 class Endpoint {
   /// The DNS hostname of the endpoint.
   final String? address;
@@ -1601,14 +1667,20 @@ class Endpoint {
   /// The port number that applications should use to connect to the endpoint.
   final int? port;
 
+  /// The URL that applications should use to connect to the endpoint. The default
+  /// ports are 8111 for the "dax" protocol and 9111 for the "daxs" protocol.
+  final String? url;
+
   Endpoint({
     this.address,
     this.port,
+    this.url,
   });
   factory Endpoint.fromJson(Map<String, dynamic> json) {
     return Endpoint(
       address: json['Address'] as String?,
       port: json['Port'] as int?,
+      url: json['URL'] as String?,
     );
   }
 }
@@ -1794,7 +1866,9 @@ class NotificationConfiguration {
   /// The Amazon Resource Name (ARN) that identifies the topic.
   final String? topicArn;
 
-  /// The current state of the topic.
+  /// The current state of the topic. A value of “active” means that notifications
+  /// will be sent to the topic. A value of “inactive” means that notifications
+  /// will not be sent to the topic.
   final String? topicStatus;
 
   NotificationConfiguration({
@@ -2438,6 +2512,14 @@ class ServiceLinkedRoleNotFoundFault extends _s.GenericAwsException {
             message: message);
 }
 
+class ServiceQuotaExceededException extends _s.GenericAwsException {
+  ServiceQuotaExceededException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'ServiceQuotaExceededException',
+            message: message);
+}
+
 class SubnetGroupAlreadyExistsFault extends _s.GenericAwsException {
   SubnetGroupAlreadyExistsFault({String? type, String? message})
       : super(
@@ -2522,6 +2604,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       ParameterGroupQuotaExceededFault(type: type, message: message),
   'ServiceLinkedRoleNotFoundFault': (type, message) =>
       ServiceLinkedRoleNotFoundFault(type: type, message: message),
+  'ServiceQuotaExceededException': (type, message) =>
+      ServiceQuotaExceededException(type: type, message: message),
   'SubnetGroupAlreadyExistsFault': (type, message) =>
       SubnetGroupAlreadyExistsFault(type: type, message: message),
   'SubnetGroupInUseFault': (type, message) =>

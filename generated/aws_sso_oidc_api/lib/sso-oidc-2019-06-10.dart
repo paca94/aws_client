@@ -18,29 +18,55 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS Single Sign-On (SSO) OpenID Connect (OIDC) is a web service that enables
-/// a client (such as AWS CLI or a native application) to register with AWS SSO.
-/// The service also enables the client to fetch the user’s access token upon
-/// successful authentication and authorization with AWS SSO. This service
-/// conforms with the OAuth 2.0 based implementation of the device authorization
-/// grant standard (<a
-/// href="https://tools.ietf.org/html/rfc8628">https://tools.ietf.org/html/rfc8628</a>).
-///
-/// For general information about AWS SSO, see <a
-/// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html">What
-/// is AWS Single Sign-On?</a> in the <i>AWS SSO User Guide</i>.
-///
-/// This API reference guide describes the AWS SSO OIDC operations that you can
-/// call programatically and includes detailed information on data types and
-/// errors.
+/// Amazon Web Services Single Sign On OpenID Connect (OIDC) is a web service
+/// that enables a client (such as Amazon Web Services CLI or a native
+/// application) to register with Amazon Web Services SSO. The service also
+/// enables the client to fetch the user’s access token upon successful
+/// authentication and authorization with Amazon Web Services SSO.
 /// <note>
-/// AWS provides SDKs that consist of libraries and sample code for various
-/// programming languages and platforms such as Java, Ruby, .Net, iOS, and
-/// Android. The SDKs provide a convenient way to create programmatic access to
-/// AWS SSO and other AWS services. For more information about the AWS SDKs,
-/// including how to download and install them, see <a
-/// href="http://aws.amazon.com/tools/">Tools for Amazon Web Services</a>.
+/// Although Amazon Web Services Single Sign-On was renamed, the
+/// <code>sso</code> and <code>identitystore</code> API namespaces will continue
+/// to retain their original name for backward compatibility purposes. For more
+/// information, see <a
+/// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html#renamed">Amazon
+/// Web Services SSO rename</a>.
 /// </note>
+/// <b>Considerations for Using This Guide</b>
+///
+/// Before you begin using this guide, we recommend that you first review the
+/// following important information about how the Amazon Web Services SSO OIDC
+/// service works.
+///
+/// <ul>
+/// <li>
+/// The Amazon Web Services SSO OIDC service currently implements only the
+/// portions of the OAuth 2.0 Device Authorization Grant standard (<a
+/// href="https://tools.ietf.org/html/rfc8628">https://tools.ietf.org/html/rfc8628</a>)
+/// that are necessary to enable single sign-on authentication with the AWS CLI.
+/// Support for other OIDC flows frequently needed for native applications, such
+/// as Authorization Code Flow (+ PKCE), will be addressed in future releases.
+/// </li>
+/// <li>
+/// The service emits only OIDC access tokens, such that obtaining a new token
+/// (For example, token refresh) requires explicit user re-authentication.
+/// </li>
+/// <li>
+/// The access tokens provided by this service grant access to all AWS account
+/// entitlements assigned to an Amazon Web Services SSO user, not just a
+/// particular application.
+/// </li>
+/// <li>
+/// The documentation in this guide does not describe the mechanism to convert
+/// the access token into AWS Auth (“sigv4”) credentials for use with
+/// IAM-protected AWS service endpoints. For more information, see <a
+/// href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_GetRoleCredentials.html">GetRoleCredentials</a>
+/// in the <i>Amazon Web Services SSO Portal API Reference Guide</i>.
+/// </li>
+/// </ul>
+/// For general information about Amazon Web Services SSO, see <a
+/// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html">What
+/// is Amazon Web Services SSO?</a> in the <i>Amazon Web Services SSO User
+/// Guide</i>.
 class SSOOIDC {
   final _s.RestJsonProtocol _protocol;
   SSOOIDC({
@@ -72,7 +98,7 @@ class SSOOIDC {
 
   /// Creates and returns an access token for the authorized client. The access
   /// token issued will be used to fetch short-term credentials for the assigned
-  /// roles in the AWS account.
+  /// roles in the Amazon Web Services account.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [InvalidClientException].
@@ -101,8 +127,13 @@ class SSOOIDC {
   /// <a>StartDeviceAuthorization</a> API.
   ///
   /// Parameter [grantType] :
-  /// Supports grant types for authorization code, refresh token, and device
-  /// code request.
+  /// Supports grant types for the authorization code, refresh token, and device
+  /// code request. For device code requests, specify the following value:
+  ///
+  /// <code>urn:ietf:params:oauth:grant-type:<i>device_code</i> </code>
+  ///
+  /// For information about how to obtain the device code, see the
+  /// <a>StartDeviceAuthorization</a> topic.
   ///
   /// Parameter [code] :
   /// The authorization code received from the authorization service. This
@@ -114,8 +145,15 @@ class SSOOIDC {
   /// Users authorize the service to send the request to this location.
   ///
   /// Parameter [refreshToken] :
+  /// Currently, <code>refreshToken</code> is not yet implemented and is not
+  /// supported. For more information about the features and limitations of the
+  /// current Amazon Web Services SSO OIDC implementation, see <i>Considerations
+  /// for Using this Guide</i> in the <a
+  /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html">Amazon
+  /// Web Services SSO OIDC API Reference</a>.
+  ///
   /// The token used to obtain an access token in the event that the access
-  /// token is invalid or expired. This token is not issued by the service.
+  /// token is invalid or expired.
   ///
   /// Parameter [scope] :
   /// The list of scopes that is defined by the client. Upon authorization, this
@@ -154,9 +192,9 @@ class SSOOIDC {
     return CreateTokenResponse.fromJson(response);
   }
 
-  /// Registers a client with AWS SSO. This allows clients to initiate device
-  /// authorization. The output should be persisted for reuse through many
-  /// authentication requests.
+  /// Registers a client with Amazon Web Services SSO. This allows clients to
+  /// initiate device authorization. The output should be persisted for reuse
+  /// through many authentication requests.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [InvalidScopeException].
@@ -205,8 +243,8 @@ class SSOOIDC {
   /// May throw [InternalServerException].
   ///
   /// Parameter [clientId] :
-  /// The unique identifier string for the client that is registered with AWS
-  /// SSO. This value should come from the persisted result of the
+  /// The unique identifier string for the client that is registered with Amazon
+  /// Web Services SSO. This value should come from the persisted result of the
   /// <a>RegisterClient</a> API operation.
   ///
   /// Parameter [clientSecret] :
@@ -214,9 +252,10 @@ class SSOOIDC {
   /// from the persisted result of the <a>RegisterClient</a> API operation.
   ///
   /// Parameter [startUrl] :
-  /// The URL for the AWS SSO user portal. For more information, see <a
+  /// The URL for the AWS access portal. For more information, see <a
   /// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/using-the-portal.html">Using
-  /// the User Portal</a> in the <i>AWS Single Sign-On User Guide</i>.
+  /// the AWS access portal</a> in the <i>Amazon Web Services SSO User
+  /// Guide</i>.
   Future<StartDeviceAuthorizationResponse> startDeviceAuthorization({
     required String clientId,
     required String clientSecret,
@@ -242,16 +281,31 @@ class SSOOIDC {
 }
 
 class CreateTokenResponse {
-  /// An opaque token to access AWS SSO resources assigned to a user.
+  /// An opaque token to access Amazon Web Services SSO resources assigned to a
+  /// user.
   final String? accessToken;
 
   /// Indicates the time in seconds when an access token will expire.
   final int? expiresIn;
 
+  /// Currently, <code>idToken</code> is not yet implemented and is not supported.
+  /// For more information about the features and limitations of the current
+  /// Amazon Web Services SSO OIDC implementation, see <i>Considerations for Using
+  /// this Guide</i> in the <a
+  /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html">Amazon
+  /// Web Services SSO OIDC API Reference</a>.
+  ///
   /// The identifier of the user that associated with the access token, if
   /// present.
   final String? idToken;
 
+  /// Currently, <code>refreshToken</code> is not yet implemented and is not
+  /// supported. For more information about the features and limitations of the
+  /// current Amazon Web Services SSO OIDC implementation, see <i>Considerations
+  /// for Using this Guide</i> in the <a
+  /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/Welcome.html">Amazon
+  /// Web Services SSO OIDC API Reference</a>.
+  ///
   /// A token that, if present, can be used to refresh a previously issued access
   /// token that might have expired.
   final String? refreshToken;

@@ -582,6 +582,8 @@ class DeviceFarm {
   /// Creates a Selenium testing project. Projects are used to track
   /// <a>TestGridSession</a> instances.
   ///
+  /// May throw [ArgumentException].
+  /// May throw [LimitExceededException].
   /// May throw [InternalServiceException].
   ///
   /// Parameter [name] :
@@ -589,9 +591,13 @@ class DeviceFarm {
   ///
   /// Parameter [description] :
   /// Human-readable description of the project.
+  ///
+  /// Parameter [vpcConfig] :
+  /// The VPC security groups and subnets that are attached to a project.
   Future<CreateTestGridProjectResult> createTestGridProject({
     required String name,
     String? description,
+    TestGridVpcConfig? vpcConfig,
   }) async {
     ArgumentError.checkNotNull(name, 'name');
     _s.validateStringLength(
@@ -620,6 +626,7 @@ class DeviceFarm {
       payload: {
         'name': name,
         if (description != null) 'description': description,
+        if (vpcConfig != null) 'vpcConfig': vpcConfig,
       },
     );
 
@@ -3608,22 +3615,25 @@ class DeviceFarm {
   /// Parameter [offeringId] :
   /// The ID of the offering.
   ///
-  /// Parameter [offeringPromotionId] :
-  /// The ID of the offering promotion to be applied to the purchase.
-  ///
   /// Parameter [quantity] :
   /// The number of device slots to purchase in an offering request.
+  ///
+  /// Parameter [offeringPromotionId] :
+  /// The ID of the offering promotion to be applied to the purchase.
   Future<PurchaseOfferingResult> purchaseOffering({
-    String? offeringId,
+    required String offeringId,
+    required int quantity,
     String? offeringPromotionId,
-    int? quantity,
   }) async {
+    ArgumentError.checkNotNull(offeringId, 'offeringId');
     _s.validateStringLength(
       'offeringId',
       offeringId,
       32,
       1152921504606846976,
+      isRequired: true,
     );
+    ArgumentError.checkNotNull(quantity, 'quantity');
     _s.validateStringLength(
       'offeringPromotionId',
       offeringPromotionId,
@@ -3641,10 +3651,10 @@ class DeviceFarm {
       // TODO queryParams
       headers: headers,
       payload: {
-        if (offeringId != null) 'offeringId': offeringId,
+        'offeringId': offeringId,
+        'quantity': quantity,
         if (offeringPromotionId != null)
           'offeringPromotionId': offeringPromotionId,
-        if (quantity != null) 'quantity': quantity,
       },
     );
 
@@ -3669,15 +3679,18 @@ class DeviceFarm {
   /// Parameter [quantity] :
   /// The quantity requested in an offering renewal.
   Future<RenewOfferingResult> renewOffering({
-    String? offeringId,
-    int? quantity,
+    required String offeringId,
+    required int quantity,
   }) async {
+    ArgumentError.checkNotNull(offeringId, 'offeringId');
     _s.validateStringLength(
       'offeringId',
       offeringId,
       32,
       1152921504606846976,
+      isRequired: true,
     );
+    ArgumentError.checkNotNull(quantity, 'quantity');
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'DeviceFarm_20150623.RenewOffering'
@@ -3689,8 +3702,8 @@ class DeviceFarm {
       // TODO queryParams
       headers: headers,
       payload: {
-        if (offeringId != null) 'offeringId': offeringId,
-        if (quantity != null) 'quantity': quantity,
+        'offeringId': offeringId,
+        'quantity': quantity,
       },
     );
 
@@ -4447,6 +4460,7 @@ class DeviceFarm {
   ///
   /// May throw [NotFoundException].
   /// May throw [ArgumentException].
+  /// May throw [LimitExceededException].
   /// May throw [InternalServiceException].
   ///
   /// Parameter [projectArn] :
@@ -4457,10 +4471,14 @@ class DeviceFarm {
   ///
   /// Parameter [name] :
   /// Human-readable name for the project.
+  ///
+  /// Parameter [vpcConfig] :
+  /// The VPC security groups and subnets that are attached to a project.
   Future<UpdateTestGridProjectResult> updateTestGridProject({
     required String projectArn,
     String? description,
     String? name,
+    TestGridVpcConfig? vpcConfig,
   }) async {
     ArgumentError.checkNotNull(projectArn, 'projectArn');
     _s.validateStringLength(
@@ -4496,6 +4514,7 @@ class DeviceFarm {
         'projectArn': projectArn,
         if (description != null) 'description': description,
         if (name != null) 'name': name,
+        if (vpcConfig != null) 'vpcConfig': vpcConfig,
       },
     );
 
@@ -5829,11 +5848,11 @@ class DeviceFilter {
   ///
   /// Supported operators: <code>EQUALS</code>
   /// </dd> </dl>
-  final DeviceFilterAttribute? attribute;
+  final DeviceFilterAttribute attribute;
 
   /// Specifies how Device Farm compares the filter's attribute to the value. See
   /// the attribute descriptions.
-  final RuleOperator? operator;
+  final RuleOperator operator;
 
   /// An array of one or more filter values used in a device filter.
   /// <p class="title"> <b>Operator Values</b>
@@ -5863,19 +5882,19 @@ class DeviceFilter {
   /// The FLEET_TYPE attribute can be set to PUBLIC or PRIVATE.
   /// </li>
   /// </ul>
-  final List<String>? values;
+  final List<String> values;
 
   DeviceFilter({
-    this.attribute,
-    this.operator,
-    this.values,
+    required this.attribute,
+    required this.operator,
+    required this.values,
   });
   factory DeviceFilter.fromJson(Map<String, dynamic> json) {
     return DeviceFilter(
-      attribute: (json['attribute'] as String?)?.toDeviceFilterAttribute(),
-      operator: (json['operator'] as String?)?.toRuleOperator(),
-      values: (json['values'] as List?)
-          ?.whereNotNull()
+      attribute: (json['attribute'] as String).toDeviceFilterAttribute(),
+      operator: (json['operator'] as String).toRuleOperator(),
+      values: (json['values'] as List)
+          .whereNotNull()
           .map((e) => e as String)
           .toList(),
     );
@@ -5886,9 +5905,9 @@ class DeviceFilter {
     final operator = this.operator;
     final values = this.values;
     return {
-      if (attribute != null) 'attribute': attribute.toValue(),
-      if (operator != null) 'operator': operator.toValue(),
-      if (values != null) 'values': values,
+      'attribute': attribute.toValue(),
+      'operator': operator.toValue(),
+      'values': values,
     };
   }
 }
@@ -10271,11 +10290,15 @@ class TestGridProject {
   /// A human-readable name for the project.
   final String? name;
 
+  /// The VPC security groups and subnets that are attached to a project.
+  final TestGridVpcConfig? vpcConfig;
+
   TestGridProject({
     this.arn,
     this.created,
     this.description,
     this.name,
+    this.vpcConfig,
   });
   factory TestGridProject.fromJson(Map<String, dynamic> json) {
     return TestGridProject(
@@ -10283,6 +10306,10 @@ class TestGridProject {
       created: timeStampFromJson(json['created']),
       description: json['description'] as String?,
       name: json['name'] as String?,
+      vpcConfig: json['vpcConfig'] != null
+          ? TestGridVpcConfig.fromJson(
+              json['vpcConfig'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -10485,6 +10512,48 @@ extension on String {
         return TestGridSessionStatus.errored;
     }
     throw Exception('$this is not known in enum TestGridSessionStatus');
+  }
+}
+
+/// The VPC security groups and subnets that are attached to a project.
+class TestGridVpcConfig {
+  /// A list of VPC security group IDs in your Amazon VPC.
+  final List<String> securityGroupIds;
+
+  /// A list of VPC subnet IDs in your Amazon VPC.
+  final List<String> subnetIds;
+
+  /// The ID of the Amazon VPC.
+  final String vpcId;
+
+  TestGridVpcConfig({
+    required this.securityGroupIds,
+    required this.subnetIds,
+    required this.vpcId,
+  });
+  factory TestGridVpcConfig.fromJson(Map<String, dynamic> json) {
+    return TestGridVpcConfig(
+      securityGroupIds: (json['securityGroupIds'] as List)
+          .whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      subnetIds: (json['subnetIds'] as List)
+          .whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      vpcId: json['vpcId'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final securityGroupIds = this.securityGroupIds;
+    final subnetIds = this.subnetIds;
+    final vpcId = this.vpcId;
+    return {
+      'securityGroupIds': securityGroupIds,
+      'subnetIds': subnetIds,
+      'vpcId': vpcId,
+    };
   }
 }
 

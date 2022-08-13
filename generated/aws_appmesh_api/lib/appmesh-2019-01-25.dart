@@ -18,14 +18,15 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS App Mesh is a service mesh based on the Envoy proxy that makes it easy
-/// to monitor and control microservices. App Mesh standardizes how your
+/// App Mesh is a service mesh based on the Envoy proxy that makes it easy to
+/// monitor and control microservices. App Mesh standardizes how your
 /// microservices communicate, giving you end-to-end visibility and helping to
 /// ensure high availability for your applications.
 ///
 /// App Mesh gives you consistent visibility and network traffic controls for
-/// every microservice in an application. You can use App Mesh with AWS Fargate,
-/// Amazon ECS, Amazon EKS, Kubernetes on AWS, and Amazon EC2.
+/// every microservice in an application. You can use App Mesh with Amazon Web
+/// Services Fargate, Amazon ECS, Amazon EKS, Kubernetes on Amazon Web Services,
+/// and Amazon EC2.
 /// <note>
 /// App Mesh supports microservice applications that use service discovery
 /// naming for their components. For more information about service discovery on
@@ -105,10 +106,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then the account that you specify must share the mesh with your
-  /// account before you can create the resource in the service mesh. For more
-  /// information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then the account that you specify must share
+  /// the mesh with your account before you can create the resource in the
+  /// service mesh. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -288,10 +289,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then the account that you specify must share the mesh with your
-  /// account before you can create the resource in the service mesh. For more
-  /// information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then the account that you specify must share
+  /// the mesh with your account before you can create the resource in the
+  /// service mesh. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -401,10 +402,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then the account that you specify must share the mesh with your
-  /// account before you can create the resource in the service mesh. For more
-  /// information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then the account that you specify must share
+  /// the mesh with your account before you can create the resource in the
+  /// service mesh. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -494,16 +495,14 @@ class AppMesh {
   /// metrics and traces. You can override this behavior by setting the
   /// <code>APPMESH_RESOURCE_CLUSTER</code> environment variable with your own
   /// name.
-  ///
-  /// AWS Cloud Map is not available in the eu-south-1 Region.
   /// </note>
   /// For more information about virtual nodes, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/virtual_nodes.html">Virtual
   /// nodes</a>. You must be using <code>1.15.0</code> or later of the Envoy
-  /// image when setting these variables. For more information about App Mesh
+  /// image when setting these variables. For more information aboutApp Mesh
   /// Envoy variables, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/envoy.html">Envoy
-  /// image</a> in the AWS App Mesh User Guide.
+  /// image</a> in the App Mesh User Guide.
   ///
   /// May throw [NotFoundException].
   /// May throw [BadRequestException].
@@ -529,10 +528,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then the account that you specify must share the mesh with your
-  /// account before you can create the resource in the service mesh. For more
-  /// information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then the account that you specify must share
+  /// the mesh with your account before you can create the resource in the
+  /// service mesh. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -633,10 +632,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then the account that you specify must share the mesh with your
-  /// account before you can create the resource in the service mesh. For more
-  /// information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then the account that you specify must share
+  /// the mesh with your account before you can create the resource in the
+  /// service mesh. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -737,10 +736,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then the account that you specify must share the mesh with your
-  /// account before you can create the resource in the service mesh. For more
-  /// information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then the account that you specify must share
+  /// the mesh with your account before you can create the resource in the
+  /// service mesh. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -817,9 +816,10 @@ class AppMesh {
   /// The name of the virtual gateway to delete the route from.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DeleteGatewayRouteOutput> deleteGatewayRoute({
@@ -934,9 +934,10 @@ class AppMesh {
   /// The name of the virtual router to delete the route in.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DeleteRouteOutput> deleteRoute({
@@ -1010,9 +1011,10 @@ class AppMesh {
   /// The name of the virtual gateway to delete.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DeleteVirtualGatewayOutput> deleteVirtualGateway({
@@ -1079,9 +1081,10 @@ class AppMesh {
   /// The name of the virtual node to delete.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DeleteVirtualNodeOutput> deleteVirtualNode({
@@ -1148,9 +1151,10 @@ class AppMesh {
   /// The name of the virtual router to delete.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DeleteVirtualRouterOutput> deleteVirtualRouter({
@@ -1214,9 +1218,10 @@ class AppMesh {
   /// The name of the virtual service to delete.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DeleteVirtualServiceOutput> deleteVirtualService({
@@ -1275,9 +1280,10 @@ class AppMesh {
   /// The name of the virtual gateway that the gateway route is associated with.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeGatewayRouteOutput> describeGatewayRoute({
@@ -1346,9 +1352,10 @@ class AppMesh {
   /// The name of the service mesh to describe.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeMeshOutput> describeMesh({
@@ -1404,9 +1411,10 @@ class AppMesh {
   /// The name of the virtual router that the route is associated with.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeRouteOutput> describeRoute({
@@ -1478,9 +1486,10 @@ class AppMesh {
   /// The name of the virtual gateway to describe.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeVirtualGatewayOutput> describeVirtualGateway({
@@ -1543,9 +1552,10 @@ class AppMesh {
   /// The name of the virtual node to describe.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeVirtualNodeOutput> describeVirtualNode({
@@ -1608,9 +1618,10 @@ class AppMesh {
   /// The name of the virtual router to describe.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeVirtualRouterOutput> describeVirtualRouter({
@@ -1673,9 +1684,10 @@ class AppMesh {
   /// The name of the virtual service to describe.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<DescribeVirtualServiceOutput> describeVirtualService({
@@ -1743,9 +1755,10 @@ class AppMesh {
   /// results and a <code>nextToken</code> value if applicable.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -1887,9 +1900,10 @@ class AppMesh {
   /// applicable.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -2031,9 +2045,10 @@ class AppMesh {
   /// 100 results and a <code>nextToken</code> value if applicable.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -2109,9 +2124,10 @@ class AppMesh {
   /// results and a <code>nextToken</code> value if applicable.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -2187,9 +2203,10 @@ class AppMesh {
   /// 100 results and a <code>nextToken</code> value if applicable.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -2265,9 +2282,10 @@ class AppMesh {
   /// 100 results and a <code>nextToken</code> value if applicable.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   ///
@@ -2426,9 +2444,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<UpdateGatewayRouteOutput> updateGatewayRoute({
@@ -2569,9 +2588,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<UpdateRouteOutput> updateRoute({
@@ -2661,9 +2681,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<UpdateVirtualGatewayOutput> updateVirtualGateway({
@@ -2744,9 +2765,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<UpdateVirtualNodeOutput> updateVirtualNode({
@@ -2827,9 +2849,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<UpdateVirtualRouterOutput> updateVirtualRouter({
@@ -2910,9 +2933,10 @@ class AppMesh {
   /// underscores are allowed.
   ///
   /// Parameter [meshOwner] :
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared
+  /// the mesh with your account. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   Future<UpdateVirtualServiceOutput> updateVirtualService({
@@ -2984,18 +3008,18 @@ class AccessLog {
   }
 }
 
-/// An object that represents the AWS Cloud Map attribute information for your
+/// An object that represents the Cloud Map attribute information for your
 /// virtual node.
 /// <note>
-/// AWS Cloud Map is not available in the eu-south-1 Region.
+/// Cloud Map is not available in the eu-south-1 Region.
 /// </note>
 class AwsCloudMapInstanceAttribute {
-  /// The name of an AWS Cloud Map service instance attribute key. Any AWS Cloud
-  /// Map service instance that contains the specified key and value is returned.
+  /// The name of an Cloud Map service instance attribute key. Any Cloud Map
+  /// service instance that contains the specified key and value is returned.
   final String key;
 
-  /// The value of an AWS Cloud Map service instance attribute key. Any AWS Cloud
-  /// Map service instance that contains the specified key and value is returned.
+  /// The value of an Cloud Map service instance attribute key. Any Cloud Map
+  /// service instance that contains the specified key and value is returned.
   final String value;
 
   AwsCloudMapInstanceAttribute({
@@ -3019,16 +3043,16 @@ class AwsCloudMapInstanceAttribute {
   }
 }
 
-/// An object that represents the AWS Cloud Map service discovery information
-/// for your virtual node.
+/// An object that represents the Cloud Map service discovery information for
+/// your virtual node.
 /// <note>
-/// AWS Cloud Map is not available in the eu-south-1 Region.
+/// Cloud Map is not available in the eu-south-1 Region.
 /// </note>
 class AwsCloudMapServiceDiscovery {
-  /// The name of the AWS Cloud Map namespace to use.
+  /// The name of the Cloud Map namespace to use.
   final String namespaceName;
 
-  /// The name of the AWS Cloud Map service to use.
+  /// The name of the Cloud Map service to use.
   final String serviceName;
 
   /// A string map that contains attributes with values that you can use to filter
@@ -3037,10 +3061,14 @@ class AwsCloudMapServiceDiscovery {
   /// will be returned.
   final List<AwsCloudMapInstanceAttribute>? attributes;
 
+  /// The IP version to use to control traffic within the mesh.
+  final IpPreference? ipPreference;
+
   AwsCloudMapServiceDiscovery({
     required this.namespaceName,
     required this.serviceName,
     this.attributes,
+    this.ipPreference,
   });
   factory AwsCloudMapServiceDiscovery.fromJson(Map<String, dynamic> json) {
     return AwsCloudMapServiceDiscovery(
@@ -3051,6 +3079,7 @@ class AwsCloudMapServiceDiscovery {
           .map((e) =>
               AwsCloudMapInstanceAttribute.fromJson(e as Map<String, dynamic>))
           .toList(),
+      ipPreference: (json['ipPreference'] as String?)?.toIpPreference(),
     );
   }
 
@@ -3058,10 +3087,12 @@ class AwsCloudMapServiceDiscovery {
     final namespaceName = this.namespaceName;
     final serviceName = this.serviceName;
     final attributes = this.attributes;
+    final ipPreference = this.ipPreference;
     return {
       'namespaceName': namespaceName,
       'serviceName': serviceName,
       if (attributes != null) 'attributes': attributes,
+      if (ipPreference != null) 'ipPreference': ipPreference.toValue(),
     };
   }
 }
@@ -3147,6 +3178,9 @@ class ClientPolicyTls {
   /// A reference to an object that represents a TLS validation context.
   final TlsValidationContext validation;
 
+  /// A reference to an object that represents a client's TLS certificate.
+  final ClientTlsCertificate? certificate;
+
   /// Whether the policy is enforced. The default is <code>True</code>, if a value
   /// isn't specified.
   final bool? enforce;
@@ -3156,6 +3190,7 @@ class ClientPolicyTls {
 
   ClientPolicyTls({
     required this.validation,
+    this.certificate,
     this.enforce,
     this.ports,
   });
@@ -3163,6 +3198,10 @@ class ClientPolicyTls {
     return ClientPolicyTls(
       validation: TlsValidationContext.fromJson(
           json['validation'] as Map<String, dynamic>),
+      certificate: json['certificate'] != null
+          ? ClientTlsCertificate.fromJson(
+              json['certificate'] as Map<String, dynamic>)
+          : null,
       enforce: json['enforce'] as bool?,
       ports: (json['ports'] as List?)
           ?.whereNotNull()
@@ -3173,12 +3212,54 @@ class ClientPolicyTls {
 
   Map<String, dynamic> toJson() {
     final validation = this.validation;
+    final certificate = this.certificate;
     final enforce = this.enforce;
     final ports = this.ports;
     return {
       'validation': validation,
+      if (certificate != null) 'certificate': certificate,
       if (enforce != null) 'enforce': enforce,
       if (ports != null) 'ports': ports,
+    };
+  }
+}
+
+/// An object that represents the client's certificate.
+class ClientTlsCertificate {
+  /// An object that represents a local file certificate. The certificate must
+  /// meet specific requirements and you must have proxy authorization enabled.
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html">Transport
+  /// Layer Security (TLS)</a>.
+  final ListenerTlsFileCertificate? file;
+
+  /// A reference to an object that represents a client's TLS Secret Discovery
+  /// Service certificate.
+  final ListenerTlsSdsCertificate? sds;
+
+  ClientTlsCertificate({
+    this.file,
+    this.sds,
+  });
+  factory ClientTlsCertificate.fromJson(Map<String, dynamic> json) {
+    return ClientTlsCertificate(
+      file: json['file'] != null
+          ? ListenerTlsFileCertificate.fromJson(
+              json['file'] as Map<String, dynamic>)
+          : null,
+      sds: json['sds'] != null
+          ? ListenerTlsSdsCertificate.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final file = this.file;
+    final sds = this.sds;
+    return {
+      if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
     };
   }
 }
@@ -3249,6 +3330,34 @@ class CreateVirtualServiceOutput {
   CreateVirtualServiceOutput({
     required this.virtualService,
   });
+}
+
+enum DefaultGatewayRouteRewrite {
+  enabled,
+  disabled,
+}
+
+extension on DefaultGatewayRouteRewrite {
+  String toValue() {
+    switch (this) {
+      case DefaultGatewayRouteRewrite.enabled:
+        return 'ENABLED';
+      case DefaultGatewayRouteRewrite.disabled:
+        return 'DISABLED';
+    }
+  }
+}
+
+extension on String {
+  DefaultGatewayRouteRewrite toDefaultGatewayRouteRewrite() {
+    switch (this) {
+      case 'ENABLED':
+        return DefaultGatewayRouteRewrite.enabled;
+      case 'DISABLED':
+        return DefaultGatewayRouteRewrite.disabled;
+    }
+    throw Exception('$this is not known in enum DefaultGatewayRouteRewrite');
+  }
 }
 
 class DeleteGatewayRouteOutput {
@@ -3387,25 +3496,67 @@ class DescribeVirtualServiceOutput {
   });
 }
 
+enum DnsResponseType {
+  loadbalancer,
+  endpoints,
+}
+
+extension on DnsResponseType {
+  String toValue() {
+    switch (this) {
+      case DnsResponseType.loadbalancer:
+        return 'LOADBALANCER';
+      case DnsResponseType.endpoints:
+        return 'ENDPOINTS';
+    }
+  }
+}
+
+extension on String {
+  DnsResponseType toDnsResponseType() {
+    switch (this) {
+      case 'LOADBALANCER':
+        return DnsResponseType.loadbalancer;
+      case 'ENDPOINTS':
+        return DnsResponseType.endpoints;
+    }
+    throw Exception('$this is not known in enum DnsResponseType');
+  }
+}
+
 /// An object that represents the DNS service discovery information for your
 /// virtual node.
 class DnsServiceDiscovery {
   /// Specifies the DNS service discovery hostname for the virtual node.
   final String hostname;
 
+  /// The IP version to use to control traffic within the mesh.
+  final IpPreference? ipPreference;
+
+  /// Specifies the DNS response type for the virtual node.
+  final DnsResponseType? responseType;
+
   DnsServiceDiscovery({
     required this.hostname,
+    this.ipPreference,
+    this.responseType,
   });
   factory DnsServiceDiscovery.fromJson(Map<String, dynamic> json) {
     return DnsServiceDiscovery(
       hostname: json['hostname'] as String,
+      ipPreference: (json['ipPreference'] as String?)?.toIpPreference(),
+      responseType: (json['responseType'] as String?)?.toDnsResponseType(),
     );
   }
 
   Map<String, dynamic> toJson() {
     final hostname = this.hostname;
+    final ipPreference = this.ipPreference;
+    final responseType = this.responseType;
     return {
       'hostname': hostname,
+      if (ipPreference != null) 'ipPreference': ipPreference.toValue(),
+      if (responseType != null) 'responseType': responseType.toValue(),
     };
   }
 }
@@ -3471,9 +3622,10 @@ extension on String {
 class EgressFilter {
   /// The egress filter type. By default, the type is <code>DROP_ALL</code>, which
   /// allows egress only from virtual nodes to other defined resources in the
-  /// service mesh (and any traffic to <code>*.amazonaws.com</code> for AWS API
-  /// calls). You can set the egress filter type to <code>ALLOW_ALL</code> to
-  /// allow egress to any endpoint inside or outside of the service mesh.
+  /// service mesh (and any traffic to <code>*.amazonaws.com</code> for Amazon Web
+  /// Services API calls). You can set the egress filter type to
+  /// <code>ALLOW_ALL</code> to allow egress to any endpoint inside or outside of
+  /// the service mesh.
   final EgressFilterType type;
 
   EgressFilter({
@@ -3528,10 +3680,9 @@ class FileAccessLog {
   /// use a log driver, such as <code>awslogs</code>, to export the access logs to
   /// a log storage service such as Amazon CloudWatch Logs. You can also specify a
   /// path in the Envoy container's file system to write the files to disk.
-  /// <note>
-  /// The Envoy process must have write permissions to the path that you specify
-  /// here. Otherwise, Envoy fails to bootstrap properly.
-  /// </note>
+  /// <pre><code> &lt;note&gt; &lt;p&gt;The Envoy process must have write
+  /// permissions to the path that you specify here. Otherwise, Envoy fails to
+  /// bootstrap properly.&lt;/p&gt; &lt;/note&gt; </code></pre>
   final String path;
 
   FileAccessLog({
@@ -3591,6 +3742,59 @@ class GatewayRouteData {
   }
 }
 
+/// An object representing the gateway route host name to match.
+class GatewayRouteHostnameMatch {
+  /// The exact host name to match on.
+  final String? exact;
+
+  /// The specified ending characters of the host name to match on.
+  final String? suffix;
+
+  GatewayRouteHostnameMatch({
+    this.exact,
+    this.suffix,
+  });
+  factory GatewayRouteHostnameMatch.fromJson(Map<String, dynamic> json) {
+    return GatewayRouteHostnameMatch(
+      exact: json['exact'] as String?,
+      suffix: json['suffix'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exact = this.exact;
+    final suffix = this.suffix;
+    return {
+      if (exact != null) 'exact': exact,
+      if (suffix != null) 'suffix': suffix,
+    };
+  }
+}
+
+/// An object representing the gateway route host name to rewrite.
+class GatewayRouteHostnameRewrite {
+  /// The default target host name to write to.
+  final DefaultGatewayRouteRewrite? defaultTargetHostname;
+
+  GatewayRouteHostnameRewrite({
+    this.defaultTargetHostname,
+  });
+  factory GatewayRouteHostnameRewrite.fromJson(Map<String, dynamic> json) {
+    return GatewayRouteHostnameRewrite(
+      defaultTargetHostname: (json['defaultTargetHostname'] as String?)
+          ?.toDefaultGatewayRouteRewrite(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final defaultTargetHostname = this.defaultTargetHostname;
+    return {
+      if (defaultTargetHostname != null)
+        'defaultTargetHostname': defaultTargetHostname.toValue(),
+    };
+  }
+}
+
 /// An object that represents a gateway route returned by a list operation.
 class GatewayRouteRef {
   /// The full Amazon Resource Name (ARN) for the gateway route.
@@ -3608,16 +3812,17 @@ class GatewayRouteRef {
   /// The name of the service mesh that the resource resides in.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -3668,10 +3873,14 @@ class GatewayRouteSpec {
   /// An object that represents the specification of an HTTP gateway route.
   final HttpGatewayRoute? httpRoute;
 
+  /// The ordering of the gateway routes spec.
+  final int? priority;
+
   GatewayRouteSpec({
     this.grpcRoute,
     this.http2Route,
     this.httpRoute,
+    this.priority,
   });
   factory GatewayRouteSpec.fromJson(Map<String, dynamic> json) {
     return GatewayRouteSpec(
@@ -3685,6 +3894,7 @@ class GatewayRouteSpec {
       httpRoute: json['httpRoute'] != null
           ? HttpGatewayRoute.fromJson(json['httpRoute'] as Map<String, dynamic>)
           : null,
+      priority: json['priority'] as int?,
     );
   }
 
@@ -3692,10 +3902,12 @@ class GatewayRouteSpec {
     final grpcRoute = this.grpcRoute;
     final http2Route = this.http2Route;
     final httpRoute = this.httpRoute;
+    final priority = this.priority;
     return {
       if (grpcRoute != null) 'grpcRoute': grpcRoute,
       if (http2Route != null) 'http2Route': http2Route,
       if (httpRoute != null) 'httpRoute': httpRoute,
+      if (priority != null) 'priority': priority,
     };
   }
 }
@@ -3830,49 +4042,200 @@ class GrpcGatewayRouteAction {
   /// request matches the gateway route.
   final GatewayRouteTarget target;
 
+  /// The gateway route action to rewrite.
+  final GrpcGatewayRouteRewrite? rewrite;
+
   GrpcGatewayRouteAction({
     required this.target,
+    this.rewrite,
   });
   factory GrpcGatewayRouteAction.fromJson(Map<String, dynamic> json) {
     return GrpcGatewayRouteAction(
       target:
           GatewayRouteTarget.fromJson(json['target'] as Map<String, dynamic>),
+      rewrite: json['rewrite'] != null
+          ? GrpcGatewayRouteRewrite.fromJson(
+              json['rewrite'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final target = this.target;
+    final rewrite = this.rewrite;
     return {
       'target': target,
+      if (rewrite != null) 'rewrite': rewrite,
     };
   }
 }
 
 /// An object that represents the criteria for determining a request match.
 class GrpcGatewayRouteMatch {
+  /// The gateway route host name to be matched on.
+  final GatewayRouteHostnameMatch? hostname;
+
+  /// The gateway route metadata to be matched on.
+  final List<GrpcGatewayRouteMetadata>? metadata;
+
   /// The fully qualified domain name for the service to match from the request.
   final String? serviceName;
 
   GrpcGatewayRouteMatch({
+    this.hostname,
+    this.metadata,
     this.serviceName,
   });
   factory GrpcGatewayRouteMatch.fromJson(Map<String, dynamic> json) {
     return GrpcGatewayRouteMatch(
+      hostname: json['hostname'] != null
+          ? GatewayRouteHostnameMatch.fromJson(
+              json['hostname'] as Map<String, dynamic>)
+          : null,
+      metadata: (json['metadata'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              GrpcGatewayRouteMetadata.fromJson(e as Map<String, dynamic>))
+          .toList(),
       serviceName: json['serviceName'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final hostname = this.hostname;
+    final metadata = this.metadata;
     final serviceName = this.serviceName;
     return {
+      if (hostname != null) 'hostname': hostname,
+      if (metadata != null) 'metadata': metadata,
       if (serviceName != null) 'serviceName': serviceName,
+    };
+  }
+}
+
+/// An object representing the metadata of the gateway route.
+class GrpcGatewayRouteMetadata {
+  /// A name for the gateway route metadata.
+  final String name;
+
+  /// Specify <code>True</code> to match anything except the match criteria. The
+  /// default value is <code>False</code>.
+  final bool? invert;
+
+  /// The criteria for determining a metadata match.
+  final GrpcMetadataMatchMethod? match;
+
+  GrpcGatewayRouteMetadata({
+    required this.name,
+    this.invert,
+    this.match,
+  });
+  factory GrpcGatewayRouteMetadata.fromJson(Map<String, dynamic> json) {
+    return GrpcGatewayRouteMetadata(
+      name: json['name'] as String,
+      invert: json['invert'] as bool?,
+      match: json['match'] != null
+          ? GrpcMetadataMatchMethod.fromJson(
+              json['match'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final invert = this.invert;
+    final match = this.match;
+    return {
+      'name': name,
+      if (invert != null) 'invert': invert,
+      if (match != null) 'match': match,
+    };
+  }
+}
+
+/// An object that represents the gateway route to rewrite.
+class GrpcGatewayRouteRewrite {
+  /// The host name of the gateway route to rewrite.
+  final GatewayRouteHostnameRewrite? hostname;
+
+  GrpcGatewayRouteRewrite({
+    this.hostname,
+  });
+  factory GrpcGatewayRouteRewrite.fromJson(Map<String, dynamic> json) {
+    return GrpcGatewayRouteRewrite(
+      hostname: json['hostname'] != null
+          ? GatewayRouteHostnameRewrite.fromJson(
+              json['hostname'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final hostname = this.hostname;
+    return {
+      if (hostname != null) 'hostname': hostname,
+    };
+  }
+}
+
+/// An object representing the method header to be matched.
+class GrpcMetadataMatchMethod {
+  /// The exact method header to be matched on.
+  final String? exact;
+
+  /// The specified beginning characters of the method header to be matched on.
+  final String? prefix;
+  final MatchRange? range;
+
+  /// The regex used to match the method header.
+  final String? regex;
+
+  /// The specified ending characters of the method header to match on.
+  final String? suffix;
+
+  GrpcMetadataMatchMethod({
+    this.exact,
+    this.prefix,
+    this.range,
+    this.regex,
+    this.suffix,
+  });
+  factory GrpcMetadataMatchMethod.fromJson(Map<String, dynamic> json) {
+    return GrpcMetadataMatchMethod(
+      exact: json['exact'] as String?,
+      prefix: json['prefix'] as String?,
+      range: json['range'] != null
+          ? MatchRange.fromJson(json['range'] as Map<String, dynamic>)
+          : null,
+      regex: json['regex'] as String?,
+      suffix: json['suffix'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exact = this.exact;
+    final prefix = this.prefix;
+    final range = this.range;
+    final regex = this.regex;
+    final suffix = this.suffix;
+    return {
+      if (exact != null) 'exact': exact,
+      if (prefix != null) 'prefix': prefix,
+      if (range != null) 'range': range,
+      if (regex != null) 'regex': regex,
+      if (suffix != null) 'suffix': suffix,
     };
   }
 }
 
 /// An object that represents a retry policy. Specify at least one value for at
 /// least one of the types of <code>RetryEvents</code>, a value for
-/// <code>maxRetries</code>, and a value for <code>perRetryTimeout</code>.
+/// <code>maxRetries</code>, and a value for <code>perRetryTimeout</code>. Both
+/// <code>server-error</code> and <code>gateway-error</code> under
+/// <code>httpRetryEvents</code> include the Envoy <code>reset</code> policy.
+/// For more information on the <code>reset</code> policy, see the <a
+/// href="https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on">Envoy
+/// documentation</a>.
 class GrpcRetryPolicy {
   /// The maximum number of retry attempts.
   final int maxRetries;
@@ -4404,26 +4767,88 @@ class HttpGatewayRouteAction {
   /// request matches the gateway route.
   final GatewayRouteTarget target;
 
+  /// The gateway route action to rewrite.
+  final HttpGatewayRouteRewrite? rewrite;
+
   HttpGatewayRouteAction({
     required this.target,
+    this.rewrite,
   });
   factory HttpGatewayRouteAction.fromJson(Map<String, dynamic> json) {
     return HttpGatewayRouteAction(
       target:
           GatewayRouteTarget.fromJson(json['target'] as Map<String, dynamic>),
+      rewrite: json['rewrite'] != null
+          ? HttpGatewayRouteRewrite.fromJson(
+              json['rewrite'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final target = this.target;
+    final rewrite = this.rewrite;
     return {
       'target': target,
+      if (rewrite != null) 'rewrite': rewrite,
+    };
+  }
+}
+
+/// An object that represents the HTTP header in the gateway route.
+class HttpGatewayRouteHeader {
+  /// A name for the HTTP header in the gateway route that will be matched on.
+  final String name;
+
+  /// Specify <code>True</code> to match anything except the match criteria. The
+  /// default value is <code>False</code>.
+  final bool? invert;
+
+  /// An object that represents the method and value to match with the header
+  /// value sent in a request. Specify one match method.
+  final HeaderMatchMethod? match;
+
+  HttpGatewayRouteHeader({
+    required this.name,
+    this.invert,
+    this.match,
+  });
+  factory HttpGatewayRouteHeader.fromJson(Map<String, dynamic> json) {
+    return HttpGatewayRouteHeader(
+      name: json['name'] as String,
+      invert: json['invert'] as bool?,
+      match: json['match'] != null
+          ? HeaderMatchMethod.fromJson(json['match'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final invert = this.invert;
+    final match = this.match;
+    return {
+      'name': name,
+      if (invert != null) 'invert': invert,
+      if (match != null) 'match': match,
     };
   }
 }
 
 /// An object that represents the criteria for determining a request match.
 class HttpGatewayRouteMatch {
+  /// The client request headers to match on.
+  final List<HttpGatewayRouteHeader>? headers;
+
+  /// The host name to match on.
+  final GatewayRouteHostnameMatch? hostname;
+
+  /// The method to match on.
+  final HttpMethod? method;
+
+  /// The path to match on.
+  final HttpPathMatch? path;
+
   /// Specifies the path to match requests with. This parameter must always start
   /// with <code>/</code>, which by itself matches all requests to the virtual
   /// service name. You can also match for path-based routing of requests. For
@@ -4431,21 +4856,153 @@ class HttpGatewayRouteMatch {
   /// you want the route to match requests to
   /// <code>my-service.local/metrics</code>, your prefix should be
   /// <code>/metrics</code>.
-  final String prefix;
+  final String? prefix;
+
+  /// The query parameter to match on.
+  final List<HttpQueryParameter>? queryParameters;
 
   HttpGatewayRouteMatch({
-    required this.prefix,
+    this.headers,
+    this.hostname,
+    this.method,
+    this.path,
+    this.prefix,
+    this.queryParameters,
   });
   factory HttpGatewayRouteMatch.fromJson(Map<String, dynamic> json) {
     return HttpGatewayRouteMatch(
-      prefix: json['prefix'] as String,
+      headers: (json['headers'] as List?)
+          ?.whereNotNull()
+          .map(
+              (e) => HttpGatewayRouteHeader.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      hostname: json['hostname'] != null
+          ? GatewayRouteHostnameMatch.fromJson(
+              json['hostname'] as Map<String, dynamic>)
+          : null,
+      method: (json['method'] as String?)?.toHttpMethod(),
+      path: json['path'] != null
+          ? HttpPathMatch.fromJson(json['path'] as Map<String, dynamic>)
+          : null,
+      prefix: json['prefix'] as String?,
+      queryParameters: (json['queryParameters'] as List?)
+          ?.whereNotNull()
+          .map((e) => HttpQueryParameter.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
+    final headers = this.headers;
+    final hostname = this.hostname;
+    final method = this.method;
+    final path = this.path;
+    final prefix = this.prefix;
+    final queryParameters = this.queryParameters;
+    return {
+      if (headers != null) 'headers': headers,
+      if (hostname != null) 'hostname': hostname,
+      if (method != null) 'method': method.toValue(),
+      if (path != null) 'path': path,
+      if (prefix != null) 'prefix': prefix,
+      if (queryParameters != null) 'queryParameters': queryParameters,
+    };
+  }
+}
+
+/// An object that represents the path to rewrite.
+class HttpGatewayRoutePathRewrite {
+  /// The exact path to rewrite.
+  final String? exact;
+
+  HttpGatewayRoutePathRewrite({
+    this.exact,
+  });
+  factory HttpGatewayRoutePathRewrite.fromJson(Map<String, dynamic> json) {
+    return HttpGatewayRoutePathRewrite(
+      exact: json['exact'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exact = this.exact;
+    return {
+      if (exact != null) 'exact': exact,
+    };
+  }
+}
+
+/// An object representing the beginning characters of the route to rewrite.
+class HttpGatewayRoutePrefixRewrite {
+  /// The default prefix used to replace the incoming route prefix when rewritten.
+  final DefaultGatewayRouteRewrite? defaultPrefix;
+
+  /// The value used to replace the incoming route prefix when rewritten.
+  final String? value;
+
+  HttpGatewayRoutePrefixRewrite({
+    this.defaultPrefix,
+    this.value,
+  });
+  factory HttpGatewayRoutePrefixRewrite.fromJson(Map<String, dynamic> json) {
+    return HttpGatewayRoutePrefixRewrite(
+      defaultPrefix:
+          (json['defaultPrefix'] as String?)?.toDefaultGatewayRouteRewrite(),
+      value: json['value'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final defaultPrefix = this.defaultPrefix;
+    final value = this.value;
+    return {
+      if (defaultPrefix != null) 'defaultPrefix': defaultPrefix.toValue(),
+      if (value != null) 'value': value,
+    };
+  }
+}
+
+/// An object representing the gateway route to rewrite.
+class HttpGatewayRouteRewrite {
+  /// The host name to rewrite.
+  final GatewayRouteHostnameRewrite? hostname;
+
+  /// The path to rewrite.
+  final HttpGatewayRoutePathRewrite? path;
+
+  /// The specified beginning characters to rewrite.
+  final HttpGatewayRoutePrefixRewrite? prefix;
+
+  HttpGatewayRouteRewrite({
+    this.hostname,
+    this.path,
+    this.prefix,
+  });
+  factory HttpGatewayRouteRewrite.fromJson(Map<String, dynamic> json) {
+    return HttpGatewayRouteRewrite(
+      hostname: json['hostname'] != null
+          ? GatewayRouteHostnameRewrite.fromJson(
+              json['hostname'] as Map<String, dynamic>)
+          : null,
+      path: json['path'] != null
+          ? HttpGatewayRoutePathRewrite.fromJson(
+              json['path'] as Map<String, dynamic>)
+          : null,
+      prefix: json['prefix'] != null
+          ? HttpGatewayRoutePrefixRewrite.fromJson(
+              json['prefix'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final hostname = this.hostname;
+    final path = this.path;
     final prefix = this.prefix;
     return {
-      'prefix': prefix,
+      if (hostname != null) 'hostname': hostname,
+      if (path != null) 'path': path,
+      if (prefix != null) 'prefix': prefix,
     };
   }
 }
@@ -4513,9 +5070,74 @@ extension on String {
   }
 }
 
+/// An object representing the path to match in the request.
+class HttpPathMatch {
+  /// The exact path to match on.
+  final String? exact;
+
+  /// The regex used to match the path.
+  final String? regex;
+
+  HttpPathMatch({
+    this.exact,
+    this.regex,
+  });
+  factory HttpPathMatch.fromJson(Map<String, dynamic> json) {
+    return HttpPathMatch(
+      exact: json['exact'] as String?,
+      regex: json['regex'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exact = this.exact;
+    final regex = this.regex;
+    return {
+      if (exact != null) 'exact': exact,
+      if (regex != null) 'regex': regex,
+    };
+  }
+}
+
+/// An object that represents the query parameter in the request.
+class HttpQueryParameter {
+  /// A name for the query parameter that will be matched on.
+  final String name;
+
+  /// The query parameter to match on.
+  final QueryParameterMatch? match;
+
+  HttpQueryParameter({
+    required this.name,
+    this.match,
+  });
+  factory HttpQueryParameter.fromJson(Map<String, dynamic> json) {
+    return HttpQueryParameter(
+      name: json['name'] as String,
+      match: json['match'] != null
+          ? QueryParameterMatch.fromJson(json['match'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final match = this.match;
+    return {
+      'name': name,
+      if (match != null) 'match': match,
+    };
+  }
+}
+
 /// An object that represents a retry policy. Specify at least one value for at
 /// least one of the types of <code>RetryEvents</code>, a value for
-/// <code>maxRetries</code>, and a value for <code>perRetryTimeout</code>.
+/// <code>maxRetries</code>, and a value for <code>perRetryTimeout</code>. Both
+/// <code>server-error</code> and <code>gateway-error</code> under
+/// <code>httpRetryEvents</code> include the Envoy <code>reset</code> policy.
+/// For more information on the <code>reset</code> policy, see the <a
+/// href="https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on">Envoy
+/// documentation</a>.
 class HttpRetryPolicy {
   /// The maximum number of retry attempts.
   final int maxRetries;
@@ -4700,6 +5322,15 @@ class HttpRouteHeader {
 /// An object that represents the requirements for a route to match HTTP
 /// requests for a virtual router.
 class HttpRouteMatch {
+  /// The client request headers to match on.
+  final List<HttpRouteHeader>? headers;
+
+  /// The client request method to match on. Specify only one.
+  final HttpMethod? method;
+
+  /// The client request path to match on.
+  final HttpPathMatch? path;
+
   /// Specifies the path to match requests with. This parameter must always start
   /// with <code>/</code>, which by itself matches all requests to the virtual
   /// service name. You can also match for path-based routing of requests. For
@@ -4707,44 +5338,55 @@ class HttpRouteMatch {
   /// you want the route to match requests to
   /// <code>my-service.local/metrics</code>, your prefix should be
   /// <code>/metrics</code>.
-  final String prefix;
+  final String? prefix;
 
-  /// An object that represents the client request headers to match on.
-  final List<HttpRouteHeader>? headers;
+  /// The client request query parameters to match on.
+  final List<HttpQueryParameter>? queryParameters;
 
-  /// The client request method to match on. Specify only one.
-  final HttpMethod? method;
-
-  /// The client request scheme to match on. Specify only one.
+  /// The client request scheme to match on. Specify only one. Applicable only for
+  /// HTTP2 routes.
   final HttpScheme? scheme;
 
   HttpRouteMatch({
-    required this.prefix,
     this.headers,
     this.method,
+    this.path,
+    this.prefix,
+    this.queryParameters,
     this.scheme,
   });
   factory HttpRouteMatch.fromJson(Map<String, dynamic> json) {
     return HttpRouteMatch(
-      prefix: json['prefix'] as String,
       headers: (json['headers'] as List?)
           ?.whereNotNull()
           .map((e) => HttpRouteHeader.fromJson(e as Map<String, dynamic>))
           .toList(),
       method: (json['method'] as String?)?.toHttpMethod(),
+      path: json['path'] != null
+          ? HttpPathMatch.fromJson(json['path'] as Map<String, dynamic>)
+          : null,
+      prefix: json['prefix'] as String?,
+      queryParameters: (json['queryParameters'] as List?)
+          ?.whereNotNull()
+          .map((e) => HttpQueryParameter.fromJson(e as Map<String, dynamic>))
+          .toList(),
       scheme: (json['scheme'] as String?)?.toHttpScheme(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    final prefix = this.prefix;
     final headers = this.headers;
     final method = this.method;
+    final path = this.path;
+    final prefix = this.prefix;
+    final queryParameters = this.queryParameters;
     final scheme = this.scheme;
     return {
-      'prefix': prefix,
       if (headers != null) 'headers': headers,
       if (method != null) 'method': method.toValue(),
+      if (path != null) 'path': path,
+      if (prefix != null) 'prefix': prefix,
+      if (queryParameters != null) 'queryParameters': queryParameters,
       if (scheme != null) 'scheme': scheme.toValue(),
     };
   }
@@ -4814,6 +5456,44 @@ class HttpTimeout {
       if (idle != null) 'idle': idle,
       if (perRequest != null) 'perRequest': perRequest,
     };
+  }
+}
+
+enum IpPreference {
+  iPv6Preferred,
+  iPv4Preferred,
+  iPv4Only,
+  iPv6Only,
+}
+
+extension on IpPreference {
+  String toValue() {
+    switch (this) {
+      case IpPreference.iPv6Preferred:
+        return 'IPv6_PREFERRED';
+      case IpPreference.iPv4Preferred:
+        return 'IPv4_PREFERRED';
+      case IpPreference.iPv4Only:
+        return 'IPv4_ONLY';
+      case IpPreference.iPv6Only:
+        return 'IPv6_ONLY';
+    }
+  }
+}
+
+extension on String {
+  IpPreference toIpPreference() {
+    switch (this) {
+      case 'IPv6_PREFERRED':
+        return IpPreference.iPv6Preferred;
+      case 'IPv4_PREFERRED':
+        return IpPreference.iPv4Preferred;
+      case 'IPv4_ONLY':
+        return IpPreference.iPv4Only;
+      case 'IPv6_ONLY':
+        return IpPreference.iPv6Only;
+    }
+    throw Exception('$this is not known in enum IpPreference');
   }
 }
 
@@ -5107,6 +5787,7 @@ class Listener {
 
 /// An object that represents timeouts for different protocols.
 class ListenerTimeout {
+  /// An object that represents types of timeouts.
   final GrpcTimeout? grpc;
 
   /// An object that represents types of timeouts.
@@ -5158,7 +5839,8 @@ class ListenerTimeout {
 /// An object that represents the Transport Layer Security (TLS) properties for
 /// a listener.
 class ListenerTls {
-  /// A reference to an object that represents a listener's TLS certificate.
+  /// A reference to an object that represents a listener's Transport Layer
+  /// Security (TLS) certificate.
   final ListenerTlsCertificate certificate;
 
   /// Specify one of the following modes.
@@ -5176,29 +5858,40 @@ class ListenerTls {
   /// </ul>
   final ListenerTlsMode mode;
 
+  /// A reference to an object that represents a listener's Transport Layer
+  /// Security (TLS) validation context.
+  final ListenerTlsValidationContext? validation;
+
   ListenerTls({
     required this.certificate,
     required this.mode,
+    this.validation,
   });
   factory ListenerTls.fromJson(Map<String, dynamic> json) {
     return ListenerTls(
       certificate: ListenerTlsCertificate.fromJson(
           json['certificate'] as Map<String, dynamic>),
       mode: (json['mode'] as String).toListenerTlsMode(),
+      validation: json['validation'] != null
+          ? ListenerTlsValidationContext.fromJson(
+              json['validation'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final certificate = this.certificate;
     final mode = this.mode;
+    final validation = this.validation;
     return {
       'certificate': certificate,
       'mode': mode.toValue(),
+      if (validation != null) 'validation': validation,
     };
   }
 }
 
-/// An object that represents an AWS Certicate Manager (ACM) certificate.
+/// An object that represents an Certificate Manager certificate.
 class ListenerTlsAcmCertificate {
   /// The Amazon Resource Name (ARN) for the certificate. The certificate must
   /// meet specific requirements and you must have proxy authorization enabled.
@@ -5227,16 +5920,20 @@ class ListenerTlsAcmCertificate {
 /// An object that represents a listener's Transport Layer Security (TLS)
 /// certificate.
 class ListenerTlsCertificate {
-  /// A reference to an object that represents an AWS Certicate Manager (ACM)
-  /// certificate.
+  /// A reference to an object that represents an Certificate Manager certificate.
   final ListenerTlsAcmCertificate? acm;
 
   /// A reference to an object that represents a local file certificate.
   final ListenerTlsFileCertificate? file;
 
+  /// A reference to an object that represents a listener's Secret Discovery
+  /// Service certificate.
+  final ListenerTlsSdsCertificate? sds;
+
   ListenerTlsCertificate({
     this.acm,
     this.file,
+    this.sds,
   });
   factory ListenerTlsCertificate.fromJson(Map<String, dynamic> json) {
     return ListenerTlsCertificate(
@@ -5248,15 +5945,21 @@ class ListenerTlsCertificate {
           ? ListenerTlsFileCertificate.fromJson(
               json['file'] as Map<String, dynamic>)
           : null,
+      sds: json['sds'] != null
+          ? ListenerTlsSdsCertificate.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final acm = this.acm;
     final file = this.file;
+    final sds = this.sds;
     return {
       if (acm != null) 'acm': acm,
       if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
     };
   }
 }
@@ -5325,6 +6028,110 @@ extension on String {
         return ListenerTlsMode.disabled;
     }
     throw Exception('$this is not known in enum ListenerTlsMode');
+  }
+}
+
+/// An object that represents the listener's Secret Discovery Service
+/// certificate. The proxy must be configured with a local SDS provider via a
+/// Unix Domain Socket. See App Mesh <a
+/// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html">TLS
+/// documentation</a> for more info.
+class ListenerTlsSdsCertificate {
+  /// A reference to an object that represents the name of the secret requested
+  /// from the Secret Discovery Service provider representing Transport Layer
+  /// Security (TLS) materials like a certificate or certificate chain.
+  final String secretName;
+
+  ListenerTlsSdsCertificate({
+    required this.secretName,
+  });
+  factory ListenerTlsSdsCertificate.fromJson(Map<String, dynamic> json) {
+    return ListenerTlsSdsCertificate(
+      secretName: json['secretName'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final secretName = this.secretName;
+    return {
+      'secretName': secretName,
+    };
+  }
+}
+
+/// An object that represents a listener's Transport Layer Security (TLS)
+/// validation context.
+class ListenerTlsValidationContext {
+  /// A reference to where to retrieve the trust chain when validating a peer’s
+  /// Transport Layer Security (TLS) certificate.
+  final ListenerTlsValidationContextTrust trust;
+
+  /// A reference to an object that represents the SANs for a listener's Transport
+  /// Layer Security (TLS) validation context.
+  final SubjectAlternativeNames? subjectAlternativeNames;
+
+  ListenerTlsValidationContext({
+    required this.trust,
+    this.subjectAlternativeNames,
+  });
+  factory ListenerTlsValidationContext.fromJson(Map<String, dynamic> json) {
+    return ListenerTlsValidationContext(
+      trust: ListenerTlsValidationContextTrust.fromJson(
+          json['trust'] as Map<String, dynamic>),
+      subjectAlternativeNames: json['subjectAlternativeNames'] != null
+          ? SubjectAlternativeNames.fromJson(
+              json['subjectAlternativeNames'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final trust = this.trust;
+    final subjectAlternativeNames = this.subjectAlternativeNames;
+    return {
+      'trust': trust,
+      if (subjectAlternativeNames != null)
+        'subjectAlternativeNames': subjectAlternativeNames,
+    };
+  }
+}
+
+/// An object that represents a listener's Transport Layer Security (TLS)
+/// validation context trust.
+class ListenerTlsValidationContextTrust {
+  /// An object that represents a Transport Layer Security (TLS) validation
+  /// context trust for a local file.
+  final TlsValidationContextFileTrust? file;
+
+  /// A reference to an object that represents a listener's Transport Layer
+  /// Security (TLS) Secret Discovery Service validation context trust.
+  final TlsValidationContextSdsTrust? sds;
+
+  ListenerTlsValidationContextTrust({
+    this.file,
+    this.sds,
+  });
+  factory ListenerTlsValidationContextTrust.fromJson(
+      Map<String, dynamic> json) {
+    return ListenerTlsValidationContextTrust(
+      file: json['file'] != null
+          ? TlsValidationContextFileTrust.fromJson(
+              json['file'] as Map<String, dynamic>)
+          : null,
+      sds: json['sds'] != null
+          ? TlsValidationContextSdsTrust.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final file = this.file;
+    final sds = this.sds;
+    return {
+      if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
+    };
   }
 }
 
@@ -5429,16 +6236,17 @@ class MeshRef {
   /// The name of the service mesh.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -5470,26 +6278,57 @@ class MeshRef {
   }
 }
 
+/// An object that represents the service discovery information for a service
+/// mesh.
+class MeshServiceDiscovery {
+  /// The IP version to use to control traffic within the mesh.
+  final IpPreference? ipPreference;
+
+  MeshServiceDiscovery({
+    this.ipPreference,
+  });
+  factory MeshServiceDiscovery.fromJson(Map<String, dynamic> json) {
+    return MeshServiceDiscovery(
+      ipPreference: (json['ipPreference'] as String?)?.toIpPreference(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final ipPreference = this.ipPreference;
+    return {
+      if (ipPreference != null) 'ipPreference': ipPreference.toValue(),
+    };
+  }
+}
+
 /// An object that represents the specification of a service mesh.
 class MeshSpec {
   /// The egress filter rules for the service mesh.
   final EgressFilter? egressFilter;
+  final MeshServiceDiscovery? serviceDiscovery;
 
   MeshSpec({
     this.egressFilter,
+    this.serviceDiscovery,
   });
   factory MeshSpec.fromJson(Map<String, dynamic> json) {
     return MeshSpec(
       egressFilter: json['egressFilter'] != null
           ? EgressFilter.fromJson(json['egressFilter'] as Map<String, dynamic>)
           : null,
+      serviceDiscovery: json['serviceDiscovery'] != null
+          ? MeshServiceDiscovery.fromJson(
+              json['serviceDiscovery'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final egressFilter = this.egressFilter;
+    final serviceDiscovery = this.serviceDiscovery;
     return {
       if (egressFilter != null) 'egressFilter': egressFilter,
+      if (serviceDiscovery != null) 'serviceDiscovery': serviceDiscovery,
     };
   }
 }
@@ -5655,6 +6494,28 @@ extension on String {
   }
 }
 
+/// An object representing the query parameter to match.
+class QueryParameterMatch {
+  /// The exact query parameter to match on.
+  final String? exact;
+
+  QueryParameterMatch({
+    this.exact,
+  });
+  factory QueryParameterMatch.fromJson(Map<String, dynamic> json) {
+    return QueryParameterMatch(
+      exact: json['exact'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exact = this.exact;
+    return {
+      if (exact != null) 'exact': exact,
+    };
+  }
+}
+
 /// An object that represents metadata for a resource.
 class ResourceMetadata {
   /// The full Amazon Resource Name (ARN) for the resource.
@@ -5666,16 +6527,17 @@ class ResourceMetadata {
   /// The Unix epoch timestamp in seconds for when the resource was last updated.
   final DateTime lastUpdatedAt;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -5765,16 +6627,17 @@ class RouteRef {
   /// The name of the service mesh that the route resides in.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -5926,7 +6789,7 @@ extension on String {
 /// An object that represents the service discovery information for a virtual
 /// node.
 class ServiceDiscovery {
-  /// Specifies any AWS Cloud Map information for the virtual node.
+  /// Specifies any Cloud Map information for the virtual node.
   final AwsCloudMapServiceDiscovery? awsCloudMap;
 
   /// Specifies the DNS information for the virtual node.
@@ -5954,6 +6817,56 @@ class ServiceDiscovery {
     return {
       if (awsCloudMap != null) 'awsCloudMap': awsCloudMap,
       if (dns != null) 'dns': dns,
+    };
+  }
+}
+
+/// An object that represents the methods by which a subject alternative name on
+/// a peer Transport Layer Security (TLS) certificate can be matched.
+class SubjectAlternativeNameMatchers {
+  /// The values sent must match the specified values exactly.
+  final List<String> exact;
+
+  SubjectAlternativeNameMatchers({
+    required this.exact,
+  });
+  factory SubjectAlternativeNameMatchers.fromJson(Map<String, dynamic> json) {
+    return SubjectAlternativeNameMatchers(
+      exact: (json['exact'] as List)
+          .whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final exact = this.exact;
+    return {
+      'exact': exact,
+    };
+  }
+}
+
+/// An object that represents the subject alternative names secured by the
+/// certificate.
+class SubjectAlternativeNames {
+  /// An object that represents the criteria for determining a SANs match.
+  final SubjectAlternativeNameMatchers match;
+
+  SubjectAlternativeNames({
+    required this.match,
+  });
+  factory SubjectAlternativeNames.fromJson(Map<String, dynamic> json) {
+    return SubjectAlternativeNames(
+      match: SubjectAlternativeNameMatchers.fromJson(
+          json['match'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final match = this.match;
+    return {
+      'match': match,
     };
   }
 }
@@ -6105,32 +7018,45 @@ class TcpTimeout {
   }
 }
 
-/// An object that represents a Transport Layer Security (TLS) validation
-/// context.
+/// An object that represents how the proxy will validate its peer during
+/// Transport Layer Security (TLS) negotiation.
 class TlsValidationContext {
-  /// A reference to an object that represents a TLS validation context trust.
+  /// A reference to where to retrieve the trust chain when validating a peer’s
+  /// Transport Layer Security (TLS) certificate.
   final TlsValidationContextTrust trust;
+
+  /// A reference to an object that represents the SANs for a Transport Layer
+  /// Security (TLS) validation context.
+  final SubjectAlternativeNames? subjectAlternativeNames;
 
   TlsValidationContext({
     required this.trust,
+    this.subjectAlternativeNames,
   });
   factory TlsValidationContext.fromJson(Map<String, dynamic> json) {
     return TlsValidationContext(
       trust: TlsValidationContextTrust.fromJson(
           json['trust'] as Map<String, dynamic>),
+      subjectAlternativeNames: json['subjectAlternativeNames'] != null
+          ? SubjectAlternativeNames.fromJson(
+              json['subjectAlternativeNames'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final trust = this.trust;
+    final subjectAlternativeNames = this.subjectAlternativeNames;
     return {
       'trust': trust,
+      if (subjectAlternativeNames != null)
+        'subjectAlternativeNames': subjectAlternativeNames,
     };
   }
 }
 
-/// An object that represents a TLS validation context trust for an AWS
-/// Certicate Manager (ACM) certificate.
+/// An object that represents a Transport Layer Security (TLS) validation
+/// context trust for an Certificate Manager certificate.
 class TlsValidationContextAcmTrust {
   /// One or more ACM Amazon Resource Name (ARN)s.
   final List<String> certificateAuthorityArns;
@@ -6179,19 +7105,53 @@ class TlsValidationContextFileTrust {
   }
 }
 
+/// An object that represents a Transport Layer Security (TLS) Secret Discovery
+/// Service validation context trust. The proxy must be configured with a local
+/// SDS provider via a Unix Domain Socket. See App Mesh <a
+/// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html">TLS
+/// documentation</a> for more info.
+class TlsValidationContextSdsTrust {
+  /// A reference to an object that represents the name of the secret for a
+  /// Transport Layer Security (TLS) Secret Discovery Service validation context
+  /// trust.
+  final String secretName;
+
+  TlsValidationContextSdsTrust({
+    required this.secretName,
+  });
+  factory TlsValidationContextSdsTrust.fromJson(Map<String, dynamic> json) {
+    return TlsValidationContextSdsTrust(
+      secretName: json['secretName'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final secretName = this.secretName;
+    return {
+      'secretName': secretName,
+    };
+  }
+}
+
 /// An object that represents a Transport Layer Security (TLS) validation
 /// context trust.
 class TlsValidationContextTrust {
-  /// A reference to an object that represents a TLS validation context trust for
-  /// an AWS Certicate Manager (ACM) certificate.
+  /// A reference to an object that represents a Transport Layer Security (TLS)
+  /// validation context trust for an Certificate Manager certificate.
   final TlsValidationContextAcmTrust? acm;
 
-  /// An object that represents a TLS validation context trust for a local file.
+  /// An object that represents a Transport Layer Security (TLS) validation
+  /// context trust for a local file.
   final TlsValidationContextFileTrust? file;
+
+  /// A reference to an object that represents a Transport Layer Security (TLS)
+  /// Secret Discovery Service validation context trust.
+  final TlsValidationContextSdsTrust? sds;
 
   TlsValidationContextTrust({
     this.acm,
     this.file,
+    this.sds,
   });
   factory TlsValidationContextTrust.fromJson(Map<String, dynamic> json) {
     return TlsValidationContextTrust(
@@ -6203,15 +7163,21 @@ class TlsValidationContextTrust {
           ? TlsValidationContextFileTrust.fromJson(
               json['file'] as Map<String, dynamic>)
           : null,
+      sds: json['sds'] != null
+          ? TlsValidationContextSdsTrust.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final acm = this.acm;
     final file = this.file;
+    final sds = this.sds;
     return {
       if (acm != null) 'acm': acm,
       if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
     };
   }
 }
@@ -6369,8 +7335,13 @@ class VirtualGatewayClientPolicy {
 
 /// An object that represents a Transport Layer Security (TLS) client policy.
 class VirtualGatewayClientPolicyTls {
-  /// A reference to an object that represents a TLS validation context.
+  /// A reference to an object that represents a Transport Layer Security (TLS)
+  /// validation context.
   final VirtualGatewayTlsValidationContext validation;
+
+  /// A reference to an object that represents a virtual gateway's client's
+  /// Transport Layer Security (TLS) certificate.
+  final VirtualGatewayClientTlsCertificate? certificate;
 
   /// Whether the policy is enforced. The default is <code>True</code>, if a value
   /// isn't specified.
@@ -6381,6 +7352,7 @@ class VirtualGatewayClientPolicyTls {
 
   VirtualGatewayClientPolicyTls({
     required this.validation,
+    this.certificate,
     this.enforce,
     this.ports,
   });
@@ -6388,6 +7360,10 @@ class VirtualGatewayClientPolicyTls {
     return VirtualGatewayClientPolicyTls(
       validation: VirtualGatewayTlsValidationContext.fromJson(
           json['validation'] as Map<String, dynamic>),
+      certificate: json['certificate'] != null
+          ? VirtualGatewayClientTlsCertificate.fromJson(
+              json['certificate'] as Map<String, dynamic>)
+          : null,
       enforce: json['enforce'] as bool?,
       ports: (json['ports'] as List?)
           ?.whereNotNull()
@@ -6398,12 +7374,56 @@ class VirtualGatewayClientPolicyTls {
 
   Map<String, dynamic> toJson() {
     final validation = this.validation;
+    final certificate = this.certificate;
     final enforce = this.enforce;
     final ports = this.ports;
     return {
       'validation': validation,
+      if (certificate != null) 'certificate': certificate,
       if (enforce != null) 'enforce': enforce,
       if (ports != null) 'ports': ports,
+    };
+  }
+}
+
+/// An object that represents the virtual gateway's client's Transport Layer
+/// Security (TLS) certificate.
+class VirtualGatewayClientTlsCertificate {
+  /// An object that represents a local file certificate. The certificate must
+  /// meet specific requirements and you must have proxy authorization enabled.
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html">
+  /// Transport Layer Security (TLS) </a>.
+  final VirtualGatewayListenerTlsFileCertificate? file;
+
+  /// A reference to an object that represents a virtual gateway's client's Secret
+  /// Discovery Service certificate.
+  final VirtualGatewayListenerTlsSdsCertificate? sds;
+
+  VirtualGatewayClientTlsCertificate({
+    this.file,
+    this.sds,
+  });
+  factory VirtualGatewayClientTlsCertificate.fromJson(
+      Map<String, dynamic> json) {
+    return VirtualGatewayClientTlsCertificate(
+      file: json['file'] != null
+          ? VirtualGatewayListenerTlsFileCertificate.fromJson(
+              json['file'] as Map<String, dynamic>)
+          : null,
+      sds: json['sds'] != null
+          ? VirtualGatewayListenerTlsSdsCertificate.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final file = this.file;
+    final sds = this.sds;
+    return {
+      if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
     };
   }
 }
@@ -6748,29 +7768,40 @@ class VirtualGatewayListenerTls {
   /// </ul>
   final VirtualGatewayListenerTlsMode mode;
 
+  /// A reference to an object that represents a virtual gateway's listener's
+  /// Transport Layer Security (TLS) validation context.
+  final VirtualGatewayListenerTlsValidationContext? validation;
+
   VirtualGatewayListenerTls({
     required this.certificate,
     required this.mode,
+    this.validation,
   });
   factory VirtualGatewayListenerTls.fromJson(Map<String, dynamic> json) {
     return VirtualGatewayListenerTls(
       certificate: VirtualGatewayListenerTlsCertificate.fromJson(
           json['certificate'] as Map<String, dynamic>),
       mode: (json['mode'] as String).toVirtualGatewayListenerTlsMode(),
+      validation: json['validation'] != null
+          ? VirtualGatewayListenerTlsValidationContext.fromJson(
+              json['validation'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final certificate = this.certificate;
     final mode = this.mode;
+    final validation = this.validation;
     return {
       'certificate': certificate,
       'mode': mode.toValue(),
+      if (validation != null) 'validation': validation,
     };
   }
 }
 
-/// An object that represents an AWS Certicate Manager (ACM) certificate.
+/// An object that represents an Certificate Manager certificate.
 class VirtualGatewayListenerTlsAcmCertificate {
   /// The Amazon Resource Name (ARN) for the certificate. The certificate must
   /// meet specific requirements and you must have proxy authorization enabled.
@@ -6800,16 +7831,20 @@ class VirtualGatewayListenerTlsAcmCertificate {
 /// An object that represents a listener's Transport Layer Security (TLS)
 /// certificate.
 class VirtualGatewayListenerTlsCertificate {
-  /// A reference to an object that represents an AWS Certicate Manager (ACM)
-  /// certificate.
+  /// A reference to an object that represents an Certificate Manager certificate.
   final VirtualGatewayListenerTlsAcmCertificate? acm;
 
   /// A reference to an object that represents a local file certificate.
   final VirtualGatewayListenerTlsFileCertificate? file;
 
+  /// A reference to an object that represents a virtual gateway's listener's
+  /// Secret Discovery Service certificate.
+  final VirtualGatewayListenerTlsSdsCertificate? sds;
+
   VirtualGatewayListenerTlsCertificate({
     this.acm,
     this.file,
+    this.sds,
   });
   factory VirtualGatewayListenerTlsCertificate.fromJson(
       Map<String, dynamic> json) {
@@ -6822,15 +7857,21 @@ class VirtualGatewayListenerTlsCertificate {
           ? VirtualGatewayListenerTlsFileCertificate.fromJson(
               json['file'] as Map<String, dynamic>)
           : null,
+      sds: json['sds'] != null
+          ? VirtualGatewayListenerTlsSdsCertificate.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final acm = this.acm;
     final file = this.file;
+    final sds = this.sds;
     return {
       if (acm != null) 'acm': acm,
       if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
     };
   }
 }
@@ -6900,6 +7941,113 @@ extension on String {
         return VirtualGatewayListenerTlsMode.disabled;
     }
     throw Exception('$this is not known in enum VirtualGatewayListenerTlsMode');
+  }
+}
+
+/// An object that represents the virtual gateway's listener's Secret Discovery
+/// Service certificate.The proxy must be configured with a local SDS provider
+/// via a Unix Domain Socket. See App Mesh<a
+/// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html">TLS
+/// documentation</a> for more info.
+class VirtualGatewayListenerTlsSdsCertificate {
+  /// A reference to an object that represents the name of the secret secret
+  /// requested from the Secret Discovery Service provider representing Transport
+  /// Layer Security (TLS) materials like a certificate or certificate chain.
+  final String secretName;
+
+  VirtualGatewayListenerTlsSdsCertificate({
+    required this.secretName,
+  });
+  factory VirtualGatewayListenerTlsSdsCertificate.fromJson(
+      Map<String, dynamic> json) {
+    return VirtualGatewayListenerTlsSdsCertificate(
+      secretName: json['secretName'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final secretName = this.secretName;
+    return {
+      'secretName': secretName,
+    };
+  }
+}
+
+/// An object that represents a virtual gateway's listener's Transport Layer
+/// Security (TLS) validation context.
+class VirtualGatewayListenerTlsValidationContext {
+  /// A reference to where to retrieve the trust chain when validating a peer’s
+  /// Transport Layer Security (TLS) certificate.
+  final VirtualGatewayListenerTlsValidationContextTrust trust;
+
+  /// A reference to an object that represents the SANs for a virtual gateway
+  /// listener's Transport Layer Security (TLS) validation context.
+  final SubjectAlternativeNames? subjectAlternativeNames;
+
+  VirtualGatewayListenerTlsValidationContext({
+    required this.trust,
+    this.subjectAlternativeNames,
+  });
+  factory VirtualGatewayListenerTlsValidationContext.fromJson(
+      Map<String, dynamic> json) {
+    return VirtualGatewayListenerTlsValidationContext(
+      trust: VirtualGatewayListenerTlsValidationContextTrust.fromJson(
+          json['trust'] as Map<String, dynamic>),
+      subjectAlternativeNames: json['subjectAlternativeNames'] != null
+          ? SubjectAlternativeNames.fromJson(
+              json['subjectAlternativeNames'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final trust = this.trust;
+    final subjectAlternativeNames = this.subjectAlternativeNames;
+    return {
+      'trust': trust,
+      if (subjectAlternativeNames != null)
+        'subjectAlternativeNames': subjectAlternativeNames,
+    };
+  }
+}
+
+/// An object that represents a virtual gateway's listener's Transport Layer
+/// Security (TLS) validation context trust.
+class VirtualGatewayListenerTlsValidationContextTrust {
+  /// An object that represents a Transport Layer Security (TLS) validation
+  /// context trust for a local file.
+  final VirtualGatewayTlsValidationContextFileTrust? file;
+
+  /// A reference to an object that represents a virtual gateway's listener's
+  /// Transport Layer Security (TLS) Secret Discovery Service validation context
+  /// trust.
+  final VirtualGatewayTlsValidationContextSdsTrust? sds;
+
+  VirtualGatewayListenerTlsValidationContextTrust({
+    this.file,
+    this.sds,
+  });
+  factory VirtualGatewayListenerTlsValidationContextTrust.fromJson(
+      Map<String, dynamic> json) {
+    return VirtualGatewayListenerTlsValidationContextTrust(
+      file: json['file'] != null
+          ? VirtualGatewayTlsValidationContextFileTrust.fromJson(
+              json['file'] as Map<String, dynamic>)
+          : null,
+      sds: json['sds'] != null
+          ? VirtualGatewayTlsValidationContextSdsTrust.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final file = this.file;
+    final sds = this.sds;
+    return {
+      if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
+    };
   }
 }
 
@@ -7004,16 +8152,17 @@ class VirtualGatewayRef {
   /// The name of the service mesh that the resource resides in.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -7146,30 +8295,43 @@ extension on String {
 /// An object that represents a Transport Layer Security (TLS) validation
 /// context.
 class VirtualGatewayTlsValidationContext {
-  /// A reference to an object that represents a TLS validation context trust.
+  /// A reference to where to retrieve the trust chain when validating a peer’s
+  /// Transport Layer Security (TLS) certificate.
   final VirtualGatewayTlsValidationContextTrust trust;
+
+  /// A reference to an object that represents the SANs for a virtual gateway's
+  /// listener's Transport Layer Security (TLS) validation context.
+  final SubjectAlternativeNames? subjectAlternativeNames;
 
   VirtualGatewayTlsValidationContext({
     required this.trust,
+    this.subjectAlternativeNames,
   });
   factory VirtualGatewayTlsValidationContext.fromJson(
       Map<String, dynamic> json) {
     return VirtualGatewayTlsValidationContext(
       trust: VirtualGatewayTlsValidationContextTrust.fromJson(
           json['trust'] as Map<String, dynamic>),
+      subjectAlternativeNames: json['subjectAlternativeNames'] != null
+          ? SubjectAlternativeNames.fromJson(
+              json['subjectAlternativeNames'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final trust = this.trust;
+    final subjectAlternativeNames = this.subjectAlternativeNames;
     return {
       'trust': trust,
+      if (subjectAlternativeNames != null)
+        'subjectAlternativeNames': subjectAlternativeNames,
     };
   }
 }
 
-/// An object that represents a TLS validation context trust for an AWS
-/// Certicate Manager (ACM) certificate.
+/// An object that represents a Transport Layer Security (TLS) validation
+/// context trust for an Certificate Manager certificate.
 class VirtualGatewayTlsValidationContextAcmTrust {
   /// One or more ACM Amazon Resource Name (ARN)s.
   final List<String> certificateAuthorityArns;
@@ -7220,19 +8382,55 @@ class VirtualGatewayTlsValidationContextFileTrust {
   }
 }
 
+/// An object that represents a virtual gateway's listener's Transport Layer
+/// Security (TLS) Secret Discovery Service validation context trust. The proxy
+/// must be configured with a local SDS provider via a Unix Domain Socket. See
+/// App Mesh <a
+/// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html">TLS
+/// documentation</a> for more info.
+class VirtualGatewayTlsValidationContextSdsTrust {
+  /// A reference to an object that represents the name of the secret for a
+  /// virtual gateway's Transport Layer Security (TLS) Secret Discovery Service
+  /// validation context trust.
+  final String secretName;
+
+  VirtualGatewayTlsValidationContextSdsTrust({
+    required this.secretName,
+  });
+  factory VirtualGatewayTlsValidationContextSdsTrust.fromJson(
+      Map<String, dynamic> json) {
+    return VirtualGatewayTlsValidationContextSdsTrust(
+      secretName: json['secretName'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final secretName = this.secretName;
+    return {
+      'secretName': secretName,
+    };
+  }
+}
+
 /// An object that represents a Transport Layer Security (TLS) validation
 /// context trust.
 class VirtualGatewayTlsValidationContextTrust {
-  /// A reference to an object that represents a TLS validation context trust for
-  /// an AWS Certicate Manager (ACM) certificate.
+  /// A reference to an object that represents a Transport Layer Security (TLS)
+  /// validation context trust for an Certificate Manager certificate.
   final VirtualGatewayTlsValidationContextAcmTrust? acm;
 
-  /// An object that represents a TLS validation context trust for a local file.
+  /// An object that represents a Transport Layer Security (TLS) validation
+  /// context trust for a local file.
   final VirtualGatewayTlsValidationContextFileTrust? file;
+
+  /// A reference to an object that represents a virtual gateway's Transport Layer
+  /// Security (TLS) Secret Discovery Service validation context trust.
+  final VirtualGatewayTlsValidationContextSdsTrust? sds;
 
   VirtualGatewayTlsValidationContextTrust({
     this.acm,
     this.file,
+    this.sds,
   });
   factory VirtualGatewayTlsValidationContextTrust.fromJson(
       Map<String, dynamic> json) {
@@ -7245,15 +8443,21 @@ class VirtualGatewayTlsValidationContextTrust {
           ? VirtualGatewayTlsValidationContextFileTrust.fromJson(
               json['file'] as Map<String, dynamic>)
           : null,
+      sds: json['sds'] != null
+          ? VirtualGatewayTlsValidationContextSdsTrust.fromJson(
+              json['sds'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final acm = this.acm;
     final file = this.file;
+    final sds = this.sds;
     return {
       if (acm != null) 'acm': acm,
       if (file != null) 'file': file,
+      if (sds != null) 'sds': sds,
     };
   }
 }
@@ -7448,16 +8652,17 @@ class VirtualNodeRef {
   /// The name of the service mesh that the virtual node resides in.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -7728,16 +8933,17 @@ class VirtualRouterRef {
   /// The name of the service mesh that the virtual router resides in.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;
@@ -7986,16 +9192,17 @@ class VirtualServiceRef {
   /// The name of the service mesh that the virtual service resides in.
   final String meshName;
 
-  /// The AWS IAM account ID of the service mesh owner. If the account ID is not
-  /// your own, then it's the ID of the account that shared the mesh with your
-  /// account. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the service mesh owner. If the
+  /// account ID is not your own, then it's the ID of the account that shared the
+  /// mesh with your account. For more information about mesh sharing, see <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String meshOwner;
 
-  /// The AWS IAM account ID of the resource owner. If the account ID is not your
-  /// own, then it's the ID of the mesh owner or of another account that the mesh
-  /// is shared with. For more information about mesh sharing, see <a
+  /// The Amazon Web Services IAM account ID of the resource owner. If the account
+  /// ID is not your own, then it's the ID of the mesh owner or of another account
+  /// that the mesh is shared with. For more information about mesh sharing, see
+  /// <a
   /// href="https://docs.aws.amazon.com/app-mesh/latest/userguide/sharing.html">Working
   /// with shared meshes</a>.
   final String resourceOwner;

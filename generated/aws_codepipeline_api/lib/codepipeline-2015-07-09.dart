@@ -228,7 +228,7 @@ class CodePipeline {
       'provider',
       provider,
       1,
-      25,
+      35,
       isRequired: true,
     );
     ArgumentError.checkNotNull(version, 'version');
@@ -349,7 +349,7 @@ class CodePipeline {
       'provider',
       provider,
       1,
-      25,
+      35,
       isRequired: true,
     );
     ArgumentError.checkNotNull(version, 'version');
@@ -617,6 +617,94 @@ class CodePipeline {
         'transitionType': transitionType.toValue(),
       },
     );
+  }
+
+  /// Returns information about an action type created for an external provider,
+  /// where the action is to be used by customers of the external provider. The
+  /// action can be created with any supported integration model.
+  ///
+  /// May throw [ActionTypeNotFoundException].
+  /// May throw [ValidationException].
+  ///
+  /// Parameter [category] :
+  /// Defines what kind of action can be taken in the stage. The following are
+  /// the valid values:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Source</code>
+  /// </li>
+  /// <li>
+  /// <code>Build</code>
+  /// </li>
+  /// <li>
+  /// <code>Test</code>
+  /// </li>
+  /// <li>
+  /// <code>Deploy</code>
+  /// </li>
+  /// <li>
+  /// <code>Approval</code>
+  /// </li>
+  /// <li>
+  /// <code>Invoke</code>
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [owner] :
+  /// The creator of an action type that was created with any supported
+  /// integration model. There are two valid values: <code>AWS</code> and
+  /// <code>ThirdParty</code>.
+  ///
+  /// Parameter [provider] :
+  /// The provider of the action type being called. The provider name is
+  /// specified when the action type is created.
+  ///
+  /// Parameter [version] :
+  /// A string that describes the action type version.
+  Future<GetActionTypeOutput> getActionType({
+    required ActionCategory category,
+    required String owner,
+    required String provider,
+    required String version,
+  }) async {
+    ArgumentError.checkNotNull(category, 'category');
+    ArgumentError.checkNotNull(owner, 'owner');
+    ArgumentError.checkNotNull(provider, 'provider');
+    _s.validateStringLength(
+      'provider',
+      provider,
+      1,
+      35,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(version, 'version');
+    _s.validateStringLength(
+      'version',
+      version,
+      1,
+      9,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'CodePipeline_20150709.GetActionType'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'category': category.toValue(),
+        'owner': owner,
+        'provider': provider,
+        'version': version,
+      },
+    );
+
+    return GetActionTypeOutput.fromJson(jsonResponse.body);
   }
 
   /// Returns information about a job. Used for custom actions only.
@@ -942,15 +1030,25 @@ class CodePipeline {
   /// Parameter [nextToken] :
   /// An identifier that was returned from the previous list action types call,
   /// which can be used to return the next set of action types in the list.
+  ///
+  /// Parameter [regionFilter] :
+  /// The Region to filter on for the list of action types.
   Future<ListActionTypesOutput> listActionTypes({
     ActionOwner? actionOwnerFilter,
     String? nextToken,
+    String? regionFilter,
   }) async {
     _s.validateStringLength(
       'nextToken',
       nextToken,
       1,
       2048,
+    );
+    _s.validateStringLength(
+      'regionFilter',
+      regionFilter,
+      4,
+      30,
     );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -966,6 +1064,7 @@ class CodePipeline {
         if (actionOwnerFilter != null)
           'actionOwnerFilter': actionOwnerFilter.toValue(),
         if (nextToken != null) 'nextToken': nextToken,
+        if (regionFilter != null) 'regionFilter': regionFilter,
       },
     );
 
@@ -1042,12 +1141,25 @@ class CodePipeline {
   /// May throw [ValidationException].
   /// May throw [InvalidNextTokenException].
   ///
+  /// Parameter [maxResults] :
+  /// The maximum number of pipelines to return in a single call. To retrieve
+  /// the remaining pipelines, make another call with the returned nextToken
+  /// value. The minimum value you can specify is 1. The maximum accepted value
+  /// is 1000.
+  ///
   /// Parameter [nextToken] :
   /// An identifier that was returned from the previous list pipelines call. It
   /// can be used to return the next set of pipelines in the list.
   Future<ListPipelinesOutput> listPipelines({
+    int? maxResults,
     String? nextToken,
   }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      1000,
+    );
     _s.validateStringLength(
       'nextToken',
       nextToken,
@@ -1065,6 +1177,7 @@ class CodePipeline {
       // TODO queryParams
       headers: headers,
       payload: {
+        if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
       },
     );
@@ -2031,6 +2144,37 @@ class CodePipeline {
     );
   }
 
+  /// Updates an action type that was created with any supported integration
+  /// model, where the action type is to be used by customers of the action type
+  /// provider. Use a JSON file with the action definition and
+  /// <code>UpdateActionType</code> to provide the full structure.
+  ///
+  /// May throw [RequestFailedException].
+  /// May throw [ValidationException].
+  /// May throw [ActionTypeNotFoundException].
+  ///
+  /// Parameter [actionType] :
+  /// The action type definition for the action type to be updated.
+  Future<void> updateActionType({
+    required ActionTypeDeclaration actionType,
+  }) async {
+    ArgumentError.checkNotNull(actionType, 'actionType');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'CodePipeline_20150709.UpdateActionType'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'actionType': actionType,
+      },
+    );
+  }
+
   /// Updates a specified pipeline with edits or changes to its structure. Use a
   /// JSON file with the pipeline structure and <code>UpdatePipeline</code> to
   /// provide the full structure of the pipeline. Updating the pipeline
@@ -2906,6 +3050,188 @@ class ActionType {
   }
 }
 
+/// Information about parameters for artifacts associated with the action type,
+/// such as the minimum and maximum artifacts allowed.
+class ActionTypeArtifactDetails {
+  /// The maximum number of artifacts that can be used with the actiontype. For
+  /// example, you should specify a minimum and maximum of zero input artifacts
+  /// for an action type with a category of <code>source</code>.
+  final int maximumCount;
+
+  /// The minimum number of artifacts that can be used with the action type. For
+  /// example, you should specify a minimum and maximum of zero input artifacts
+  /// for an action type with a category of <code>source</code>.
+  final int minimumCount;
+
+  ActionTypeArtifactDetails({
+    required this.maximumCount,
+    required this.minimumCount,
+  });
+  factory ActionTypeArtifactDetails.fromJson(Map<String, dynamic> json) {
+    return ActionTypeArtifactDetails(
+      maximumCount: json['maximumCount'] as int,
+      minimumCount: json['minimumCount'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final maximumCount = this.maximumCount;
+    final minimumCount = this.minimumCount;
+    return {
+      'maximumCount': maximumCount,
+      'minimumCount': minimumCount,
+    };
+  }
+}
+
+/// The parameters for the action type definition that are provided when the
+/// action type is created or updated.
+class ActionTypeDeclaration {
+  /// Information about the executor for an action type that was created with any
+  /// supported integration model.
+  final ActionTypeExecutor executor;
+
+  /// The action category, owner, provider, and version of the action type to be
+  /// updated.
+  final ActionTypeIdentifier id;
+
+  /// Details for the artifacts, such as application files, to be worked on by the
+  /// action. For example, the minimum and maximum number of input artifacts
+  /// allowed.
+  final ActionTypeArtifactDetails inputArtifactDetails;
+
+  /// Details for the output artifacts, such as a built application, that are the
+  /// result of the action. For example, the minimum and maximum number of output
+  /// artifacts allowed.
+  final ActionTypeArtifactDetails outputArtifactDetails;
+
+  /// The description for the action type to be updated.
+  final String? description;
+
+  /// Details identifying the accounts with permissions to use the action type.
+  final ActionTypePermissions? permissions;
+
+  /// The properties of the action type to be updated.
+  final List<ActionTypeProperty>? properties;
+
+  /// The links associated with the action type to be updated.
+  final ActionTypeUrls? urls;
+
+  ActionTypeDeclaration({
+    required this.executor,
+    required this.id,
+    required this.inputArtifactDetails,
+    required this.outputArtifactDetails,
+    this.description,
+    this.permissions,
+    this.properties,
+    this.urls,
+  });
+  factory ActionTypeDeclaration.fromJson(Map<String, dynamic> json) {
+    return ActionTypeDeclaration(
+      executor:
+          ActionTypeExecutor.fromJson(json['executor'] as Map<String, dynamic>),
+      id: ActionTypeIdentifier.fromJson(json['id'] as Map<String, dynamic>),
+      inputArtifactDetails: ActionTypeArtifactDetails.fromJson(
+          json['inputArtifactDetails'] as Map<String, dynamic>),
+      outputArtifactDetails: ActionTypeArtifactDetails.fromJson(
+          json['outputArtifactDetails'] as Map<String, dynamic>),
+      description: json['description'] as String?,
+      permissions: json['permissions'] != null
+          ? ActionTypePermissions.fromJson(
+              json['permissions'] as Map<String, dynamic>)
+          : null,
+      properties: (json['properties'] as List?)
+          ?.whereNotNull()
+          .map((e) => ActionTypeProperty.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      urls: json['urls'] != null
+          ? ActionTypeUrls.fromJson(json['urls'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final executor = this.executor;
+    final id = this.id;
+    final inputArtifactDetails = this.inputArtifactDetails;
+    final outputArtifactDetails = this.outputArtifactDetails;
+    final description = this.description;
+    final permissions = this.permissions;
+    final properties = this.properties;
+    final urls = this.urls;
+    return {
+      'executor': executor,
+      'id': id,
+      'inputArtifactDetails': inputArtifactDetails,
+      'outputArtifactDetails': outputArtifactDetails,
+      if (description != null) 'description': description,
+      if (permissions != null) 'permissions': permissions,
+      if (properties != null) 'properties': properties,
+      if (urls != null) 'urls': urls,
+    };
+  }
+}
+
+/// The action engine, or executor, for an action type created for a provider,
+/// where the action is to be used by customers of the provider. The action
+/// engine is associated with the model used to create and update the action,
+/// such as the Lambda integration model.
+class ActionTypeExecutor {
+  /// The action configuration properties for the action type. These properties
+  /// are specified in the action definition when the action type is created.
+  final ExecutorConfiguration configuration;
+
+  /// The integration model used to create and update the action type,
+  /// <code>Lambda</code> or <code>JobWorker</code>.
+  final ExecutorType type;
+
+  /// The timeout in seconds for the job. An action execution can have multiple
+  /// jobs. This is the timeout for a single job, not the entire action execution.
+  final int? jobTimeout;
+
+  /// The policy statement that specifies the permissions in the CodePipeline
+  /// customer’s account that are needed to successfully run an action.
+  ///
+  /// To grant permission to another account, specify the account ID as the
+  /// Principal, a domain-style identifier defined by the service, for example
+  /// <code>codepipeline.amazonaws.com</code>.
+  /// <note>
+  /// The size of the passed JSON policy document cannot exceed 2048 characters.
+  /// </note>
+  final String? policyStatementsTemplate;
+
+  ActionTypeExecutor({
+    required this.configuration,
+    required this.type,
+    this.jobTimeout,
+    this.policyStatementsTemplate,
+  });
+  factory ActionTypeExecutor.fromJson(Map<String, dynamic> json) {
+    return ActionTypeExecutor(
+      configuration: ExecutorConfiguration.fromJson(
+          json['configuration'] as Map<String, dynamic>),
+      type: (json['type'] as String).toExecutorType(),
+      jobTimeout: json['jobTimeout'] as int?,
+      policyStatementsTemplate: json['policyStatementsTemplate'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final configuration = this.configuration;
+    final type = this.type;
+    final jobTimeout = this.jobTimeout;
+    final policyStatementsTemplate = this.policyStatementsTemplate;
+    return {
+      'configuration': configuration,
+      'type': type.toValue(),
+      if (jobTimeout != null) 'jobTimeout': jobTimeout,
+      if (policyStatementsTemplate != null)
+        'policyStatementsTemplate': policyStatementsTemplate,
+    };
+  }
+}
+
 /// Represents information about an action type.
 class ActionTypeId {
   /// A category defines what kind of action can be taken in the stage, and
@@ -2982,6 +3308,161 @@ class ActionTypeId {
   }
 }
 
+/// Specifies the category, owner, provider, and version of the action type.
+class ActionTypeIdentifier {
+  /// Defines what kind of action can be taken in the stage, one of the following:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Source</code>
+  /// </li>
+  /// <li>
+  /// <code>Build</code>
+  /// </li>
+  /// <li>
+  /// <code>Test</code>
+  /// </li>
+  /// <li>
+  /// <code>Deploy</code>
+  /// </li>
+  /// <li>
+  /// <code>Approval</code>
+  /// </li>
+  /// <li>
+  /// <code>Invoke</code>
+  /// </li>
+  /// </ul>
+  final ActionCategory category;
+
+  /// The creator of the action type being called: <code>AWS</code> or
+  /// <code>ThirdParty</code>.
+  final String owner;
+
+  /// The provider of the action type being called. The provider name is supplied
+  /// when the action type is created.
+  final String provider;
+
+  /// A string that describes the action type version.
+  final String version;
+
+  ActionTypeIdentifier({
+    required this.category,
+    required this.owner,
+    required this.provider,
+    required this.version,
+  });
+  factory ActionTypeIdentifier.fromJson(Map<String, dynamic> json) {
+    return ActionTypeIdentifier(
+      category: (json['category'] as String).toActionCategory(),
+      owner: json['owner'] as String,
+      provider: json['provider'] as String,
+      version: json['version'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final category = this.category;
+    final owner = this.owner;
+    final provider = this.provider;
+    final version = this.version;
+    return {
+      'category': category.toValue(),
+      'owner': owner,
+      'provider': provider,
+      'version': version,
+    };
+  }
+}
+
+/// Details identifying the users with permissions to use the action type.
+class ActionTypePermissions {
+  /// A list of AWS account IDs with access to use the action type in their
+  /// pipelines.
+  final List<String> allowedAccounts;
+
+  ActionTypePermissions({
+    required this.allowedAccounts,
+  });
+  factory ActionTypePermissions.fromJson(Map<String, dynamic> json) {
+    return ActionTypePermissions(
+      allowedAccounts: (json['allowedAccounts'] as List)
+          .whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final allowedAccounts = this.allowedAccounts;
+    return {
+      'allowedAccounts': allowedAccounts,
+    };
+  }
+}
+
+/// Represents information about each property specified in the action
+/// configuration, such as the description and key name that display for the
+/// customer using the action type.
+class ActionTypeProperty {
+  /// Whether the configuration property is a key.
+  final bool key;
+
+  /// The property name that is displayed to users.
+  final String name;
+
+  /// Whether to omit the field value entered by the customer in the log. If
+  /// <code>true</code>, the value is not saved in CloudTrail logs for the action
+  /// execution.
+  final bool noEcho;
+
+  /// Whether the configuration property is an optional value.
+  final bool optional;
+
+  /// The description of the property that is displayed to users.
+  final String? description;
+
+  /// Indicates that the property is used with polling. An action type can have up
+  /// to one queryable property. If it has one, that property must be both
+  /// required and not secret.
+  final bool? queryable;
+
+  ActionTypeProperty({
+    required this.key,
+    required this.name,
+    required this.noEcho,
+    required this.optional,
+    this.description,
+    this.queryable,
+  });
+  factory ActionTypeProperty.fromJson(Map<String, dynamic> json) {
+    return ActionTypeProperty(
+      key: json['key'] as bool,
+      name: json['name'] as String,
+      noEcho: json['noEcho'] as bool,
+      optional: json['optional'] as bool,
+      description: json['description'] as String?,
+      queryable: json['queryable'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final key = this.key;
+    final name = this.name;
+    final noEcho = this.noEcho;
+    final optional = this.optional;
+    final description = this.description;
+    final queryable = this.queryable;
+    return {
+      'key': key,
+      'name': name,
+      'noEcho': noEcho,
+      'optional': optional,
+      if (description != null) 'description': description,
+      if (queryable != null) 'queryable': queryable,
+    };
+  }
+}
+
 /// Returns information about the settings for an action type.
 class ActionTypeSettings {
   /// The URL returned to the AWS CodePipeline console that provides a deep link
@@ -3034,6 +3515,60 @@ class ActionTypeSettings {
         'revisionUrlTemplate': revisionUrlTemplate,
       if (thirdPartyConfigurationUrl != null)
         'thirdPartyConfigurationUrl': thirdPartyConfigurationUrl,
+    };
+  }
+}
+
+/// Returns information about URLs for web pages that display to customers as
+/// links on the pipeline view, such as an external configuration page for the
+/// action type.
+class ActionTypeUrls {
+  /// The URL returned to the CodePipeline console that contains a link to the
+  /// page where customers can configure the external action.
+  final String? configurationUrl;
+
+  /// The URL returned to the CodePipeline console that provides a deep link to
+  /// the resources of the external system, such as a status page. This link is
+  /// provided as part of the action display in the pipeline.
+  final String? entityUrlTemplate;
+
+  /// The link to an execution page for the action type in progress. For example,
+  /// for a CodeDeploy action, this link is shown on the pipeline view page in the
+  /// CodePipeline console, and it links to a CodeDeploy status page.
+  final String? executionUrlTemplate;
+
+  /// The URL returned to the CodePipeline console that contains a link to the
+  /// page where customers can update or change the configuration of the external
+  /// action.
+  final String? revisionUrlTemplate;
+
+  ActionTypeUrls({
+    this.configurationUrl,
+    this.entityUrlTemplate,
+    this.executionUrlTemplate,
+    this.revisionUrlTemplate,
+  });
+  factory ActionTypeUrls.fromJson(Map<String, dynamic> json) {
+    return ActionTypeUrls(
+      configurationUrl: json['configurationUrl'] as String?,
+      entityUrlTemplate: json['entityUrlTemplate'] as String?,
+      executionUrlTemplate: json['executionUrlTemplate'] as String?,
+      revisionUrlTemplate: json['revisionUrlTemplate'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final configurationUrl = this.configurationUrl;
+    final entityUrlTemplate = this.entityUrlTemplate;
+    final executionUrlTemplate = this.executionUrlTemplate;
+    final revisionUrlTemplate = this.revisionUrlTemplate;
+    return {
+      if (configurationUrl != null) 'configurationUrl': configurationUrl,
+      if (entityUrlTemplate != null) 'entityUrlTemplate': entityUrlTemplate,
+      if (executionUrlTemplate != null)
+        'executionUrlTemplate': executionUrlTemplate,
+      if (revisionUrlTemplate != null)
+        'revisionUrlTemplate': revisionUrlTemplate,
     };
   }
 }
@@ -3625,6 +4160,74 @@ class ExecutionTrigger {
   }
 }
 
+/// The action engine, or executor, related to the supported integration model
+/// used to create and update the action type. The available executor types are
+/// <code>Lambda</code> and <code>JobWorker</code>.
+class ExecutorConfiguration {
+  /// Details about the <code>JobWorker</code> executor of the action type.
+  final JobWorkerExecutorConfiguration? jobWorkerExecutorConfiguration;
+
+  /// Details about the <code>Lambda</code> executor of the action type.
+  final LambdaExecutorConfiguration? lambdaExecutorConfiguration;
+
+  ExecutorConfiguration({
+    this.jobWorkerExecutorConfiguration,
+    this.lambdaExecutorConfiguration,
+  });
+  factory ExecutorConfiguration.fromJson(Map<String, dynamic> json) {
+    return ExecutorConfiguration(
+      jobWorkerExecutorConfiguration: json['jobWorkerExecutorConfiguration'] !=
+              null
+          ? JobWorkerExecutorConfiguration.fromJson(
+              json['jobWorkerExecutorConfiguration'] as Map<String, dynamic>)
+          : null,
+      lambdaExecutorConfiguration: json['lambdaExecutorConfiguration'] != null
+          ? LambdaExecutorConfiguration.fromJson(
+              json['lambdaExecutorConfiguration'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final jobWorkerExecutorConfiguration = this.jobWorkerExecutorConfiguration;
+    final lambdaExecutorConfiguration = this.lambdaExecutorConfiguration;
+    return {
+      if (jobWorkerExecutorConfiguration != null)
+        'jobWorkerExecutorConfiguration': jobWorkerExecutorConfiguration,
+      if (lambdaExecutorConfiguration != null)
+        'lambdaExecutorConfiguration': lambdaExecutorConfiguration,
+    };
+  }
+}
+
+enum ExecutorType {
+  jobWorker,
+  lambda,
+}
+
+extension on ExecutorType {
+  String toValue() {
+    switch (this) {
+      case ExecutorType.jobWorker:
+        return 'JobWorker';
+      case ExecutorType.lambda:
+        return 'Lambda';
+    }
+  }
+}
+
+extension on String {
+  ExecutorType toExecutorType() {
+    switch (this) {
+      case 'JobWorker':
+        return ExecutorType.jobWorker;
+      case 'Lambda':
+        return ExecutorType.lambda;
+    }
+    throw Exception('$this is not known in enum ExecutorType');
+  }
+}
+
 /// Represents information about failure details.
 class FailureDetails {
   /// The message about the failure.
@@ -3699,6 +4302,24 @@ extension on String {
         return FailureType.systemUnavailable;
     }
     throw Exception('$this is not known in enum FailureType');
+  }
+}
+
+class GetActionTypeOutput {
+  /// The action type information for the requested action type, such as the
+  /// action type ID.
+  final ActionTypeDeclaration? actionType;
+
+  GetActionTypeOutput({
+    this.actionType,
+  });
+  factory GetActionTypeOutput.fromJson(Map<String, dynamic> json) {
+    return GetActionTypeOutput(
+      actionType: json['actionType'] != null
+          ? ActionTypeDeclaration.fromJson(
+              json['actionType'] as Map<String, dynamic>)
+          : null,
+    );
   }
 }
 
@@ -4051,6 +4672,68 @@ extension on String {
         return JobStatus.failed;
     }
     throw Exception('$this is not known in enum JobStatus');
+  }
+}
+
+/// Details about the polling configuration for the <code>JobWorker</code>
+/// action engine, or executor.
+class JobWorkerExecutorConfiguration {
+  /// The accounts in which the job worker is configured and might poll for jobs
+  /// as part of the action execution.
+  final List<String>? pollingAccounts;
+
+  /// The service Principals in which the job worker is configured and might poll
+  /// for jobs as part of the action execution.
+  final List<String>? pollingServicePrincipals;
+
+  JobWorkerExecutorConfiguration({
+    this.pollingAccounts,
+    this.pollingServicePrincipals,
+  });
+  factory JobWorkerExecutorConfiguration.fromJson(Map<String, dynamic> json) {
+    return JobWorkerExecutorConfiguration(
+      pollingAccounts: (json['pollingAccounts'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      pollingServicePrincipals: (json['pollingServicePrincipals'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final pollingAccounts = this.pollingAccounts;
+    final pollingServicePrincipals = this.pollingServicePrincipals;
+    return {
+      if (pollingAccounts != null) 'pollingAccounts': pollingAccounts,
+      if (pollingServicePrincipals != null)
+        'pollingServicePrincipals': pollingServicePrincipals,
+    };
+  }
+}
+
+/// Details about the configuration for the <code>Lambda</code> action engine,
+/// or executor.
+class LambdaExecutorConfiguration {
+  /// The ARN of the Lambda function used by the action engine.
+  final String lambdaFunctionArn;
+
+  LambdaExecutorConfiguration({
+    required this.lambdaFunctionArn,
+  });
+  factory LambdaExecutorConfiguration.fromJson(Map<String, dynamic> json) {
+    return LambdaExecutorConfiguration(
+      lambdaFunctionArn: json['lambdaFunctionArn'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final lambdaFunctionArn = this.lambdaFunctionArn;
+    return {
+      'lambdaFunctionArn': lambdaFunctionArn,
+    };
   }
 }
 
@@ -4440,6 +5123,10 @@ class PipelineExecution {
   ///
   /// <ul>
   /// <li>
+  /// Cancelled: The pipeline’s definition was updated before the pipeline
+  /// execution could be completed.
+  /// </li>
+  /// <li>
   /// InProgress: The pipeline execution is currently running.
   /// </li>
   /// <li>
@@ -4471,12 +5158,16 @@ class PipelineExecution {
   /// </ul>
   final PipelineExecutionStatus? status;
 
+  /// A summary that contains a description of the pipeline execution status.
+  final String? statusSummary;
+
   PipelineExecution({
     this.artifactRevisions,
     this.pipelineExecutionId,
     this.pipelineName,
     this.pipelineVersion,
     this.status,
+    this.statusSummary,
   });
   factory PipelineExecution.fromJson(Map<String, dynamic> json) {
     return PipelineExecution(
@@ -4488,11 +5179,13 @@ class PipelineExecution {
       pipelineName: json['pipelineName'] as String?,
       pipelineVersion: json['pipelineVersion'] as int?,
       status: (json['status'] as String?)?.toPipelineExecutionStatus(),
+      statusSummary: json['statusSummary'] as String?,
     );
   }
 }
 
 enum PipelineExecutionStatus {
+  cancelled,
   inProgress,
   stopped,
   stopping,
@@ -4504,6 +5197,8 @@ enum PipelineExecutionStatus {
 extension on PipelineExecutionStatus {
   String toValue() {
     switch (this) {
+      case PipelineExecutionStatus.cancelled:
+        return 'Cancelled';
       case PipelineExecutionStatus.inProgress:
         return 'InProgress';
       case PipelineExecutionStatus.stopped:
@@ -4523,6 +5218,8 @@ extension on PipelineExecutionStatus {
 extension on String {
   PipelineExecutionStatus toPipelineExecutionStatus() {
     switch (this) {
+      case 'Cancelled':
+        return PipelineExecutionStatus.cancelled;
       case 'InProgress':
         return PipelineExecutionStatus.inProgress;
       case 'Stopped':
@@ -4937,6 +5634,10 @@ class StageExecution {
 
   /// The status of the stage, or for a completed stage, the last status of the
   /// stage.
+  /// <note>
+  /// A status of cancelled means that the pipeline’s definition was updated
+  /// before the stage execution could be completed.
+  /// </note>
   final StageExecutionStatus status;
 
   StageExecution({
@@ -4952,6 +5653,7 @@ class StageExecution {
 }
 
 enum StageExecutionStatus {
+  cancelled,
   inProgress,
   failed,
   stopped,
@@ -4962,6 +5664,8 @@ enum StageExecutionStatus {
 extension on StageExecutionStatus {
   String toValue() {
     switch (this) {
+      case StageExecutionStatus.cancelled:
+        return 'Cancelled';
       case StageExecutionStatus.inProgress:
         return 'InProgress';
       case StageExecutionStatus.failed:
@@ -4979,6 +5683,8 @@ extension on StageExecutionStatus {
 extension on String {
   StageExecutionStatus toStageExecutionStatus() {
     switch (this) {
+      case 'Cancelled':
+        return StageExecutionStatus.cancelled;
       case 'InProgress':
         return StageExecutionStatus.inProgress;
       case 'Failed':
@@ -5800,6 +6506,11 @@ class PipelineVersionNotFoundException extends _s.GenericAwsException {
             message: message);
 }
 
+class RequestFailedException extends _s.GenericAwsException {
+  RequestFailedException({String? type, String? message})
+      : super(type: type, code: 'RequestFailedException', message: message);
+}
+
 class ResourceNotFoundException extends _s.GenericAwsException {
   ResourceNotFoundException({String? type, String? message})
       : super(type: type, code: 'ResourceNotFoundException', message: message);
@@ -5890,6 +6601,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       PipelineNotFoundException(type: type, message: message),
   'PipelineVersionNotFoundException': (type, message) =>
       PipelineVersionNotFoundException(type: type, message: message),
+  'RequestFailedException': (type, message) =>
+      RequestFailedException(type: type, message: message),
   'ResourceNotFoundException': (type, message) =>
       ResourceNotFoundException(type: type, message: message),
   'StageNotFoundException': (type, message) =>

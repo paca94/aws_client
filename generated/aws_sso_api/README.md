@@ -2,7 +2,8 @@
 
 **Generated Dart library from API specification**
 
-
+*About the service:*
+<p/>
 
 ## Links
 

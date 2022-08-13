@@ -1155,8 +1155,13 @@ class MTurk {
     );
   }
 
-  /// The <code>GetAccountBalance</code> operation retrieves the amount of money
-  /// in your Amazon Mechanical Turk account.
+  /// The <code>GetAccountBalance</code> operation retrieves the Prepaid HITs
+  /// balance in your Amazon Mechanical Turk account if you are a Prepaid
+  /// Requester. Alternatively, this operation will retrieve the remaining
+  /// available AWS Billing usage if you have enabled AWS Billing. Note: If you
+  /// have enabled AWS Billing and still have a remaining Prepaid HITs balance,
+  /// this balance can be viewed on the My Account page in the Requester
+  /// console.
   ///
   /// May throw [ServiceFault].
   /// May throw [RequestError].
@@ -4424,23 +4429,6 @@ class RejectQualificationRequestResponse {
   }
 }
 
-/// Your request is invalid.
-class RequestError implements _s.AwsException {
-  final String? message;
-  final String? turkErrorCode;
-
-  RequestError({
-    this.message,
-    this.turkErrorCode,
-  });
-  factory RequestError.fromJson(Map<String, dynamic> json) {
-    return RequestError(
-      message: json['Message'] as String?,
-      turkErrorCode: json['TurkErrorCode'] as String?,
-    );
-  }
-}
-
 /// Both the AssignmentReviewReport and the HITReviewReport elements contains
 /// the ReviewActionDetail data structure. This structure is returned multiple
 /// times for each action specified in the Review Policy.
@@ -4715,24 +4703,6 @@ class SendTestEventNotificationResponse {
   }
 }
 
-/// Amazon Mechanical Turk is temporarily unable to process your request. Try
-/// your call again.
-class ServiceFault implements _s.AwsException {
-  final String? message;
-  final String? turkErrorCode;
-
-  ServiceFault({
-    this.message,
-    this.turkErrorCode,
-  });
-  factory ServiceFault.fromJson(Map<String, dynamic> json) {
-    return ServiceFault(
-      message: json['Message'] as String?,
-      turkErrorCode: json['TurkErrorCode'] as String?,
-    );
-  }
-}
-
 class UpdateExpirationForHITResponse {
   UpdateExpirationForHITResponse();
   factory UpdateExpirationForHITResponse.fromJson(Map<String, dynamic> _) {
@@ -4799,7 +4769,17 @@ class WorkerBlock {
   }
 }
 
+class RequestError extends _s.GenericAwsException {
+  RequestError({String? type, String? message})
+      : super(type: type, code: 'RequestError', message: message);
+}
+
+class ServiceFault extends _s.GenericAwsException {
+  ServiceFault({String? type, String? message})
+      : super(type: type, code: 'ServiceFault', message: message);
+}
+
 final _exceptionFns = <String, _s.AwsExceptionFn>{
-  'RequestError': (type, message) => RequestError(message: message),
-  'ServiceFault': (type, message) => ServiceFault(message: message),
+  'RequestError': (type, message) => RequestError(type: type, message: message),
+  'ServiceFault': (type, message) => ServiceFault(type: type, message: message),
 };

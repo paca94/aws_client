@@ -148,7 +148,7 @@ class Comprehend {
   ///
   /// Parameter [textList] :
   /// A list containing the text of the input documents. The list can contain a
-  /// maximum of 25 documents. Each document must contain fewer that 5,000 bytes
+  /// maximum of 25 documents. Each document must contain fewer than 5,000 bytes
   /// of UTF-8 encoded characters.
   Future<BatchDetectKeyPhrasesResponse> batchDetectKeyPhrases({
     required LanguageCode languageCode,
@@ -274,7 +274,10 @@ class Comprehend {
   /// May throw [InternalServerException].
   ///
   /// Parameter [endpointArn] :
-  /// The Amazon Resource Number (ARN) of the endpoint.
+  /// The Amazon Resource Number (ARN) of the endpoint. For information about
+  /// endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
   ///
   /// Parameter [text] :
   /// The document text to be analyzed.
@@ -315,6 +318,55 @@ class Comprehend {
     );
 
     return ClassifyDocumentResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Analyzes input text for the presence of personally identifiable
+  /// information (PII) and returns the labels of identified PII entity types
+  /// such as name, address, bank account number, or phone number.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [TextSizeLimitExceededException].
+  /// May throw [UnsupportedLanguageException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [languageCode] :
+  /// The language of the input documents. Currently, English is the only valid
+  /// language.
+  ///
+  /// Parameter [text] :
+  /// Creates a new document classification request to analyze a single document
+  /// in real-time, returning personally identifiable information (PII) entity
+  /// labels.
+  Future<ContainsPiiEntitiesResponse> containsPiiEntities({
+    required LanguageCode languageCode,
+    required String text,
+  }) async {
+    ArgumentError.checkNotNull(languageCode, 'languageCode');
+    ArgumentError.checkNotNull(text, 'text');
+    _s.validateStringLength(
+      'text',
+      text,
+      1,
+      1152921504606846976,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.ContainsPiiEntities'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'LanguageCode': languageCode.toValue(),
+        'Text': text,
+      },
+    );
+
+    return ContainsPiiEntitiesResponse.fromJson(jsonResponse.body);
   }
 
   /// Creates a new document classifier that you can use to categorize
@@ -361,6 +413,39 @@ class Comprehend {
   /// individual document are separated by a delimiter. The default delimiter
   /// between labels is a pipe (|).
   ///
+  /// Parameter [modelKmsKeyId] :
+  /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
+  /// uses to encrypt trained custom models. The ModelKmsKeyId can be either of
+  /// the following formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [modelPolicy] :
+  /// The resource-based policy to attach to your custom document classifier
+  /// model. You can use this policy to allow another AWS account to import your
+  /// custom model.
+  ///
+  /// Provide your policy as a JSON body that you enter as a UTF-8 encoded
+  /// string without line breaks. To provide valid JSON, enclose the attribute
+  /// names and values in double quotes. If the JSON body is also enclosed in
+  /// double quotes, then you must escape the double quotes that are inside the
+  /// policy:
+  ///
+  /// <code>"{\"attribute\": \"value\", \"attribute\": [\"value\"]}"</code>
+  ///
+  /// To avoid escaping quotes, you can use single quotes to enclose the policy
+  /// and double quotes to enclose the JSON names and values:
+  ///
+  /// <code>'{"attribute": "value", "attribute": ["value"]}'</code>
+  ///
   /// Parameter [outputDataConfig] :
   /// Enables the addition of output results configuration parameters for custom
   /// classifier jobs.
@@ -370,6 +455,12 @@ class Comprehend {
   /// a key-value pair that adds as a metadata to a resource used by Amazon
   /// Comprehend. For example, a tag with "Sales" as the key might be added to a
   /// resource to indicate its use by the sales department.
+  ///
+  /// Parameter [versionName] :
+  /// The version name given to the newly created classifier. Version names can
+  /// have a maximum of 256 characters. Alphanumeric characters, hyphens (-) and
+  /// underscores (_) are allowed. The version name must be unique among all
+  /// models with the same classifier name in the account/AWS Region.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -400,8 +491,11 @@ class Comprehend {
     required LanguageCode languageCode,
     String? clientRequestToken,
     DocumentClassifierMode? mode,
+    String? modelKmsKeyId,
+    String? modelPolicy,
     DocumentClassifierOutputDataConfig? outputDataConfig,
     List<Tag>? tags,
+    String? versionName,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -431,6 +525,24 @@ class Comprehend {
       64,
     );
     _s.validateStringLength(
+      'modelKmsKeyId',
+      modelKmsKeyId,
+      0,
+      2048,
+    );
+    _s.validateStringLength(
+      'modelPolicy',
+      modelPolicy,
+      1,
+      20000,
+    );
+    _s.validateStringLength(
+      'versionName',
+      versionName,
+      0,
+      63,
+    );
+    _s.validateStringLength(
       'volumeKmsKeyId',
       volumeKmsKeyId,
       0,
@@ -454,8 +566,11 @@ class Comprehend {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (mode != null) 'Mode': mode.toValue(),
+        if (modelKmsKeyId != null) 'ModelKmsKeyId': modelKmsKeyId,
+        if (modelPolicy != null) 'ModelPolicy': modelPolicy,
         if (outputDataConfig != null) 'OutputDataConfig': outputDataConfig,
         if (tags != null) 'Tags': tags,
+        if (versionName != null) 'VersionName': versionName,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -465,7 +580,9 @@ class Comprehend {
   }
 
   /// Creates a model-specific endpoint for synchronous inference for a
-  /// previously trained custom model
+  /// previously trained custom model For information about endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ResourceInUseException].
@@ -495,6 +612,11 @@ class Comprehend {
   /// previous endpoint creation request, Amazon Comprehend will not return a
   /// <code>ResourceInUseException</code>.
   ///
+  /// Parameter [dataAccessRoleArn] :
+  /// The Amazon Resource Name (ARN) of the AWS identity and Access Management
+  /// (IAM) role that grants Amazon Comprehend read access to trained custom
+  /// models encrypted with a customer managed key (ModelKmsKeyId).
+  ///
   /// Parameter [tags] :
   /// Tags associated with the endpoint being created. A tag is a key-value pair
   /// that adds metadata to the endpoint. For example, a tag with "Sales" as the
@@ -505,6 +627,7 @@ class Comprehend {
     required String endpointName,
     required String modelArn,
     String? clientRequestToken,
+    String? dataAccessRoleArn,
     List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(desiredInferenceUnits, 'desiredInferenceUnits');
@@ -537,6 +660,12 @@ class Comprehend {
       1,
       64,
     );
+    _s.validateStringLength(
+      'dataAccessRoleArn',
+      dataAccessRoleArn,
+      20,
+      2048,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'Comprehend_20171127.CreateEndpoint'
@@ -553,6 +682,7 @@ class Comprehend {
         'ModelArn': modelArn,
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (dataAccessRoleArn != null) 'DataAccessRoleArn': dataAccessRoleArn,
         if (tags != null) 'Tags': tags,
       },
     );
@@ -598,11 +728,49 @@ class Comprehend {
   /// A unique identifier for the request. If you don't set the client request
   /// token, Amazon Comprehend generates one.
   ///
+  /// Parameter [modelKmsKeyId] :
+  /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
+  /// uses to encrypt trained custom models. The ModelKmsKeyId can be either of
+  /// the following formats
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [modelPolicy] :
+  /// The JSON resource-based policy to attach to your custom entity recognizer
+  /// model. You can use this policy to allow another AWS account to import your
+  /// custom model.
+  ///
+  /// Provide your JSON as a UTF-8 encoded string without line breaks. To
+  /// provide valid JSON for your policy, enclose the attribute names and values
+  /// in double quotes. If the JSON body is also enclosed in double quotes, then
+  /// you must escape the double quotes that are inside the policy:
+  ///
+  /// <code>"{\"attribute\": \"value\", \"attribute\": [\"value\"]}"</code>
+  ///
+  /// To avoid escaping quotes, you can use single quotes to enclose the policy
+  /// and double quotes to enclose the JSON names and values:
+  ///
+  /// <code>'{"attribute": "value", "attribute": ["value"]}'</code>
+  ///
   /// Parameter [tags] :
   /// Tags to be associated with the entity recognizer being created. A tag is a
   /// key-value pair that adds as a metadata to a resource used by Amazon
   /// Comprehend. For example, a tag with "Sales" as the key might be added to a
   /// resource to indicate its use by the sales department.
+  ///
+  /// Parameter [versionName] :
+  /// The version name given to the newly created recognizer. Version names can
+  /// be a maximum of 256 characters. Alphanumeric characters, hyphens (-) and
+  /// underscores (_) are allowed. The version name must be unique among all
+  /// models with the same recognizer name in the account/ AWS Region.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -632,7 +800,10 @@ class Comprehend {
     required LanguageCode languageCode,
     required String recognizerName,
     String? clientRequestToken,
+    String? modelKmsKeyId,
+    String? modelPolicy,
     List<Tag>? tags,
+    String? versionName,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -661,6 +832,24 @@ class Comprehend {
       64,
     );
     _s.validateStringLength(
+      'modelKmsKeyId',
+      modelKmsKeyId,
+      0,
+      2048,
+    );
+    _s.validateStringLength(
+      'modelPolicy',
+      modelPolicy,
+      1,
+      20000,
+    );
+    _s.validateStringLength(
+      'versionName',
+      versionName,
+      0,
+      63,
+    );
+    _s.validateStringLength(
       'volumeKmsKeyId',
       volumeKmsKeyId,
       0,
@@ -683,7 +872,10 @@ class Comprehend {
         'RecognizerName': recognizerName,
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (modelKmsKeyId != null) 'ModelKmsKeyId': modelKmsKeyId,
+        if (modelPolicy != null) 'ModelPolicy': modelPolicy,
         if (tags != null) 'Tags': tags,
+        if (versionName != null) 'VersionName': versionName,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -740,7 +932,10 @@ class Comprehend {
   }
 
   /// Deletes a model-specific endpoint for a previously-trained custom model.
-  /// All endpoints must be deleted in order for the model to be deleted.
+  /// All endpoints must be deleted in order for the model to be deleted. For
+  /// information about endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ResourceInUseException].
@@ -820,6 +1015,53 @@ class Comprehend {
       headers: headers,
       payload: {
         'EntityRecognizerArn': entityRecognizerArn,
+      },
+    );
+  }
+
+  /// Deletes a resource-based policy that is attached to a custom model.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [resourceArn] :
+  /// The Amazon Resource Name (ARN) of the custom model version that has the
+  /// policy to delete.
+  ///
+  /// Parameter [policyRevisionId] :
+  /// The revision ID of the policy to delete.
+  Future<void> deleteResourcePolicy({
+    required String resourceArn,
+    String? policyRevisionId,
+  }) async {
+    ArgumentError.checkNotNull(resourceArn, 'resourceArn');
+    _s.validateStringLength(
+      'resourceArn',
+      resourceArn,
+      0,
+      256,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'policyRevisionId',
+      policyRevisionId,
+      0,
+      64,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.DeleteResourcePolicy'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ResourceArn': resourceArn,
+        if (policyRevisionId != null) 'PolicyRevisionId': policyRevisionId,
       },
     );
   }
@@ -948,7 +1190,10 @@ class Comprehend {
   }
 
   /// Gets the properties associated with a specific endpoint. Use this
-  /// operation to get the status of an endpoint.
+  /// operation to get the status of an endpoint. For information about
+  /// endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
@@ -1185,6 +1430,44 @@ class Comprehend {
     return DescribePiiEntitiesDetectionJobResponse.fromJson(jsonResponse.body);
   }
 
+  /// Gets the details of a resource-based policy that is attached to a custom
+  /// model, including the JSON body of the policy.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [resourceArn] :
+  /// The Amazon Resource Name (ARN) of the policy to describe.
+  Future<DescribeResourcePolicyResponse> describeResourcePolicy({
+    required String resourceArn,
+  }) async {
+    ArgumentError.checkNotNull(resourceArn, 'resourceArn');
+    _s.validateStringLength(
+      'resourceArn',
+      resourceArn,
+      0,
+      256,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.DescribeResourcePolicy'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ResourceArn': resourceArn,
+      },
+    );
+
+    return DescribeResourcePolicyResponse.fromJson(jsonResponse.body);
+  }
+
   /// Gets the properties associated with a sentiment detection job. Use this
   /// operation to get the status of a detection job.
   ///
@@ -1223,6 +1506,49 @@ class Comprehend {
     );
 
     return DescribeSentimentDetectionJobResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Gets the properties associated with a targeted sentiment detection job.
+  /// Use this operation to get the status of the job.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [JobNotFoundException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [jobId] :
+  /// The identifier that Amazon Comprehend generated for the job. The operation
+  /// returns this identifier in its response.
+  Future<DescribeTargetedSentimentDetectionJobResponse>
+      describeTargetedSentimentDetectionJob({
+    required String jobId,
+  }) async {
+    ArgumentError.checkNotNull(jobId, 'jobId');
+    _s.validateStringLength(
+      'jobId',
+      jobId,
+      1,
+      32,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'Comprehend_20171127.DescribeTargetedSentimentDetectionJob'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'JobId': jobId,
+      },
+    );
+
+    return DescribeTargetedSentimentDetectionJobResponse.fromJson(
+        jsonResponse.body);
   }
 
   /// Gets the properties associated with a topic detection job. Use this
@@ -1328,6 +1654,10 @@ class Comprehend {
   /// custom model, and it ignores any language code that you provide in your
   /// request.
   ///
+  /// For information about endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
+  ///
   /// Parameter [languageCode] :
   /// The language of the input documents. You can specify any of the primary
   /// languages supported by Amazon Comprehend. All documents must be in the
@@ -1431,7 +1761,8 @@ class Comprehend {
   /// May throw [InternalServerException].
   ///
   /// Parameter [languageCode] :
-  /// The language of the input documents.
+  /// The language of the input documents. Currently, English is the only valid
+  /// language.
   ///
   /// Parameter [text] :
   /// A UTF-8 text string. Each string must contain fewer that 5,000 bytes of
@@ -1566,6 +1897,127 @@ class Comprehend {
     return DetectSyntaxResponse.fromJson(jsonResponse.body);
   }
 
+  /// Creates a new custom model that replicates a source custom model that you
+  /// import. The source model can be in your AWS account or another one.
+  ///
+  /// If the source model is in another AWS account, then it must have a
+  /// resource-based policy that authorizes you to import it.
+  ///
+  /// The source model must be in the same AWS region that you're using when you
+  /// import. You can't import a model that's in a different region.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ResourceInUseException].
+  /// May throw [ResourceUnavailableException].
+  /// May throw [TooManyTagsException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [ResourceLimitExceededException].
+  /// May throw [KmsKeyValidationException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [sourceModelArn] :
+  /// The Amazon Resource Name (ARN) of the custom model to import.
+  ///
+  /// Parameter [dataAccessRoleArn] :
+  /// The Amazon Resource Name (ARN) of the AWS Identity and Management (IAM)
+  /// role that allows Amazon Comprehend to use Amazon Key Management Service
+  /// (KMS) to encrypt or decrypt the custom model.
+  ///
+  /// Parameter [modelKmsKeyId] :
+  /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
+  /// uses to encrypt trained custom models. The ModelKmsKeyId can be either of
+  /// the following formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [modelName] :
+  /// The name to assign to the custom model that is created in Amazon
+  /// Comprehend by this import.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the custom model that is created by this
+  /// import. A tag is a key-value pair that adds as a metadata to a resource
+  /// used by Amazon Comprehend. For example, a tag with "Sales" as the key
+  /// might be added to a resource to indicate its use by the sales department.
+  ///
+  /// Parameter [versionName] :
+  /// The version name given to the custom model that is created by this import.
+  /// Version names can have a maximum of 256 characters. Alphanumeric
+  /// characters, hyphens (-) and underscores (_) are allowed. The version name
+  /// must be unique among all models with the same classifier name in the
+  /// account/AWS Region.
+  Future<ImportModelResponse> importModel({
+    required String sourceModelArn,
+    String? dataAccessRoleArn,
+    String? modelKmsKeyId,
+    String? modelName,
+    List<Tag>? tags,
+    String? versionName,
+  }) async {
+    ArgumentError.checkNotNull(sourceModelArn, 'sourceModelArn');
+    _s.validateStringLength(
+      'sourceModelArn',
+      sourceModelArn,
+      0,
+      256,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'dataAccessRoleArn',
+      dataAccessRoleArn,
+      20,
+      2048,
+    );
+    _s.validateStringLength(
+      'modelKmsKeyId',
+      modelKmsKeyId,
+      0,
+      2048,
+    );
+    _s.validateStringLength(
+      'modelName',
+      modelName,
+      0,
+      63,
+    );
+    _s.validateStringLength(
+      'versionName',
+      versionName,
+      0,
+      63,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.ImportModel'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'SourceModelArn': sourceModelArn,
+        if (dataAccessRoleArn != null) 'DataAccessRoleArn': dataAccessRoleArn,
+        if (modelKmsKeyId != null) 'ModelKmsKeyId': modelKmsKeyId,
+        if (modelName != null) 'ModelName': modelName,
+        if (tags != null) 'Tags': tags,
+        if (versionName != null) 'VersionName': versionName,
+      },
+    );
+
+    return ImportModelResponse.fromJson(jsonResponse.body);
+  }
+
   /// Gets a list of the documentation classification jobs that you have
   /// submitted.
   ///
@@ -1620,6 +2072,53 @@ class Comprehend {
     );
 
     return ListDocumentClassificationJobsResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Gets a list of summaries of the document classifiers that you have created
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of results to return on each page. The default is 100.
+  ///
+  /// Parameter [nextToken] :
+  /// Identifies the next page of results to return.
+  Future<ListDocumentClassifierSummariesResponse>
+      listDocumentClassifierSummaries({
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      500,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      1152921504606846976,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.ListDocumentClassifierSummaries'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListDocumentClassifierSummariesResponse.fromJson(jsonResponse.body);
   }
 
   /// Gets a list of the document classifiers that you have created.
@@ -1733,7 +2232,10 @@ class Comprehend {
         jsonResponse.body);
   }
 
-  /// Gets a list of all existing endpoints that you've created.
+  /// Gets a list of all existing endpoints that you've created. For information
+  /// about endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
@@ -1838,6 +2340,52 @@ class Comprehend {
     );
 
     return ListEntitiesDetectionJobsResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Gets a list of summaries for the entity recognizers that you have created.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of results to return on each page. The default is 100.
+  ///
+  /// Parameter [nextToken] :
+  /// Identifies the next page of results to return.
+  Future<ListEntityRecognizerSummariesResponse> listEntityRecognizerSummaries({
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      500,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      1152921504606846976,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.ListEntityRecognizerSummaries'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListEntityRecognizerSummariesResponse.fromJson(jsonResponse.body);
   }
 
   /// Gets a list of the properties of all entity recognizers that you created,
@@ -2155,6 +2703,62 @@ class Comprehend {
     return ListTagsForResourceResponse.fromJson(jsonResponse.body);
   }
 
+  /// Gets a list of targeted sentiment detection jobs that you have submitted.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InvalidFilterException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [filter] :
+  /// Filters the jobs that are returned. You can filter jobs on their name,
+  /// status, or the date and time that they were submitted. You can only set
+  /// one filter at a time.
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of results to return in each page. The default is 100.
+  ///
+  /// Parameter [nextToken] :
+  /// Identifies the next page of results to return.
+  Future<ListTargetedSentimentDetectionJobsResponse>
+      listTargetedSentimentDetectionJobs({
+    TargetedSentimentDetectionJobFilter? filter,
+    int? maxResults,
+    String? nextToken,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      500,
+    );
+    _s.validateStringLength(
+      'nextToken',
+      nextToken,
+      1,
+      1152921504606846976,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.ListTargetedSentimentDetectionJobs'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (filter != null) 'Filter': filter,
+        if (maxResults != null) 'MaxResults': maxResults,
+        if (nextToken != null) 'NextToken': nextToken,
+      },
+    );
+
+    return ListTargetedSentimentDetectionJobsResponse.fromJson(
+        jsonResponse.body);
+  }
+
   /// Gets a list of the topic detection jobs that you have submitted.
   ///
   /// May throw [InvalidRequestException].
@@ -2209,6 +2813,84 @@ class Comprehend {
     return ListTopicsDetectionJobsResponse.fromJson(jsonResponse.body);
   }
 
+  /// Attaches a resource-based policy to a custom model. You can use this
+  /// policy to authorize an entity in another AWS account to import the custom
+  /// model, which replicates it in Amazon Comprehend in their account.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [resourceArn] :
+  /// The Amazon Resource Name (ARN) of the custom model to attach the policy
+  /// to.
+  ///
+  /// Parameter [resourcePolicy] :
+  /// The JSON resource-based policy to attach to your custom model. Provide
+  /// your JSON as a UTF-8 encoded string without line breaks. To provide valid
+  /// JSON for your policy, enclose the attribute names and values in double
+  /// quotes. If the JSON body is also enclosed in double quotes, then you must
+  /// escape the double quotes that are inside the policy:
+  ///
+  /// <code>"{\"attribute\": \"value\", \"attribute\": [\"value\"]}"</code>
+  ///
+  /// To avoid escaping quotes, you can use single quotes to enclose the policy
+  /// and double quotes to enclose the JSON names and values:
+  ///
+  /// <code>'{"attribute": "value", "attribute": ["value"]}'</code>
+  ///
+  /// Parameter [policyRevisionId] :
+  /// The revision ID that Amazon Comprehend assigned to the policy that you are
+  /// updating. If you are creating a new policy that has no prior version,
+  /// don't use this parameter. Amazon Comprehend creates the revision ID for
+  /// you.
+  Future<PutResourcePolicyResponse> putResourcePolicy({
+    required String resourceArn,
+    required String resourcePolicy,
+    String? policyRevisionId,
+  }) async {
+    ArgumentError.checkNotNull(resourceArn, 'resourceArn');
+    _s.validateStringLength(
+      'resourceArn',
+      resourceArn,
+      0,
+      256,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(resourcePolicy, 'resourcePolicy');
+    _s.validateStringLength(
+      'resourcePolicy',
+      resourcePolicy,
+      1,
+      20000,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'policyRevisionId',
+      policyRevisionId,
+      0,
+      64,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.PutResourcePolicy'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ResourceArn': resourceArn,
+        'ResourcePolicy': resourcePolicy,
+        if (policyRevisionId != null) 'PolicyRevisionId': policyRevisionId,
+      },
+    );
+
+    return PutResourcePolicyResponse.fromJson(jsonResponse.body);
+  }
+
   /// Starts an asynchronous document classification job. Use the operation to
   /// track the progress of the job.
   ///
@@ -2217,6 +2899,7 @@ class Comprehend {
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceUnavailableException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2239,6 +2922,12 @@ class Comprehend {
   ///
   /// Parameter [jobName] :
   /// The identifier of the job.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the document classification job. A tag is a
+  /// key-value pair that adds metadata to a resource used by Amazon Comprehend.
+  /// For example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -2270,6 +2959,7 @@ class Comprehend {
     required OutputDataConfig outputDataConfig,
     String? clientRequestToken,
     String? jobName,
+    List<Tag>? tags,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -2327,6 +3017,7 @@ class Comprehend {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -2341,6 +3032,7 @@ class Comprehend {
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2361,6 +3053,12 @@ class Comprehend {
   ///
   /// Parameter [jobName] :
   /// An identifier for the job.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the dominant language detection job. A tag is a
+  /// key-value pair that adds metadata to a resource used by Amazon Comprehend.
+  /// For example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -2391,6 +3089,7 @@ class Comprehend {
     required OutputDataConfig outputDataConfig,
     String? clientRequestToken,
     String? jobName,
+    List<Tag>? tags,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -2439,6 +3138,7 @@ class Comprehend {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -2461,6 +3161,7 @@ class Comprehend {
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceUnavailableException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2493,6 +3194,12 @@ class Comprehend {
   /// Parameter [jobName] :
   /// The identifier of the job.
   ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the entities detection job. A tag is a
+  /// key-value pair that adds metadata to a resource used by Amazon Comprehend.
+  /// For example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
+  ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
   /// uses to encrypt data on the storage volume attached to the ML compute
@@ -2523,6 +3230,7 @@ class Comprehend {
     String? clientRequestToken,
     String? entityRecognizerArn,
     String? jobName,
+    List<Tag>? tags,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -2581,6 +3289,7 @@ class Comprehend {
         if (entityRecognizerArn != null)
           'EntityRecognizerArn': entityRecognizerArn,
         if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -2594,6 +3303,7 @@ class Comprehend {
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2618,6 +3328,12 @@ class Comprehend {
   ///
   /// Parameter [jobName] :
   /// The identifier of the events detection job.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the events detection job. A tag is a key-value
+  /// pair that adds metadata to a resource used by Amazon Comprehend. For
+  /// example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   Future<StartEventsDetectionJobResponse> startEventsDetectionJob({
     required String dataAccessRoleArn,
     required InputDataConfig inputDataConfig,
@@ -2626,6 +3342,7 @@ class Comprehend {
     required List<String> targetEventTypes,
     String? clientRequestToken,
     String? jobName,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(dataAccessRoleArn, 'dataAccessRoleArn');
     _s.validateStringLength(
@@ -2670,6 +3387,7 @@ class Comprehend {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -2682,6 +3400,7 @@ class Comprehend {
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2707,6 +3426,12 @@ class Comprehend {
   ///
   /// Parameter [jobName] :
   /// The identifier of the job.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the key phrases detection job. A tag is a
+  /// key-value pair that adds metadata to a resource used by Amazon Comprehend.
+  /// For example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -2737,6 +3462,7 @@ class Comprehend {
     required OutputDataConfig outputDataConfig,
     String? clientRequestToken,
     String? jobName,
+    List<Tag>? tags,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -2787,6 +3513,7 @@ class Comprehend {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -2801,6 +3528,7 @@ class Comprehend {
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2811,7 +3539,8 @@ class Comprehend {
   /// The input properties for a PII entities detection job.
   ///
   /// Parameter [languageCode] :
-  /// The language of the input documents.
+  /// The language of the input documents. Currently, English is the only valid
+  /// language.
   ///
   /// Parameter [mode] :
   /// Specifies whether the output provides the locations (offsets) of PII
@@ -2835,6 +3564,12 @@ class Comprehend {
   /// <code>ONLY_REDACTION</code>. In that case, you must provide a
   /// <code>RedactionConfig</code> definition that includes the
   /// <code>PiiEntityTypes</code> parameter.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the PII entities detection job. A tag is a
+  /// key-value pair that adds metadata to a resource used by Amazon Comprehend.
+  /// For example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   Future<StartPiiEntitiesDetectionJobResponse> startPiiEntitiesDetectionJob({
     required String dataAccessRoleArn,
     required InputDataConfig inputDataConfig,
@@ -2844,6 +3579,7 @@ class Comprehend {
     String? clientRequestToken,
     String? jobName,
     RedactionConfig? redactionConfig,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(dataAccessRoleArn, 'dataAccessRoleArn');
     _s.validateStringLength(
@@ -2889,6 +3625,7 @@ class Comprehend {
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
         if (redactionConfig != null) 'RedactionConfig': redactionConfig,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -2896,11 +3633,12 @@ class Comprehend {
   }
 
   /// Starts an asynchronous sentiment detection job for a collection of
-  /// documents. use the operation to track the status of a job.
+  /// documents. Use the operation to track the status of a job.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -2926,6 +3664,12 @@ class Comprehend {
   ///
   /// Parameter [jobName] :
   /// The identifier of the job.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the sentiment detection job. A tag is a
+  /// key-value pair that adds metadata to a resource used by Amazon Comprehend.
+  /// For example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -2956,6 +3700,7 @@ class Comprehend {
     required OutputDataConfig outputDataConfig,
     String? clientRequestToken,
     String? jobName,
+    List<Tag>? tags,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -3006,12 +3751,132 @@ class Comprehend {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
     );
 
     return StartSentimentDetectionJobResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Starts an asynchronous targeted sentiment detection job for a collection
+  /// of documents. Use the operation to track the status of a job.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [dataAccessRoleArn] :
+  /// The Amazon Resource Name (ARN) of the AWS Identity and Access Management
+  /// (IAM) role that grants Amazon Comprehend read access to your input data.
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/access-control-managing-permissions.html#auth-role-permissions">Role-based
+  /// permissions</a>.
+  ///
+  /// Parameter [languageCode] :
+  /// The language of the input documents. Currently, English is the only valid
+  /// language.
+  ///
+  /// Parameter [outputDataConfig] :
+  /// Specifies where to send the output files.
+  ///
+  /// Parameter [clientRequestToken] :
+  /// A unique identifier for the request. If you don't set the client request
+  /// token, Amazon Comprehend generates one.
+  ///
+  /// Parameter [jobName] :
+  /// The identifier of the job.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the targeted sentiment detection job. A tag is
+  /// a key-value pair that adds metadata to a resource used by Amazon
+  /// Comprehend. For example, a tag with "Sales" as the key might be added to a
+  /// resource to indicate its use by the sales department.
+  ///
+  /// Parameter [volumeKmsKeyId] :
+  /// ID for the KMS key that Amazon Comprehend uses to encrypt data on the
+  /// storage volume attached to the ML compute instance(s) that process the
+  /// analysis job. The VolumeKmsKeyId can be either of the following formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  Future<StartTargetedSentimentDetectionJobResponse>
+      startTargetedSentimentDetectionJob({
+    required String dataAccessRoleArn,
+    required InputDataConfig inputDataConfig,
+    required LanguageCode languageCode,
+    required OutputDataConfig outputDataConfig,
+    String? clientRequestToken,
+    String? jobName,
+    List<Tag>? tags,
+    String? volumeKmsKeyId,
+    VpcConfig? vpcConfig,
+  }) async {
+    ArgumentError.checkNotNull(dataAccessRoleArn, 'dataAccessRoleArn');
+    _s.validateStringLength(
+      'dataAccessRoleArn',
+      dataAccessRoleArn,
+      20,
+      2048,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(inputDataConfig, 'inputDataConfig');
+    ArgumentError.checkNotNull(languageCode, 'languageCode');
+    ArgumentError.checkNotNull(outputDataConfig, 'outputDataConfig');
+    _s.validateStringLength(
+      'clientRequestToken',
+      clientRequestToken,
+      1,
+      64,
+    );
+    _s.validateStringLength(
+      'jobName',
+      jobName,
+      1,
+      256,
+    );
+    _s.validateStringLength(
+      'volumeKmsKeyId',
+      volumeKmsKeyId,
+      0,
+      2048,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.StartTargetedSentimentDetectionJob'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'DataAccessRoleArn': dataAccessRoleArn,
+        'InputDataConfig': inputDataConfig,
+        'LanguageCode': languageCode.toValue(),
+        'OutputDataConfig': outputDataConfig,
+        'ClientRequestToken':
+            clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (jobName != null) 'JobName': jobName,
+        if (tags != null) 'Tags': tags,
+        if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
+        if (vpcConfig != null) 'VpcConfig': vpcConfig,
+      },
+    );
+
+    return StartTargetedSentimentDetectionJobResponse.fromJson(
+        jsonResponse.body);
   }
 
   /// Starts an asynchronous topic detection job. Use the
@@ -3021,6 +3886,7 @@ class Comprehend {
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
   /// May throw [KmsKeyValidationException].
+  /// May throw [TooManyTagsException].
   /// May throw [InternalServerException].
   ///
   /// Parameter [dataAccessRoleArn] :
@@ -3047,6 +3913,12 @@ class Comprehend {
   ///
   /// Parameter [numberOfTopics] :
   /// The number of topics to detect.
+  ///
+  /// Parameter [tags] :
+  /// Tags to be associated with the topics detection job. A tag is a key-value
+  /// pair that adds metadata to a resource used by Amazon Comprehend. For
+  /// example, a tag with "Sales" as the key might be added to a resource to
+  /// indicate its use by the sales department.
   ///
   /// Parameter [volumeKmsKeyId] :
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend
@@ -3077,6 +3949,7 @@ class Comprehend {
     String? clientRequestToken,
     String? jobName,
     int? numberOfTopics,
+    List<Tag>? tags,
     String? volumeKmsKeyId,
     VpcConfig? vpcConfig,
   }) async {
@@ -3132,6 +4005,7 @@ class Comprehend {
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (jobName != null) 'JobName': jobName,
         if (numberOfTopics != null) 'NumberOfTopics': numberOfTopics,
+        if (tags != null) 'Tags': tags,
         if (volumeKmsKeyId != null) 'VolumeKmsKeyId': volumeKmsKeyId,
         if (vpcConfig != null) 'VpcConfig': vpcConfig,
       },
@@ -3367,7 +4241,7 @@ class Comprehend {
 
   /// Stops a sentiment detection job in progress.
   ///
-  /// If the job state is <code>IN_PROGRESS</code> the job is marked for
+  /// If the job state is <code>IN_PROGRESS</code>, the job is marked for
   /// termination and put into the <code>STOP_REQUESTED</code> state. If the job
   /// completes before it can be stopped, it is put into the
   /// <code>COMPLETED</code> state; otherwise the job is be stopped and put into
@@ -3413,6 +4287,58 @@ class Comprehend {
     );
 
     return StopSentimentDetectionJobResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Stops a targeted sentiment detection job in progress.
+  ///
+  /// If the job state is <code>IN_PROGRESS</code>, the job is marked for
+  /// termination and put into the <code>STOP_REQUESTED</code> state. If the job
+  /// completes before it can be stopped, it is put into the
+  /// <code>COMPLETED</code> state; otherwise the job is be stopped and put into
+  /// the <code>STOPPED</code> state.
+  ///
+  /// If the job is in the <code>COMPLETED</code> or <code>FAILED</code> state
+  /// when you call the <code>StopDominantLanguageDetectionJob</code> operation,
+  /// the operation returns a 400 Internal Request Exception.
+  ///
+  /// When a job is stopped, any documents already processed are written to the
+  /// output location.
+  ///
+  /// May throw [InvalidRequestException].
+  /// May throw [JobNotFoundException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [jobId] :
+  /// The identifier of the targeted sentiment detection job to stop.
+  Future<StopTargetedSentimentDetectionJobResponse>
+      stopTargetedSentimentDetectionJob({
+    required String jobId,
+  }) async {
+    ArgumentError.checkNotNull(jobId, 'jobId');
+    _s.validateStringLength(
+      'jobId',
+      jobId,
+      1,
+      32,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Comprehend_20171127.StopTargetedSentimentDetectionJob'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'JobId': jobId,
+      },
+    );
+
+    return StopTargetedSentimentDetectionJobResponse.fromJson(
+        jsonResponse.body);
   }
 
   /// Stops a document classifier training job while in progress.
@@ -3599,7 +4525,10 @@ class Comprehend {
     );
   }
 
-  /// Updates information about the specified endpoint.
+  /// Updates information about the specified endpoint. For information about
+  /// endpoints, see <a
+  /// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+  /// endpoints</a>.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [TooManyRequestsException].
@@ -3609,25 +4538,26 @@ class Comprehend {
   /// May throw [ResourceUnavailableException].
   /// May throw [InternalServerException].
   ///
+  /// Parameter [endpointArn] :
+  /// The Amazon Resource Number (ARN) of the endpoint being updated.
+  ///
+  /// Parameter [desiredDataAccessRoleArn] :
+  /// Data access role ARN to use in case the new model is encrypted with a
+  /// customer CMK.
+  ///
   /// Parameter [desiredInferenceUnits] :
   /// The desired number of inference units to be used by the model using this
   /// endpoint. Each inference unit represents of a throughput of 100 characters
   /// per second.
   ///
-  /// Parameter [endpointArn] :
-  /// The Amazon Resource Number (ARN) of the endpoint being updated.
+  /// Parameter [desiredModelArn] :
+  /// The ARN of the new model to use when updating an existing endpoint.
   Future<void> updateEndpoint({
-    required int desiredInferenceUnits,
     required String endpointArn,
+    String? desiredDataAccessRoleArn,
+    int? desiredInferenceUnits,
+    String? desiredModelArn,
   }) async {
-    ArgumentError.checkNotNull(desiredInferenceUnits, 'desiredInferenceUnits');
-    _s.validateNumRange(
-      'desiredInferenceUnits',
-      desiredInferenceUnits,
-      1,
-      1152921504606846976,
-      isRequired: true,
-    );
     ArgumentError.checkNotNull(endpointArn, 'endpointArn');
     _s.validateStringLength(
       'endpointArn',
@@ -3635,6 +4565,24 @@ class Comprehend {
       0,
       256,
       isRequired: true,
+    );
+    _s.validateStringLength(
+      'desiredDataAccessRoleArn',
+      desiredDataAccessRoleArn,
+      20,
+      2048,
+    );
+    _s.validateNumRange(
+      'desiredInferenceUnits',
+      desiredInferenceUnits,
+      1,
+      1152921504606846976,
+    );
+    _s.validateStringLength(
+      'desiredModelArn',
+      desiredModelArn,
+      0,
+      256,
     );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -3647,10 +4595,44 @@ class Comprehend {
       // TODO queryParams
       headers: headers,
       payload: {
-        'DesiredInferenceUnits': desiredInferenceUnits,
         'EndpointArn': endpointArn,
+        if (desiredDataAccessRoleArn != null)
+          'DesiredDataAccessRoleArn': desiredDataAccessRoleArn,
+        if (desiredInferenceUnits != null)
+          'DesiredInferenceUnits': desiredInferenceUnits,
+        if (desiredModelArn != null) 'DesiredModelArn': desiredModelArn,
       },
     );
+  }
+}
+
+enum AugmentedManifestsDocumentTypeFormat {
+  plainTextDocument,
+  semiStructuredDocument,
+}
+
+extension on AugmentedManifestsDocumentTypeFormat {
+  String toValue() {
+    switch (this) {
+      case AugmentedManifestsDocumentTypeFormat.plainTextDocument:
+        return 'PLAIN_TEXT_DOCUMENT';
+      case AugmentedManifestsDocumentTypeFormat.semiStructuredDocument:
+        return 'SEMI_STRUCTURED_DOCUMENT';
+    }
+  }
+}
+
+extension on String {
+  AugmentedManifestsDocumentTypeFormat
+      toAugmentedManifestsDocumentTypeFormat() {
+    switch (this) {
+      case 'PLAIN_TEXT_DOCUMENT':
+        return AugmentedManifestsDocumentTypeFormat.plainTextDocument;
+      case 'SEMI_STRUCTURED_DOCUMENT':
+        return AugmentedManifestsDocumentTypeFormat.semiStructuredDocument;
+    }
+    throw Exception(
+        '$this is not known in enum AugmentedManifestsDocumentTypeFormat');
   }
 }
 
@@ -3675,9 +4657,48 @@ class AugmentedManifestsListItem {
   /// The Amazon S3 location of the augmented manifest file.
   final String s3Uri;
 
+  /// The S3 prefix to the annotation files that are referred in the augmented
+  /// manifest file.
+  final String? annotationDataS3Uri;
+
+  /// The type of augmented manifest. PlainTextDocument or SemiStructuredDocument.
+  /// If you don't specify, the default is PlainTextDocument.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>PLAIN_TEXT_DOCUMENT</code> A document type that represents any unicode
+  /// text that is encoded in UTF-8.
+  /// </li>
+  /// <li>
+  /// <code>SEMI_STRUCTURED_DOCUMENT</code> A document type with positional and
+  /// structural context, like a PDF. For training with Amazon Comprehend, only
+  /// PDFs are supported. For inference, Amazon Comprehend support PDFs, DOCX and
+  /// TXT.
+  /// </li>
+  /// </ul>
+  final AugmentedManifestsDocumentTypeFormat? documentType;
+
+  /// The S3 prefix to the source files (PDFs) that are referred to in the
+  /// augmented manifest file.
+  final String? sourceDocumentsS3Uri;
+
+  /// The purpose of the data you've provided in the augmented manifest. You can
+  /// either train or test this data. If you don't specify, the default is train.
+  ///
+  /// TRAIN - all of the documents in the manifest will be used for training. If
+  /// no test documents are provided, Amazon Comprehend will automatically reserve
+  /// a portion of the training documents for testing.
+  ///
+  /// TEST - all of the documents in the manifest will be used for testing.
+  final Split? split;
+
   AugmentedManifestsListItem({
     required this.attributeNames,
     required this.s3Uri,
+    this.annotationDataS3Uri,
+    this.documentType,
+    this.sourceDocumentsS3Uri,
+    this.split,
   });
   factory AugmentedManifestsListItem.fromJson(Map<String, dynamic> json) {
     return AugmentedManifestsListItem(
@@ -3686,15 +4707,30 @@ class AugmentedManifestsListItem {
           .map((e) => e as String)
           .toList(),
       s3Uri: json['S3Uri'] as String,
+      annotationDataS3Uri: json['AnnotationDataS3Uri'] as String?,
+      documentType: (json['DocumentType'] as String?)
+          ?.toAugmentedManifestsDocumentTypeFormat(),
+      sourceDocumentsS3Uri: json['SourceDocumentsS3Uri'] as String?,
+      split: (json['Split'] as String?)?.toSplit(),
     );
   }
 
   Map<String, dynamic> toJson() {
     final attributeNames = this.attributeNames;
     final s3Uri = this.s3Uri;
+    final annotationDataS3Uri = this.annotationDataS3Uri;
+    final documentType = this.documentType;
+    final sourceDocumentsS3Uri = this.sourceDocumentsS3Uri;
+    final split = this.split;
     return {
       'AttributeNames': attributeNames,
       'S3Uri': s3Uri,
+      if (annotationDataS3Uri != null)
+        'AnnotationDataS3Uri': annotationDataS3Uri,
+      if (documentType != null) 'DocumentType': documentType.toValue(),
+      if (sourceDocumentsS3Uri != null)
+        'SourceDocumentsS3Uri': sourceDocumentsS3Uri,
+      if (split != null) 'Split': split.toValue(),
     };
   }
 }
@@ -4160,6 +5196,24 @@ class ClassifyDocumentResponse {
   }
 }
 
+class ContainsPiiEntitiesResponse {
+  /// The labels used in the document being analyzed. Individual labels represent
+  /// personally identifiable information (PII) entity types.
+  final List<EntityLabel>? labels;
+
+  ContainsPiiEntitiesResponse({
+    this.labels,
+  });
+  factory ContainsPiiEntitiesResponse.fromJson(Map<String, dynamic> json) {
+    return ContainsPiiEntitiesResponse(
+      labels: (json['Labels'] as List?)
+          ?.whereNotNull()
+          .map((e) => EntityLabel.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 class CreateDocumentClassifierResponse {
   /// The Amazon Resource Name (ARN) that identifies the document classifier.
   final String? documentClassifierArn;
@@ -4220,6 +5274,13 @@ class DeleteEntityRecognizerResponse {
   DeleteEntityRecognizerResponse();
   factory DeleteEntityRecognizerResponse.fromJson(Map<String, dynamic> _) {
     return DeleteEntityRecognizerResponse();
+  }
+}
+
+class DeleteResourcePolicyResponse {
+  DeleteResourcePolicyResponse();
+  factory DeleteResourcePolicyResponse.fromJson(Map<String, dynamic> _) {
+    return DeleteResourcePolicyResponse();
   }
 }
 
@@ -4399,6 +5460,37 @@ class DescribePiiEntitiesDetectionJobResponse {
   }
 }
 
+class DescribeResourcePolicyResponse {
+  /// The time at which the policy was created.
+  final DateTime? creationTime;
+
+  /// The time at which the policy was last modified.
+  final DateTime? lastModifiedTime;
+
+  /// The revision ID of the policy. Each time you modify a policy, Amazon
+  /// Comprehend assigns a new revision ID, and it deletes the prior version of
+  /// the policy.
+  final String? policyRevisionId;
+
+  /// The JSON body of the resource-based policy.
+  final String? resourcePolicy;
+
+  DescribeResourcePolicyResponse({
+    this.creationTime,
+    this.lastModifiedTime,
+    this.policyRevisionId,
+    this.resourcePolicy,
+  });
+  factory DescribeResourcePolicyResponse.fromJson(Map<String, dynamic> json) {
+    return DescribeResourcePolicyResponse(
+      creationTime: timeStampFromJson(json['CreationTime']),
+      lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
+      policyRevisionId: json['PolicyRevisionId'] as String?,
+      resourcePolicy: json['ResourcePolicy'] as String?,
+    );
+  }
+}
+
 class DescribeSentimentDetectionJobResponse {
   /// An object that contains the properties associated with a sentiment detection
   /// job.
@@ -4414,6 +5506,28 @@ class DescribeSentimentDetectionJobResponse {
           json['SentimentDetectionJobProperties'] != null
               ? SentimentDetectionJobProperties.fromJson(
                   json['SentimentDetectionJobProperties']
+                      as Map<String, dynamic>)
+              : null,
+    );
+  }
+}
+
+class DescribeTargetedSentimentDetectionJobResponse {
+  /// An object that contains the properties associated with a targeted sentiment
+  /// detection job.
+  final TargetedSentimentDetectionJobProperties?
+      targetedSentimentDetectionJobProperties;
+
+  DescribeTargetedSentimentDetectionJobResponse({
+    this.targetedSentimentDetectionJobProperties,
+  });
+  factory DescribeTargetedSentimentDetectionJobResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DescribeTargetedSentimentDetectionJobResponse(
+      targetedSentimentDetectionJobProperties:
+          json['TargetedSentimentDetectionJobProperties'] != null
+              ? TargetedSentimentDetectionJobProperties.fromJson(
+                  json['TargetedSentimentDetectionJobProperties']
                       as Map<String, dynamic>)
               : null,
     );
@@ -4649,6 +5763,17 @@ class DocumentClassificationJobProperties {
   /// classification job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the document classification job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:document-classification-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:document-classification-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the document classification job.
   final String? jobId;
 
@@ -4689,7 +5814,7 @@ class DocumentClassificationJobProperties {
   /// Configuration parameters for a private Virtual Private Cloud (VPC)
   /// containing the resources you are using for your document classification job.
   /// For more information, see <a
-  /// href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html">Amazon
+  /// href="https://docs.aws.amazon.com/vppc/latest/userguide/what-is-amazon-vpc.html">Amazon
   /// VPC</a>.
   final VpcConfig? vpcConfig;
 
@@ -4698,6 +5823,7 @@ class DocumentClassificationJobProperties {
     this.documentClassifierArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -4717,6 +5843,7 @@ class DocumentClassificationJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -4766,6 +5893,9 @@ extension on String {
 /// only specify one filtering parameter in a request. For more information, see
 /// the operation.
 class DocumentClassifierFilter {
+  /// The name that you assigned to the document classifier
+  final String? documentClassifierName;
+
   /// Filters the list of classifiers based on status.
   final ModelStatus? status;
 
@@ -4782,15 +5912,19 @@ class DocumentClassifierFilter {
   final DateTime? submitTimeBefore;
 
   DocumentClassifierFilter({
+    this.documentClassifierName,
     this.status,
     this.submitTimeAfter,
     this.submitTimeBefore,
   });
   Map<String, dynamic> toJson() {
+    final documentClassifierName = this.documentClassifierName;
     final status = this.status;
     final submitTimeAfter = this.submitTimeAfter;
     final submitTimeBefore = this.submitTimeBefore;
     return {
+      if (documentClassifierName != null)
+        'DocumentClassifierName': documentClassifierName,
       if (status != null) 'Status': status.toValue(),
       if (submitTimeAfter != null)
         'SubmitTimeAfter': unixTimestampToJson(submitTimeAfter),
@@ -4803,7 +5937,7 @@ class DocumentClassifierFilter {
 /// The input properties for training a document classifier.
 ///
 /// For more information on how the input file is formatted, see
-/// <a>how-document-classification-training-data</a>.
+/// <a>prep-classifier-data</a>.
 class DocumentClassifierInputDataConfig {
   /// A list of augmented manifest files that provide training data for your
   /// custom model. An augmented manifest file is a labeled dataset that is
@@ -4859,11 +5993,18 @@ class DocumentClassifierInputDataConfig {
   /// <code>COMPREHEND_CSV</code>.
   final String? s3Uri;
 
+  /// The Amazon S3 URI for the input data. The Amazon S3 bucket must be in the
+  /// same AWS Region as the API endpoint that you are calling. The URI can point
+  /// to a single input file or it can provide the prefix for a collection of
+  /// input files.
+  final String? testS3Uri;
+
   DocumentClassifierInputDataConfig({
     this.augmentedManifests,
     this.dataFormat,
     this.labelDelimiter,
     this.s3Uri,
+    this.testS3Uri,
   });
   factory DocumentClassifierInputDataConfig.fromJson(
       Map<String, dynamic> json) {
@@ -4877,6 +6018,7 @@ class DocumentClassifierInputDataConfig {
           (json['DataFormat'] as String?)?.toDocumentClassifierDataFormat(),
       labelDelimiter: json['LabelDelimiter'] as String?,
       s3Uri: json['S3Uri'] as String?,
+      testS3Uri: json['TestS3Uri'] as String?,
     );
   }
 
@@ -4885,11 +6027,13 @@ class DocumentClassifierInputDataConfig {
     final dataFormat = this.dataFormat;
     final labelDelimiter = this.labelDelimiter;
     final s3Uri = this.s3Uri;
+    final testS3Uri = this.testS3Uri;
     return {
       if (augmentedManifests != null) 'AugmentedManifests': augmentedManifests,
       if (dataFormat != null) 'DataFormat': dataFormat.toValue(),
       if (labelDelimiter != null) 'LabelDelimiter': labelDelimiter,
       if (s3Uri != null) 'S3Uri': s3Uri,
+      if (testS3Uri != null) 'TestS3Uri': testS3Uri,
     };
   }
 }
@@ -5014,8 +6158,28 @@ class DocumentClassifierProperties {
   /// changed once the classifier is trained.
   final DocumentClassifierMode? mode;
 
+  /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
+  /// to encrypt trained custom models. The ModelKmsKeyId can be either of the
+  /// following formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  final String? modelKmsKeyId;
+
   /// Provides output results configuration parameters for custom classifier jobs.
   final DocumentClassifierOutputDataConfig? outputDataConfig;
+
+  /// The Amazon Resource Name (ARN) of the source model. This model was imported
+  /// from a different AWS account to create the document classifier model in your
+  /// AWS account.
+  final String? sourceModelArn;
 
   /// The status of the document classifier. If the status is <code>TRAINED</code>
   /// the classifier is ready to use. If the status is <code>FAILED</code> you can
@@ -5037,6 +6201,9 @@ class DocumentClassifierProperties {
   /// TrainingEndTime.
   final DateTime? trainingStartTime;
 
+  /// The version name that you assigned to the document classifier.
+  final String? versionName;
+
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
   /// to encrypt data on the storage volume attached to the ML compute instance(s)
   /// that process the analysis job. The VolumeKmsKeyId can be either of the
@@ -5056,7 +6223,7 @@ class DocumentClassifierProperties {
   /// Configuration parameters for a private Virtual Private Cloud (VPC)
   /// containing the resources you are using for your custom classifier. For more
   /// information, see <a
-  /// href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html">Amazon
+  /// href="https://docs.aws.amazon.com/vppc/latest/userguide/what-is-amazon-vpc.html">Amazon
   /// VPC</a>.
   final VpcConfig? vpcConfig;
 
@@ -5069,11 +6236,14 @@ class DocumentClassifierProperties {
     this.languageCode,
     this.message,
     this.mode,
+    this.modelKmsKeyId,
     this.outputDataConfig,
+    this.sourceModelArn,
     this.status,
     this.submitTime,
     this.trainingEndTime,
     this.trainingStartTime,
+    this.versionName,
     this.volumeKmsKeyId,
     this.vpcConfig,
   });
@@ -5093,18 +6263,58 @@ class DocumentClassifierProperties {
       languageCode: (json['LanguageCode'] as String?)?.toLanguageCode(),
       message: json['Message'] as String?,
       mode: (json['Mode'] as String?)?.toDocumentClassifierMode(),
+      modelKmsKeyId: json['ModelKmsKeyId'] as String?,
       outputDataConfig: json['OutputDataConfig'] != null
           ? DocumentClassifierOutputDataConfig.fromJson(
               json['OutputDataConfig'] as Map<String, dynamic>)
           : null,
+      sourceModelArn: json['SourceModelArn'] as String?,
       status: (json['Status'] as String?)?.toModelStatus(),
       submitTime: timeStampFromJson(json['SubmitTime']),
       trainingEndTime: timeStampFromJson(json['TrainingEndTime']),
       trainingStartTime: timeStampFromJson(json['TrainingStartTime']),
+      versionName: json['VersionName'] as String?,
       volumeKmsKeyId: json['VolumeKmsKeyId'] as String?,
       vpcConfig: json['VpcConfig'] != null
           ? VpcConfig.fromJson(json['VpcConfig'] as Map<String, dynamic>)
           : null,
+    );
+  }
+}
+
+/// Describes information about a document classifier and its versions.
+class DocumentClassifierSummary {
+  /// The name that you assigned the document classifier.
+  final String? documentClassifierName;
+
+  /// The time that the latest document classifier version was submitted for
+  /// processing.
+  final DateTime? latestVersionCreatedAt;
+
+  /// The version name you assigned to the latest document classifier version.
+  final String? latestVersionName;
+
+  /// Provides the status of the latest document classifier version.
+  final ModelStatus? latestVersionStatus;
+
+  /// The number of versions you created.
+  final int? numberOfVersions;
+
+  DocumentClassifierSummary({
+    this.documentClassifierName,
+    this.latestVersionCreatedAt,
+    this.latestVersionName,
+    this.latestVersionStatus,
+    this.numberOfVersions,
+  });
+  factory DocumentClassifierSummary.fromJson(Map<String, dynamic> json) {
+    return DocumentClassifierSummary(
+      documentClassifierName: json['DocumentClassifierName'] as String?,
+      latestVersionCreatedAt: timeStampFromJson(json['LatestVersionCreatedAt']),
+      latestVersionName: json['LatestVersionName'] as String?,
+      latestVersionStatus:
+          (json['LatestVersionStatus'] as String?)?.toModelStatus(),
+      numberOfVersions: json['NumberOfVersions'] as int?,
     );
   }
 }
@@ -5128,6 +6338,169 @@ class DocumentLabel {
       name: json['Name'] as String?,
       score: json['Score'] as double?,
     );
+  }
+}
+
+enum DocumentReadAction {
+  textractDetectDocumentText,
+  textractAnalyzeDocument,
+}
+
+extension on DocumentReadAction {
+  String toValue() {
+    switch (this) {
+      case DocumentReadAction.textractDetectDocumentText:
+        return 'TEXTRACT_DETECT_DOCUMENT_TEXT';
+      case DocumentReadAction.textractAnalyzeDocument:
+        return 'TEXTRACT_ANALYZE_DOCUMENT';
+    }
+  }
+}
+
+extension on String {
+  DocumentReadAction toDocumentReadAction() {
+    switch (this) {
+      case 'TEXTRACT_DETECT_DOCUMENT_TEXT':
+        return DocumentReadAction.textractDetectDocumentText;
+      case 'TEXTRACT_ANALYZE_DOCUMENT':
+        return DocumentReadAction.textractAnalyzeDocument;
+    }
+    throw Exception('$this is not known in enum DocumentReadAction');
+  }
+}
+
+/// A list of the types of analyses to perform. This field specifies what
+/// feature types need to be extracted from the document where entity
+/// recognition is expected.
+///
+/// <ul>
+/// <li>
+/// <code>TABLES</code> - Add TABLES to the list to return information about the
+/// tables that are detected in the input document.
+/// </li>
+/// <li>
+/// <code>FORMS</code> - Add FORMS to return detected form data.
+/// </li>
+/// </ul>
+enum DocumentReadFeatureTypes {
+  tables,
+  forms,
+}
+
+extension on DocumentReadFeatureTypes {
+  String toValue() {
+    switch (this) {
+      case DocumentReadFeatureTypes.tables:
+        return 'TABLES';
+      case DocumentReadFeatureTypes.forms:
+        return 'FORMS';
+    }
+  }
+}
+
+extension on String {
+  DocumentReadFeatureTypes toDocumentReadFeatureTypes() {
+    switch (this) {
+      case 'TABLES':
+        return DocumentReadFeatureTypes.tables;
+      case 'FORMS':
+        return DocumentReadFeatureTypes.forms;
+    }
+    throw Exception('$this is not known in enum DocumentReadFeatureTypes');
+  }
+}
+
+enum DocumentReadMode {
+  serviceDefault,
+  forceDocumentReadAction,
+}
+
+extension on DocumentReadMode {
+  String toValue() {
+    switch (this) {
+      case DocumentReadMode.serviceDefault:
+        return 'SERVICE_DEFAULT';
+      case DocumentReadMode.forceDocumentReadAction:
+        return 'FORCE_DOCUMENT_READ_ACTION';
+    }
+  }
+}
+
+extension on String {
+  DocumentReadMode toDocumentReadMode() {
+    switch (this) {
+      case 'SERVICE_DEFAULT':
+        return DocumentReadMode.serviceDefault;
+      case 'FORCE_DOCUMENT_READ_ACTION':
+        return DocumentReadMode.forceDocumentReadAction;
+    }
+    throw Exception('$this is not known in enum DocumentReadMode');
+  }
+}
+
+/// The input properties for a topic detection job.
+class DocumentReaderConfig {
+  /// This enum field will start with two values which will apply to PDFs:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>TEXTRACT_DETECT_DOCUMENT_TEXT</code> - The service calls
+  /// DetectDocumentText for PDF documents per page.
+  /// </li>
+  /// <li>
+  /// <code>TEXTRACT_ANALYZE_DOCUMENT</code> - The service calls AnalyzeDocument
+  /// for PDF documents per page.
+  /// </li>
+  /// </ul>
+  final DocumentReadAction documentReadAction;
+
+  /// This enum field provides two values:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>SERVICE_DEFAULT</code> - use service defaults for Document reading.
+  /// For Digital PDF it would mean using an internal parser instead of Textract
+  /// APIs
+  /// </li>
+  /// <li>
+  /// <code>FORCE_DOCUMENT_READ_ACTION</code> - Always use specified action for
+  /// DocumentReadAction, including Digital PDF.
+  /// </li>
+  /// </ul>
+  final DocumentReadMode? documentReadMode;
+
+  /// Specifies how the text in an input file should be processed:
+  final List<DocumentReadFeatureTypes>? featureTypes;
+
+  DocumentReaderConfig({
+    required this.documentReadAction,
+    this.documentReadMode,
+    this.featureTypes,
+  });
+  factory DocumentReaderConfig.fromJson(Map<String, dynamic> json) {
+    return DocumentReaderConfig(
+      documentReadAction:
+          (json['DocumentReadAction'] as String).toDocumentReadAction(),
+      documentReadMode:
+          (json['DocumentReadMode'] as String?)?.toDocumentReadMode(),
+      featureTypes: (json['FeatureTypes'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as String).toDocumentReadFeatureTypes())
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final documentReadAction = this.documentReadAction;
+    final documentReadMode = this.documentReadMode;
+    final featureTypes = this.featureTypes;
+    return {
+      'DocumentReadAction': documentReadAction.toValue(),
+      if (documentReadMode != null)
+        'DocumentReadMode': documentReadMode.toValue(),
+      if (featureTypes != null)
+        'FeatureTypes': featureTypes.map((e) => e.toValue()).toList(),
+    };
   }
 }
 
@@ -5210,6 +6583,17 @@ class DominantLanguageDetectionJobProperties {
   /// language detection job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the dominant language detection job. It is
+  /// a unique, fully qualified identifier for the job. It includes the AWS
+  /// account, Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:dominant-language-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:dominant-language-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the dominant language detection job.
   final String? jobId;
 
@@ -5259,6 +6643,7 @@ class DominantLanguageDetectionJobProperties {
     this.dataAccessRoleArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -5277,6 +6662,7 @@ class DominantLanguageDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -5336,7 +6722,10 @@ class EndpointFilter {
   }
 }
 
-/// Specifies information about the specified endpoint.
+/// Specifies information about the specified endpoint. For information about
+/// endpoints, see <a
+/// href="https://docs.aws.amazon.com/comprehend/latest/dg/manage-endpoints.html">Managing
+/// endpoints</a>.
 class EndpointProperties {
   /// The creation date and time of the endpoint.
   final DateTime? creationTime;
@@ -5345,10 +6734,23 @@ class EndpointProperties {
   /// endpoint.
   final int? currentInferenceUnits;
 
+  /// The Amazon Resource Name (ARN) of the AWS identity and Access Management
+  /// (IAM) role that grants Amazon Comprehend read access to trained custom
+  /// models encrypted with a customer managed key (ModelKmsKeyId).
+  final String? dataAccessRoleArn;
+
+  /// Data access role ARN to use in case the new model is encrypted with a
+  /// customer KMS key.
+  final String? desiredDataAccessRoleArn;
+
   /// The desired number of inference units to be used by the model using this
   /// endpoint. Each inference unit represents of a throughput of 100 characters
   /// per second.
   final int? desiredInferenceUnits;
+
+  /// ARN of the new model to use for updating an existing endpoint. This ARN is
+  /// going to be different from the model ARN when the update is in progress
+  final String? desiredModelArn;
 
   /// The Amazon Resource Number (ARN) of the endpoint.
   final String? endpointArn;
@@ -5371,7 +6773,10 @@ class EndpointProperties {
   EndpointProperties({
     this.creationTime,
     this.currentInferenceUnits,
+    this.dataAccessRoleArn,
+    this.desiredDataAccessRoleArn,
     this.desiredInferenceUnits,
+    this.desiredModelArn,
     this.endpointArn,
     this.lastModifiedTime,
     this.message,
@@ -5382,7 +6787,10 @@ class EndpointProperties {
     return EndpointProperties(
       creationTime: timeStampFromJson(json['CreationTime']),
       currentInferenceUnits: json['CurrentInferenceUnits'] as int?,
+      dataAccessRoleArn: json['DataAccessRoleArn'] as String?,
+      desiredDataAccessRoleArn: json['DesiredDataAccessRoleArn'] as String?,
       desiredInferenceUnits: json['DesiredInferenceUnits'] as int?,
+      desiredModelArn: json['DesiredModelArn'] as String?,
       endpointArn: json['EndpointArn'] as String?,
       lastModifiedTime: timeStampFromJson(json['LastModifiedTime']),
       message: json['Message'] as String?,
@@ -5493,6 +6901,17 @@ class EntitiesDetectionJobProperties {
   /// detection job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the entities detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:entities-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:entities-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the entities detection job.
   final String? jobId;
 
@@ -5545,6 +6964,7 @@ class EntitiesDetectionJobProperties {
     this.endTime,
     this.entityRecognizerArn,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -5564,6 +6984,7 @@ class EntitiesDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -5628,6 +7049,28 @@ class Entity {
   }
 }
 
+/// Specifies one of the label or labels that categorize the personally
+/// identifiable information (PII) entity being analyzed.
+class EntityLabel {
+  /// The name of the label.
+  final PiiEntityType? name;
+
+  /// The level of confidence that Amazon Comprehend has in the accuracy of the
+  /// detection.
+  final double? score;
+
+  EntityLabel({
+    this.name,
+    this.score,
+  });
+  factory EntityLabel.fromJson(Map<String, dynamic> json) {
+    return EntityLabel(
+      name: (json['Name'] as String?)?.toPiiEntityType(),
+      score: json['Score'] as double?,
+    );
+  }
+}
+
 /// Describes the annotations associated with a entity recognizer.
 class EntityRecognizerAnnotations {
   /// Specifies the Amazon S3 location where the annotations for an entity
@@ -5635,19 +7078,28 @@ class EntityRecognizerAnnotations {
   /// endpoint that you are calling.
   final String s3Uri;
 
+  /// This specifies the Amazon S3 location where the test annotations for an
+  /// entity recognizer are located. The URI must be in the same AWS Region as the
+  /// API endpoint that you are calling.
+  final String? testS3Uri;
+
   EntityRecognizerAnnotations({
     required this.s3Uri,
+    this.testS3Uri,
   });
   factory EntityRecognizerAnnotations.fromJson(Map<String, dynamic> json) {
     return EntityRecognizerAnnotations(
       s3Uri: json['S3Uri'] as String,
+      testS3Uri: json['TestS3Uri'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final s3Uri = this.s3Uri;
+    final testS3Uri = this.testS3Uri;
     return {
       'S3Uri': s3Uri,
+      if (testS3Uri != null) 'TestS3Uri': testS3Uri,
     };
   }
 }
@@ -5687,19 +7139,41 @@ class EntityRecognizerDocuments {
   /// endpoint that you are calling.
   final String s3Uri;
 
+  /// Specifies how the text in an input file should be processed. This is
+  /// optional, and the default is ONE_DOC_PER_LINE. ONE_DOC_PER_FILE - Each file
+  /// is considered a separate document. Use this option when you are processing
+  /// large documents, such as newspaper articles or scientific papers.
+  /// ONE_DOC_PER_LINE - Each line in a file is considered a separate document.
+  /// Use this option when you are processing many short documents, such as text
+  /// messages.
+  final InputFormat? inputFormat;
+
+  /// Specifies the Amazon S3 location where the test documents for an entity
+  /// recognizer are located. The URI must be in the same AWS Region as the API
+  /// endpoint that you are calling.
+  final String? testS3Uri;
+
   EntityRecognizerDocuments({
     required this.s3Uri,
+    this.inputFormat,
+    this.testS3Uri,
   });
   factory EntityRecognizerDocuments.fromJson(Map<String, dynamic> json) {
     return EntityRecognizerDocuments(
       s3Uri: json['S3Uri'] as String,
+      inputFormat: (json['InputFormat'] as String?)?.toInputFormat(),
+      testS3Uri: json['TestS3Uri'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final s3Uri = this.s3Uri;
+    final inputFormat = this.inputFormat;
+    final testS3Uri = this.testS3Uri;
     return {
       'S3Uri': s3Uri,
+      if (inputFormat != null) 'InputFormat': inputFormat.toValue(),
+      if (testS3Uri != null) 'TestS3Uri': testS3Uri,
     };
   }
 }
@@ -5731,8 +7205,10 @@ class EntityRecognizerEntityList {
 class EntityRecognizerEvaluationMetrics {
   /// A measure of how accurate the recognizer results are for the test data. It
   /// is derived from the <code>Precision</code> and <code>Recall</code> values.
-  /// The <code>F1Score</code> is the harmonic average of the two scores. The
-  /// highest score is 1, and the worst score is 0.
+  /// The <code>F1Score</code> is the harmonic average of the two scores. For
+  /// plain text entity recognizer models, the range is 0 to 100, where 100 is the
+  /// best score. For PDF/Word entity recognizer models, the range is 0 to 1,
+  /// where 1 is the best score.
   final double? f1Score;
 
   /// A measure of the usefulness of the recognizer results in the test data. High
@@ -5763,6 +7239,9 @@ class EntityRecognizerEvaluationMetrics {
 /// only specify one filtering parameter in a request. For more information, see
 /// the operation./&gt;
 class EntityRecognizerFilter {
+  /// The name that you assigned the entity recognizer.
+  final String? recognizerName;
+
   /// The status of an entity recognizer.
   final ModelStatus? status;
 
@@ -5777,15 +7256,18 @@ class EntityRecognizerFilter {
   final DateTime? submitTimeBefore;
 
   EntityRecognizerFilter({
+    this.recognizerName,
     this.status,
     this.submitTimeAfter,
     this.submitTimeBefore,
   });
   Map<String, dynamic> toJson() {
+    final recognizerName = this.recognizerName;
     final status = this.status;
     final submitTimeAfter = this.submitTimeAfter;
     final submitTimeBefore = this.submitTimeBefore;
     return {
+      if (recognizerName != null) 'RecognizerName': recognizerName,
       if (status != null) 'Status': status.toValue(),
       if (submitTimeAfter != null)
         'SubmitTimeAfter': unixTimestampToJson(submitTimeAfter),
@@ -6006,8 +7488,28 @@ class EntityRecognizerProperties {
   /// A description of the status of the recognizer.
   final String? message;
 
+  /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
+  /// to encrypt trained custom models. The ModelKmsKeyId can be either of the
+  /// following formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  final String? modelKmsKeyId;
+
   /// Provides information about an entity recognizer.
   final EntityRecognizerMetadata? recognizerMetadata;
+
+  /// The Amazon Resource Name (ARN) of the source model. This model was imported
+  /// from a different AWS account to create the entity recognizer model in your
+  /// AWS account.
+  final String? sourceModelArn;
 
   /// Provides the status of the entity recognizer.
   final ModelStatus? status;
@@ -6020,6 +7522,9 @@ class EntityRecognizerProperties {
 
   /// The time that training of the entity recognizer started.
   final DateTime? trainingStartTime;
+
+  /// The version name you assigned to the entity recognizer.
+  final String? versionName;
 
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
   /// to encrypt data on the storage volume attached to the ML compute instance(s)
@@ -6051,11 +7556,14 @@ class EntityRecognizerProperties {
     this.inputDataConfig,
     this.languageCode,
     this.message,
+    this.modelKmsKeyId,
     this.recognizerMetadata,
+    this.sourceModelArn,
     this.status,
     this.submitTime,
     this.trainingEndTime,
     this.trainingStartTime,
+    this.versionName,
     this.volumeKmsKeyId,
     this.vpcConfig,
   });
@@ -6070,18 +7578,58 @@ class EntityRecognizerProperties {
           : null,
       languageCode: (json['LanguageCode'] as String?)?.toLanguageCode(),
       message: json['Message'] as String?,
+      modelKmsKeyId: json['ModelKmsKeyId'] as String?,
       recognizerMetadata: json['RecognizerMetadata'] != null
           ? EntityRecognizerMetadata.fromJson(
               json['RecognizerMetadata'] as Map<String, dynamic>)
           : null,
+      sourceModelArn: json['SourceModelArn'] as String?,
       status: (json['Status'] as String?)?.toModelStatus(),
       submitTime: timeStampFromJson(json['SubmitTime']),
       trainingEndTime: timeStampFromJson(json['TrainingEndTime']),
       trainingStartTime: timeStampFromJson(json['TrainingStartTime']),
+      versionName: json['VersionName'] as String?,
       volumeKmsKeyId: json['VolumeKmsKeyId'] as String?,
       vpcConfig: json['VpcConfig'] != null
           ? VpcConfig.fromJson(json['VpcConfig'] as Map<String, dynamic>)
           : null,
+    );
+  }
+}
+
+/// Describes the information about an entity recognizer and its versions.
+class EntityRecognizerSummary {
+  /// The time that the latest entity recognizer version was submitted for
+  /// processing.
+  final DateTime? latestVersionCreatedAt;
+
+  /// The version name you assigned to the latest entity recognizer version.
+  final String? latestVersionName;
+
+  /// Provides the status of the latest entity recognizer version.
+  final ModelStatus? latestVersionStatus;
+
+  /// The number of versions you created.
+  final int? numberOfVersions;
+
+  /// The name that you assigned the entity recognizer.
+  final String? recognizerName;
+
+  EntityRecognizerSummary({
+    this.latestVersionCreatedAt,
+    this.latestVersionName,
+    this.latestVersionStatus,
+    this.numberOfVersions,
+    this.recognizerName,
+  });
+  factory EntityRecognizerSummary.fromJson(Map<String, dynamic> json) {
+    return EntityRecognizerSummary(
+      latestVersionCreatedAt: timeStampFromJson(json['LatestVersionCreatedAt']),
+      latestVersionName: json['LatestVersionName'] as String?,
+      latestVersionStatus:
+          (json['LatestVersionStatus'] as String?)?.toModelStatus(),
+      numberOfVersions: json['NumberOfVersions'] as int?,
+      recognizerName: json['RecognizerName'] as String?,
     );
   }
 }
@@ -6264,6 +7812,17 @@ class EventsDetectionJobProperties {
   /// detection job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the events detection job. It is a unique,
+  /// fully qualified identifier for the job. It includes the AWS account, Region,
+  /// and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:events-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:events-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the events detection job.
   final String? jobId;
 
@@ -6293,6 +7852,7 @@ class EventsDetectionJobProperties {
     this.dataAccessRoleArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -6310,6 +7870,7 @@ class EventsDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -6328,7 +7889,21 @@ class EventsDetectionJobProperties {
   }
 }
 
-/// The input properties for a topic detection job.
+class ImportModelResponse {
+  /// The Amazon Resource Name (ARN) of the custom model being imported.
+  final String? modelArn;
+
+  ImportModelResponse({
+    this.modelArn,
+  });
+  factory ImportModelResponse.fromJson(Map<String, dynamic> json) {
+    return ImportModelResponse(
+      modelArn: json['ModelArn'] as String?,
+    );
+  }
+}
+
+/// The input properties for an inference job.
 class InputDataConfig {
   /// The Amazon S3 URI for the input data. The URI must be in same region as the
   /// API endpoint that you are calling. The URI can point to a single input file
@@ -6339,6 +7914,14 @@ class InputDataConfig {
   /// than one file begins with the prefix, Amazon Comprehend uses all of them as
   /// input.
   final String s3Uri;
+
+  /// The document reader config field applies only for InputDataConfig of
+  /// StartEntitiesDetectionJob.
+  ///
+  /// Use DocumentReaderConfig to provide specifications about how you want your
+  /// inference documents read. Currently it applies for PDF documents in
+  /// StartEntitiesDetectionJob custom inference.
+  final DocumentReaderConfig? documentReaderConfig;
 
   /// Specifies how the text in an input file should be processed:
   ///
@@ -6358,20 +7941,28 @@ class InputDataConfig {
 
   InputDataConfig({
     required this.s3Uri,
+    this.documentReaderConfig,
     this.inputFormat,
   });
   factory InputDataConfig.fromJson(Map<String, dynamic> json) {
     return InputDataConfig(
       s3Uri: json['S3Uri'] as String,
+      documentReaderConfig: json['DocumentReaderConfig'] != null
+          ? DocumentReaderConfig.fromJson(
+              json['DocumentReaderConfig'] as Map<String, dynamic>)
+          : null,
       inputFormat: (json['InputFormat'] as String?)?.toInputFormat(),
     );
   }
 
   Map<String, dynamic> toJson() {
     final s3Uri = this.s3Uri;
+    final documentReaderConfig = this.documentReaderConfig;
     final inputFormat = this.inputFormat;
     return {
       'S3Uri': s3Uri,
+      if (documentReaderConfig != null)
+        'DocumentReaderConfig': documentReaderConfig,
       if (inputFormat != null) 'InputFormat': inputFormat.toValue(),
     };
   }
@@ -6547,6 +8138,17 @@ class KeyPhrasesDetectionJobProperties {
   /// phrases detection job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the key phrases detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:key-phrases-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:key-phrases-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the key phrases detection job.
   final String? jobId;
 
@@ -6598,6 +8200,7 @@ class KeyPhrasesDetectionJobProperties {
     this.dataAccessRoleArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -6616,6 +8219,7 @@ class KeyPhrasesDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -6738,6 +8342,31 @@ class ListDocumentClassificationJobsResponse {
   }
 }
 
+class ListDocumentClassifierSummariesResponse {
+  /// The list of summaries of document classifiers.
+  final List<DocumentClassifierSummary>? documentClassifierSummariesList;
+
+  /// Identifies the next page of results to return.
+  final String? nextToken;
+
+  ListDocumentClassifierSummariesResponse({
+    this.documentClassifierSummariesList,
+    this.nextToken,
+  });
+  factory ListDocumentClassifierSummariesResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ListDocumentClassifierSummariesResponse(
+      documentClassifierSummariesList:
+          (json['DocumentClassifierSummariesList'] as List?)
+              ?.whereNotNull()
+              .map((e) =>
+                  DocumentClassifierSummary.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
 class ListDocumentClassifiersResponse {
   /// A list containing the properties of each job returned.
   final List<DocumentClassifierProperties>? documentClassifierPropertiesList;
@@ -6831,6 +8460,31 @@ class ListEntitiesDetectionJobsResponse {
               ?.whereNotNull()
               .map((e) => EntitiesDetectionJobProperties.fromJson(
                   e as Map<String, dynamic>))
+              .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class ListEntityRecognizerSummariesResponse {
+  /// The list entity recognizer summaries.
+  final List<EntityRecognizerSummary>? entityRecognizerSummariesList;
+
+  /// The list entity recognizer summaries.
+  final String? nextToken;
+
+  ListEntityRecognizerSummariesResponse({
+    this.entityRecognizerSummariesList,
+    this.nextToken,
+  });
+  factory ListEntityRecognizerSummariesResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ListEntityRecognizerSummariesResponse(
+      entityRecognizerSummariesList:
+          (json['EntityRecognizerSummariesList'] as List?)
+              ?.whereNotNull()
+              .map((e) =>
+                  EntityRecognizerSummary.fromJson(e as Map<String, dynamic>))
               .toList(),
       nextToken: json['NextToken'] as String?,
     );
@@ -6989,6 +8643,32 @@ class ListTagsForResourceResponse {
   }
 }
 
+class ListTargetedSentimentDetectionJobsResponse {
+  /// Identifies the next page of results to return.
+  final String? nextToken;
+
+  /// A list containing the properties of each job that is returned.
+  final List<TargetedSentimentDetectionJobProperties>?
+      targetedSentimentDetectionJobPropertiesList;
+
+  ListTargetedSentimentDetectionJobsResponse({
+    this.nextToken,
+    this.targetedSentimentDetectionJobPropertiesList,
+  });
+  factory ListTargetedSentimentDetectionJobsResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ListTargetedSentimentDetectionJobsResponse(
+      nextToken: json['NextToken'] as String?,
+      targetedSentimentDetectionJobPropertiesList:
+          (json['TargetedSentimentDetectionJobPropertiesList'] as List?)
+              ?.whereNotNull()
+              .map((e) => TargetedSentimentDetectionJobProperties.fromJson(
+                  e as Map<String, dynamic>))
+              .toList(),
+    );
+  }
+}
+
 class ListTopicsDetectionJobsResponse {
   /// Identifies the next page of results to return.
   final String? nextToken;
@@ -7066,7 +8746,7 @@ extension on String {
   }
 }
 
-/// Provides configuration parameters for the output of topic detection jobs.
+/// Provides configuration parameters for the output of inference jobs.
 /// <p/>
 class OutputDataConfig {
   /// When you use the <code>OutputDataConfig</code> object with asynchronous
@@ -7079,6 +8759,10 @@ class OutputDataConfig {
   /// in a directory specific to the job. The <code>S3Uri</code> field contains
   /// the location of the output file, called <code>output.tar.gz</code>. It is a
   /// compressed archive that contains the ouput of the operation.
+  ///
+  /// For a PII entity detection job, the output file is plain text, not a
+  /// compressed archive. The output file name is the same as the input file, with
+  /// <code>.out</code> appended at the end.
   final String s3Uri;
 
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
@@ -7309,6 +8993,17 @@ class PiiEntitiesDetectionJobProperties {
   /// The input properties for a PII entities detection job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the PII entities detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:pii-entities-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:pii-entities-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the PII entities detection job.
   final String? jobId;
 
@@ -7349,6 +9044,7 @@ class PiiEntitiesDetectionJobProperties {
     this.dataAccessRoleArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -7368,6 +9064,7 @@ class PiiEntitiesDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -7506,6 +9203,20 @@ enum PiiEntityType {
   ipAddress,
   macAddress,
   all,
+  licensePlate,
+  vehicleIdentificationNumber,
+  ukNationalInsuranceNumber,
+  caSocialInsuranceNumber,
+  usIndividualTaxIdentificationNumber,
+  ukUniqueTaxpayerReferenceNumber,
+  inPermanentAccountNumber,
+  inNrega,
+  internationalBankAccountNumber,
+  swiftCode,
+  ukNationalHealthServiceNumber,
+  caHealthNumber,
+  inAadhaar,
+  inVoterNumber,
 }
 
 extension on PiiEntityType {
@@ -7557,6 +9268,34 @@ extension on PiiEntityType {
         return 'MAC_ADDRESS';
       case PiiEntityType.all:
         return 'ALL';
+      case PiiEntityType.licensePlate:
+        return 'LICENSE_PLATE';
+      case PiiEntityType.vehicleIdentificationNumber:
+        return 'VEHICLE_IDENTIFICATION_NUMBER';
+      case PiiEntityType.ukNationalInsuranceNumber:
+        return 'UK_NATIONAL_INSURANCE_NUMBER';
+      case PiiEntityType.caSocialInsuranceNumber:
+        return 'CA_SOCIAL_INSURANCE_NUMBER';
+      case PiiEntityType.usIndividualTaxIdentificationNumber:
+        return 'US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER';
+      case PiiEntityType.ukUniqueTaxpayerReferenceNumber:
+        return 'UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER';
+      case PiiEntityType.inPermanentAccountNumber:
+        return 'IN_PERMANENT_ACCOUNT_NUMBER';
+      case PiiEntityType.inNrega:
+        return 'IN_NREGA';
+      case PiiEntityType.internationalBankAccountNumber:
+        return 'INTERNATIONAL_BANK_ACCOUNT_NUMBER';
+      case PiiEntityType.swiftCode:
+        return 'SWIFT_CODE';
+      case PiiEntityType.ukNationalHealthServiceNumber:
+        return 'UK_NATIONAL_HEALTH_SERVICE_NUMBER';
+      case PiiEntityType.caHealthNumber:
+        return 'CA_HEALTH_NUMBER';
+      case PiiEntityType.inAadhaar:
+        return 'IN_AADHAAR';
+      case PiiEntityType.inVoterNumber:
+        return 'IN_VOTER_NUMBER';
     }
   }
 }
@@ -7610,6 +9349,34 @@ extension on String {
         return PiiEntityType.macAddress;
       case 'ALL':
         return PiiEntityType.all;
+      case 'LICENSE_PLATE':
+        return PiiEntityType.licensePlate;
+      case 'VEHICLE_IDENTIFICATION_NUMBER':
+        return PiiEntityType.vehicleIdentificationNumber;
+      case 'UK_NATIONAL_INSURANCE_NUMBER':
+        return PiiEntityType.ukNationalInsuranceNumber;
+      case 'CA_SOCIAL_INSURANCE_NUMBER':
+        return PiiEntityType.caSocialInsuranceNumber;
+      case 'US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER':
+        return PiiEntityType.usIndividualTaxIdentificationNumber;
+      case 'UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER':
+        return PiiEntityType.ukUniqueTaxpayerReferenceNumber;
+      case 'IN_PERMANENT_ACCOUNT_NUMBER':
+        return PiiEntityType.inPermanentAccountNumber;
+      case 'IN_NREGA':
+        return PiiEntityType.inNrega;
+      case 'INTERNATIONAL_BANK_ACCOUNT_NUMBER':
+        return PiiEntityType.internationalBankAccountNumber;
+      case 'SWIFT_CODE':
+        return PiiEntityType.swiftCode;
+      case 'UK_NATIONAL_HEALTH_SERVICE_NUMBER':
+        return PiiEntityType.ukNationalHealthServiceNumber;
+      case 'CA_HEALTH_NUMBER':
+        return PiiEntityType.caHealthNumber;
+      case 'IN_AADHAAR':
+        return PiiEntityType.inAadhaar;
+      case 'IN_VOTER_NUMBER':
+        return PiiEntityType.inVoterNumber;
     }
     throw Exception('$this is not known in enum PiiEntityType');
   }
@@ -7621,6 +9388,10 @@ class PiiOutputDataConfig {
   /// When you use the <code>PiiOutputDataConfig</code> object with asynchronous
   /// operations, you specify the Amazon S3 location where you want to write the
   /// output data.
+  ///
+  /// For a PII entity detection job, the output file is plain text, not a
+  /// compressed archive. The output file name is the same as the input file, with
+  /// <code>.out</code> appended at the end.
   final String s3Uri;
 
   /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
@@ -7635,6 +9406,22 @@ class PiiOutputDataConfig {
     return PiiOutputDataConfig(
       s3Uri: json['S3Uri'] as String,
       kmsKeyId: json['KmsKeyId'] as String?,
+    );
+  }
+}
+
+class PutResourcePolicyResponse {
+  /// The revision ID of the policy. Each time you modify a policy, Amazon
+  /// Comprehend assigns a new revision ID, and it deletes the prior version of
+  /// the policy.
+  final String? policyRevisionId;
+
+  PutResourcePolicyResponse({
+    this.policyRevisionId,
+  });
+  factory PutResourcePolicyResponse.fromJson(Map<String, dynamic> json) {
+    return PutResourcePolicyResponse(
+      policyRevisionId: json['PolicyRevisionId'] as String?,
     );
   }
 }
@@ -7736,6 +9523,17 @@ class SentimentDetectionJobProperties {
   /// sentiment detection job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the sentiment detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:sentiment-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:sentiment-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the sentiment detection job.
   final String? jobId;
 
@@ -7787,6 +9585,7 @@ class SentimentDetectionJobProperties {
     this.dataAccessRoleArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -7805,6 +9604,7 @@ class SentimentDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
@@ -7896,7 +9696,46 @@ extension on String {
   }
 }
 
+enum Split {
+  train,
+  test,
+}
+
+extension on Split {
+  String toValue() {
+    switch (this) {
+      case Split.train:
+        return 'TRAIN';
+      case Split.test:
+        return 'TEST';
+    }
+  }
+}
+
+extension on String {
+  Split toSplit() {
+    switch (this) {
+      case 'TRAIN':
+        return Split.train;
+      case 'TEST':
+        return Split.test;
+    }
+    throw Exception('$this is not known in enum Split');
+  }
+}
+
 class StartDocumentClassificationJobResponse {
+  /// The Amazon Resource Name (ARN) of the document classification job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:document-classification-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:document-classification-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job. To get the status of the job, use this
   /// identifier with the operation.
   final String? jobId;
@@ -7927,12 +9766,14 @@ class StartDocumentClassificationJobResponse {
   final JobStatus? jobStatus;
 
   StartDocumentClassificationJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartDocumentClassificationJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StartDocumentClassificationJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -7940,6 +9781,17 @@ class StartDocumentClassificationJobResponse {
 }
 
 class StartDominantLanguageDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the dominant language detection job. It is
+  /// a unique, fully qualified identifier for the job. It includes the AWS
+  /// account, Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:dominant-language-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:dominant-language-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job. To get the status of a job, use this
   /// identifier with the operation.
   final String? jobId;
@@ -7963,12 +9815,14 @@ class StartDominantLanguageDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartDominantLanguageDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartDominantLanguageDetectionJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StartDominantLanguageDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -7976,6 +9830,17 @@ class StartDominantLanguageDetectionJobResponse {
 }
 
 class StartEntitiesDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the entities detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:entities-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:entities-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job. To get the status of job, use this
   /// identifier with the operation.
   final String? jobId;
@@ -8006,12 +9871,14 @@ class StartEntitiesDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartEntitiesDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartEntitiesDetectionJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StartEntitiesDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8019,6 +9886,17 @@ class StartEntitiesDetectionJobResponse {
 }
 
 class StartEventsDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the events detection job. It is a unique,
+  /// fully qualified identifier for the job. It includes the AWS account, Region,
+  /// and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:events-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:events-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// An unique identifier for the request. If you don't set the client request
   /// token, Amazon Comprehend generates one.
   final String? jobId;
@@ -8027,11 +9905,13 @@ class StartEventsDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartEventsDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartEventsDetectionJobResponse.fromJson(Map<String, dynamic> json) {
     return StartEventsDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8039,6 +9919,17 @@ class StartEventsDetectionJobResponse {
 }
 
 class StartKeyPhrasesDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the key phrase detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:key-phrases-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:key-phrases-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job. To get the status of a job, use this
   /// identifier with the operation.
   final String? jobId;
@@ -8062,12 +9953,14 @@ class StartKeyPhrasesDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartKeyPhrasesDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartKeyPhrasesDetectionJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StartKeyPhrasesDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8075,6 +9968,17 @@ class StartKeyPhrasesDetectionJobResponse {
 }
 
 class StartPiiEntitiesDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the PII entity detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:pii-entities-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:pii-entities-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job.
   final String? jobId;
 
@@ -8082,12 +9986,14 @@ class StartPiiEntitiesDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartPiiEntitiesDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartPiiEntitiesDetectionJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StartPiiEntitiesDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8095,6 +10001,17 @@ class StartPiiEntitiesDetectionJobResponse {
 }
 
 class StartSentimentDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the sentiment detection job. It is a
+  /// unique, fully qualified identifier for the job. It includes the AWS account,
+  /// Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:sentiment-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:sentiment-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job. To get the status of a job, use this
   /// identifier with the operation.
   final String? jobId;
@@ -8118,12 +10035,63 @@ class StartSentimentDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartSentimentDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartSentimentDetectionJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StartSentimentDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
+      jobId: json['JobId'] as String?,
+      jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
+    );
+  }
+}
+
+class StartTargetedSentimentDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the targeted sentiment detection job. It
+  /// is a unique, fully qualified identifier for the job. It includes the AWS
+  /// account, Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:targeted-sentiment-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:targeted-sentiment-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
+  /// The identifier generated for the job. To get the status of a job, use this
+  /// identifier with the operation.
+  final String? jobId;
+
+  /// The status of the job.
+  ///
+  /// <ul>
+  /// <li>
+  /// SUBMITTED - The job has been received and is queued for processing.
+  /// </li>
+  /// <li>
+  /// IN_PROGRESS - Amazon Comprehend is processing the job.
+  /// </li>
+  /// <li>
+  /// COMPLETED - The job was successfully completed and the output is available.
+  /// </li>
+  /// <li>
+  /// FAILED - The job did not complete. To get details, use the operation.
+  /// </li>
+  /// </ul>
+  final JobStatus? jobStatus;
+
+  StartTargetedSentimentDetectionJobResponse({
+    this.jobArn,
+    this.jobId,
+    this.jobStatus,
+  });
+  factory StartTargetedSentimentDetectionJobResponse.fromJson(
+      Map<String, dynamic> json) {
+    return StartTargetedSentimentDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8131,6 +10099,17 @@ class StartSentimentDetectionJobResponse {
 }
 
 class StartTopicsDetectionJobResponse {
+  /// The Amazon Resource Name (ARN) of the topics detection job. It is a unique,
+  /// fully qualified identifier for the job. It includes the AWS account, Region,
+  /// and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:topics-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:document-classification-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier generated for the job. To get the status of the job, use this
   /// identifier with the <code>DescribeTopicDetectionJob</code> operation.
   final String? jobId;
@@ -8155,11 +10134,13 @@ class StartTopicsDetectionJobResponse {
   final JobStatus? jobStatus;
 
   StartTopicsDetectionJobResponse({
+    this.jobArn,
     this.jobId,
     this.jobStatus,
   });
   factory StartTopicsDetectionJobResponse.fromJson(Map<String, dynamic> json) {
     return StartTopicsDetectionJobResponse(
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8286,6 +10267,28 @@ class StopSentimentDetectionJobResponse {
   factory StopSentimentDetectionJobResponse.fromJson(
       Map<String, dynamic> json) {
     return StopSentimentDetectionJobResponse(
+      jobId: json['JobId'] as String?,
+      jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
+    );
+  }
+}
+
+class StopTargetedSentimentDetectionJobResponse {
+  /// The identifier of the targeted sentiment detection job to stop.
+  final String? jobId;
+
+  /// Either <code>STOP_REQUESTED</code> if the job is currently running, or
+  /// <code>STOPPED</code> if the job was previously stopped with the
+  /// <code>StopSentimentDetectionJob</code> operation.
+  final JobStatus? jobStatus;
+
+  StopTargetedSentimentDetectionJobResponse({
+    this.jobId,
+    this.jobStatus,
+  });
+  factory StopTargetedSentimentDetectionJobResponse.fromJson(
+      Map<String, dynamic> json) {
+    return StopTargetedSentimentDetectionJobResponse(
       jobId: json['JobId'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
     );
@@ -8445,6 +10448,151 @@ class TagResourceResponse {
   }
 }
 
+/// Provides information for filtering a list of dominant language detection
+/// jobs. For more information, see the operation.
+class TargetedSentimentDetectionJobFilter {
+  /// Filters on the name of the job.
+  final String? jobName;
+
+  /// Filters the list of jobs based on job status. Returns only jobs with the
+  /// specified status.
+  final JobStatus? jobStatus;
+
+  /// Filters the list of jobs based on the time that the job was submitted for
+  /// processing. Returns only jobs submitted after the specified time. Jobs are
+  /// returned in descending order, newest to oldest.
+  final DateTime? submitTimeAfter;
+
+  /// Filters the list of jobs based on the time that the job was submitted for
+  /// processing. Returns only jobs submitted before the specified time. Jobs are
+  /// returned in ascending order, oldest to newest.
+  final DateTime? submitTimeBefore;
+
+  TargetedSentimentDetectionJobFilter({
+    this.jobName,
+    this.jobStatus,
+    this.submitTimeAfter,
+    this.submitTimeBefore,
+  });
+  Map<String, dynamic> toJson() {
+    final jobName = this.jobName;
+    final jobStatus = this.jobStatus;
+    final submitTimeAfter = this.submitTimeAfter;
+    final submitTimeBefore = this.submitTimeBefore;
+    return {
+      if (jobName != null) 'JobName': jobName,
+      if (jobStatus != null) 'JobStatus': jobStatus.toValue(),
+      if (submitTimeAfter != null)
+        'SubmitTimeAfter': unixTimestampToJson(submitTimeAfter),
+      if (submitTimeBefore != null)
+        'SubmitTimeBefore': unixTimestampToJson(submitTimeBefore),
+    };
+  }
+}
+
+/// Provides information about a targeted sentiment detection job.
+class TargetedSentimentDetectionJobProperties {
+  /// The Amazon Resource Name (ARN) that gives Amazon Comprehend read access to
+  /// your input data.
+  final String? dataAccessRoleArn;
+
+  /// The time that the targeted sentiment detection job ended.
+  final DateTime? endTime;
+  final InputDataConfig? inputDataConfig;
+
+  /// The Amazon Resource Name (ARN) of the targeted sentiment detection job. It
+  /// is a unique, fully qualified identifier for the job. It includes the AWS
+  /// account, Region, and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:targeted-sentiment-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:targeted-sentiment-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
+  /// The identifier assigned to the targeted sentiment detection job.
+  final String? jobId;
+
+  /// The name that you assigned to the targeted sentiment detection job.
+  final String? jobName;
+
+  /// The current status of the targeted sentiment detection job. If the status is
+  /// <code>FAILED</code>, the <code>Messages</code> field shows the reason for
+  /// the failure.
+  final JobStatus? jobStatus;
+
+  /// The language code of the input documents.
+  final LanguageCode? languageCode;
+
+  /// A description of the status of a job.
+  final String? message;
+  final OutputDataConfig? outputDataConfig;
+
+  /// The time that the targeted sentiment detection job was submitted for
+  /// processing.
+  final DateTime? submitTime;
+
+  /// ID for the AWS Key Management Service (KMS) key that Amazon Comprehend uses
+  /// to encrypt data on the storage volume attached to the ML compute instance(s)
+  /// that process the targeted sentiment detection job. The VolumeKmsKeyId can be
+  /// either of the following formats:
+  ///
+  /// <ul>
+  /// <li>
+  /// KMS Key ID: <code>"1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// <li>
+  /// Amazon Resource Name (ARN) of a KMS Key:
+  /// <code>"arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"</code>
+  /// </li>
+  /// </ul>
+  final String? volumeKmsKeyId;
+  final VpcConfig? vpcConfig;
+
+  TargetedSentimentDetectionJobProperties({
+    this.dataAccessRoleArn,
+    this.endTime,
+    this.inputDataConfig,
+    this.jobArn,
+    this.jobId,
+    this.jobName,
+    this.jobStatus,
+    this.languageCode,
+    this.message,
+    this.outputDataConfig,
+    this.submitTime,
+    this.volumeKmsKeyId,
+    this.vpcConfig,
+  });
+  factory TargetedSentimentDetectionJobProperties.fromJson(
+      Map<String, dynamic> json) {
+    return TargetedSentimentDetectionJobProperties(
+      dataAccessRoleArn: json['DataAccessRoleArn'] as String?,
+      endTime: timeStampFromJson(json['EndTime']),
+      inputDataConfig: json['InputDataConfig'] != null
+          ? InputDataConfig.fromJson(
+              json['InputDataConfig'] as Map<String, dynamic>)
+          : null,
+      jobArn: json['JobArn'] as String?,
+      jobId: json['JobId'] as String?,
+      jobName: json['JobName'] as String?,
+      jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),
+      languageCode: (json['LanguageCode'] as String?)?.toLanguageCode(),
+      message: json['Message'] as String?,
+      outputDataConfig: json['OutputDataConfig'] != null
+          ? OutputDataConfig.fromJson(
+              json['OutputDataConfig'] as Map<String, dynamic>)
+          : null,
+      submitTime: timeStampFromJson(json['SubmitTime']),
+      volumeKmsKeyId: json['VolumeKmsKeyId'] as String?,
+      vpcConfig: json['VpcConfig'] != null
+          ? VpcConfig.fromJson(json['VpcConfig'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 /// Provides information for filtering topic detection jobs. For more
 /// information, see .
 class TopicsDetectionJobFilter {
@@ -8500,6 +10648,17 @@ class TopicsDetectionJobProperties {
   /// job.
   final InputDataConfig? inputDataConfig;
 
+  /// The Amazon Resource Name (ARN) of the topics detection job. It is a unique,
+  /// fully qualified identifier for the job. It includes the AWS account, Region,
+  /// and the job ID. The format of the ARN is as follows:
+  ///
+  /// <code>arn:&lt;partition&gt;:comprehend:&lt;region&gt;:&lt;account-id&gt;:topics-detection-job/&lt;job-id&gt;</code>
+  ///
+  /// The following is an example job ARN:
+  ///
+  /// <code>arn:aws:comprehend:us-west-2:111122223333:topics-detection-job/1234abcd12ab34cd56ef1234567890ab</code>
+  final String? jobArn;
+
   /// The identifier assigned to the topic detection job.
   final String? jobId;
 
@@ -8552,6 +10711,7 @@ class TopicsDetectionJobProperties {
     this.dataAccessRoleArn,
     this.endTime,
     this.inputDataConfig,
+    this.jobArn,
     this.jobId,
     this.jobName,
     this.jobStatus,
@@ -8570,6 +10730,7 @@ class TopicsDetectionJobProperties {
           ? InputDataConfig.fromJson(
               json['InputDataConfig'] as Map<String, dynamic>)
           : null,
+      jobArn: json['JobArn'] as String?,
       jobId: json['JobId'] as String?,
       jobName: json['JobName'] as String?,
       jobStatus: (json['JobStatus'] as String?)?.toJobStatus(),

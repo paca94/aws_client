@@ -18,10 +18,6 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// <important>
-/// Amazon Augmented AI is in preview release and is subject to change. We do
-/// not recommend using this product in production environments.
-/// </important>
 /// Amazon Augmented AI (Amazon A2I) adds the benefit of human judgment to any
 /// machine learning application. When an AI application can't evaluate data
 /// with a high degree of confidence, human reviewers can take over. This human
@@ -94,6 +90,9 @@ class AugmentedAIRuntime {
 
   /// Deletes the specified human loop for a flow definition.
   ///
+  /// If the human loop was deleted, this operation will return a
+  /// <code>ResourceNotFoundException</code>.
+  ///
   /// May throw [ValidationException].
   /// May throw [ResourceNotFoundException].
   /// May throw [ThrottlingException].
@@ -120,7 +119,9 @@ class AugmentedAIRuntime {
     );
   }
 
-  /// Returns information about the specified human loop.
+  /// Returns information about the specified human loop. If the human loop was
+  /// deleted, this operation will return a
+  /// <code>ResourceNotFoundException</code> error.
   ///
   /// May throw [ValidationException].
   /// May throw [ResourceNotFoundException].
@@ -375,6 +376,9 @@ class DescribeHumanLoopResponse {
   final HumanLoopStatus humanLoopStatus;
 
   /// A failure code that identifies the type of failure.
+  ///
+  /// Possible values: <code>ValidationError</code>, <code>Expired</code>,
+  /// <code>InternalError</code>
   final String? failureCode;
 
   /// The reason why a human loop failed. The failure reason is returned when the

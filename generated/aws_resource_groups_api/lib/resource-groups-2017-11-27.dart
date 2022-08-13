@@ -469,6 +469,15 @@ class ResourceGroups {
   /// <li>
   /// <code>resource-groups:ListGroupResources</code>
   /// </li>
+  /// <li>
+  /// <code>cloudformation:DescribeStacks</code>
+  /// </li>
+  /// <li>
+  /// <code>cloudformation:ListStackResources</code>
+  /// </li>
+  /// <li>
+  /// <code>tag:GetResources</code>
+  /// </li>
   /// </ul>
   ///
   /// May throw [UnauthorizedException].
@@ -756,6 +765,15 @@ class ResourceGroups {
   /// <ul>
   /// <li>
   /// <code>resource-groups:SearchResources</code>
+  /// </li>
+  /// <li>
+  /// <code>cloudformation:DescribeStacks</code>
+  /// </li>
+  /// <li>
+  /// <code>cloudformation:ListStackResources</code>
+  /// </li>
+  /// <li>
+  /// <code>tag:GetResources</code>
   /// </li>
   /// </ul>
   ///

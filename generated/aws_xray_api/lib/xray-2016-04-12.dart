@@ -18,8 +18,8 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS X-Ray provides APIs for managing debug traces and retrieving service
-/// maps and other data created by processing those traces.
+/// Amazon Web Services X-Ray provides APIs for managing debug traces and
+/// retrieving service maps and other data created by processing those traces.
 class XRay {
   final _s.RestJsonProtocol _protocol;
   XRay({
@@ -109,7 +109,8 @@ class XRay {
   /// A map that contains one or more tag keys and tag values to attach to an
   /// X-Ray group. For more information about ways to use tags, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html">Tagging
-  /// AWS resources</a> in the <i>AWS General Reference</i>.
+  /// Amazon Web Services resources</a> in the <i>Amazon Web Services General
+  /// Reference</i>.
   ///
   /// The following restrictions apply to tags:
   ///
@@ -131,8 +132,8 @@ class XRay {
   /// Tag keys and values are case sensitive.
   /// </li>
   /// <li>
-  /// Don't use <code>aws:</code> as a prefix for keys; it's reserved for AWS
-  /// use.
+  /// Don't use <code>aws:</code> as a prefix for keys; it's reserved for Amazon
+  /// Web Services use.
   /// </li>
   /// </ul>
   Future<CreateGroupResult> createGroup({
@@ -166,13 +167,16 @@ class XRay {
   }
 
   /// Creates a rule to control sampling behavior for instrumented applications.
-  /// Services retrieve rules with <a>GetSamplingRules</a>, and evaluate each
-  /// rule in ascending order of <i>priority</i> for each request. If a rule
-  /// matches, the service records a trace, borrowing it from the reservoir
-  /// size. After 10 seconds, the service reports back to X-Ray with
-  /// <a>GetSamplingTargets</a> to get updated versions of each in-use rule. The
-  /// updated rule contains a trace quota that the service can use instead of
-  /// borrowing from the reservoir.
+  /// Services retrieve rules with <a
+  /// href="https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingRules.html">GetSamplingRules</a>,
+  /// and evaluate each rule in ascending order of <i>priority</i> for each
+  /// request. If a rule matches, the service records a trace, borrowing it from
+  /// the reservoir size. After 10 seconds, the service reports back to X-Ray
+  /// with <a
+  /// href="https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html">GetSamplingTargets</a>
+  /// to get updated versions of each in-use rule. The updated rule contains a
+  /// trace quota that the service can use instead of borrowing from the
+  /// reservoir.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -185,7 +189,8 @@ class XRay {
   /// A map that contains one or more tag keys and tag values to attach to an
   /// X-Ray sampling rule. For more information about ways to use tags, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html">Tagging
-  /// AWS resources</a> in the <i>AWS General Reference</i>.
+  /// Amazon Web Services resources</a> in the <i>Amazon Web Services General
+  /// Reference</i>.
   ///
   /// The following restrictions apply to tags:
   ///
@@ -207,8 +212,8 @@ class XRay {
   /// Tag keys and values are case sensitive.
   /// </li>
   /// <li>
-  /// Don't use <code>aws:</code> as a prefix for keys; it's reserved for AWS
-  /// use.
+  /// Don't use <code>aws:</code> as a prefix for keys; it's reserved for Amazon
+  /// Web Services use.
   /// </li>
   /// </ul>
   Future<CreateSamplingRuleResult> createSamplingRule({
@@ -662,9 +667,9 @@ class XRay {
   /// requests, and downstream services that they call as a result. Root
   /// services process incoming requests and make calls to downstream services.
   /// Root services are applications that use the <a
-  /// href="https://docs.aws.amazon.com/xray/index.html">AWS X-Ray SDK</a>.
-  /// Downstream services can be other applications, AWS resources, HTTP web
-  /// APIs, or SQL databases.
+  /// href="https://docs.aws.amazon.com/xray/index.html">Amazon Web Services
+  /// X-Ray SDK</a>. Downstream services can be other applications, Amazon Web
+  /// Services resources, HTTP web APIs, or SQL databases.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -850,7 +855,8 @@ class XRay {
   /// For a full list of indexed fields and keywords that you can use in filter
   /// expressions, see <a
   /// href="https://docs.aws.amazon.com/xray/latest/devguide/xray-console-filters.html">Using
-  /// Filter Expressions</a> in the <i>AWS X-Ray Developer Guide</i>.
+  /// Filter Expressions</a> in the <i>Amazon Web Services X-Ray Developer
+  /// Guide</i>.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -909,8 +915,8 @@ class XRay {
     return GetTraceSummariesResult.fromJson(response);
   }
 
-  /// Returns a list of tags that are applied to the specified AWS X-Ray group
-  /// or sampling rule.
+  /// Returns a list of tags that are applied to the specified Amazon Web
+  /// Services X-Ray group or sampling rule.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -958,7 +964,7 @@ class XRay {
   /// encryption. Set to <code>NONE</code> for default encryption.
   ///
   /// Parameter [keyId] :
-  /// An AWS KMS customer master key (CMK) in one of the following formats:
+  /// An Amazon Web Services KMS key in one of the following formats:
   ///
   /// <ul>
   /// <li>
@@ -966,8 +972,8 @@ class XRay {
   /// </li>
   /// <li>
   /// <b>Key ID</b> - The KMS key ID of the key. For example,
-  /// <code>ae4aa6d49-a4d8-9df9-a475-4ff6d7898456</code>. AWS X-Ray does not
-  /// support asymmetric CMKs.
+  /// <code>ae4aa6d49-a4d8-9df9-a475-4ff6d7898456</code>. Amazon Web Services
+  /// X-Ray does not support asymmetric KMS keys.
   /// </li>
   /// <li>
   /// <b>ARN</b> - The full Amazon Resource Name of the key ID or alias. For
@@ -1001,7 +1007,7 @@ class XRay {
     return PutEncryptionConfigResult.fromJson(response);
   }
 
-  /// Used by the AWS X-Ray daemon to upload telemetry.
+  /// Used by the Amazon Web Services X-Ray daemon to upload telemetry.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -1056,7 +1062,7 @@ class XRay {
     );
   }
 
-  /// Uploads segment documents to AWS X-Ray. The <a
+  /// Uploads segment documents to Amazon Web Services X-Ray. The <a
   /// href="https://docs.aws.amazon.com/xray/index.html">X-Ray SDK</a> generates
   /// segment documents and sends them to the X-Ray daemon, which uploads them
   /// in batches. A segment document can be a completed segment, an in-progress
@@ -1064,8 +1070,9 @@ class XRay {
   ///
   /// Segments must include the following fields. For the full segment document
   /// schema, see <a
-  /// href="https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html">AWS
-  /// X-Ray Segment Documents</a> in the <i>AWS X-Ray Developer Guide</i>.
+  /// href="https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html">Amazon
+  /// Web Services X-Ray Segment Documents</a> in the <i>Amazon Web Services
+  /// X-Ray Developer Guide</i>.
   /// <p class="title"> <b>Required segment document fields</b>
   ///
   /// <ul>
@@ -1140,7 +1147,8 @@ class XRay {
     return PutTraceSegmentsResult.fromJson(response);
   }
 
-  /// Applies tags to an existing AWS X-Ray group or sampling rule.
+  /// Applies tags to an existing Amazon Web Services X-Ray group or sampling
+  /// rule.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -1155,7 +1163,8 @@ class XRay {
   /// X-Ray group or sampling rule. For more information about ways to use tags,
   /// see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html">Tagging
-  /// AWS resources</a> in the <i>AWS General Reference</i>.
+  /// Amazon Web Services resources</a> in the <i>Amazon Web Services General
+  /// Reference</i>.
   ///
   /// The following restrictions apply to tags:
   ///
@@ -1177,8 +1186,8 @@ class XRay {
   /// Tag keys and values are case sensitive.
   /// </li>
   /// <li>
-  /// Don't use <code>aws:</code> as a prefix for keys; it's reserved for AWS
-  /// use. You cannot edit or delete system tags.
+  /// Don't use <code>aws:</code> as a prefix for keys; it's reserved for Amazon
+  /// Web Services use. You cannot edit or delete system tags.
   /// </li>
   /// </ul>
   Future<void> tagResource({
@@ -1206,8 +1215,9 @@ class XRay {
     );
   }
 
-  /// Removes tags from an AWS X-Ray group or sampling rule. You cannot edit or
-  /// delete system tags (those with an <code>aws:</code> prefix).
+  /// Removes tags from an Amazon Web Services X-Ray group or sampling rule. You
+  /// cannot edit or delete system tags (those with an <code>aws:</code>
+  /// prefix).
   ///
   /// May throw [InvalidRequestException].
   /// May throw [ThrottledException].
@@ -1644,15 +1654,15 @@ class EdgeStatistics {
 
 /// A configuration document that specifies encryption configuration settings.
 class EncryptionConfig {
-  /// The ID of the customer master key (CMK) used for encryption, if applicable.
+  /// The ID of the KMS key used for encryption, if applicable.
   final String? keyId;
 
   /// The encryption status. While the status is <code>UPDATING</code>, X-Ray may
   /// encrypt data with a combination of the new and old settings.
   final EncryptionStatus? status;
 
-  /// The type of encryption. Set to <code>KMS</code> for encryption with CMKs.
-  /// Set to <code>NONE</code> for default encryption.
+  /// The type of encryption. Set to <code>KMS</code> for encryption with KMS
+  /// keys. Set to <code>NONE</code> for default encryption.
   final EncryptionType? type;
 
   EncryptionConfig({
@@ -2090,7 +2100,7 @@ class GetInsightImpactGraphResult {
   /// The time, in Unix seconds, at which the service graph started.
   final DateTime? serviceGraphStartTime;
 
-  /// The AWS instrumented services related to the insight.
+  /// The Amazon Web Services instrumented services related to the insight.
   final List<InsightImpactGraphService>? services;
 
   /// The provided start time.
@@ -2213,14 +2223,17 @@ class GetSamplingStatisticSummariesResult {
 class GetSamplingTargetsResult {
   /// The last time a user changed the sampling rule configuration. If the
   /// sampling rule configuration changed since the service last retrieved it, the
-  /// service should call <a>GetSamplingRules</a> to get the latest version.
+  /// service should call <a
+  /// href="https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingRules.html">GetSamplingRules</a>
+  /// to get the latest version.
   final DateTime? lastRuleModification;
 
   /// Updated rules that the service should use to sample requests.
   final List<SamplingTargetDocument>? samplingTargetDocuments;
 
-  /// Information about <a>SamplingStatisticsDocument</a> that X-Ray could not
-  /// process.
+  /// Information about <a
+  /// href="https://docs.aws.amazon.com/xray/latest/api/API_SamplingStatisticsDocument.html">SamplingStatisticsDocument</a>
+  /// that X-Ray could not process.
   final List<UnprocessedStatistics>? unprocessedStatistics;
 
   GetSamplingTargetsResult({
@@ -2394,7 +2407,7 @@ class Group {
   /// group or false to disable insights for the group.
   /// </li>
   /// <li>
-  /// The NotifcationsEnabled boolean can be set to true to enable insights
+  /// The NotificationsEnabled boolean can be set to true to enable insights
   /// notifications through Amazon EventBridge for the group.
   /// </li>
   /// </ul>
@@ -2705,7 +2718,7 @@ class InsightImpactGraphEdge {
 /// requests, or downstream services, resources, and applications that an
 /// application used.
 class InsightImpactGraphService {
-  /// Identifier of the AWS account in which the service runs.
+  /// Identifier of the Amazon Web Services account in which the service runs.
   final String? accountId;
 
   /// Connections to downstream services.
@@ -2724,17 +2737,19 @@ class InsightImpactGraphService {
   ///
   /// <ul>
   /// <li>
-  /// AWS Resource - The type of an AWS resource. For example, AWS::EC2::Instance
-  /// for an application running on Amazon EC2 or AWS::DynamoDB::Table for an
-  /// Amazon DynamoDB table that the application used.
+  /// Amazon Web Services Resource - The type of an Amazon Web Services resource.
+  /// For example, AWS::EC2::Instance for an application running on Amazon EC2 or
+  /// AWS::DynamoDB::Table for an Amazon DynamoDB table that the application used.
   /// </li>
   /// <li>
-  /// AWS Service - The type of an AWS service. For example, AWS::DynamoDB for
-  /// downstream calls to Amazon DynamoDB that didn't target a specific table.
+  /// Amazon Web Services Service - The type of an Amazon Web Services service.
+  /// For example, AWS::DynamoDB for downstream calls to Amazon DynamoDB that
+  /// didn't target a specific table.
   /// </li>
   /// <li>
-  /// AWS Service - The type of an AWS service. For example, AWS::DynamoDB for
-  /// downstream calls to Amazon DynamoDB that didn't target a specific table.
+  /// Amazon Web Services Service - The type of an Amazon Web Services service.
+  /// For example, AWS::DynamoDB for downstream calls to Amazon DynamoDB that
+  /// didn't target a specific table.
   /// </li>
   /// <li>
   /// remote - A downstream service of indeterminate type.
@@ -3186,7 +3201,8 @@ class SamplingRule {
   /// applies to all services using the rule collectively.
   final int reservoirSize;
 
-  /// Matches the ARN of the AWS resource on which the service runs.
+  /// Matches the ARN of the Amazon Web Services resource on which the service
+  /// runs.
   final String resourceARN;
 
   /// Matches the <code>name</code> that the service uses to identify itself in
@@ -3280,7 +3296,9 @@ class SamplingRule {
   }
 }
 
-/// A <a>SamplingRule</a> and its metadata.
+/// A <a
+/// href="https://docs.aws.amazon.com/xray/latest/api/API_SamplingRule.html">SamplingRule</a>
+/// and its metadata.
 class SamplingRuleRecord {
   /// When the rule was created.
   final DateTime? createdAt;
@@ -3330,7 +3348,8 @@ class SamplingRuleUpdate {
   /// applies to all services using the rule collectively.
   final int? reservoirSize;
 
-  /// Matches the ARN of the AWS resource on which the service runs.
+  /// Matches the ARN of the Amazon Web Services resource on which the service
+  /// runs.
   final String? resourceARN;
 
   /// The ARN of the sampling rule. Specify a rule by either name or ARN, but not
@@ -3434,7 +3453,8 @@ class SamplingStatisticSummary {
 
 /// Request sampling results for a single rule from a service. Results are for
 /// the last 10 seconds unless the service has been assigned a longer reporting
-/// interval after a previous call to <a>GetSamplingTargets</a>.
+/// interval after a previous call to <a
+/// href="https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html">GetSamplingTargets</a>.
 class SamplingStatisticsDocument {
   /// A unique identifier for the service in hexadecimal.
   final String clientID;
@@ -3532,8 +3552,8 @@ extension on String {
 
 /// Temporary changes to a sampling rule configuration. To meet the global
 /// sampling target for a rule, X-Ray calculates a new reservoir for each
-/// service based on the recent sampling results of all services that called
-/// <a>GetSamplingTargets</a>.
+/// service based on the recent sampling results of all services that called <a
+/// href="https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html">GetSamplingTargets</a>.
 class SamplingTargetDocument {
   /// The percentage of matching requests to instrument, after the reservoir is
   /// exhausted.
@@ -3571,14 +3591,15 @@ class SamplingTargetDocument {
 }
 
 /// A segment from a trace that has been ingested by the X-Ray service. The
-/// segment can be compiled from documents uploaded with
-/// <a>PutTraceSegments</a>, or an <code>inferred</code> segment for a
-/// downstream service, generated from a subsegment sent by the service that
-/// called it.
+/// segment can be compiled from documents uploaded with <a
+/// href="https://docs.aws.amazon.com/xray/latest/api/API_PutTraceSegments.html">PutTraceSegments</a>,
+/// or an <code>inferred</code> segment for a downstream service, generated from
+/// a subsegment sent by the service that called it.
 ///
 /// For the full segment document schema, see <a
-/// href="https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html">AWS
-/// X-Ray Segment Documents</a> in the <i>AWS X-Ray Developer Guide</i>.
+/// href="https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html">Amazon
+/// Web Services X-Ray Segment Documents</a> in the <i>Amazon Web Services X-Ray
+/// Developer Guide</i>.
 class Segment {
   /// The segment document.
   final String? document;
@@ -3602,7 +3623,7 @@ class Segment {
 /// requests, or downstream services, resources, and applications that an
 /// application used.
 class Service {
-  /// Identifier of the AWS account in which the service runs.
+  /// Identifier of the Amazon Web Services account in which the service runs.
   final String? accountId;
 
   /// A histogram that maps the spread of service durations.
@@ -3642,15 +3663,15 @@ class Service {
   ///
   /// <ul>
   /// <li>
-  /// AWS Resource - The type of an AWS resource. For example,
-  /// <code>AWS::EC2::Instance</code> for an application running on Amazon EC2 or
-  /// <code>AWS::DynamoDB::Table</code> for an Amazon DynamoDB table that the
-  /// application used.
+  /// Amazon Web Services Resource - The type of an Amazon Web Services resource.
+  /// For example, <code>AWS::EC2::Instance</code> for an application running on
+  /// Amazon EC2 or <code>AWS::DynamoDB::Table</code> for an Amazon DynamoDB table
+  /// that the application used.
   /// </li>
   /// <li>
-  /// AWS Service - The type of an AWS service. For example,
-  /// <code>AWS::DynamoDB</code> for downstream calls to Amazon DynamoDB that
-  /// didn't target a specific table.
+  /// Amazon Web Services Service - The type of an Amazon Web Services service.
+  /// For example, <code>AWS::DynamoDB</code> for downstream calls to Amazon
+  /// DynamoDB that didn't target a specific table.
   /// </li>
   /// <li>
   /// <code>client</code> - Represents the clients that sent requests to a root
@@ -3785,10 +3806,12 @@ class ServiceStatistics {
   }
 }
 
-/// A map that contains tag keys and tag values to attach to an AWS X-Ray group
-/// or sampling rule. For more information about ways to use tags, see <a
+/// A map that contains tag keys and tag values to attach to an Amazon Web
+/// Services X-Ray group or sampling rule. For more information about ways to
+/// use tags, see <a
 /// href="https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html">Tagging
-/// AWS resources</a> in the <i>AWS General Reference</i>.
+/// Amazon Web Services resources</a> in the <i>Amazon Web Services General
+/// Reference</i>.
 ///
 /// The following restrictions apply to tags:
 ///
@@ -3800,8 +3823,8 @@ class ServiceStatistics {
 /// Tag keys and values are case sensitive.
 /// </li>
 /// <li>
-/// Don't use <code>aws:</code> as a prefix for keys; it's reserved for AWS use.
-/// You cannot edit or delete system tags.
+/// Don't use <code>aws:</code> as a prefix for keys; it's reserved for Amazon
+/// Web Services use. You cannot edit or delete system tags.
 /// </li>
 /// </ul>
 class Tag {
@@ -3979,8 +4002,8 @@ class Trace {
 
   /// LimitExceeded is set to true when the trace has exceeded one of the defined
   /// quotas. For more information about quotas, see <a
-  /// href="https://docs.aws.amazon.com/general/latest/gr/xray.html">AWS X-Ray
-  /// endpoints and quotas</a>.
+  /// href="https://docs.aws.amazon.com/general/latest/gr/xray.html">Amazon Web
+  /// Services X-Ray endpoints and quotas</a>.
   final bool? limitExceeded;
 
   /// Segment documents for the segments and subsegments that comprise the trace.
@@ -4186,8 +4209,9 @@ class TraceUser {
   }
 }
 
-/// Sampling statistics from a call to <a>GetSamplingTargets</a> that X-Ray
-/// could not process.
+/// Sampling statistics from a call to <a
+/// href="https://docs.aws.amazon.com/xray/latest/api/API_GetSamplingTargets.html">GetSamplingTargets</a>
+/// that X-Ray could not process.
 class UnprocessedStatistics {
   /// The error code.
   final String? errorCode;

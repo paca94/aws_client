@@ -7,11 +7,11 @@ The Amazon Chime API (application programming interface) is designed for
 developers to perform key tasks, such as creating and managing Amazon Chime
 accounts, users, and Voice Connectors. This guide provides detailed
 information about the Amazon Chime API, including operations, types, inputs
-and outputs, and error codes. It also includes some server-side API actions
-to use with the Amazon Chime SDK. For more information about the Amazon
-Chime SDK, see <a
-href="https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html">Using
-the Amazon Chime SDK</a> in the <i>Amazon Chime Developer Guide</i>.
+and outputs, and error codes. It also includes API actions for use with the
+Amazon Chime SDK, which developers use to build their own communication
+applications. For more information about the Amazon Chime SDK, see <a
+href="https://docs.aws.amazon.com/chime/latest/dg/meetings-sdk.html"> Using
+the Amazon Chime SDK </a> in the <i>Amazon Chime Developer Guide</i>.
 
 You can use an AWS SDK, the AWS Command Line Interface (AWS CLI), or the
 REST API to make API calls. We recommend using an AWS SDK or the AWS CLI.
@@ -30,9 +30,9 @@ the AWS Command Line Interface</a> in the <i>AWS Command Line Interface User
 Guide</i>. For a list of available Amazon Chime commands, see the <a
 href="https://docs.aws.amazon.com/cli/latest/reference/chime/index.html">Amazon
 Chime commands</a> in the <i>AWS CLI Command Reference</i>.
-</dd> <dt>Using REST</dt> <dd>
+</dd> <dt>Using REST APIs</dt> <dd>
 If you use REST to make API calls, you must authenticate your request by
-providing a signature. Amazon Chime supports Signature Version 4. For more
+providing a signature. Amazon Chime supports signature version 4. For more
 information, see <a
 href="https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html">Signature
 Version 4 Signing Process</a> in the <i>Amazon Web Services General

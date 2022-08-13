@@ -3,20 +3,35 @@
 **Generated Dart library from API specification**
 
 *About the service:*
-The AWS Health API provides programmatic access to the AWS Health
-information that appears in the <a
-href="https://phd.aws.amazon.com/phd/home#/">AWS Personal Health
-Dashboard</a>. You can use the API operations to get information about AWS
-Health events that affect your AWS services and resources.
+The Health API provides programmatic access to the Health information that
+appears in the <a href="https://phd.aws.amazon.com/phd/home#/">Personal
+Health Dashboard</a>. You can use the API operations to get information
+about events that might affect your Amazon Web Services services and
+resources.
 <note>
-You must have a Business or Enterprise support plan from <a
-href="https://aws.amazon.com/premiumsupport/">AWS Support</a> to use the AWS
-Health API. If you call the AWS Health API from an AWS account that doesn't
-have a Business or Enterprise support plan, you receive a
+<ul>
+<li>
+You must have a Business, Enterprise On-Ramp, or Enterprise Support plan
+from <a href="https://aws.amazon.com/premiumsupport/">Amazon Web Services
+Support</a> to use the Health API. If you call the Health API from an Amazon
+Web Services account that doesn't have a Business, Enterprise On-Ramp, or
+Enterprise Support plan, you receive a
 <code>SubscriptionRequiredException</code> error.
-</note>
-AWS Health has a single endpoint: health.us-east-1.amazonaws.com (HTTPS).
-Use this endpoint to call the AWS Health API operations.
+</li>
+<li>
+You can use the Health endpoint health.us-east-1.amazonaws.com (HTTPS) to
+call the Health API operations. Health supports a multi-Region application
+architecture and has two regional endpoints in an active-passive
+configuration. You can use the high availability endpoint example to
+determine which Amazon Web Services Region is active, so that you can get
+the latest information from the API. For more information, see <a
+href="https://docs.aws.amazon.com/health/latest/ug/health-api.html">Accessing
+the Health API</a> in the <i>Health User Guide</i>.
+</li>
+</ul> </note>
+For authentication of requests, Health uses the <a
+href="https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html">Signature
+Version 4 Signing Process</a>.
 
 ## Links
 

@@ -200,6 +200,38 @@ class Pinpoint {
     );
   }
 
+  /// Creates a new message template for messages using the in-app message
+  /// channel.
+  ///
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [ForbiddenException].
+  ///
+  /// Parameter [templateName] :
+  /// The name of the message template. A template name must start with an
+  /// alphanumeric character and can contain a maximum of 128 characters. The
+  /// characters can be alphanumeric characters, underscores (_), or hyphens
+  /// (-). Template names are case sensitive.
+  Future<CreateInAppTemplateResponse> createInAppTemplate({
+    required InAppTemplateRequest inAppTemplateRequest,
+    required String templateName,
+  }) async {
+    ArgumentError.checkNotNull(inAppTemplateRequest, 'inAppTemplateRequest');
+    ArgumentError.checkNotNull(templateName, 'templateName');
+    final response = await _protocol.sendRaw(
+      payload: inAppTemplateRequest,
+      method: 'POST',
+      requestUri: '/v1/templates/${Uri.encodeComponent(templateName)}/inapp',
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return CreateInAppTemplateResponse(
+      templateCreateMessageBody: TemplateCreateMessageBody.fromJson($json),
+    );
+  }
+
   /// Creates a journey for an application.
   ///
   /// May throw [BadRequestException].
@@ -829,6 +861,74 @@ class Pinpoint {
     final $json = await _s.jsonFromResponse(response);
     return DeleteGcmChannelResponse(
       gCMChannelResponse: GCMChannelResponse.fromJson($json),
+    );
+  }
+
+  /// Deletes a message template for messages sent using the in-app message
+  /// channel.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [PayloadTooLargeException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [templateName] :
+  /// The name of the message template. A template name must start with an
+  /// alphanumeric character and can contain a maximum of 128 characters. The
+  /// characters can be alphanumeric characters, underscores (_), or hyphens
+  /// (-). Template names are case sensitive.
+  ///
+  /// Parameter [version] :
+  /// The unique identifier for the version of the message template to update,
+  /// retrieve information about, or delete. To retrieve identifiers and other
+  /// information for all the versions of a template, use the <link
+  /// linkend="templates-template-name-template-type-versions">Template
+  /// Versions</link> resource.
+  ///
+  /// If specified, this value must match the identifier for an existing
+  /// template version. If specified for an update operation, this value must
+  /// match the identifier for the latest existing version of the template. This
+  /// restriction helps ensure that race conditions don't occur.
+  ///
+  /// If you don't specify a value for this parameter, Amazon Pinpoint does the
+  /// following:
+  ///
+  /// <ul>
+  /// <li>
+  /// For a get operation, retrieves information about the active version of the
+  /// template.
+  /// </li>
+  /// <li>
+  /// For an update operation, saves the updates to (overwrites) the latest
+  /// existing version of the template, if the create-new-version parameter
+  /// isn't used or is set to false.
+  /// </li>
+  /// <li>
+  /// For a delete operation, deletes the template, including all versions of
+  /// the template.
+  /// </li>
+  /// </ul>
+  Future<DeleteInAppTemplateResponse> deleteInAppTemplate({
+    required String templateName,
+    String? version,
+  }) async {
+    ArgumentError.checkNotNull(templateName, 'templateName');
+    final $query = <String, List<String>>{
+      if (version != null) 'version': [version],
+    };
+    final response = await _protocol.sendRaw(
+      payload: null,
+      method: 'DELETE',
+      requestUri: '/v1/templates/${Uri.encodeComponent(templateName)}/inapp',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return DeleteInAppTemplateResponse(
+      messageBody: MessageBody.fromJson($json),
     );
   }
 
@@ -2295,6 +2395,109 @@ class Pinpoint {
     );
   }
 
+  /// Retrieves the in-app messages targeted for the provided endpoint ID.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [PayloadTooLargeException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [applicationId] :
+  /// The unique identifier for the application. This identifier is displayed as
+  /// the <b>Project ID</b> on the Amazon Pinpoint console.
+  ///
+  /// Parameter [endpointId] :
+  /// The unique identifier for the endpoint.
+  Future<GetInAppMessagesResponse> getInAppMessages({
+    required String applicationId,
+    required String endpointId,
+  }) async {
+    ArgumentError.checkNotNull(applicationId, 'applicationId');
+    ArgumentError.checkNotNull(endpointId, 'endpointId');
+    final response = await _protocol.sendRaw(
+      payload: null,
+      method: 'GET',
+      requestUri:
+          '/v1/apps/${Uri.encodeComponent(applicationId)}/endpoints/${Uri.encodeComponent(endpointId)}/inappmessages',
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return GetInAppMessagesResponse(
+      inAppMessagesResponse: InAppMessagesResponse.fromJson($json),
+    );
+  }
+
+  /// Retrieves the content and settings of a message template for messages sent
+  /// through the in-app channel.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [PayloadTooLargeException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [templateName] :
+  /// The name of the message template. A template name must start with an
+  /// alphanumeric character and can contain a maximum of 128 characters. The
+  /// characters can be alphanumeric characters, underscores (_), or hyphens
+  /// (-). Template names are case sensitive.
+  ///
+  /// Parameter [version] :
+  /// The unique identifier for the version of the message template to update,
+  /// retrieve information about, or delete. To retrieve identifiers and other
+  /// information for all the versions of a template, use the <link
+  /// linkend="templates-template-name-template-type-versions">Template
+  /// Versions</link> resource.
+  ///
+  /// If specified, this value must match the identifier for an existing
+  /// template version. If specified for an update operation, this value must
+  /// match the identifier for the latest existing version of the template. This
+  /// restriction helps ensure that race conditions don't occur.
+  ///
+  /// If you don't specify a value for this parameter, Amazon Pinpoint does the
+  /// following:
+  ///
+  /// <ul>
+  /// <li>
+  /// For a get operation, retrieves information about the active version of the
+  /// template.
+  /// </li>
+  /// <li>
+  /// For an update operation, saves the updates to (overwrites) the latest
+  /// existing version of the template, if the create-new-version parameter
+  /// isn't used or is set to false.
+  /// </li>
+  /// <li>
+  /// For a delete operation, deletes the template, including all versions of
+  /// the template.
+  /// </li>
+  /// </ul>
+  Future<GetInAppTemplateResponse> getInAppTemplate({
+    required String templateName,
+    String? version,
+  }) async {
+    ArgumentError.checkNotNull(templateName, 'templateName');
+    final $query = <String, List<String>>{
+      if (version != null) 'version': [version],
+    };
+    final response = await _protocol.sendRaw(
+      payload: null,
+      method: 'GET',
+      requestUri: '/v1/templates/${Uri.encodeComponent(templateName)}/inapp',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return GetInAppTemplateResponse(
+      inAppTemplateResponse: InAppTemplateResponse.fromJson($json),
+    );
+  }
+
   /// Retrieves information about the status, configuration, and other settings
   /// for a journey.
   ///
@@ -3536,6 +3739,37 @@ class Pinpoint {
     );
   }
 
+  /// Send an OTP message
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [PayloadTooLargeException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [applicationId] :
+  /// The unique ID of your Amazon Pinpoint application.
+  Future<SendOTPMessageResponse> sendOTPMessage({
+    required String applicationId,
+    required SendOTPMessageRequestParameters sendOTPMessageRequestParameters,
+  }) async {
+    ArgumentError.checkNotNull(applicationId, 'applicationId');
+    ArgumentError.checkNotNull(
+        sendOTPMessageRequestParameters, 'sendOTPMessageRequestParameters');
+    final response = await _protocol.sendRaw(
+      payload: sendOTPMessageRequestParameters,
+      method: 'POST',
+      requestUri: '/v1/apps/${Uri.encodeComponent(applicationId)}/otp',
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return SendOTPMessageResponse(
+      messageResponse: MessageResponse.fromJson($json),
+    );
+  }
+
   /// Creates and sends a message to a list of users.
   ///
   /// May throw [BadRequestException].
@@ -4112,6 +4346,90 @@ class Pinpoint {
     );
   }
 
+  /// Updates an existing message template for messages sent through the in-app
+  /// message channel.
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [PayloadTooLargeException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [templateName] :
+  /// The name of the message template. A template name must start with an
+  /// alphanumeric character and can contain a maximum of 128 characters. The
+  /// characters can be alphanumeric characters, underscores (_), or hyphens
+  /// (-). Template names are case sensitive.
+  ///
+  /// Parameter [createNewVersion] :
+  /// Specifies whether to save the updates as a new version of the message
+  /// template. Valid values are: true, save the updates as a new version; and,
+  /// false, save the updates to (overwrite) the latest existing version of the
+  /// template.
+  ///
+  /// If you don't specify a value for this parameter, Amazon Pinpoint saves the
+  /// updates to (overwrites) the latest existing version of the template. If
+  /// you specify a value of true for this parameter, don't specify a value for
+  /// the version parameter. Otherwise, an error will occur.
+  ///
+  /// Parameter [version] :
+  /// The unique identifier for the version of the message template to update,
+  /// retrieve information about, or delete. To retrieve identifiers and other
+  /// information for all the versions of a template, use the <link
+  /// linkend="templates-template-name-template-type-versions">Template
+  /// Versions</link> resource.
+  ///
+  /// If specified, this value must match the identifier for an existing
+  /// template version. If specified for an update operation, this value must
+  /// match the identifier for the latest existing version of the template. This
+  /// restriction helps ensure that race conditions don't occur.
+  ///
+  /// If you don't specify a value for this parameter, Amazon Pinpoint does the
+  /// following:
+  ///
+  /// <ul>
+  /// <li>
+  /// For a get operation, retrieves information about the active version of the
+  /// template.
+  /// </li>
+  /// <li>
+  /// For an update operation, saves the updates to (overwrites) the latest
+  /// existing version of the template, if the create-new-version parameter
+  /// isn't used or is set to false.
+  /// </li>
+  /// <li>
+  /// For a delete operation, deletes the template, including all versions of
+  /// the template.
+  /// </li>
+  /// </ul>
+  Future<UpdateInAppTemplateResponse> updateInAppTemplate({
+    required InAppTemplateRequest inAppTemplateRequest,
+    required String templateName,
+    bool? createNewVersion,
+    String? version,
+  }) async {
+    ArgumentError.checkNotNull(inAppTemplateRequest, 'inAppTemplateRequest');
+    ArgumentError.checkNotNull(templateName, 'templateName');
+    final $query = <String, List<String>>{
+      if (createNewVersion != null)
+        'create-new-version': [createNewVersion.toString()],
+      if (version != null) 'version': [version],
+    };
+    final response = await _protocol.sendRaw(
+      payload: inAppTemplateRequest,
+      method: 'PUT',
+      requestUri: '/v1/templates/${Uri.encodeComponent(templateName)}/inapp',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return UpdateInAppTemplateResponse(
+      messageBody: MessageBody.fromJson($json),
+    );
+  }
+
   /// Updates the configuration and other settings for a journey.
   ///
   /// May throw [BadRequestException].
@@ -4618,6 +4936,38 @@ class Pinpoint {
     final $json = await _s.jsonFromResponse(response);
     return UpdateVoiceTemplateResponse(
       messageBody: MessageBody.fromJson($json),
+    );
+  }
+
+  /// Verify an OTP
+  ///
+  /// May throw [BadRequestException].
+  /// May throw [InternalServerErrorException].
+  /// May throw [PayloadTooLargeException].
+  /// May throw [ForbiddenException].
+  /// May throw [NotFoundException].
+  /// May throw [MethodNotAllowedException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [applicationId] :
+  /// The unique ID of your Amazon Pinpoint application.
+  Future<VerifyOTPMessageResponse> verifyOTPMessage({
+    required String applicationId,
+    required VerifyOTPMessageRequestParameters
+        verifyOTPMessageRequestParameters,
+  }) async {
+    ArgumentError.checkNotNull(applicationId, 'applicationId');
+    ArgumentError.checkNotNull(
+        verifyOTPMessageRequestParameters, 'verifyOTPMessageRequestParameters');
+    final response = await _protocol.sendRaw(
+      payload: verifyOTPMessageRequestParameters,
+      method: 'POST',
+      requestUri: '/v1/apps/${Uri.encodeComponent(applicationId)}/verify-otp',
+      exceptionFnMap: _exceptionFns,
+    );
+    final $json = await _s.jsonFromResponse(response);
+    return VerifyOTPMessageResponse(
+      verificationResponse: VerificationResponse.fromJson($json),
     );
   }
 }
@@ -5856,6 +6206,10 @@ class Activity {
   /// you specify.
   final ConditionalSplitActivity? conditionalSplit;
 
+  /// The settings for a connect activity. This type of activity initiates a
+  /// contact center call to participants.
+  final ContactCenterActivity? contactCenter;
+
   /// The custom description of the activity.
   final String? description;
 
@@ -5893,6 +6247,7 @@ class Activity {
   Activity({
     this.custom,
     this.conditionalSplit,
+    this.contactCenter,
     this.description,
     this.email,
     this.holdout,
@@ -5911,6 +6266,10 @@ class Activity {
       conditionalSplit: json['ConditionalSplit'] != null
           ? ConditionalSplitActivity.fromJson(
               json['ConditionalSplit'] as Map<String, dynamic>)
+          : null,
+      contactCenter: json['ContactCenter'] != null
+          ? ContactCenterActivity.fromJson(
+              json['ContactCenter'] as Map<String, dynamic>)
           : null,
       description: json['Description'] as String?,
       email: json['EMAIL'] != null
@@ -5942,6 +6301,7 @@ class Activity {
   Map<String, dynamic> toJson() {
     final custom = this.custom;
     final conditionalSplit = this.conditionalSplit;
+    final contactCenter = this.contactCenter;
     final description = this.description;
     final email = this.email;
     final holdout = this.holdout;
@@ -5953,6 +6313,7 @@ class Activity {
     return {
       if (custom != null) 'CUSTOM': custom,
       if (conditionalSplit != null) 'ConditionalSplit': conditionalSplit,
+      if (contactCenter != null) 'ContactCenter': contactCenter,
       if (description != null) 'Description': description,
       if (email != null) 'EMAIL': email,
       if (holdout != null) 'Holdout': holdout,
@@ -6102,6 +6463,39 @@ class AddressConfiguration {
       if (substitutions != null) 'Substitutions': substitutions,
       if (titleOverride != null) 'TitleOverride': titleOverride,
     };
+  }
+}
+
+enum Alignment {
+  left,
+  center,
+  right,
+}
+
+extension on Alignment {
+  String toValue() {
+    switch (this) {
+      case Alignment.left:
+        return 'LEFT';
+      case Alignment.center:
+        return 'CENTER';
+      case Alignment.right:
+        return 'RIGHT';
+    }
+  }
+}
+
+extension on String {
+  Alignment toAlignment() {
+    switch (this) {
+      case 'LEFT':
+        return Alignment.left;
+      case 'CENTER':
+        return Alignment.center;
+      case 'RIGHT':
+        return Alignment.right;
+    }
+    throw Exception('$this is not known in enum Alignment');
   }
 }
 
@@ -6282,6 +6676,9 @@ class ApplicationResponse {
   /// <b>Project name</b> on the Amazon Pinpoint console.
   final String name;
 
+  /// The date and time when the Application was created.
+  final String? creationDate;
+
   /// A string-to-string map of key-value pairs that identifies the tags that are
   /// associated with the application. Each tag consists of a required tag key and
   /// an associated tag value.
@@ -6291,6 +6688,7 @@ class ApplicationResponse {
     required this.arn,
     required this.id,
     required this.name,
+    this.creationDate,
     this.tags,
   });
   factory ApplicationResponse.fromJson(Map<String, dynamic> json) {
@@ -6298,6 +6696,7 @@ class ApplicationResponse {
       arn: json['Arn'] as String,
       id: json['Id'] as String,
       name: json['Name'] as String,
+      creationDate: json['CreationDate'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -6403,9 +6802,22 @@ class AttributeDimension {
   /// segment if their attribute values match the criteria values.
   final List<String> values;
 
-  /// The type of segment dimension to use. Valid values are: INCLUSIVE, endpoints
-  /// that match the criteria are included in the segment; and, EXCLUSIVE,
-  /// endpoints that match the criteria are excluded from the segment.
+  /// The type of segment dimension to use. Valid values are:
+  /// <ul>
+  /// <li>INCLUSIVE - endpoints that have attributes matching the values are
+  /// included in the segment.</li>
+  /// <li>EXCLUSIVE - endpoints that have attributes matching the values are
+  /// excluded in the segment.</li>
+  /// <li>CONTAINS - endpoints that have attributes' substrings match the values
+  /// are included in the segment.</li>
+  /// <li>BEFORE - endpoints with attributes read as ISO_INSTANT datetimes before
+  /// the value are included in the segment.</li>
+  /// <li>AFTER - endpoints with attributes read as ISO_INSTANT datetimes after
+  /// the value are included in the segment.</li>
+  /// <li>ON - endpoints with attributes read as ISO_INSTANT dates on the value
+  /// are included in the segment. Time is ignored in this comparison.</li>
+  /// <li>BETWEEN - endpoints with attributes read as ISO_INSTANT datetimes
+  /// between the values are included in the segment.</li>
   final AttributeType? attributeType;
 
   AttributeDimension({
@@ -6435,6 +6847,11 @@ class AttributeDimension {
 enum AttributeType {
   inclusive,
   exclusive,
+  contains,
+  before,
+  after,
+  on,
+  between,
 }
 
 extension on AttributeType {
@@ -6444,6 +6861,16 @@ extension on AttributeType {
         return 'INCLUSIVE';
       case AttributeType.exclusive:
         return 'EXCLUSIVE';
+      case AttributeType.contains:
+        return 'CONTAINS';
+      case AttributeType.before:
+        return 'BEFORE';
+      case AttributeType.after:
+        return 'AFTER';
+      case AttributeType.on:
+        return 'ON';
+      case AttributeType.between:
+        return 'BETWEEN';
     }
   }
 }
@@ -6455,6 +6882,16 @@ extension on String {
         return AttributeType.inclusive;
       case 'EXCLUSIVE':
         return AttributeType.exclusive;
+      case 'CONTAINS':
+        return AttributeType.contains;
+      case 'BEFORE':
+        return AttributeType.before;
+      case 'AFTER':
+        return AttributeType.after;
+      case 'ON':
+        return AttributeType.on;
+      case 'BETWEEN':
+        return AttributeType.between;
     }
     throw Exception('$this is not known in enum AttributeType');
   }
@@ -6753,6 +7190,39 @@ class BaseKpiResult {
   }
 }
 
+enum ButtonAction {
+  link,
+  deepLink,
+  close,
+}
+
+extension on ButtonAction {
+  String toValue() {
+    switch (this) {
+      case ButtonAction.link:
+        return 'LINK';
+      case ButtonAction.deepLink:
+        return 'DEEP_LINK';
+      case ButtonAction.close:
+        return 'CLOSE';
+    }
+  }
+}
+
+extension on String {
+  ButtonAction toButtonAction() {
+    switch (this) {
+      case 'LINK':
+        return ButtonAction.link;
+      case 'DEEP_LINK':
+        return ButtonAction.deepLink;
+      case 'CLOSE':
+        return ButtonAction.close;
+    }
+    throw Exception('$this is not known in enum ButtonAction');
+  }
+}
+
 /// Specifies the contents of a message that's sent through a custom channel to
 /// recipients of a campaign.
 class CampaignCustomMessage {
@@ -6970,6 +7440,53 @@ class CampaignHook {
   }
 }
 
+/// In-app message configuration.
+class CampaignInAppMessage {
+  /// The message body of the notification, the email body or the text message.
+  final String? body;
+
+  /// In-app message content.
+  final List<InAppMessageContent>? content;
+
+  /// Custom config to be sent to client.
+  final Map<String, String>? customConfig;
+
+  /// In-app message layout.
+  final Layout? layout;
+
+  CampaignInAppMessage({
+    this.body,
+    this.content,
+    this.customConfig,
+    this.layout,
+  });
+  factory CampaignInAppMessage.fromJson(Map<String, dynamic> json) {
+    return CampaignInAppMessage(
+      body: json['Body'] as String?,
+      content: (json['Content'] as List?)
+          ?.whereNotNull()
+          .map((e) => InAppMessageContent.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      customConfig: (json['CustomConfig'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+      layout: (json['Layout'] as String?)?.toLayout(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final body = this.body;
+    final content = this.content;
+    final customConfig = this.customConfig;
+    final layout = this.layout;
+    return {
+      if (body != null) 'Body': body,
+      if (content != null) 'Content': content,
+      if (customConfig != null) 'CustomConfig': customConfig,
+      if (layout != null) 'Layout': layout.toValue(),
+    };
+  }
+}
+
 /// For a campaign, specifies limits on the messages that the campaign can send.
 /// For an application, specifies the default limits for messages that campaigns
 /// in the application can send.
@@ -6991,6 +7508,10 @@ class CampaignLimits {
   /// maximum value is 20,000.
   final int? messagesPerSecond;
 
+  /// The maximum total number of messages that the campaign can send per user
+  /// session.
+  final int? session;
+
   /// The maximum number of messages that a campaign can send to a single endpoint
   /// during the course of the campaign. If a campaign recurs, this setting
   /// applies to all runs of the campaign. The maximum value is 100.
@@ -7000,6 +7521,7 @@ class CampaignLimits {
     this.daily,
     this.maximumDuration,
     this.messagesPerSecond,
+    this.session,
     this.total,
   });
   factory CampaignLimits.fromJson(Map<String, dynamic> json) {
@@ -7007,6 +7529,7 @@ class CampaignLimits {
       daily: json['Daily'] as int?,
       maximumDuration: json['MaximumDuration'] as int?,
       messagesPerSecond: json['MessagesPerSecond'] as int?,
+      session: json['Session'] as int?,
       total: json['Total'] as int?,
     );
   }
@@ -7015,11 +7538,13 @@ class CampaignLimits {
     final daily = this.daily;
     final maximumDuration = this.maximumDuration;
     final messagesPerSecond = this.messagesPerSecond;
+    final session = this.session;
     final total = this.total;
     return {
       if (daily != null) 'Daily': daily,
       if (maximumDuration != null) 'MaximumDuration': maximumDuration,
       if (messagesPerSecond != null) 'MessagesPerSecond': messagesPerSecond,
+      if (session != null) 'Session': session,
       if (total != null) 'Total': total,
     };
   }
@@ -7086,6 +7611,11 @@ class CampaignResponse {
   /// The name of the campaign.
   final String? name;
 
+  /// Defines the priority of the campaign, used to decide the order of messages
+  /// displayed to user if there are multiple messages scheduled to be displayed
+  /// at the same moment.
+  final int? priority;
+
   /// The schedule settings for the campaign.
   final Schedule? schedule;
 
@@ -7129,6 +7659,7 @@ class CampaignResponse {
     this.limits,
     this.messageConfiguration,
     this.name,
+    this.priority,
     this.schedule,
     this.state,
     this.templateConfiguration,
@@ -7171,6 +7702,7 @@ class CampaignResponse {
               json['MessageConfiguration'] as Map<String, dynamic>)
           : null,
       name: json['Name'] as String?,
+      priority: json['Priority'] as int?,
       schedule: json['Schedule'] != null
           ? Schedule.fromJson(json['Schedule'] as Map<String, dynamic>)
           : null,
@@ -7196,37 +7728,64 @@ class CampaignSmsMessage {
   /// The body of the SMS message.
   final String? body;
 
+  /// The entity ID or Principal Entity (PE) id received from the regulatory body
+  /// for sending SMS in your country.
+  final String? entityId;
+
   /// The SMS message type. Valid values are TRANSACTIONAL (for messages that are
   /// critical or time-sensitive, such as a one-time passwords) and PROMOTIONAL
   /// (for messsages that aren't critical or time-sensitive, such as marketing
   /// messages).
   final MessageType? messageType;
 
+  /// The long code to send the SMS message from. This value should be one of the
+  /// dedicated long codes that's assigned to your AWS account. Although it isn't
+  /// required, we recommend that you specify the long code using an E.164 format
+  /// to ensure prompt and accurate delivery of the message. For example,
+  /// +12065550100.
+  final String? originationNumber;
+
   /// The sender ID to display on recipients' devices when they receive the SMS
   /// message.
   final String? senderId;
 
+  /// The template ID received from the regulatory body for sending SMS in your
+  /// country.
+  final String? templateId;
+
   CampaignSmsMessage({
     this.body,
+    this.entityId,
     this.messageType,
+    this.originationNumber,
     this.senderId,
+    this.templateId,
   });
   factory CampaignSmsMessage.fromJson(Map<String, dynamic> json) {
     return CampaignSmsMessage(
       body: json['Body'] as String?,
+      entityId: json['EntityId'] as String?,
       messageType: (json['MessageType'] as String?)?.toMessageType(),
+      originationNumber: json['OriginationNumber'] as String?,
       senderId: json['SenderId'] as String?,
+      templateId: json['TemplateId'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final body = this.body;
+    final entityId = this.entityId;
     final messageType = this.messageType;
+    final originationNumber = this.originationNumber;
     final senderId = this.senderId;
+    final templateId = this.templateId;
     return {
       if (body != null) 'Body': body,
+      if (entityId != null) 'EntityId': entityId,
       if (messageType != null) 'MessageType': messageType.toValue(),
+      if (originationNumber != null) 'OriginationNumber': originationNumber,
       if (senderId != null) 'SenderId': senderId,
+      if (templateId != null) 'TemplateId': templateId,
     };
   }
 }
@@ -7401,6 +7960,7 @@ enum ChannelType {
   email,
   baidu,
   custom,
+  inApp,
 }
 
 extension on ChannelType {
@@ -7430,6 +7990,8 @@ extension on ChannelType {
         return 'BAIDU';
       case ChannelType.custom:
         return 'CUSTOM';
+      case ChannelType.inApp:
+        return 'IN_APP';
     }
   }
 }
@@ -7461,6 +8023,8 @@ extension on String {
         return ChannelType.baidu;
       case 'CUSTOM':
         return ChannelType.custom;
+      case 'IN_APP':
+        return ChannelType.inApp;
     }
     throw Exception('$this is not known in enum ChannelType');
   }
@@ -7583,6 +8147,28 @@ class ConditionalSplitActivity {
   }
 }
 
+class ContactCenterActivity {
+  /// The unique identifier for the next activity to perform after the this
+  /// activity.
+  final String? nextActivity;
+
+  ContactCenterActivity({
+    this.nextActivity,
+  });
+  factory ContactCenterActivity.fromJson(Map<String, dynamic> json) {
+    return ContactCenterActivity(
+      nextActivity: json['NextActivity'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final nextActivity = this.nextActivity;
+    return {
+      if (nextActivity != null) 'NextActivity': nextActivity,
+    };
+  }
+}
+
 class CreateAppResponse {
   final ApplicationResponse applicationResponse;
 
@@ -7646,6 +8232,14 @@ class CreateImportJobResponse {
 
   CreateImportJobResponse({
     required this.importJobResponse,
+  });
+}
+
+class CreateInAppTemplateResponse {
+  final TemplateCreateMessageBody templateCreateMessageBody;
+
+  CreateInAppTemplateResponse({
+    required this.templateCreateMessageBody,
   });
 }
 
@@ -8009,6 +8603,63 @@ class CustomMessageActivity {
   }
 }
 
+/// Default button configuration.
+class DefaultButtonConfiguration {
+  /// Action triggered by the button.
+  final ButtonAction buttonAction;
+
+  /// Button text.
+  final String text;
+
+  /// The background color of the button.
+  final String? backgroundColor;
+
+  /// The border radius of the button.
+  final int? borderRadius;
+
+  /// Button destination.
+  final String? link;
+
+  /// The text color of the button.
+  final String? textColor;
+
+  DefaultButtonConfiguration({
+    required this.buttonAction,
+    required this.text,
+    this.backgroundColor,
+    this.borderRadius,
+    this.link,
+    this.textColor,
+  });
+  factory DefaultButtonConfiguration.fromJson(Map<String, dynamic> json) {
+    return DefaultButtonConfiguration(
+      buttonAction: (json['ButtonAction'] as String).toButtonAction(),
+      text: json['Text'] as String,
+      backgroundColor: json['BackgroundColor'] as String?,
+      borderRadius: json['BorderRadius'] as int?,
+      link: json['Link'] as String?,
+      textColor: json['TextColor'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final buttonAction = this.buttonAction;
+    final text = this.text;
+    final backgroundColor = this.backgroundColor;
+    final borderRadius = this.borderRadius;
+    final link = this.link;
+    final textColor = this.textColor;
+    return {
+      'ButtonAction': buttonAction.toValue(),
+      'Text': text,
+      if (backgroundColor != null) 'BackgroundColor': backgroundColor,
+      if (borderRadius != null) 'BorderRadius': borderRadius,
+      if (link != null) 'Link': link,
+      if (textColor != null) 'TextColor': textColor,
+    };
+  }
+}
+
 /// Specifies the default message for all channels.
 class DefaultMessage {
   /// The default body of the message.
@@ -8293,6 +8944,14 @@ class DeleteGcmChannelResponse {
 
   DeleteGcmChannelResponse({
     required this.gCMChannelResponse,
+  });
+}
+
+class DeleteInAppTemplateResponse {
+  final MessageBody messageBody;
+
+  DeleteInAppTemplateResponse({
+    required this.messageBody,
   });
 }
 
@@ -10334,6 +10993,7 @@ enum Frequency {
   weekly,
   monthly,
   event,
+  inAppEvent,
 }
 
 extension on Frequency {
@@ -10351,6 +11011,8 @@ extension on Frequency {
         return 'MONTHLY';
       case Frequency.event:
         return 'EVENT';
+      case Frequency.inAppEvent:
+        return 'IN_APP_EVENT';
     }
   }
 }
@@ -10370,6 +11032,8 @@ extension on String {
         return Frequency.monthly;
       case 'EVENT':
         return Frequency.event;
+      case 'IN_APP_EVENT':
+        return Frequency.inAppEvent;
     }
     throw Exception('$this is not known in enum Frequency');
   }
@@ -10914,6 +11578,22 @@ class GetImportJobsResponse {
   });
 }
 
+class GetInAppMessagesResponse {
+  final InAppMessagesResponse inAppMessagesResponse;
+
+  GetInAppMessagesResponse({
+    required this.inAppMessagesResponse,
+  });
+}
+
+class GetInAppTemplateResponse {
+  final InAppTemplateResponse inAppTemplateResponse;
+
+  GetInAppTemplateResponse({
+    required this.inAppTemplateResponse,
+  });
+}
+
 class GetJourneyDateRangeKpiResponse {
   final JourneyDateRangeKpiResponse journeyDateRangeKpiResponse;
 
@@ -11376,6 +12056,459 @@ class ImportJobsResponse {
   }
 }
 
+/// Schedule of the campaign.
+class InAppCampaignSchedule {
+  /// The scheduled time after which the in-app message should not be shown.
+  /// Timestamp is in ISO 8601 format.
+  final String? endDate;
+
+  /// The event filter the SDK has to use to show the in-app message in the
+  /// application.
+  final CampaignEventFilter? eventFilter;
+
+  /// Time during which the in-app message should not be shown to the user.
+  final QuietTime? quietTime;
+
+  InAppCampaignSchedule({
+    this.endDate,
+    this.eventFilter,
+    this.quietTime,
+  });
+  factory InAppCampaignSchedule.fromJson(Map<String, dynamic> json) {
+    return InAppCampaignSchedule(
+      endDate: json['EndDate'] as String?,
+      eventFilter: json['EventFilter'] != null
+          ? CampaignEventFilter.fromJson(
+              json['EventFilter'] as Map<String, dynamic>)
+          : null,
+      quietTime: json['QuietTime'] != null
+          ? QuietTime.fromJson(json['QuietTime'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Provides all fields required for building an in-app message.
+class InAppMessage {
+  /// In-app message content.
+  final List<InAppMessageContent>? content;
+
+  /// Custom config to be sent to SDK.
+  final Map<String, String>? customConfig;
+
+  /// The layout of the message.
+  final Layout? layout;
+
+  InAppMessage({
+    this.content,
+    this.customConfig,
+    this.layout,
+  });
+  factory InAppMessage.fromJson(Map<String, dynamic> json) {
+    return InAppMessage(
+      content: (json['Content'] as List?)
+          ?.whereNotNull()
+          .map((e) => InAppMessageContent.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      customConfig: (json['CustomConfig'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+      layout: (json['Layout'] as String?)?.toLayout(),
+    );
+  }
+}
+
+/// Text config for Message Body.
+class InAppMessageBodyConfig {
+  /// The alignment of the text. Valid values: LEFT, CENTER, RIGHT.
+  final Alignment alignment;
+
+  /// Message Body.
+  final String body;
+
+  /// The text color.
+  final String textColor;
+
+  InAppMessageBodyConfig({
+    required this.alignment,
+    required this.body,
+    required this.textColor,
+  });
+  factory InAppMessageBodyConfig.fromJson(Map<String, dynamic> json) {
+    return InAppMessageBodyConfig(
+      alignment: (json['Alignment'] as String).toAlignment(),
+      body: json['Body'] as String,
+      textColor: json['TextColor'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final alignment = this.alignment;
+    final body = this.body;
+    final textColor = this.textColor;
+    return {
+      'Alignment': alignment.toValue(),
+      'Body': body,
+      'TextColor': textColor,
+    };
+  }
+}
+
+/// Button Config for an in-app message.
+class InAppMessageButton {
+  /// Default button content.
+  final OverrideButtonConfiguration? android;
+
+  /// Default button content.
+  final DefaultButtonConfiguration? defaultConfig;
+
+  /// Default button content.
+  final OverrideButtonConfiguration? ios;
+
+  /// Default button content.
+  final OverrideButtonConfiguration? web;
+
+  InAppMessageButton({
+    this.android,
+    this.defaultConfig,
+    this.ios,
+    this.web,
+  });
+  factory InAppMessageButton.fromJson(Map<String, dynamic> json) {
+    return InAppMessageButton(
+      android: json['Android'] != null
+          ? OverrideButtonConfiguration.fromJson(
+              json['Android'] as Map<String, dynamic>)
+          : null,
+      defaultConfig: json['DefaultConfig'] != null
+          ? DefaultButtonConfiguration.fromJson(
+              json['DefaultConfig'] as Map<String, dynamic>)
+          : null,
+      ios: json['IOS'] != null
+          ? OverrideButtonConfiguration.fromJson(
+              json['IOS'] as Map<String, dynamic>)
+          : null,
+      web: json['Web'] != null
+          ? OverrideButtonConfiguration.fromJson(
+              json['Web'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final android = this.android;
+    final defaultConfig = this.defaultConfig;
+    final ios = this.ios;
+    final web = this.web;
+    return {
+      if (android != null) 'Android': android,
+      if (defaultConfig != null) 'DefaultConfig': defaultConfig,
+      if (ios != null) 'IOS': ios,
+      if (web != null) 'Web': web,
+    };
+  }
+}
+
+/// Targeted in-app message campaign.
+class InAppMessageCampaign {
+  /// Campaign id of the corresponding campaign.
+  final String? campaignId;
+
+  /// Daily cap which controls the number of times any in-app messages can be
+  /// shown to the endpoint during a day.
+  final int? dailyCap;
+
+  /// In-app message content with all fields required for rendering an in-app
+  /// message.
+  final InAppMessage? inAppMessage;
+
+  /// Priority of the in-app message.
+  final int? priority;
+
+  /// Schedule of the campaign.
+  final InAppCampaignSchedule? schedule;
+
+  /// Session cap which controls the number of times an in-app message can be
+  /// shown to the endpoint during an application session.
+  final int? sessionCap;
+
+  /// Total cap which controls the number of times an in-app message can be shown
+  /// to the endpoint.
+  final int? totalCap;
+
+  /// Treatment id of the campaign.
+  final String? treatmentId;
+
+  InAppMessageCampaign({
+    this.campaignId,
+    this.dailyCap,
+    this.inAppMessage,
+    this.priority,
+    this.schedule,
+    this.sessionCap,
+    this.totalCap,
+    this.treatmentId,
+  });
+  factory InAppMessageCampaign.fromJson(Map<String, dynamic> json) {
+    return InAppMessageCampaign(
+      campaignId: json['CampaignId'] as String?,
+      dailyCap: json['DailyCap'] as int?,
+      inAppMessage: json['InAppMessage'] != null
+          ? InAppMessage.fromJson(json['InAppMessage'] as Map<String, dynamic>)
+          : null,
+      priority: json['Priority'] as int?,
+      schedule: json['Schedule'] != null
+          ? InAppCampaignSchedule.fromJson(
+              json['Schedule'] as Map<String, dynamic>)
+          : null,
+      sessionCap: json['SessionCap'] as int?,
+      totalCap: json['TotalCap'] as int?,
+      treatmentId: json['TreatmentId'] as String?,
+    );
+  }
+}
+
+/// The configuration for the message content.
+class InAppMessageContent {
+  /// The background color for the message.
+  final String? backgroundColor;
+
+  /// The configuration for the message body.
+  final InAppMessageBodyConfig? bodyConfig;
+
+  /// The configuration for the message header.
+  final InAppMessageHeaderConfig? headerConfig;
+
+  /// The image url for the background of message.
+  final String? imageUrl;
+
+  /// The first button inside the message.
+  final InAppMessageButton? primaryBtn;
+
+  /// The second button inside message.
+  final InAppMessageButton? secondaryBtn;
+
+  InAppMessageContent({
+    this.backgroundColor,
+    this.bodyConfig,
+    this.headerConfig,
+    this.imageUrl,
+    this.primaryBtn,
+    this.secondaryBtn,
+  });
+  factory InAppMessageContent.fromJson(Map<String, dynamic> json) {
+    return InAppMessageContent(
+      backgroundColor: json['BackgroundColor'] as String?,
+      bodyConfig: json['BodyConfig'] != null
+          ? InAppMessageBodyConfig.fromJson(
+              json['BodyConfig'] as Map<String, dynamic>)
+          : null,
+      headerConfig: json['HeaderConfig'] != null
+          ? InAppMessageHeaderConfig.fromJson(
+              json['HeaderConfig'] as Map<String, dynamic>)
+          : null,
+      imageUrl: json['ImageUrl'] as String?,
+      primaryBtn: json['PrimaryBtn'] != null
+          ? InAppMessageButton.fromJson(
+              json['PrimaryBtn'] as Map<String, dynamic>)
+          : null,
+      secondaryBtn: json['SecondaryBtn'] != null
+          ? InAppMessageButton.fromJson(
+              json['SecondaryBtn'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final backgroundColor = this.backgroundColor;
+    final bodyConfig = this.bodyConfig;
+    final headerConfig = this.headerConfig;
+    final imageUrl = this.imageUrl;
+    final primaryBtn = this.primaryBtn;
+    final secondaryBtn = this.secondaryBtn;
+    return {
+      if (backgroundColor != null) 'BackgroundColor': backgroundColor,
+      if (bodyConfig != null) 'BodyConfig': bodyConfig,
+      if (headerConfig != null) 'HeaderConfig': headerConfig,
+      if (imageUrl != null) 'ImageUrl': imageUrl,
+      if (primaryBtn != null) 'PrimaryBtn': primaryBtn,
+      if (secondaryBtn != null) 'SecondaryBtn': secondaryBtn,
+    };
+  }
+}
+
+/// Text config for Message Header.
+class InAppMessageHeaderConfig {
+  /// The alignment of the text. Valid values: LEFT, CENTER, RIGHT.
+  final Alignment alignment;
+
+  /// Message Header.
+  final String header;
+
+  /// The text color.
+  final String textColor;
+
+  InAppMessageHeaderConfig({
+    required this.alignment,
+    required this.header,
+    required this.textColor,
+  });
+  factory InAppMessageHeaderConfig.fromJson(Map<String, dynamic> json) {
+    return InAppMessageHeaderConfig(
+      alignment: (json['Alignment'] as String).toAlignment(),
+      header: json['Header'] as String,
+      textColor: json['TextColor'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final alignment = this.alignment;
+    final header = this.header;
+    final textColor = this.textColor;
+    return {
+      'Alignment': alignment.toValue(),
+      'Header': header,
+      'TextColor': textColor,
+    };
+  }
+}
+
+/// Get in-app messages response object.
+class InAppMessagesResponse {
+  /// List of targeted in-app message campaigns.
+  final List<InAppMessageCampaign>? inAppMessageCampaigns;
+
+  InAppMessagesResponse({
+    this.inAppMessageCampaigns,
+  });
+  factory InAppMessagesResponse.fromJson(Map<String, dynamic> json) {
+    return InAppMessagesResponse(
+      inAppMessageCampaigns: (json['InAppMessageCampaigns'] as List?)
+          ?.whereNotNull()
+          .map((e) => InAppMessageCampaign.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+/// InApp Template Request.
+class InAppTemplateRequest {
+  /// The content of the message, can include up to 5 modals. Each modal must
+  /// contain a message, a header, and background color. ImageUrl and buttons are
+  /// optional.
+  final List<InAppMessageContent>? content;
+
+  /// Custom config to be sent to client.
+  final Map<String, String>? customConfig;
+
+  /// The layout of the message.
+  final Layout? layout;
+
+  /// The description of the template.
+  final String? templateDescription;
+
+  /// A string-to-string map of key-value pairs that defines the tags to associate
+  /// with the message template. Each tag consists of a required tag key and an
+  /// associated tag value.
+  final Map<String, String>? tags;
+
+  InAppTemplateRequest({
+    this.content,
+    this.customConfig,
+    this.layout,
+    this.templateDescription,
+    this.tags,
+  });
+  Map<String, dynamic> toJson() {
+    final content = this.content;
+    final customConfig = this.customConfig;
+    final layout = this.layout;
+    final templateDescription = this.templateDescription;
+    final tags = this.tags;
+    return {
+      if (content != null) 'Content': content,
+      if (customConfig != null) 'CustomConfig': customConfig,
+      if (layout != null) 'Layout': layout.toValue(),
+      if (templateDescription != null)
+        'TemplateDescription': templateDescription,
+      if (tags != null) 'tags': tags,
+    };
+  }
+}
+
+/// In-App Template Response.
+class InAppTemplateResponse {
+  /// The creation date of the template.
+  final String creationDate;
+
+  /// The last modified date of the template.
+  final String lastModifiedDate;
+
+  /// The name of the template.
+  final String templateName;
+
+  /// The type of the template.
+  final TemplateType templateType;
+
+  /// The resource arn of the template.
+  final String? arn;
+
+  /// The content of the message, can include up to 5 modals. Each modal must
+  /// contain a message, a header, and background color. ImageUrl and buttons are
+  /// optional.
+  final List<InAppMessageContent>? content;
+
+  /// Custom config to be sent to client.
+  final Map<String, String>? customConfig;
+
+  /// The layout of the message.
+  final Layout? layout;
+
+  /// The description of the template.
+  final String? templateDescription;
+
+  /// The version id of the template.
+  final String? version;
+
+  /// A string-to-string map of key-value pairs that defines the tags to associate
+  /// with the message template. Each tag consists of a required tag key and an
+  /// associated tag value.
+  final Map<String, String>? tags;
+
+  InAppTemplateResponse({
+    required this.creationDate,
+    required this.lastModifiedDate,
+    required this.templateName,
+    required this.templateType,
+    this.arn,
+    this.content,
+    this.customConfig,
+    this.layout,
+    this.templateDescription,
+    this.version,
+    this.tags,
+  });
+  factory InAppTemplateResponse.fromJson(Map<String, dynamic> json) {
+    return InAppTemplateResponse(
+      creationDate: json['CreationDate'] as String,
+      lastModifiedDate: json['LastModifiedDate'] as String,
+      templateName: json['TemplateName'] as String,
+      templateType: (json['TemplateType'] as String).toTemplateType(),
+      arn: json['Arn'] as String?,
+      content: (json['Content'] as List?)
+          ?.whereNotNull()
+          .map((e) => InAppMessageContent.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      customConfig: (json['CustomConfig'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+      layout: (json['Layout'] as String?)?.toLayout(),
+      templateDescription: json['TemplateDescription'] as String?,
+      version: json['Version'] as String?,
+      tags: (json['tags'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+    );
+  }
+}
+
 enum Include {
   all,
   any,
@@ -11736,18 +12869,24 @@ class JourneyLimits {
   /// unlimited number of times, set this value to 0.
   final int? endpointReentryCap;
 
+  /// Minimum time that must pass before an endpoint can re-enter a given journey.
+  /// The duration should use an ISO 8601 format, such as PT1H.
+  final String? endpointReentryInterval;
+
   /// The maximum number of messages that the journey can send each second.
   final int? messagesPerSecond;
 
   JourneyLimits({
     this.dailyCap,
     this.endpointReentryCap,
+    this.endpointReentryInterval,
     this.messagesPerSecond,
   });
   factory JourneyLimits.fromJson(Map<String, dynamic> json) {
     return JourneyLimits(
       dailyCap: json['DailyCap'] as int?,
       endpointReentryCap: json['EndpointReentryCap'] as int?,
+      endpointReentryInterval: json['EndpointReentryInterval'] as String?,
       messagesPerSecond: json['MessagesPerSecond'] as int?,
     );
   }
@@ -11755,10 +12894,13 @@ class JourneyLimits {
   Map<String, dynamic> toJson() {
     final dailyCap = this.dailyCap;
     final endpointReentryCap = this.endpointReentryCap;
+    final endpointReentryInterval = this.endpointReentryInterval;
     final messagesPerSecond = this.messagesPerSecond;
     return {
       if (dailyCap != null) 'DailyCap': dailyCap,
       if (endpointReentryCap != null) 'EndpointReentryCap': endpointReentryCap,
+      if (endpointReentryInterval != null)
+        'EndpointReentryInterval': endpointReentryInterval,
       if (messagesPerSecond != null) 'MessagesPerSecond': messagesPerSecond,
     };
   }
@@ -11795,6 +12937,39 @@ class JourneyPushMessage {
   }
 }
 
+/// The channel-specific configurations for the journey.
+class JourneyChannelSettings {
+  /// Amazon Resource Name (ARN) of the Connect Campaign.
+  final String? connectCampaignArn;
+
+  /// IAM role ARN to be assumed when invoking Connect campaign execution APIs for
+  /// dialing.
+  final String? connectCampaignExecutionRoleArn;
+
+  JourneyChannelSettings({
+    this.connectCampaignArn,
+    this.connectCampaignExecutionRoleArn,
+  });
+  factory JourneyChannelSettings.fromJson(Map<String, dynamic> json) {
+    return JourneyChannelSettings(
+      connectCampaignArn: json['ConnectCampaignArn'] as String?,
+      connectCampaignExecutionRoleArn:
+          json['ConnectCampaignExecutionRoleArn'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final connectCampaignArn = this.connectCampaignArn;
+    final connectCampaignExecutionRoleArn =
+        this.connectCampaignExecutionRoleArn;
+    return {
+      if (connectCampaignArn != null) 'ConnectCampaignArn': connectCampaignArn,
+      if (connectCampaignExecutionRoleArn != null)
+        'ConnectCampaignExecutionRoleArn': connectCampaignExecutionRoleArn,
+    };
+  }
+}
+
 /// Provides information about the status, configuration, and other settings for
 /// a journey.
 class JourneyResponse {
@@ -11812,8 +12987,15 @@ class JourneyResponse {
   /// (string) for an activity and the value is the settings for the activity.
   final Map<String, Activity>? activities;
 
+  /// The time when journey will stop sending messages. QuietTime should be
+  /// configured first and SendingSchedule should be set to true.
+  final ClosedDays? closedDays;
+
   /// The date, in ISO 8601 format, when the journey was created.
   final String? creationDate;
+
+  /// The channel-specific configurations for the journey.
+  final JourneyChannelSettings? journeyChannelSettings;
 
   /// The date, in ISO 8601 format, when the journey was last modified.
   final String? lastModifiedDate;
@@ -11825,6 +13007,10 @@ class JourneyResponse {
   /// participant's local time. If this value is true, the schedule uses each
   /// participant's local time.
   final bool? localTime;
+
+  /// The time when journey allow to send messages. QuietTime should be configured
+  /// first and SendingSchedule should be set to true.
+  final OpenHours? openHours;
 
   /// The quiet time settings for the journey. Quiet time is a specific time range
   /// when a journey doesn't send messages to participants, if all the following
@@ -11852,8 +13038,15 @@ class JourneyResponse {
   /// for the journey, as a duration in ISO 8601 format.
   final String? refreshFrequency;
 
+  /// Specifies whether a journey should be refreshed on segment update.
+  final bool? refreshOnSegmentUpdate;
+
   /// The schedule settings for the journey.
   final JourneySchedule? schedule;
+
+  /// Indicates if journey have Advance Quiet Time (OpenHours and ClosedDays).
+  /// This flag should be set to true in order to allow (OpenHours and ClosedDays)
+  final bool? sendingSchedule;
 
   /// The unique identifier for the first activity in the journey.
   final String? startActivity;
@@ -11894,6 +13087,10 @@ class JourneyResponse {
   /// </ul>
   final State? state;
 
+  /// Specifies whether endpoints in quiet hours should enter a wait till the end
+  /// of their quiet hours.
+  final bool? waitForQuietTime;
+
   /// This object is not used or supported.
   final Map<String, String>? tags;
 
@@ -11902,16 +13099,22 @@ class JourneyResponse {
     required this.id,
     required this.name,
     this.activities,
+    this.closedDays,
     this.creationDate,
+    this.journeyChannelSettings,
     this.lastModifiedDate,
     this.limits,
     this.localTime,
+    this.openHours,
     this.quietTime,
     this.refreshFrequency,
+    this.refreshOnSegmentUpdate,
     this.schedule,
+    this.sendingSchedule,
     this.startActivity,
     this.startCondition,
     this.state,
+    this.waitForQuietTime,
     this.tags,
   });
   factory JourneyResponse.fromJson(Map<String, dynamic> json) {
@@ -11921,25 +13124,38 @@ class JourneyResponse {
       name: json['Name'] as String,
       activities: (json['Activities'] as Map<String, dynamic>?)?.map(
           (k, e) => MapEntry(k, Activity.fromJson(e as Map<String, dynamic>))),
+      closedDays: json['ClosedDays'] != null
+          ? ClosedDays.fromJson(json['ClosedDays'] as Map<String, dynamic>)
+          : null,
       creationDate: json['CreationDate'] as String?,
+      journeyChannelSettings: json['JourneyChannelSettings'] != null
+          ? JourneyChannelSettings.fromJson(
+              json['JourneyChannelSettings'] as Map<String, dynamic>)
+          : null,
       lastModifiedDate: json['LastModifiedDate'] as String?,
       limits: json['Limits'] != null
           ? JourneyLimits.fromJson(json['Limits'] as Map<String, dynamic>)
           : null,
       localTime: json['LocalTime'] as bool?,
+      openHours: json['OpenHours'] != null
+          ? OpenHours.fromJson(json['OpenHours'] as Map<String, dynamic>)
+          : null,
       quietTime: json['QuietTime'] != null
           ? QuietTime.fromJson(json['QuietTime'] as Map<String, dynamic>)
           : null,
       refreshFrequency: json['RefreshFrequency'] as String?,
+      refreshOnSegmentUpdate: json['RefreshOnSegmentUpdate'] as bool?,
       schedule: json['Schedule'] != null
           ? JourneySchedule.fromJson(json['Schedule'] as Map<String, dynamic>)
           : null,
+      sendingSchedule: json['SendingSchedule'] as bool?,
       startActivity: json['StartActivity'] as String?,
       startCondition: json['StartCondition'] != null
           ? StartCondition.fromJson(
               json['StartCondition'] as Map<String, dynamic>)
           : null,
       state: (json['State'] as String?)?.toState(),
+      waitForQuietTime: json['WaitForQuietTime'] as bool?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -11949,11 +13165,22 @@ class JourneyResponse {
 /// Specifies the sender ID and message type for an SMS message that's sent to
 /// participants in a journey.
 class JourneySMSMessage {
+  /// The entity ID or Principal Entity (PE) id received from the regulatory body
+  /// for sending SMS in your country.
+  final String? entityId;
+
   /// The SMS message type. Valid values are TRANSACTIONAL (for messages that are
   /// critical or time-sensitive, such as a one-time passwords) and PROMOTIONAL
   /// (for messsages that aren't critical or time-sensitive, such as marketing
   /// messages).
   final MessageType? messageType;
+
+  /// The long code to send the SMS message from. This value should be one of the
+  /// dedicated long codes that's assigned to your AWS account. Although it isn't
+  /// required, we recommend that you specify the long code using an E.164 format
+  /// to ensure prompt and accurate delivery of the message. For example,
+  /// +12065550100.
+  final String? originationNumber;
 
   /// The sender ID to display as the sender of the message on a recipient's
   /// device. Support for sender IDs varies by country or region. For more
@@ -11962,23 +13189,39 @@ class JourneySMSMessage {
   /// Countries and Regions</a> in the Amazon Pinpoint User Guide.
   final String? senderId;
 
+  /// The template ID received from the regulatory body for sending SMS in your
+  /// country.
+  final String? templateId;
+
   JourneySMSMessage({
+    this.entityId,
     this.messageType,
+    this.originationNumber,
     this.senderId,
+    this.templateId,
   });
   factory JourneySMSMessage.fromJson(Map<String, dynamic> json) {
     return JourneySMSMessage(
+      entityId: json['EntityId'] as String?,
       messageType: (json['MessageType'] as String?)?.toMessageType(),
+      originationNumber: json['OriginationNumber'] as String?,
       senderId: json['SenderId'] as String?,
+      templateId: json['TemplateId'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final entityId = this.entityId;
     final messageType = this.messageType;
+    final originationNumber = this.originationNumber;
     final senderId = this.senderId;
+    final templateId = this.templateId;
     return {
+      if (entityId != null) 'EntityId': entityId,
       if (messageType != null) 'MessageType': messageType.toValue(),
+      if (originationNumber != null) 'OriginationNumber': originationNumber,
       if (senderId != null) 'SenderId': senderId,
+      if (templateId != null) 'TemplateId': templateId,
     };
   }
 }
@@ -12029,7 +13272,8 @@ class JourneySchedule {
 
 /// Changes the status of a journey.
 class JourneyStateRequest {
-  /// The status of the journey. Currently, the only supported value is CANCELLED.
+  /// The status of the journey. Currently, Supported values are ACTIVE, PAUSED,
+  /// and CANCELLED
   ///
   /// If you cancel a journey, Amazon Pinpoint continues to perform activities
   /// that are currently in progress, until those activities are complete. Amazon
@@ -12040,6 +13284,13 @@ class JourneyStateRequest {
   /// After you cancel a journey, you can't add, change, or remove any activities
   /// from the journey. In addition, Amazon Pinpoint stops evaluating the journey
   /// and doesn't perform any activities that haven't started.
+  ///
+  /// When the journey is paused, Amazon Pinpoint continues to perform activities
+  /// that are currently in progress, until those activities are complete.
+  /// Endpoints will stop entering journeys when the journey is paused and will
+  /// resume entering the journey after the journey is resumed. For wait
+  /// activities, wait time is paused when the journey is paused. Currently,
+  /// PAUSED only supports journeys with a segment refresh interval.
   final State? state;
 
   JourneyStateRequest({
@@ -12076,6 +13327,54 @@ class JourneysResponse {
           .toList(),
       nextToken: json['NextToken'] as String?,
     );
+  }
+}
+
+enum Layout {
+  bottomBanner,
+  topBanner,
+  overlays,
+  mobileFeed,
+  middleBanner,
+  carousel,
+}
+
+extension on Layout {
+  String toValue() {
+    switch (this) {
+      case Layout.bottomBanner:
+        return 'BOTTOM_BANNER';
+      case Layout.topBanner:
+        return 'TOP_BANNER';
+      case Layout.overlays:
+        return 'OVERLAYS';
+      case Layout.mobileFeed:
+        return 'MOBILE_FEED';
+      case Layout.middleBanner:
+        return 'MIDDLE_BANNER';
+      case Layout.carousel:
+        return 'CAROUSEL';
+    }
+  }
+}
+
+extension on String {
+  Layout toLayout() {
+    switch (this) {
+      case 'BOTTOM_BANNER':
+        return Layout.bottomBanner;
+      case 'TOP_BANNER':
+        return Layout.topBanner;
+      case 'OVERLAYS':
+        return Layout.overlays;
+      case 'MOBILE_FEED':
+        return Layout.mobileFeed;
+      case 'MIDDLE_BANNER':
+        return Layout.middleBanner;
+      case 'CAROUSEL':
+        return Layout.carousel;
+    }
+    throw Exception('$this is not known in enum Layout');
   }
 }
 
@@ -12328,6 +13627,9 @@ class MessageConfiguration {
   /// specified, this message overrides the default message.
   final Message? gCMMessage;
 
+  /// The in-app message configuration.
+  final CampaignInAppMessage? inAppMessage;
+
   /// The message that the campaign sends through the SMS channel. If specified,
   /// this message overrides the default message.
   final CampaignSmsMessage? sMSMessage;
@@ -12340,6 +13642,7 @@ class MessageConfiguration {
     this.defaultMessage,
     this.emailMessage,
     this.gCMMessage,
+    this.inAppMessage,
     this.sMSMessage,
   });
   factory MessageConfiguration.fromJson(Map<String, dynamic> json) {
@@ -12367,6 +13670,10 @@ class MessageConfiguration {
       gCMMessage: json['GCMMessage'] != null
           ? Message.fromJson(json['GCMMessage'] as Map<String, dynamic>)
           : null,
+      inAppMessage: json['InAppMessage'] != null
+          ? CampaignInAppMessage.fromJson(
+              json['InAppMessage'] as Map<String, dynamic>)
+          : null,
       sMSMessage: json['SMSMessage'] != null
           ? CampaignSmsMessage.fromJson(
               json['SMSMessage'] as Map<String, dynamic>)
@@ -12382,6 +13689,7 @@ class MessageConfiguration {
     final defaultMessage = this.defaultMessage;
     final emailMessage = this.emailMessage;
     final gCMMessage = this.gCMMessage;
+    final inAppMessage = this.inAppMessage;
     final sMSMessage = this.sMSMessage;
     return {
       if (aDMMessage != null) 'ADMMessage': aDMMessage,
@@ -12391,6 +13699,7 @@ class MessageConfiguration {
       if (defaultMessage != null) 'DefaultMessage': defaultMessage,
       if (emailMessage != null) 'EmailMessage': emailMessage,
       if (gCMMessage != null) 'GCMMessage': gCMMessage,
+      if (inAppMessage != null) 'InAppMessage': inAppMessage,
       if (sMSMessage != null) 'SMSMessage': sMSMessage,
     };
   }
@@ -12893,6 +14202,35 @@ extension on String {
         return Operator.any;
     }
     throw Exception('$this is not known in enum Operator');
+  }
+}
+
+/// Override button configuration.
+class OverrideButtonConfiguration {
+  /// Action triggered by the button.
+  final ButtonAction buttonAction;
+
+  /// Button destination.
+  final String? link;
+
+  OverrideButtonConfiguration({
+    required this.buttonAction,
+    this.link,
+  });
+  factory OverrideButtonConfiguration.fromJson(Map<String, dynamic> json) {
+    return OverrideButtonConfiguration(
+      buttonAction: (json['ButtonAction'] as String).toButtonAction(),
+      link: json['Link'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final buttonAction = this.buttonAction;
+    final link = this.link;
+    return {
+      'ButtonAction': buttonAction.toValue(),
+      if (link != null) 'Link': link,
+    };
   }
 }
 
@@ -13778,6 +15116,10 @@ class SMSMessage {
   /// The body of the SMS message.
   final String? body;
 
+  /// The entity ID or Principal Entity (PE) id received from the regulatory body
+  /// for sending SMS in your country.
+  final String? entityId;
+
   /// The SMS program name that you provided to AWS Support when you requested
   /// your dedicated number.
   final String? keyword;
@@ -13805,31 +15147,41 @@ class SMSMessage {
   /// default variables with individual address variables.
   final Map<String, List<String>>? substitutions;
 
+  /// The template ID received from the regulatory body for sending SMS in your
+  /// country.
+  final String? templateId;
+
   SMSMessage({
     this.body,
+    this.entityId,
     this.keyword,
     this.mediaUrl,
     this.messageType,
     this.originationNumber,
     this.senderId,
     this.substitutions,
+    this.templateId,
   });
   Map<String, dynamic> toJson() {
     final body = this.body;
+    final entityId = this.entityId;
     final keyword = this.keyword;
     final mediaUrl = this.mediaUrl;
     final messageType = this.messageType;
     final originationNumber = this.originationNumber;
     final senderId = this.senderId;
     final substitutions = this.substitutions;
+    final templateId = this.templateId;
     return {
       if (body != null) 'Body': body,
+      if (entityId != null) 'EntityId': entityId,
       if (keyword != null) 'Keyword': keyword,
       if (mediaUrl != null) 'MediaUrl': mediaUrl,
       if (messageType != null) 'MessageType': messageType.toValue(),
       if (originationNumber != null) 'OriginationNumber': originationNumber,
       if (senderId != null) 'SenderId': senderId,
       if (substitutions != null) 'Substitutions': substitutions,
+      if (templateId != null) 'TemplateId': templateId,
     };
   }
 }
@@ -14692,6 +16044,93 @@ class SendMessagesResponse {
   });
 }
 
+/// Send OTP message request parameters.
+class SendOTPMessageRequestParameters {
+  /// The brand name that will be substituted into the OTP message body. Should be
+  /// owned by calling AWS account.
+  final String brandName;
+
+  /// Channel type for the OTP message. Supported values: [SMS].
+  final String channel;
+
+  /// The destination identity to send OTP to.
+  final String destinationIdentity;
+
+  /// The origination identity used to send OTP from.
+  final String originationIdentity;
+
+  /// Developer-specified reference identifier. Required to match during OTP
+  /// verification.
+  final String referenceId;
+
+  /// The attempts allowed to validate an OTP.
+  final int? allowedAttempts;
+
+  /// The number of characters in the generated OTP.
+  final int? codeLength;
+
+  /// A unique Entity ID received from DLT after entity registration is approved.
+  final String? entityId;
+
+  /// The language to be used for the outgoing message body containing the OTP.
+  final String? language;
+
+  /// A unique Template ID received from DLT after entity registration is
+  /// approved.
+  final String? templateId;
+
+  /// The time in minutes before the OTP is no longer valid.
+  final int? validityPeriod;
+
+  SendOTPMessageRequestParameters({
+    required this.brandName,
+    required this.channel,
+    required this.destinationIdentity,
+    required this.originationIdentity,
+    required this.referenceId,
+    this.allowedAttempts,
+    this.codeLength,
+    this.entityId,
+    this.language,
+    this.templateId,
+    this.validityPeriod,
+  });
+  Map<String, dynamic> toJson() {
+    final brandName = this.brandName;
+    final channel = this.channel;
+    final destinationIdentity = this.destinationIdentity;
+    final originationIdentity = this.originationIdentity;
+    final referenceId = this.referenceId;
+    final allowedAttempts = this.allowedAttempts;
+    final codeLength = this.codeLength;
+    final entityId = this.entityId;
+    final language = this.language;
+    final templateId = this.templateId;
+    final validityPeriod = this.validityPeriod;
+    return {
+      'BrandName': brandName,
+      'Channel': channel,
+      'DestinationIdentity': destinationIdentity,
+      'OriginationIdentity': originationIdentity,
+      'ReferenceId': referenceId,
+      if (allowedAttempts != null) 'AllowedAttempts': allowedAttempts,
+      if (codeLength != null) 'CodeLength': codeLength,
+      if (entityId != null) 'EntityId': entityId,
+      if (language != null) 'Language': language,
+      if (templateId != null) 'TemplateId': templateId,
+      if (validityPeriod != null) 'ValidityPeriod': validityPeriod,
+    };
+  }
+}
+
+class SendOTPMessageResponse {
+  final MessageResponse messageResponse;
+
+  SendOTPMessageResponse({
+    required this.messageResponse,
+  });
+}
+
 /// Specifies the configuration and other settings for a message to send to all
 /// the endpoints that are associated with a list of users.
 class SendUsersMessageRequest {
@@ -15037,6 +16476,7 @@ enum State {
   completed,
   cancelled,
   closed,
+  paused,
 }
 
 extension on State {
@@ -15052,6 +16492,8 @@ extension on State {
         return 'CANCELLED';
       case State.closed:
         return 'CLOSED';
+      case State.paused:
+        return 'PAUSED';
     }
   }
 }
@@ -15069,6 +16511,8 @@ extension on String {
         return State.cancelled;
       case 'CLOSED':
         return State.closed;
+      case 'PAUSED':
+        return State.paused;
     }
     throw Exception('$this is not known in enum State');
   }
@@ -15223,6 +16667,32 @@ class TemplateConfiguration {
   }
 }
 
+/// Provides information about a request to create a message template.
+class TemplateCreateMessageBody {
+  /// The Amazon Resource Name (ARN) of the message template that was created.
+  final String? arn;
+
+  /// The message that's returned from the API for the request to create the
+  /// message template.
+  final String? message;
+
+  /// The unique identifier for the request to create the message template.
+  final String? requestID;
+
+  TemplateCreateMessageBody({
+    this.arn,
+    this.message,
+    this.requestID,
+  });
+  factory TemplateCreateMessageBody.fromJson(Map<String, dynamic> json) {
+    return TemplateCreateMessageBody(
+      arn: json['Arn'] as String?,
+      message: json['Message'] as String?,
+      requestID: json['RequestID'] as String?,
+    );
+  }
+}
+
 /// Provides information about a message template that's associated with your
 /// Amazon Pinpoint account.
 class TemplateResponse {
@@ -15304,6 +16774,7 @@ enum TemplateType {
   sms,
   voice,
   push,
+  inapp,
 }
 
 extension on TemplateType {
@@ -15317,6 +16788,8 @@ extension on TemplateType {
         return 'VOICE';
       case TemplateType.push:
         return 'PUSH';
+      case TemplateType.inapp:
+        return 'INAPP';
     }
   }
 }
@@ -15332,6 +16805,8 @@ extension on String {
         return TemplateType.voice;
       case 'PUSH':
         return TemplateType.push;
+      case 'INAPP':
+        return TemplateType.inapp;
     }
     throw Exception('$this is not known in enum TemplateType');
   }
@@ -15683,6 +17158,14 @@ class UpdateGcmChannelResponse {
   });
 }
 
+class UpdateInAppTemplateResponse {
+  final MessageBody messageBody;
+
+  UpdateInAppTemplateResponse({
+    required this.messageBody,
+  });
+}
+
 class UpdateJourneyResponse {
   final JourneyResponse journeyResponse;
 
@@ -15903,6 +17386,57 @@ class UpdateVoiceTemplateResponse {
 
   UpdateVoiceTemplateResponse({
     required this.messageBody,
+  });
+}
+
+/// Verify OTP Message Response.
+class VerificationResponse {
+  /// Specifies whether the OTP is valid or not.
+  final bool? valid;
+
+  VerificationResponse({
+    this.valid,
+  });
+  factory VerificationResponse.fromJson(Map<String, dynamic> json) {
+    return VerificationResponse(
+      valid: json['Valid'] as bool?,
+    );
+  }
+}
+
+/// Verify OTP message request.
+class VerifyOTPMessageRequestParameters {
+  /// The destination identity to send OTP to.
+  final String destinationIdentity;
+
+  /// The OTP the end user provided for verification.
+  final String otp;
+
+  /// The reference identifier provided when the OTP was previously sent.
+  final String referenceId;
+
+  VerifyOTPMessageRequestParameters({
+    required this.destinationIdentity,
+    required this.otp,
+    required this.referenceId,
+  });
+  Map<String, dynamic> toJson() {
+    final destinationIdentity = this.destinationIdentity;
+    final otp = this.otp;
+    final referenceId = this.referenceId;
+    return {
+      'DestinationIdentity': destinationIdentity,
+      'Otp': otp,
+      'ReferenceId': referenceId,
+    };
+  }
+}
+
+class VerifyOTPMessageResponse {
+  final VerificationResponse verificationResponse;
+
+  VerifyOTPMessageResponse({
+    required this.verificationResponse,
   });
 }
 
@@ -16377,6 +17911,11 @@ class WriteCampaignRequest {
   /// A custom name for the campaign.
   final String? name;
 
+  /// Defines the priority of the campaign, used to decide the order of messages
+  /// displayed to user if there are multiple messages scheduled to be displayed
+  /// at the same moment.
+  final int? priority;
+
   /// The schedule settings for the campaign.
   final Schedule? schedule;
 
@@ -16412,6 +17951,7 @@ class WriteCampaignRequest {
     this.limits,
     this.messageConfiguration,
     this.name,
+    this.priority,
     this.schedule,
     this.segmentId,
     this.segmentVersion,
@@ -16430,6 +17970,7 @@ class WriteCampaignRequest {
     final limits = this.limits;
     final messageConfiguration = this.messageConfiguration;
     final name = this.name;
+    final priority = this.priority;
     final schedule = this.schedule;
     final segmentId = this.segmentId;
     final segmentVersion = this.segmentVersion;
@@ -16450,6 +17991,7 @@ class WriteCampaignRequest {
       if (messageConfiguration != null)
         'MessageConfiguration': messageConfiguration,
       if (name != null) 'Name': name,
+      if (priority != null) 'Priority': priority,
       if (schedule != null) 'Schedule': schedule,
       if (segmentId != null) 'SegmentId': segmentId,
       if (segmentVersion != null) 'SegmentVersion': segmentVersion,
@@ -16512,8 +18054,15 @@ class WriteJourneyRequest {
   /// must be alphanumeric characters.
   final Map<String, Activity>? activities;
 
+  /// The time when journey will stop sending messages. QuietTime should be
+  /// configured first and SendingSchedule should be set to true.
+  final ClosedDays? closedDays;
+
   /// The date, in ISO 8601 format, when the journey was created.
   final String? creationDate;
+
+  /// The channel-specific configurations for the journey.
+  final JourneyChannelSettings? journeyChannelSettings;
 
   /// The date, in ISO 8601 format, when the journey was last modified.
   final String? lastModifiedDate;
@@ -16525,6 +18074,10 @@ class WriteJourneyRequest {
   /// participant's local time. To base the schedule on each participant's local
   /// time, set this value to true.
   final bool? localTime;
+
+  /// The time when journey allow to send messages. QuietTime should be configured
+  /// first and SendingSchedule should be set to true.
+  final OpenHours? openHours;
 
   /// The quiet time settings for the journey. Quiet time is a specific time range
   /// when a journey doesn't send messages to participants, if all the following
@@ -16552,8 +18105,15 @@ class WriteJourneyRequest {
   /// for the journey, as a duration in ISO 8601 format.
   final String? refreshFrequency;
 
+  /// Specifies whether a journey should be refreshed on segment update.
+  final bool? refreshOnSegmentUpdate;
+
   /// The schedule settings for the journey.
   final JourneySchedule? schedule;
+
+  /// Indicates if journey have Advance Quiet Time (OpenHours and ClosedDays).
+  /// This flag should be set to true in order to allow (OpenHours and ClosedDays)
+  final bool? sendingSchedule;
 
   /// The unique identifier for the first activity in the journey. The identifier
   /// for this activity can contain a maximum of 128 characters. The characters
@@ -16576,52 +18136,77 @@ class WriteJourneyRequest {
   /// activities from it.
   /// </li>
   /// </ul>
-  /// The CANCELLED, COMPLETED, and CLOSED values are not supported in requests to
-  /// create or update a journey. To cancel a journey, use the <link
+  /// PAUSED, CANCELLED, COMPLETED, and CLOSED states are not supported in
+  /// requests to create or update a journey. To cancel, pause, or resume a
+  /// journey, use the <link
   /// linkend="apps-application-id-journeys-journey-id-state">Journey State</link>
   /// resource.
   final State? state;
 
+  /// Specifies whether endpoints in quiet hours should enter a wait till the end
+  /// of their quiet hours.
+  final bool? waitForQuietTime;
+
   WriteJourneyRequest({
     required this.name,
     this.activities,
+    this.closedDays,
     this.creationDate,
+    this.journeyChannelSettings,
     this.lastModifiedDate,
     this.limits,
     this.localTime,
+    this.openHours,
     this.quietTime,
     this.refreshFrequency,
+    this.refreshOnSegmentUpdate,
     this.schedule,
+    this.sendingSchedule,
     this.startActivity,
     this.startCondition,
     this.state,
+    this.waitForQuietTime,
   });
   Map<String, dynamic> toJson() {
     final name = this.name;
     final activities = this.activities;
+    final closedDays = this.closedDays;
     final creationDate = this.creationDate;
+    final journeyChannelSettings = this.journeyChannelSettings;
     final lastModifiedDate = this.lastModifiedDate;
     final limits = this.limits;
     final localTime = this.localTime;
+    final openHours = this.openHours;
     final quietTime = this.quietTime;
     final refreshFrequency = this.refreshFrequency;
+    final refreshOnSegmentUpdate = this.refreshOnSegmentUpdate;
     final schedule = this.schedule;
+    final sendingSchedule = this.sendingSchedule;
     final startActivity = this.startActivity;
     final startCondition = this.startCondition;
     final state = this.state;
+    final waitForQuietTime = this.waitForQuietTime;
     return {
       'Name': name,
       if (activities != null) 'Activities': activities,
+      if (closedDays != null) 'ClosedDays': closedDays,
       if (creationDate != null) 'CreationDate': creationDate,
+      if (journeyChannelSettings != null)
+        'JourneyChannelSettings': journeyChannelSettings,
       if (lastModifiedDate != null) 'LastModifiedDate': lastModifiedDate,
       if (limits != null) 'Limits': limits,
       if (localTime != null) 'LocalTime': localTime,
+      if (openHours != null) 'OpenHours': openHours,
       if (quietTime != null) 'QuietTime': quietTime,
       if (refreshFrequency != null) 'RefreshFrequency': refreshFrequency,
+      if (refreshOnSegmentUpdate != null)
+        'RefreshOnSegmentUpdate': refreshOnSegmentUpdate,
       if (schedule != null) 'Schedule': schedule,
+      if (sendingSchedule != null) 'SendingSchedule': sendingSchedule,
       if (startActivity != null) 'StartActivity': startActivity,
       if (startCondition != null) 'StartCondition': startCondition,
       if (state != null) 'State': state.toValue(),
+      if (waitForQuietTime != null) 'WaitForQuietTime': waitForQuietTime,
     };
   }
 }
@@ -16739,6 +18324,7 @@ enum EndpointTypesElement {
   email,
   baidu,
   custom,
+  inApp,
 }
 
 extension on EndpointTypesElement {
@@ -16768,6 +18354,8 @@ extension on EndpointTypesElement {
         return 'BAIDU';
       case EndpointTypesElement.custom:
         return 'CUSTOM';
+      case EndpointTypesElement.inApp:
+        return 'IN_APP';
     }
   }
 }
@@ -16799,8 +18387,270 @@ extension on String {
         return EndpointTypesElement.baidu;
       case 'CUSTOM':
         return EndpointTypesElement.custom;
+      case 'IN_APP':
+        return EndpointTypesElement.inApp;
     }
     throw Exception('$this is not known in enum EndpointTypesElement');
+  }
+}
+
+enum DayOfWeek {
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday,
+}
+
+extension on DayOfWeek {
+  String toValue() {
+    switch (this) {
+      case DayOfWeek.monday:
+        return 'MONDAY';
+      case DayOfWeek.tuesday:
+        return 'TUESDAY';
+      case DayOfWeek.wednesday:
+        return 'WEDNESDAY';
+      case DayOfWeek.thursday:
+        return 'THURSDAY';
+      case DayOfWeek.friday:
+        return 'FRIDAY';
+      case DayOfWeek.saturday:
+        return 'SATURDAY';
+      case DayOfWeek.sunday:
+        return 'SUNDAY';
+    }
+  }
+}
+
+extension on String {
+  DayOfWeek toDayOfWeek() {
+    switch (this) {
+      case 'MONDAY':
+        return DayOfWeek.monday;
+      case 'TUESDAY':
+        return DayOfWeek.tuesday;
+      case 'WEDNESDAY':
+        return DayOfWeek.wednesday;
+      case 'THURSDAY':
+        return DayOfWeek.thursday;
+      case 'FRIDAY':
+        return DayOfWeek.friday;
+      case 'SATURDAY':
+        return DayOfWeek.saturday;
+      case 'SUNDAY':
+        return DayOfWeek.sunday;
+    }
+    throw Exception('$this is not known in enum DayOfWeek');
+  }
+}
+
+/// List of OpenHours Rules.
+class OpenHoursRule {
+  /// Local start time in ISO 8601 format.
+  final String? endTime;
+
+  /// Local start time in ISO 8601 format.
+  final String? startTime;
+
+  OpenHoursRule({
+    this.endTime,
+    this.startTime,
+  });
+  factory OpenHoursRule.fromJson(Map<String, dynamic> json) {
+    return OpenHoursRule(
+      endTime: json['EndTime'] as String?,
+      startTime: json['StartTime'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final endTime = this.endTime;
+    final startTime = this.startTime;
+    return {
+      if (endTime != null) 'EndTime': endTime,
+      if (startTime != null) 'StartTime': startTime,
+    };
+  }
+}
+
+/// The time when journey allow to send messages. QuietTime should be configured
+/// first and SendingSchedule should be set to true.
+class OpenHours {
+  /// Rules for Custom Channel.
+  final Map<DayOfWeek, List<OpenHoursRule>>? custom;
+
+  /// Rules for Email Channel.
+  final Map<DayOfWeek, List<OpenHoursRule>>? email;
+
+  /// Rules for Push Channel.
+  final Map<DayOfWeek, List<OpenHoursRule>>? push;
+
+  /// Rules for SMS Channel.
+  final Map<DayOfWeek, List<OpenHoursRule>>? sms;
+
+  /// Rules for Voice Channel.
+  final Map<DayOfWeek, List<OpenHoursRule>>? voice;
+
+  OpenHours({
+    this.custom,
+    this.email,
+    this.push,
+    this.sms,
+    this.voice,
+  });
+  factory OpenHours.fromJson(Map<String, dynamic> json) {
+    return OpenHours(
+      custom: (json['CUSTOM'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(
+          k.toDayOfWeek(),
+          (e as List)
+              .whereNotNull()
+              .map((e) => OpenHoursRule.fromJson(e as Map<String, dynamic>))
+              .toList())),
+      email: (json['EMAIL'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(
+          k.toDayOfWeek(),
+          (e as List)
+              .whereNotNull()
+              .map((e) => OpenHoursRule.fromJson(e as Map<String, dynamic>))
+              .toList())),
+      push: (json['PUSH'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(
+          k.toDayOfWeek(),
+          (e as List)
+              .whereNotNull()
+              .map((e) => OpenHoursRule.fromJson(e as Map<String, dynamic>))
+              .toList())),
+      sms: (json['SMS'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(
+          k.toDayOfWeek(),
+          (e as List)
+              .whereNotNull()
+              .map((e) => OpenHoursRule.fromJson(e as Map<String, dynamic>))
+              .toList())),
+      voice: (json['VOICE'] as Map<String, dynamic>?)?.map((k, e) => MapEntry(
+          k.toDayOfWeek(),
+          (e as List)
+              .whereNotNull()
+              .map((e) => OpenHoursRule.fromJson(e as Map<String, dynamic>))
+              .toList())),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final custom = this.custom;
+    final email = this.email;
+    final push = this.push;
+    final sms = this.sms;
+    final voice = this.voice;
+    return {
+      if (custom != null)
+        'CUSTOM': custom.map((k, e) => MapEntry(k.toValue(), e)),
+      if (email != null) 'EMAIL': email.map((k, e) => MapEntry(k.toValue(), e)),
+      if (push != null) 'PUSH': push.map((k, e) => MapEntry(k.toValue(), e)),
+      if (sms != null) 'SMS': sms.map((k, e) => MapEntry(k.toValue(), e)),
+      if (voice != null) 'VOICE': voice.map((k, e) => MapEntry(k.toValue(), e)),
+    };
+  }
+}
+
+/// Closed Days Rule. Part of Journey sending schedule.
+class ClosedDaysRule {
+  /// End Datetime in ISO 8601 format.
+  final String? endDateTime;
+
+  /// Name of the rule.
+  final String? name;
+
+  /// Start Datetime in ISO 8601 format.
+  final String? startDateTime;
+
+  ClosedDaysRule({
+    this.endDateTime,
+    this.name,
+    this.startDateTime,
+  });
+  factory ClosedDaysRule.fromJson(Map<String, dynamic> json) {
+    return ClosedDaysRule(
+      endDateTime: json['EndDateTime'] as String?,
+      name: json['Name'] as String?,
+      startDateTime: json['StartDateTime'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final endDateTime = this.endDateTime;
+    final name = this.name;
+    final startDateTime = this.startDateTime;
+    return {
+      if (endDateTime != null) 'EndDateTime': endDateTime,
+      if (name != null) 'Name': name,
+      if (startDateTime != null) 'StartDateTime': startDateTime,
+    };
+  }
+}
+
+/// The time when journey will stop sending messages.
+class ClosedDays {
+  /// Rules for Custom Channel.
+  final List<ClosedDaysRule>? custom;
+
+  /// Rules for Email Channel.
+  final List<ClosedDaysRule>? email;
+
+  /// Rules for Push Channel.
+  final List<ClosedDaysRule>? push;
+
+  /// Rules for SMS Channel.
+  final List<ClosedDaysRule>? sms;
+
+  /// Rules for Voice Channel.
+  final List<ClosedDaysRule>? voice;
+
+  ClosedDays({
+    this.custom,
+    this.email,
+    this.push,
+    this.sms,
+    this.voice,
+  });
+  factory ClosedDays.fromJson(Map<String, dynamic> json) {
+    return ClosedDays(
+      custom: (json['CUSTOM'] as List?)
+          ?.whereNotNull()
+          .map((e) => ClosedDaysRule.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      email: (json['EMAIL'] as List?)
+          ?.whereNotNull()
+          .map((e) => ClosedDaysRule.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      push: (json['PUSH'] as List?)
+          ?.whereNotNull()
+          .map((e) => ClosedDaysRule.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      sms: (json['SMS'] as List?)
+          ?.whereNotNull()
+          .map((e) => ClosedDaysRule.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      voice: (json['VOICE'] as List?)
+          ?.whereNotNull()
+          .map((e) => ClosedDaysRule.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final custom = this.custom;
+    final email = this.email;
+    final push = this.push;
+    final sms = this.sms;
+    final voice = this.voice;
+    return {
+      if (custom != null) 'CUSTOM': custom,
+      if (email != null) 'EMAIL': email,
+      if (push != null) 'PUSH': push,
+      if (sms != null) 'SMS': sms,
+      if (voice != null) 'VOICE': voice,
+    };
   }
 }
 

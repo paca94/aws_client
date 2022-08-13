@@ -4177,7 +4177,10 @@ class ServiceCatalog {
     return ImportAsProvisionedProductOutput.fromJson(jsonResponse.body);
   }
 
-  /// Lists all portfolios for which sharing was accepted by this account.
+  /// Lists all imported portfolios for which account-to-account shares were
+  /// accepted by this account. By specifying the
+  /// <code>PortfolioShareType</code>, you can list portfolios for which
+  /// organizational shares were accepted by this account.
   ///
   /// May throw [InvalidParametersException].
   /// May throw [OperationNotSupportedException].
@@ -4210,14 +4213,16 @@ class ServiceCatalog {
   ///
   /// <ul>
   /// <li>
-  /// <code>AWS_ORGANIZATIONS</code> - List portfolios shared by the management
-  /// account of your organization
+  /// <code>AWS_ORGANIZATIONS</code> - List portfolios accepted and shared via
+  /// organizational sharing by the management account or delegated
+  /// administrator of your organization.
   /// </li>
   /// <li>
-  /// <code>AWS_SERVICECATALOG</code> - List default portfolios
+  /// <code>AWS_SERVICECATALOG</code> - Deprecated type.
   /// </li>
   /// <li>
-  /// <code>IMPORTED</code> - List imported portfolios
+  /// <code>IMPORTED</code> - List imported portfolios that have been accepted
+  /// and shared through account-to-account sharing.
   /// </li>
   /// </ul>
   Future<ListAcceptedPortfolioSharesOutput> listAcceptedPortfolioShares({
@@ -4236,7 +4241,7 @@ class ServiceCatalog {
       'pageSize',
       pageSize,
       0,
-      20,
+      100,
     );
     _s.validateStringLength(
       'pageToken',
@@ -4774,7 +4779,7 @@ class ServiceCatalog {
       'pageSize',
       pageSize,
       0,
-      20,
+      100,
     );
     _s.validateStringLength(
       'pageToken',
@@ -4855,7 +4860,7 @@ class ServiceCatalog {
       'pageSize',
       pageSize,
       0,
-      20,
+      100,
     );
     _s.validateStringLength(
       'pageToken',
@@ -6054,7 +6059,7 @@ class ServiceCatalog {
       'pageSize',
       pageSize,
       0,
-      20,
+      100,
     );
     _s.validateStringLength(
       'pageToken',
@@ -8535,6 +8540,11 @@ class DescribeProvisioningParametersOutput {
   /// Information about the constraints used to provision the product.
   final List<ConstraintSummary>? constraintSummaries;
 
+  /// A list of the keys and descriptions of the outputs. These outputs can be
+  /// referenced from a provisioned product launched from this provisioning
+  /// artifact.
+  final List<ProvisioningArtifactOutput>? provisioningArtifactOutputKeys;
+
   /// The output of the provisioning artifact.
   final List<ProvisioningArtifactOutput>? provisioningArtifactOutputs;
 
@@ -8555,6 +8565,7 @@ class DescribeProvisioningParametersOutput {
 
   DescribeProvisioningParametersOutput({
     this.constraintSummaries,
+    this.provisioningArtifactOutputKeys,
     this.provisioningArtifactOutputs,
     this.provisioningArtifactParameters,
     this.provisioningArtifactPreferences,
@@ -8567,6 +8578,12 @@ class DescribeProvisioningParametersOutput {
       constraintSummaries: (json['ConstraintSummaries'] as List?)
           ?.whereNotNull()
           .map((e) => ConstraintSummary.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      provisioningArtifactOutputKeys: (json['ProvisioningArtifactOutputKeys']
+              as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              ProvisioningArtifactOutput.fromJson(e as Map<String, dynamic>))
           .toList(),
       provisioningArtifactOutputs: (json['ProvisioningArtifactOutputs']
               as List?)
@@ -8951,7 +8968,7 @@ class LaunchPathSummary {
   /// The identifier of the product path.
   final String? id;
 
-  /// The name of the portfolio to which the user was assigned.
+  /// The name of the portfolio that contains the product.
   final String? name;
 
   /// The tags associated with this product path.

@@ -19,10 +19,10 @@ import 'package:shared_aws_api/shared.dart'
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// You can use Amazon CloudWatch Logs to monitor, store, and access your log
-/// files from EC2 instances, AWS CloudTrail, or other sources. You can then
+/// files from EC2 instances, CloudTrail, and other sources. You can then
 /// retrieve the associated log data from CloudWatch Logs using the CloudWatch
-/// console, CloudWatch Logs commands in the AWS CLI, CloudWatch Logs API, or
-/// CloudWatch Logs SDK.
+/// console, CloudWatch Logs commands in the Amazon Web Services CLI, CloudWatch
+/// Logs API, or CloudWatch Logs SDK.
 ///
 /// You can use CloudWatch Logs to:
 ///
@@ -41,9 +41,9 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 /// Logs reports the data to a CloudWatch metric that you specify.
 /// </li>
 /// <li>
-/// <b>Monitor AWS CloudTrail logged events</b>: You can create alarms in
-/// CloudWatch and receive notifications of particular API activity as captured
-/// by CloudTrail. You can use the notification to perform troubleshooting.
+/// <b>Monitor CloudTrail logged events</b>: You can create alarms in CloudWatch
+/// and receive notifications of particular API activity as captured by
+/// CloudTrail. You can use the notification to perform troubleshooting.
 /// </li>
 /// <li>
 /// <b>Archive log data</b>: You can use CloudWatch Logs to store your log data
@@ -82,15 +82,15 @@ class CloudWatchLogs {
     _protocol.close();
   }
 
-  /// Associates the specified AWS Key Management Service (AWS KMS) customer
-  /// master key (CMK) with the specified log group.
+  /// Associates the specified Key Management Service customer master key (CMK)
+  /// with the specified log group.
   ///
-  /// Associating an AWS KMS CMK with a log group overrides any existing
+  /// Associating an KMS CMK with a log group overrides any existing
   /// associations between the log group and a CMK. After a CMK is associated
   /// with a log group, all newly ingested data for the log group is encrypted
   /// using the CMK. This association is stored as long as the data encrypted
-  /// with the CMK is still within Amazon CloudWatch Logs. This enables Amazon
-  /// CloudWatch Logs to decrypt this data whenever it is requested.
+  /// with the CMK is still within CloudWatch Logs. This enables CloudWatch Logs
+  /// to decrypt this data whenever it is requested.
   /// <important>
   /// CloudWatch Logs supports only symmetric CMKs. Do not use an associate an
   /// asymmetric CMK with your log group. For more information, see <a
@@ -112,7 +112,7 @@ class CloudWatchLogs {
   /// The Amazon Resource Name (ARN) of the CMK to use when encrypting log data.
   /// This must be a symmetric CMK. For more information, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms">Amazon
-  /// Resource Names - AWS Key Management Service (AWS KMS)</a> and <a
+  /// Resource Names - Key Management Service</a> and <a
   /// href="https://docs.aws.amazon.com/kms/latest/developerguide/symmetric-asymmetric.html">Using
   /// Symmetric and Asymmetric Keys</a>.
   ///
@@ -199,7 +199,13 @@ class CloudWatchLogs {
   /// <code>CreateExportTask</code> operation, you must use credentials that
   /// have permission to write to the S3 bucket that you specify as the
   /// destination.
+  /// <important>
+  /// Exporting log data to Amazon S3 buckets that are encrypted by KMS is not
+  /// supported. Exporting log data to Amazon S3 buckets that have S3 Object
+  /// Lock enabled with a retention period is not supported.
   ///
+  /// Exporting to S3 buckets that are encrypted with AES-256 is supported.
+  /// </important>
   /// This is an asynchronous call. If all the required information is provided,
   /// this operation initiates an export task and responds with the ID of the
   /// task. After the task has started, you can use <a
@@ -213,9 +219,11 @@ class CloudWatchLogs {
   /// the same S3 bucket. To separate out log data for each export task, you can
   /// specify a prefix to be used as the Amazon S3 key prefix for all exported
   /// objects.
-  ///
-  /// Exporting to S3 buckets that are encrypted with AES-256 is supported.
-  /// Exporting to S3 buckets encrypted with SSE-KMS is not supported.
+  /// <note>
+  /// Time-based sorting on chunks of log data inside an exported file is not
+  /// guaranteed. You can sort the exported log fild data by using Linux
+  /// utilities.
+  /// </note>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [LimitExceededException].
@@ -226,7 +234,7 @@ class CloudWatchLogs {
   ///
   /// Parameter [destination] :
   /// The name of S3 bucket for the exported log data. The bucket must be in the
-  /// same AWS region.
+  /// same Amazon Web Services region.
   ///
   /// Parameter [from] :
   /// The start time of the range for the request, expressed as the number of
@@ -336,7 +344,8 @@ class CloudWatchLogs {
   ///
   /// <ul>
   /// <li>
-  /// Log group names must be unique within a region for an AWS account.
+  /// Log group names must be unique within a region for an Amazon Web Services
+  /// account.
   /// </li>
   /// <li>
   /// Log group names can be between 1 and 512 characters long.
@@ -352,11 +361,11 @@ class CloudWatchLogs {
   /// deleted after a specified time, use <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html">PutRetentionPolicy</a>.
   ///
-  /// If you associate a AWS Key Management Service (AWS KMS) customer master
-  /// key (CMK) with the log group, ingested data is encrypted using the CMK.
-  /// This association is stored as long as the data encrypted with the CMK is
-  /// still within Amazon CloudWatch Logs. This enables Amazon CloudWatch Logs
-  /// to decrypt this data whenever it is requested.
+  /// If you associate a Key Management Service customer master key (CMK) with
+  /// the log group, ingested data is encrypted using the CMK. This association
+  /// is stored as long as the data encrypted with the CMK is still within
+  /// CloudWatch Logs. This enables CloudWatch Logs to decrypt this data
+  /// whenever it is requested.
   ///
   /// If you attempt to associate a CMK with the log group but the CMK does not
   /// exist or the CMK is disabled, you receive an
@@ -381,10 +390,18 @@ class CloudWatchLogs {
   /// The Amazon Resource Name (ARN) of the CMK to use when encrypting log data.
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-kms">Amazon
-  /// Resource Names - AWS Key Management Service (AWS KMS)</a>.
+  /// Resource Names - Key Management Service</a>.
   ///
   /// Parameter [tags] :
   /// The key-value pairs to use for the tags.
+  ///
+  /// CloudWatch Logs doesn’t support IAM policies that prevent users from
+  /// assigning specified tags to log groups using the
+  /// <code>aws:Resource/<i>key-name</i> </code> or <code>aws:TagKeys</code>
+  /// condition keys. For more information about using tags to control access,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_tags.html">Controlling
+  /// access to Amazon Web Services resources using tags</a>.
   Future<void> createLogGroup({
     required String logGroupName,
     String? kmsKeyId,
@@ -957,6 +974,15 @@ class CloudWatchLogs {
   /// Lists the specified log groups. You can list all your log groups or filter
   /// the results by prefix. The results are ASCII-sorted by log group name.
   ///
+  /// CloudWatch Logs doesn’t support IAM policies that control access to the
+  /// <code>DescribeLogGroups</code> action by using the
+  /// <code>aws:ResourceTag/<i>key-name</i> </code> condition key. Other
+  /// CloudWatch Logs actions do support the use of the
+  /// <code>aws:ResourceTag/<i>key-name</i> </code> condition key to control
+  /// access. For more information about using tags to control access, see <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_tags.html">Controlling
+  /// access to Amazon Web Services resources using tags</a>.
+  ///
   /// May throw [InvalidParameterException].
   /// May throw [ServiceUnavailableException].
   ///
@@ -1056,10 +1082,10 @@ class CloudWatchLogs {
   /// If you order the results by event time, you cannot specify the
   /// <code>logStreamNamePrefix</code> parameter.
   ///
-  /// <code>lastEventTimeStamp</code> represents the time of the most recent log
+  /// <code>lastEventTimestamp</code> represents the time of the most recent log
   /// event in the log stream in CloudWatch Logs. This number is expressed as
   /// the number of milliseconds after Jan 1, 1970 00:00:00 UTC.
-  /// <code>lastEventTimeStamp</code> updates on an eventual consistency basis.
+  /// <code>lastEventTimestamp</code> updates on an eventual consistency basis.
   /// It typically updates in less than an hour from ingestion, but in rare
   /// situations might take longer.
   Future<DescribeLogStreamsResponse> describeLogStreams({
@@ -1461,13 +1487,13 @@ class CloudWatchLogs {
     return DescribeSubscriptionFiltersResponse.fromJson(jsonResponse.body);
   }
 
-  /// Disassociates the associated AWS Key Management Service (AWS KMS) customer
-  /// master key (CMK) from the specified log group.
+  /// Disassociates the associated Key Management Service customer master key
+  /// (CMK) from the specified log group.
   ///
-  /// After the AWS KMS CMK is disassociated from the log group, AWS CloudWatch
-  /// Logs stops encrypting newly ingested data for the log group. All
-  /// previously ingested data remains encrypted, and AWS CloudWatch Logs
-  /// requires permissions for the CMK whenever the encrypted data is requested.
+  /// After the KMS CMK is disassociated from the log group, CloudWatch Logs
+  /// stops encrypting newly ingested data for the log group. All previously
+  /// ingested data remains encrypted, and CloudWatch Logs requires permissions
+  /// for the CMK whenever the encrypted data is requested.
   ///
   /// Note that it can take up to 5 minutes for this operation to take effect.
   ///
@@ -1578,9 +1604,6 @@ class CloudWatchLogs {
   /// The start of the time range, expressed as the number of milliseconds after
   /// Jan 1, 1970 00:00:00 UTC. Events with a timestamp before this time are not
   /// returned.
-  ///
-  /// If you omit <code>startTime</code> and <code>endTime</code> the most
-  /// recent log events are retrieved, to up 1 MB or 10,000 log events.
   Future<FilterLogEventsResponse> filterLogEvents({
     required String logGroupName,
     int? endTime,
@@ -1696,16 +1719,14 @@ class CloudWatchLogs {
   /// The token for the next set of items to return. (You received this token
   /// from a previous call.)
   ///
-  /// Using this token works only when you specify <code>true</code> for
-  /// <code>startFromHead</code>.
-  ///
   /// Parameter [startFromHead] :
   /// If the value is true, the earliest log events are returned first. If the
   /// value is false, the latest log events are returned first. The default
   /// value is false.
   ///
-  /// If you are using <code>nextToken</code> in this operation, you must
-  /// specify <code>true</code> for <code>startFromHead</code>.
+  /// If you are using a previous <code>nextForwardToken</code> value as the
+  /// <code>nextToken</code> in this operation, you must specify
+  /// <code>true</code> for <code>startFromHead</code>.
   ///
   /// Parameter [startTime] :
   /// The start of the time range, expressed as the number of milliseconds after
@@ -1809,8 +1830,9 @@ class CloudWatchLogs {
   ///
   /// Parameter [time] :
   /// The time to set as the center of the query. If you specify
-  /// <code>time</code>, the 8 minutes before and 8 minutes after this time are
-  /// searched. If you omit <code>time</code>, the past 15 minutes are queried.
+  /// <code>time</code>, the 15 minutes before this time are queries. If you
+  /// omit <code>time</code> the 8 minutes before and 8 minutes after this time
+  /// are searched.
   ///
   /// The <code>time</code> value is specified as epoch time, the number of
   /// seconds since January 1, 1970, 00:00:00 UTC.
@@ -2068,6 +2090,11 @@ class CloudWatchLogs {
   /// policy document</a> that is used to authorize claims to register a
   /// subscription filter against a given destination.
   ///
+  /// If multiple Amazon Web Services accounts are sending logs to this
+  /// destination, each sender account must be listed separately in the policy.
+  /// The policy does not support specifying <code>*</code> as the Principal or
+  /// the use of the <code>aws:PrincipalOrgId</code> global key.
+  ///
   /// May throw [InvalidParameterException].
   /// May throw [OperationAbortedException].
   /// May throw [ServiceUnavailableException].
@@ -2079,9 +2106,24 @@ class CloudWatchLogs {
   ///
   /// Parameter [destinationName] :
   /// A name for an existing destination.
+  ///
+  /// Parameter [forceUpdate] :
+  /// Specify true if you are updating an existing destination policy to grant
+  /// permission to an organization ID instead of granting permission to
+  /// individual AWS accounts. Before you update a destination policy this way,
+  /// you must first update the subscription filters in the accounts that send
+  /// logs to this destination. If you do not, the subscription filters might
+  /// stop working. By specifying <code>true</code> for
+  /// <code>forceUpdate</code>, you are affirming that you have already updated
+  /// the subscription filters. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Cross-Account-Log_Subscription-Update.html">
+  /// Updating an existing cross-account subscription</a>
+  ///
+  /// If you omit this parameter, the default of <code>false</code> is used.
   Future<void> putDestinationPolicy({
     required String accessPolicy,
     required String destinationName,
+    bool? forceUpdate,
   }) async {
     ArgumentError.checkNotNull(accessPolicy, 'accessPolicy');
     _s.validateStringLength(
@@ -2112,6 +2154,7 @@ class CloudWatchLogs {
       payload: {
         'accessPolicy': accessPolicy,
         'destinationName': destinationName,
+        if (forceUpdate != null) 'forceUpdate': forceUpdate,
       },
     );
   }
@@ -2145,9 +2188,10 @@ class CloudWatchLogs {
   /// <li>
   /// The log events in the batch must be in chronological order by their
   /// timestamp. The timestamp is the time the event occurred, expressed as the
-  /// number of milliseconds after Jan 1, 1970 00:00:00 UTC. (In AWS Tools for
-  /// PowerShell and the AWS SDK for .NET, the timestamp is specified in .NET
-  /// format: yyyy-mm-ddThh:mm:ss. For example, 2017-09-15T13:45:30.)
+  /// number of milliseconds after Jan 1, 1970 00:00:00 UTC. (In Amazon Web
+  /// Services Tools for PowerShell and the Amazon Web Services SDK for .NET,
+  /// the timestamp is specified in .NET format: yyyy-mm-ddThh:mm:ss. For
+  /// example, 2017-09-15T13:45:30.)
   /// </li>
   /// <li>
   /// A batch of log events in a single request cannot span more than 24 hours.
@@ -2162,8 +2206,8 @@ class CloudWatchLogs {
   /// </li>
   /// </ul>
   /// If a call to <code>PutLogEvents</code> returns
-  /// "UnrecognizedClientException" the most likely cause is an invalid AWS
-  /// access key ID or secret key.
+  /// "UnrecognizedClientException" the most likely cause is an invalid Amazon
+  /// Web Services access key ID or secret key.
   ///
   /// May throw [InvalidParameterException].
   /// May throw [InvalidSequenceTokenException].
@@ -2247,6 +2291,26 @@ class CloudWatchLogs {
   ///
   /// The maximum number of metric filters that can be associated with a log
   /// group is 100.
+  ///
+  /// When you create a metric filter, you can also optionally assign a unit and
+  /// dimensions to the metric that is created.
+  /// <important>
+  /// Metrics extracted from log events are charged as custom metrics. To
+  /// prevent unexpected high charges, do not specify high-cardinality fields
+  /// such as <code>IPAddress</code> or <code>requestID</code> as dimensions.
+  /// Each different value found for a dimension is treated as a separate metric
+  /// and accrues charges as a separate custom metric.
+  ///
+  /// To help prevent accidental high charges, Amazon disables a metric filter
+  /// if it generates 1000 different name/value pairs for the dimensions that
+  /// you have specified within a certain amount of time.
+  ///
+  /// You can also set up a billing alarm to alert you if your charges are
+  /// higher than expected. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">
+  /// Creating a Billing Alarm to Monitor Your Estimated Amazon Web Services
+  /// Charges</a>.
+  /// </important>
   ///
   /// May throw [InvalidParameterException].
   /// May throw [ResourceNotFoundException].
@@ -2333,6 +2397,7 @@ class CloudWatchLogs {
   /// able to perform this operation.
   ///
   /// May throw [InvalidParameterException].
+  /// May throw [LimitExceededException].
   /// May throw [ResourceNotFoundException].
   /// May throw [ServiceUnavailableException].
   ///
@@ -2413,9 +2478,10 @@ class CloudWatchLogs {
     return PutQueryDefinitionResponse.fromJson(jsonResponse.body);
   }
 
-  /// Creates or updates a resource policy allowing other AWS services to put
-  /// log events to this account, such as Amazon Route 53. An account can have
-  /// up to 10 resource policies per AWS Region.
+  /// Creates or updates a resource policy allowing other Amazon Web Services
+  /// services to put log events to this account, such as Amazon Route 53. An
+  /// account can have up to 10 resource policies per Amazon Web Services
+  /// Region.
   ///
   /// May throw [InvalidParameterException].
   /// May throw [LimitExceededException].
@@ -2431,10 +2497,23 @@ class CloudWatchLogs {
   /// <code>"logArn"</code> with the ARN of your CloudWatch Logs resource, such
   /// as a log group or log stream.
   ///
+  /// CloudWatch Logs also supports <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-sourcearn">aws:SourceArn</a>
+  /// and <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-sourceaccount">aws:SourceAccount</a>
+  /// condition context keys.
+  ///
+  /// In the example resource policy, you would replace the value of
+  /// <code>SourceArn</code> with the resource making the call from Route 53 to
+  /// CloudWatch Logs and replace the value of <code>SourceAccount</code> with
+  /// the Amazon Web Services account ID making that call.
+  /// <p/>
   /// <code>{ "Version": "2012-10-17", "Statement": [ { "Sid":
   /// "Route53LogsToCloudWatchLogs", "Effect": "Allow", "Principal": {
-  /// "Service": [ "route53.amazonaws.com" ] }, "Action":"logs:PutLogEvents",
-  /// "Resource": "logArn" } ] } </code>
+  /// "Service": [ "route53.amazonaws.com" ] }, "Action": "logs:PutLogEvents",
+  /// "Resource": "logArn", "Condition": { "ArnLike": { "aws:SourceArn":
+  /// "myRoute53ResourceArn" }, "StringEquals": { "aws:SourceAccount":
+  /// "myAwsAccountId" } } } ] }</code>
   ///
   /// Parameter [policyName] :
   /// Name of the new policy. This parameter is required.
@@ -2532,14 +2611,13 @@ class CloudWatchLogs {
   /// account as the subscription filter, for same-account delivery.
   /// </li>
   /// <li>
-  /// An AWS Lambda function that belongs to the same account as the
-  /// subscription filter, for same-account delivery.
+  /// An Lambda function that belongs to the same account as the subscription
+  /// filter, for same-account delivery.
   /// </li>
   /// </ul>
-  /// There can only be one subscription filter associated with a log group. If
-  /// you are updating an existing filter, you must specify the correct name in
-  /// <code>filterName</code>. Otherwise, the call fails because you cannot
-  /// associate a second filter with a log group.
+  /// Each log group can have up to two subscription filters associated with it.
+  /// If you are updating an existing filter, you must specify the correct name
+  /// in <code>filterName</code>.
   ///
   /// To perform a <code>PutSubscriptionFilter</code> operation, you must also
   /// have the <code>iam:PassRole</code> permission.
@@ -2562,23 +2640,26 @@ class CloudWatchLogs {
   /// <li>
   /// A logical destination (specified using an ARN) belonging to a different
   /// account, for cross-account delivery.
+  ///
+  /// If you are setting up a cross-account subscription, the destination must
+  /// have an IAM policy associated with it that allows the sender to send logs
+  /// to the destination. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutDestinationPolicy.html">PutDestinationPolicy</a>.
   /// </li>
   /// <li>
   /// An Amazon Kinesis Firehose delivery stream belonging to the same account
   /// as the subscription filter, for same-account delivery.
   /// </li>
   /// <li>
-  /// An AWS Lambda function belonging to the same account as the subscription
+  /// A Lambda function belonging to the same account as the subscription
   /// filter, for same-account delivery.
   /// </li>
   /// </ul>
   ///
   /// Parameter [filterName] :
   /// A name for the subscription filter. If you are updating an existing
-  /// filter, you must specify the correct name in <code>filterName</code>.
-  /// Otherwise, the call fails because you cannot associate a second filter
-  /// with a log group. To find the name of the filter currently associated with
-  /// a log group, use <a
+  /// filter, you must specify the correct name in <code>filterName</code>. To
+  /// find the name of the filter currently associated with a log group, use <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_DescribeSubscriptionFilters.html">DescribeSubscriptionFilters</a>.
   ///
   /// Parameter [filterPattern] :
@@ -2834,6 +2915,14 @@ class CloudWatchLogs {
   /// Log Groups in Amazon CloudWatch Logs</a> in the <i>Amazon CloudWatch Logs
   /// User Guide</i>.
   ///
+  /// CloudWatch Logs doesn’t support IAM policies that prevent users from
+  /// assigning specified tags to log groups using the
+  /// <code>aws:Resource/<i>key-name</i> </code> or <code>aws:TagKeys</code>
+  /// condition keys. For more information about using tags to control access,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_tags.html">Controlling
+  /// access to Amazon Web Services resources using tags</a>.
+  ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterException].
   ///
@@ -2919,6 +3008,11 @@ class CloudWatchLogs {
   /// href="https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_ListTagsLogGroup.html">ListTagsLogGroup</a>.
   /// To add tags, use <a
   /// href="https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_TagLogGroup.html">TagLogGroup</a>.
+  ///
+  /// CloudWatch Logs doesn’t support IAM policies that prevent users from
+  /// assigning specified tags to log groups using the
+  /// <code>aws:Resource/<i>key-name</i> </code> or <code>aws:TagKeys</code>
+  /// condition keys.
   ///
   /// May throw [ResourceNotFoundException].
   ///
@@ -3030,7 +3124,7 @@ class DescribeExportTasksResponse {
 class DescribeLogGroupsResponse {
   /// The log groups.
   ///
-  /// If the <code>retentionInDays</code> value if not included for a log group,
+  /// If the <code>retentionInDays</code> value is not included for a log group,
   /// then that log group is set to have its events never expire.
   final List<LogGroup>? logGroups;
   final String? nextToken;
@@ -3178,8 +3272,8 @@ class DescribeSubscriptionFiltersResponse {
 /// Represents a cross-account destination that receives subscription log
 /// events.
 class Destination {
-  /// An IAM policy document that governs which AWS accounts can create
-  /// subscription filters against this destination.
+  /// An IAM policy document that governs which Amazon Web Services accounts can
+  /// create subscription filters against this destination.
   final String? accessPolicy;
 
   /// The ARN of this destination.
@@ -3839,11 +3933,38 @@ class MetricTransformation {
   /// event. This value can be null.
   final double? defaultValue;
 
+  /// The fields to use as dimensions for the metric. One metric filter can
+  /// include as many as three dimensions.
+  /// <important>
+  /// Metrics extracted from log events are charged as custom metrics. To prevent
+  /// unexpected high charges, do not specify high-cardinality fields such as
+  /// <code>IPAddress</code> or <code>requestID</code> as dimensions. Each
+  /// different value found for a dimension is treated as a separate metric and
+  /// accrues charges as a separate custom metric.
+  ///
+  /// To help prevent accidental high charges, Amazon disables a metric filter if
+  /// it generates 1000 different name/value pairs for the dimensions that you
+  /// have specified within a certain amount of time.
+  ///
+  /// You can also set up a billing alarm to alert you if your charges are higher
+  /// than expected. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html">
+  /// Creating a Billing Alarm to Monitor Your Estimated Amazon Web Services
+  /// Charges</a>.
+  /// </important>
+  final Map<String, String>? dimensions;
+
+  /// The unit to assign to the metric. If you omit this, the unit is set as
+  /// <code>None</code>.
+  final StandardUnit? unit;
+
   MetricTransformation({
     required this.metricName,
     required this.metricNamespace,
     required this.metricValue,
     this.defaultValue,
+    this.dimensions,
+    this.unit,
   });
   factory MetricTransformation.fromJson(Map<String, dynamic> json) {
     return MetricTransformation(
@@ -3851,6 +3972,9 @@ class MetricTransformation {
       metricNamespace: json['metricNamespace'] as String,
       metricValue: json['metricValue'] as String,
       defaultValue: json['defaultValue'] as double?,
+      dimensions: (json['dimensions'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+      unit: (json['unit'] as String?)?.toStandardUnit(),
     );
   }
 
@@ -3859,11 +3983,15 @@ class MetricTransformation {
     final metricNamespace = this.metricNamespace;
     final metricValue = this.metricValue;
     final defaultValue = this.defaultValue;
+    final dimensions = this.dimensions;
+    final unit = this.unit;
     return {
       'metricName': metricName,
       'metricNamespace': metricNamespace,
       'metricValue': metricValue,
       if (defaultValue != null) 'defaultValue': defaultValue,
+      if (dimensions != null) 'dimensions': dimensions,
+      if (unit != null) 'unit': unit.toValue(),
     };
   }
 }
@@ -4105,6 +4233,8 @@ enum QueryStatus {
   complete,
   failed,
   cancelled,
+  timeout,
+  unknown,
 }
 
 extension on QueryStatus {
@@ -4120,6 +4250,10 @@ extension on QueryStatus {
         return 'Failed';
       case QueryStatus.cancelled:
         return 'Cancelled';
+      case QueryStatus.timeout:
+        return 'Timeout';
+      case QueryStatus.unknown:
+        return 'Unknown';
     }
   }
 }
@@ -4137,6 +4271,10 @@ extension on String {
         return QueryStatus.failed;
       case 'Cancelled':
         return QueryStatus.cancelled;
+      case 'Timeout':
+        return QueryStatus.timeout;
+      case 'Unknown':
+        return QueryStatus.unknown;
     }
     throw Exception('$this is not known in enum QueryStatus');
   }
@@ -4237,6 +4375,159 @@ class SearchedLogStream {
       logStreamName: json['logStreamName'] as String?,
       searchedCompletely: json['searchedCompletely'] as bool?,
     );
+  }
+}
+
+enum StandardUnit {
+  seconds,
+  microseconds,
+  milliseconds,
+  bytes,
+  kilobytes,
+  megabytes,
+  gigabytes,
+  terabytes,
+  bits,
+  kilobits,
+  megabits,
+  gigabits,
+  terabits,
+  percent,
+  count,
+  bytesSecond,
+  kilobytesSecond,
+  megabytesSecond,
+  gigabytesSecond,
+  terabytesSecond,
+  bitsSecond,
+  kilobitsSecond,
+  megabitsSecond,
+  gigabitsSecond,
+  terabitsSecond,
+  countSecond,
+  none,
+}
+
+extension on StandardUnit {
+  String toValue() {
+    switch (this) {
+      case StandardUnit.seconds:
+        return 'Seconds';
+      case StandardUnit.microseconds:
+        return 'Microseconds';
+      case StandardUnit.milliseconds:
+        return 'Milliseconds';
+      case StandardUnit.bytes:
+        return 'Bytes';
+      case StandardUnit.kilobytes:
+        return 'Kilobytes';
+      case StandardUnit.megabytes:
+        return 'Megabytes';
+      case StandardUnit.gigabytes:
+        return 'Gigabytes';
+      case StandardUnit.terabytes:
+        return 'Terabytes';
+      case StandardUnit.bits:
+        return 'Bits';
+      case StandardUnit.kilobits:
+        return 'Kilobits';
+      case StandardUnit.megabits:
+        return 'Megabits';
+      case StandardUnit.gigabits:
+        return 'Gigabits';
+      case StandardUnit.terabits:
+        return 'Terabits';
+      case StandardUnit.percent:
+        return 'Percent';
+      case StandardUnit.count:
+        return 'Count';
+      case StandardUnit.bytesSecond:
+        return 'Bytes/Second';
+      case StandardUnit.kilobytesSecond:
+        return 'Kilobytes/Second';
+      case StandardUnit.megabytesSecond:
+        return 'Megabytes/Second';
+      case StandardUnit.gigabytesSecond:
+        return 'Gigabytes/Second';
+      case StandardUnit.terabytesSecond:
+        return 'Terabytes/Second';
+      case StandardUnit.bitsSecond:
+        return 'Bits/Second';
+      case StandardUnit.kilobitsSecond:
+        return 'Kilobits/Second';
+      case StandardUnit.megabitsSecond:
+        return 'Megabits/Second';
+      case StandardUnit.gigabitsSecond:
+        return 'Gigabits/Second';
+      case StandardUnit.terabitsSecond:
+        return 'Terabits/Second';
+      case StandardUnit.countSecond:
+        return 'Count/Second';
+      case StandardUnit.none:
+        return 'None';
+    }
+  }
+}
+
+extension on String {
+  StandardUnit toStandardUnit() {
+    switch (this) {
+      case 'Seconds':
+        return StandardUnit.seconds;
+      case 'Microseconds':
+        return StandardUnit.microseconds;
+      case 'Milliseconds':
+        return StandardUnit.milliseconds;
+      case 'Bytes':
+        return StandardUnit.bytes;
+      case 'Kilobytes':
+        return StandardUnit.kilobytes;
+      case 'Megabytes':
+        return StandardUnit.megabytes;
+      case 'Gigabytes':
+        return StandardUnit.gigabytes;
+      case 'Terabytes':
+        return StandardUnit.terabytes;
+      case 'Bits':
+        return StandardUnit.bits;
+      case 'Kilobits':
+        return StandardUnit.kilobits;
+      case 'Megabits':
+        return StandardUnit.megabits;
+      case 'Gigabits':
+        return StandardUnit.gigabits;
+      case 'Terabits':
+        return StandardUnit.terabits;
+      case 'Percent':
+        return StandardUnit.percent;
+      case 'Count':
+        return StandardUnit.count;
+      case 'Bytes/Second':
+        return StandardUnit.bytesSecond;
+      case 'Kilobytes/Second':
+        return StandardUnit.kilobytesSecond;
+      case 'Megabytes/Second':
+        return StandardUnit.megabytesSecond;
+      case 'Gigabytes/Second':
+        return StandardUnit.gigabytesSecond;
+      case 'Terabytes/Second':
+        return StandardUnit.terabytesSecond;
+      case 'Bits/Second':
+        return StandardUnit.bitsSecond;
+      case 'Kilobits/Second':
+        return StandardUnit.kilobitsSecond;
+      case 'Megabits/Second':
+        return StandardUnit.megabitsSecond;
+      case 'Gigabits/Second':
+        return StandardUnit.gigabitsSecond;
+      case 'Terabits/Second':
+        return StandardUnit.terabitsSecond;
+      case 'Count/Second':
+        return StandardUnit.countSecond;
+      case 'None':
+        return StandardUnit.none;
+    }
+    throw Exception('$this is not known in enum StandardUnit');
   }
 }
 

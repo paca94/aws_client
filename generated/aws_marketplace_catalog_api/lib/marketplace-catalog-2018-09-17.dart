@@ -375,9 +375,13 @@ class MarketplaceCatalog {
   ///
   /// For example, you cannot start the ChangeSet described in the <a
   /// href="https://docs.aws.amazon.com/marketplace-catalog/latest/api-reference/API_StartChangeSet.html#API_StartChangeSet_Examples">example</a>
-  /// below because it contains two changes to execute the same change type
-  /// (<code>AddRevisions</code>) against the same entity
+  /// later in this topic, because it contains two changes to execute the same
+  /// change type (<code>AddRevisions</code>) against the same entity
   /// (<code>entity-id@1)</code>.
+  ///
+  /// For more information about working with change sets, see <a
+  /// href="https://docs.aws.amazon.com/marketplace-catalog/latest/api-reference/welcome.html#working-with-change-sets">
+  /// Working with change sets</a>.
   ///
   /// May throw [InternalServiceException].
   /// May throw [AccessDeniedException].
@@ -431,7 +435,7 @@ class MarketplaceCatalog {
       'Catalog': catalog,
       'ChangeSet': changeSet,
       if (changeSetName != null) 'ChangeSetName': changeSetName,
-      if (clientRequestToken != null) 'ClientRequestToken': clientRequestToken,
+      'ClientRequestToken': clientRequestToken ?? _s.generateIdempotencyToken(),
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -477,19 +481,25 @@ class Change {
   /// The entity to be changed.
   final Entity entity;
 
+  /// Optional name for the change.
+  final String? changeName;
+
   Change({
     required this.changeType,
     required this.details,
     required this.entity,
+    this.changeName,
   });
   Map<String, dynamic> toJson() {
     final changeType = this.changeType;
     final details = this.details;
     final entity = this.entity;
+    final changeName = this.changeName;
     return {
       'ChangeType': changeType,
       'Details': details,
       'Entity': entity,
+      if (changeName != null) 'ChangeName': changeName,
     };
   }
 }
@@ -603,6 +613,9 @@ extension on String {
 /// This object is a container for common summary information about the change.
 /// The summary doesn't contain the whole change structure.
 class ChangeSummary {
+  /// Optional name for the change.
+  final String? changeName;
+
   /// The type of the change.
   final String? changeType;
 
@@ -617,6 +630,7 @@ class ChangeSummary {
   final List<ErrorDetail>? errorDetailList;
 
   ChangeSummary({
+    this.changeName,
     this.changeType,
     this.details,
     this.entity,
@@ -624,6 +638,7 @@ class ChangeSummary {
   });
   factory ChangeSummary.fromJson(Map<String, dynamic> json) {
     return ChangeSummary(
+      changeName: json['ChangeName'] as String?,
       changeType: json['ChangeType'] as String?,
       details: json['Details'] as String?,
       entity: json['Entity'] != null
@@ -709,7 +724,7 @@ class DescribeEntityResponse {
   /// This stringified JSON object includes the details of the entity.
   final String? details;
 
-  /// The ARN associated to the unique identifier for the change set referenced in
+  /// The ARN associated to the unique identifier for the entity referenced in
   /// this request.
   final String? entityArn;
 
@@ -743,8 +758,8 @@ class DescribeEntityResponse {
   }
 }
 
-/// A product entity contains data that describes your product, its supported
-/// features, and how it can be used or launched by your customer.
+/// An entity contains data that describes your product, its supported features,
+/// and how it can be used or launched by your customer.
 class Entity {
   /// The type of entity.
   final String type;

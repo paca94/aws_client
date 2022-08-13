@@ -293,10 +293,15 @@ class AlexaForBusiness {
   ///
   /// Parameter [description] :
   /// The description of the address book.
+  ///
+  /// Parameter [tags] :
+  /// The tags to be added to the specified resource. Do not provide system
+  /// tags.
   Future<CreateAddressBookResponse> createAddressBook({
     required String name,
     String? clientRequestToken,
     String? description,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(name, 'name');
     _s.validateStringLength(
@@ -333,6 +338,7 @@ class AlexaForBusiness {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (description != null) 'Description': description,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -448,6 +454,10 @@ class AlexaForBusiness {
   ///
   /// Parameter [pSTNDialIn] :
   /// The information for PSTN conferencing.
+  ///
+  /// Parameter [tags] :
+  /// The tags to be added to the specified resource. Do not provide system
+  /// tags.
   Future<CreateConferenceProviderResponse> createConferenceProvider({
     required String conferenceProviderName,
     required ConferenceProviderType conferenceProviderType,
@@ -455,6 +465,7 @@ class AlexaForBusiness {
     String? clientRequestToken,
     IPDialIn? iPDialIn,
     PSTNDialIn? pSTNDialIn,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(
         conferenceProviderName, 'conferenceProviderName');
@@ -492,6 +503,7 @@ class AlexaForBusiness {
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (iPDialIn != null) 'IPDialIn': iPDialIn,
         if (pSTNDialIn != null) 'PSTNDialIn': pSTNDialIn,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -529,6 +541,10 @@ class AlexaForBusiness {
   ///
   /// Parameter [sipAddresses] :
   /// The list of SIP addresses for the contact.
+  ///
+  /// Parameter [tags] :
+  /// The tags to be added to the specified resource. Do not provide system
+  /// tags.
   Future<CreateContactResponse> createContact({
     required String firstName,
     String? clientRequestToken,
@@ -537,6 +553,7 @@ class AlexaForBusiness {
     String? phoneNumber,
     List<PhoneNumber>? phoneNumbers,
     List<SipAddress>? sipAddresses,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(firstName, 'firstName');
     _s.validateStringLength(
@@ -589,6 +606,7 @@ class AlexaForBusiness {
         if (phoneNumber != null) 'PhoneNumber': phoneNumber,
         if (phoneNumbers != null) 'PhoneNumbers': phoneNumbers,
         if (sipAddresses != null) 'SipAddresses': sipAddresses,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -609,10 +627,15 @@ class AlexaForBusiness {
   ///
   /// Parameter [description] :
   /// The description of the gateway group.
+  ///
+  /// Parameter [tags] :
+  /// The tags to be added to the specified resource. Do not provide system
+  /// tags.
   Future<CreateGatewayGroupResponse> createGatewayGroup({
     required String name,
     String? clientRequestToken,
     String? description,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(name, 'name');
     _s.validateStringLength(
@@ -649,6 +672,7 @@ class AlexaForBusiness {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (description != null) 'Description': description,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -693,6 +717,10 @@ class AlexaForBusiness {
   /// asynchronously transmitted to the device and is used when the password of
   /// the network changes to NextPassword.
   ///
+  /// Parameter [tags] :
+  /// The tags to be added to the specified resource. Do not provide system
+  /// tags.
+  ///
   /// Parameter [trustAnchors] :
   /// The root certificates of your authentication server that is installed on
   /// your devices and used to trust your authentication server during EAP
@@ -707,6 +735,7 @@ class AlexaForBusiness {
     String? description,
     NetworkEapMethod? eapMethod,
     String? nextPassword,
+    List<Tag>? tags,
     List<String>? trustAnchors,
   }) async {
     ArgumentError.checkNotNull(networkProfileName, 'networkProfileName');
@@ -772,6 +801,7 @@ class AlexaForBusiness {
         if (description != null) 'Description': description,
         if (eapMethod != null) 'EapMethod': eapMethod.toValue(),
         if (nextPassword != null) 'NextPassword': nextPassword,
+        if (tags != null) 'Tags': tags,
         if (trustAnchors != null) 'TrustAnchors': trustAnchors,
       },
     );
@@ -806,6 +836,9 @@ class AlexaForBusiness {
   /// Parameter [clientRequestToken] :
   /// The user-specified token that is used during the creation of a profile.
   ///
+  /// Parameter [dataRetentionOptIn] :
+  /// Whether data retention of the profile is enabled.
+  ///
   /// Parameter [locale] :
   /// The locale of the room profile. (This is currently only available to a
   /// limited preview audience.)
@@ -832,6 +865,7 @@ class AlexaForBusiness {
     required String timezone,
     required WakeWord wakeWord,
     String? clientRequestToken,
+    bool? dataRetentionOptIn,
     String? locale,
     int? maxVolumeLimit,
     CreateMeetingRoomConfiguration? meetingRoomConfiguration,
@@ -897,6 +931,8 @@ class AlexaForBusiness {
         'WakeWord': wakeWord.toValue(),
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (dataRetentionOptIn != null)
+          'DataRetentionOptIn': dataRetentionOptIn,
         if (locale != null) 'Locale': locale,
         if (maxVolumeLimit != null) 'MaxVolumeLimit': maxVolumeLimit,
         if (meetingRoomConfiguration != null)
@@ -2811,7 +2847,12 @@ class AlexaForBusiness {
   /// of your AVS device.
   ///
   /// Parameter [roomArn] :
-  /// The ARN of the room with which to associate your AVS device.
+  /// The Amazon Resource Name (ARN) of the room with which to associate your
+  /// AVS device.
+  ///
+  /// Parameter [tags] :
+  /// The tags to be added to the specified resource. Do not provide system
+  /// tags.
   Future<RegisterAVSDeviceResponse> registerAVSDevice({
     required String amazonId,
     required String clientId,
@@ -2819,6 +2860,7 @@ class AlexaForBusiness {
     required String userCode,
     String? deviceSerialNumber,
     String? roomArn,
+    List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(amazonId, 'amazonId');
     ArgumentError.checkNotNull(clientId, 'clientId');
@@ -2849,6 +2891,7 @@ class AlexaForBusiness {
         if (deviceSerialNumber != null)
           'DeviceSerialNumber': deviceSerialNumber,
         if (roomArn != null) 'RoomArn': roomArn,
+        if (tags != null) 'Tags': tags,
       },
     );
 
@@ -2887,6 +2930,13 @@ class AlexaForBusiness {
 
   /// Determines the details for the room from which a skill request was
   /// invoked. This operation is used by skill developers.
+  ///
+  /// To query ResolveRoom from an Alexa skill, the skill ID needs to be
+  /// authorized. When the skill is using an AWS Lambda function, the skill is
+  /// automatically authorized when you publish your skill as a private skill to
+  /// your AWS account. Skills that are hosted using a custom web service must
+  /// be manually authorized. To get your skill authorized, contact AWS Support
+  /// with your AWS account ID that queries the ResolveRoom API and skill ID.
   ///
   /// May throw [NotFoundException].
   ///
@@ -4189,6 +4239,9 @@ class AlexaForBusiness {
   /// Parameter [address] :
   /// The updated address for the room profile.
   ///
+  /// Parameter [dataRetentionOptIn] :
+  /// Whether data retention of the profile is enabled.
+  ///
   /// Parameter [distanceUnit] :
   /// The updated distance unit for the room profile.
   ///
@@ -4228,6 +4281,7 @@ class AlexaForBusiness {
   /// The updated wake word for the room profile.
   Future<void> updateProfile({
     String? address,
+    bool? dataRetentionOptIn,
     DistanceUnit? distanceUnit,
     bool? isDefault,
     String? locale,
@@ -4277,6 +4331,8 @@ class AlexaForBusiness {
       headers: headers,
       payload: {
         if (address != null) 'Address': address,
+        if (dataRetentionOptIn != null)
+          'DataRetentionOptIn': dataRetentionOptIn,
         if (distanceUnit != null) 'DistanceUnit': distanceUnit.toValue(),
         if (isDefault != null) 'IsDefault': isDefault,
         if (locale != null) 'Locale': locale,
@@ -7390,6 +7446,9 @@ class Profile {
   /// The ARN of the address book.
   final String? addressBookArn;
 
+  /// Whether data retention of the profile is enabled.
+  final bool? dataRetentionOptIn;
+
   /// The distance unit of a room profile.
   final DistanceUnit? distanceUnit;
 
@@ -7430,6 +7489,7 @@ class Profile {
   Profile({
     this.address,
     this.addressBookArn,
+    this.dataRetentionOptIn,
     this.distanceUnit,
     this.isDefault,
     this.locale,
@@ -7447,6 +7507,7 @@ class Profile {
     return Profile(
       address: json['Address'] as String?,
       addressBookArn: json['AddressBookArn'] as String?,
+      dataRetentionOptIn: json['DataRetentionOptIn'] as bool?,
       distanceUnit: (json['DistanceUnit'] as String?)?.toDistanceUnit(),
       isDefault: json['IsDefault'] as bool?,
       locale: json['Locale'] as String?,

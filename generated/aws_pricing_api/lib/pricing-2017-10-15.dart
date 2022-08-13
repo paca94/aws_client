@@ -18,19 +18,19 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS Price List Service API (AWS Price List Service) is a centralized and
-/// convenient way to programmatically query Amazon Web Services for services,
-/// products, and pricing information. The AWS Price List Service uses
-/// standardized product attributes such as <code>Location</code>, <code>Storage
+/// Amazon Web Services Price List API is a centralized and convenient way to
+/// programmatically query Amazon Web Services for services, products, and
+/// pricing information. The Amazon Web Services Price List uses standardized
+/// product attributes such as <code>Location</code>, <code>Storage
 /// Class</code>, and <code>Operating System</code>, and provides prices at the
-/// SKU level. You can use the AWS Price List Service to build cost control and
-/// scenario planning tools, reconcile billing data, forecast future spend for
-/// budgeting purposes, and provide cost benefit analysis that compare your
-/// internal workloads with AWS.
+/// SKU level. You can use the Amazon Web Services Price List to build cost
+/// control and scenario planning tools, reconcile billing data, forecast future
+/// spend for budgeting purposes, and provide cost benefit analysis that compare
+/// your internal workloads with Amazon Web Services.
 ///
 /// Use <code>GetServices</code> without a service code to retrieve the service
 /// codes for all AWS services, then <code>GetServices</code> with a service
-/// code to retreive the attribute names for that service. After you have the
+/// code to retrieve the attribute names for that service. After you have the
 /// service code and attribute names, you can use
 /// <code>GetAttributeValues</code> to see what values are available for an
 /// attribute. With the service code and an attribute name and value, you can
@@ -40,7 +40,8 @@ export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 ///
 /// Service Endpoint
 ///
-/// AWS Price List Service API provides the following two endpoints:
+/// Amazon Web Services Price List service API provides the following two
+/// endpoints:
 ///
 /// <ul>
 /// <li>
@@ -144,12 +145,12 @@ class Pricing {
     return DescribeServicesResponse.fromJson(jsonResponse.body);
   }
 
-  /// Returns a list of attribute values. Attibutes are similar to the details
+  /// Returns a list of attribute values. Attributes are similar to the details
   /// in a Price List API offer file. For a list of available attributes, see <a
-  /// href="http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/reading-an-offer.html#pps-defs">Offer
+  /// href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/reading-an-offer.html#pps-defs">Offer
   /// File Definitions</a> in the <a
-  /// href="http://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html">AWS
-  /// Billing and Cost Management User Guide</a>.
+  /// href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html">Billing
+  /// and Cost Management User Guide</a>.
   ///
   /// May throw [InternalErrorException].
   /// May throw [InvalidParameterException].
@@ -215,6 +216,9 @@ class Pricing {
   /// May throw [InvalidNextTokenException].
   /// May throw [ExpiredNextTokenException].
   ///
+  /// Parameter [serviceCode] :
+  /// The code for the service whose products you want to retrieve.
+  ///
   /// Parameter [filters] :
   /// The list of filters that limit the returned products. only products that
   /// match all filters are returned.
@@ -230,16 +234,14 @@ class Pricing {
   /// Parameter [nextToken] :
   /// The pagination token that indicates the next set of results that you want
   /// to retrieve.
-  ///
-  /// Parameter [serviceCode] :
-  /// The code for the service whose products you want to retrieve.
   Future<GetProductsResponse> getProducts({
+    required String serviceCode,
     List<Filter>? filters,
     String? formatVersion,
     int? maxResults,
     String? nextToken,
-    String? serviceCode,
   }) async {
+    ArgumentError.checkNotNull(serviceCode, 'serviceCode');
     _s.validateNumRange(
       'maxResults',
       maxResults,
@@ -257,11 +259,11 @@ class Pricing {
       // TODO queryParams
       headers: headers,
       payload: {
+        'ServiceCode': serviceCode,
         if (filters != null) 'Filters': filters,
         if (formatVersion != null) 'FormatVersion': formatVersion,
         if (maxResults != null) 'MaxResults': maxResults,
         if (nextToken != null) 'NextToken': nextToken,
-        if (serviceCode != null) 'ServiceCode': serviceCode,
       },
     );
 
@@ -290,7 +292,7 @@ class DescribeServicesResponse {
   /// The format version of the response. For example, <code>aws_v1</code>.
   final String? formatVersion;
 
-  /// The pagination token for the next set of retreivable results.
+  /// The pagination token for the next set of retrievable results.
   final String? nextToken;
 
   /// The service metadata for the service or services in the response.
@@ -309,20 +311,6 @@ class DescribeServicesResponse {
           ?.whereNotNull()
           .map((e) => Service.fromJson(e as Map<String, dynamic>))
           .toList(),
-    );
-  }
-}
-
-/// The pagination token expired. Try again without a pagination token.
-class ExpiredNextTokenException implements _s.AwsException {
-  final String? message;
-
-  ExpiredNextTokenException({
-    this.message,
-  });
-  factory ExpiredNextTokenException.fromJson(Map<String, dynamic> json) {
-    return ExpiredNextTokenException(
-      message: json['Message'] as String?,
     );
   }
 }
@@ -449,95 +437,64 @@ class GetProductsResponse {
   }
 }
 
-/// An error on the server occurred during the processing of your request. Try
-/// again later.
-class InternalErrorException implements _s.AwsException {
-  final String? message;
-
-  InternalErrorException({
-    this.message,
-  });
-  factory InternalErrorException.fromJson(Map<String, dynamic> json) {
-    return InternalErrorException(
-      message: json['Message'] as String?,
-    );
-  }
-}
-
-/// The pagination token is invalid. Try again without a pagination token.
-class InvalidNextTokenException implements _s.AwsException {
-  final String? message;
-
-  InvalidNextTokenException({
-    this.message,
-  });
-  factory InvalidNextTokenException.fromJson(Map<String, dynamic> json) {
-    return InvalidNextTokenException(
-      message: json['Message'] as String?,
-    );
-  }
-}
-
-/// One or more parameters had an invalid value.
-class InvalidParameterException implements _s.AwsException {
-  final String? message;
-
-  InvalidParameterException({
-    this.message,
-  });
-  factory InvalidParameterException.fromJson(Map<String, dynamic> json) {
-    return InvalidParameterException(
-      message: json['Message'] as String?,
-    );
-  }
-}
-
-/// The requested resource can't be found.
-class NotFoundException implements _s.AwsException {
-  final String? message;
-
-  NotFoundException({
-    this.message,
-  });
-  factory NotFoundException.fromJson(Map<String, dynamic> json) {
-    return NotFoundException(
-      message: json['Message'] as String?,
-    );
-  }
-}
-
 /// The metadata for a service, such as the service code and available attribute
 /// names.
 class Service {
+  /// The code for the Amazon Web Services service.
+  final String serviceCode;
+
   /// The attributes that are available for this service.
   final List<String>? attributeNames;
 
-  /// The code for the AWS service.
-  final String? serviceCode;
-
   Service({
+    required this.serviceCode,
     this.attributeNames,
-    this.serviceCode,
   });
   factory Service.fromJson(Map<String, dynamic> json) {
     return Service(
+      serviceCode: json['ServiceCode'] as String,
       attributeNames: (json['AttributeNames'] as List?)
           ?.whereNotNull()
           .map((e) => e as String)
           .toList(),
-      serviceCode: json['ServiceCode'] as String?,
     );
   }
 }
 
+class ExpiredNextTokenException extends _s.GenericAwsException {
+  ExpiredNextTokenException({String? type, String? message})
+      : super(type: type, code: 'ExpiredNextTokenException', message: message);
+}
+
+class InternalErrorException extends _s.GenericAwsException {
+  InternalErrorException({String? type, String? message})
+      : super(type: type, code: 'InternalErrorException', message: message);
+}
+
+class InvalidNextTokenException extends _s.GenericAwsException {
+  InvalidNextTokenException({String? type, String? message})
+      : super(type: type, code: 'InvalidNextTokenException', message: message);
+}
+
+class InvalidParameterException extends _s.GenericAwsException {
+  InvalidParameterException({String? type, String? message})
+      : super(type: type, code: 'InvalidParameterException', message: message);
+}
+
+class NotFoundException extends _s.GenericAwsException {
+  NotFoundException({String? type, String? message})
+      : super(type: type, code: 'NotFoundException', message: message);
+}
+
 final _exceptionFns = <String, _s.AwsExceptionFn>{
   'ExpiredNextTokenException': (type, message) =>
-      ExpiredNextTokenException(message: message),
+      ExpiredNextTokenException(type: type, message: message),
   'InternalErrorException': (type, message) =>
-      InternalErrorException(message: message),
+      InternalErrorException(type: type, message: message),
   'InvalidNextTokenException': (type, message) =>
-      InvalidNextTokenException(message: message),
+      InvalidNextTokenException(type: type, message: message),
   'InvalidParameterException': (type, message) =>
-      InvalidParameterException(message: message),
-  'NotFoundException': (type, message) => NotFoundException(message: message),
+      InvalidParameterException(type: type, message: message),
+  'NotFoundException': (type, message) =>
+      NotFoundException(type: type, message: message),
 };

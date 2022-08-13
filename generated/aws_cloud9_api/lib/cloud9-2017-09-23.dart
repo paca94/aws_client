@@ -18,8 +18,8 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS Cloud9 is a collection of tools that you can use to code, build, run,
-/// test, debug, and release software in the cloud.
+/// Cloud9 is a collection of tools that you can use to code, build, run, test,
+/// debug, and release software in the cloud.
 class Cloud9 {
   final _s.JsonProtocol _protocol;
   Cloud9({
@@ -48,7 +48,7 @@ class Cloud9 {
     _protocol.close();
   }
 
-  /// Creates an AWS Cloud9 development environment, launches an Amazon Elastic
+  /// Creates an Cloud9 development environment, launches an Amazon Elastic
   /// Compute Cloud (Amazon EC2) instance, and then connects from the instance
   /// to the environment.
   ///
@@ -67,38 +67,94 @@ class Cloud9 {
   /// Parameter [name] :
   /// The name of the environment to create.
   ///
-  /// This name is visible to other AWS IAM users in the same AWS account.
+  /// This name is visible to other IAM users in the same Amazon Web Services
+  /// account.
   ///
   /// Parameter [automaticStopTimeMinutes] :
   /// The number of minutes until the running instance is shut down after the
   /// environment has last been used.
   ///
   /// Parameter [clientRequestToken] :
-  /// A unique, case-sensitive string that helps AWS Cloud9 to ensure this
-  /// operation completes no more than one time.
+  /// A unique, case-sensitive string that helps Cloud9 to ensure this operation
+  /// completes no more than one time.
   ///
   /// For more information, see <a
-  /// href="http://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html">Client
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/Run_Instance_Idempotency.html">Client
   /// Tokens</a> in the <i>Amazon EC2 API Reference</i>.
   ///
   /// Parameter [connectionType] :
   /// The connection type used for connecting to an Amazon EC2 environment.
+  /// Valid values are <code>CONNECT_SSH</code> (default) and
+  /// <code>CONNECT_SSM</code> (connected through Amazon EC2 Systems Manager).
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/cloud9/latest/user-guide/ec2-ssm.html">Accessing
+  /// no-ingress EC2 instances with Amazon EC2 Systems Manager</a> in the
+  /// <i>Cloud9 User Guide</i>.
   ///
   /// Parameter [description] :
   /// The description of the environment to create.
   ///
+  /// Parameter [dryRun] :
+  /// Checks whether you have the required permissions for the action, without
+  /// actually making the request, and provides an error response. If you have
+  /// the required permissions, the error response is
+  /// <code>DryRunOperation</code>. Otherwise, it is
+  /// <code>UnauthorizedOperation</code>.
+  ///
+  /// Parameter [imageId] :
+  /// The identifier for the Amazon Machine Image (AMI) that's used to create
+  /// the EC2 instance. To choose an AMI for the instance, you must specify a
+  /// valid AMI alias or a valid Amazon EC2 Systems Manager (SSM) path.
+  ///
+  /// The default AMI is used if the parameter isn't explicitly assigned a value
+  /// in the request. Because Amazon Linux AMI has ended standard support as of
+  /// December 31, 2020, we recommend you choose Amazon Linux 2, which includes
+  /// long term support through 2023.
+  ///
+  /// <b>AMI aliases </b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Amazon Linux (default): <code>amazonlinux-1-x86_64</code> </b>
+  /// </li>
+  /// <li>
+  /// Amazon Linux 2: <code>amazonlinux-2-x86_64</code>
+  /// </li>
+  /// <li>
+  /// Ubuntu 18.04: <code>ubuntu-18.04-x86_64</code>
+  /// </li>
+  /// </ul>
+  /// <b>SSM paths</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Amazon Linux (default):
+  /// <code>resolve:ssm:/aws/service/cloud9/amis/amazonlinux-1-x86_64</code>
+  /// </b>
+  /// </li>
+  /// <li>
+  /// Amazon Linux 2:
+  /// <code>resolve:ssm:/aws/service/cloud9/amis/amazonlinux-2-x86_64</code>
+  /// </li>
+  /// <li>
+  /// Ubuntu 18.04:
+  /// <code>resolve:ssm:/aws/service/cloud9/amis/ubuntu-18.04-x86_64</code>
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [ownerArn] :
   /// The Amazon Resource Name (ARN) of the environment owner. This ARN can be
-  /// the ARN of any AWS IAM principal. If this value is not specified, the ARN
+  /// the ARN of any IAM principal. If this value is not specified, the ARN
   /// defaults to this environment's creator.
   ///
   /// Parameter [subnetId] :
-  /// The ID of the subnet in Amazon VPC that AWS Cloud9 will use to communicate
+  /// The ID of the subnet in Amazon VPC that Cloud9 will use to communicate
   /// with the Amazon EC2 instance.
   ///
   /// Parameter [tags] :
-  /// An array of key-value pairs that will be associated with the new AWS
-  /// Cloud9 development environment.
+  /// An array of key-value pairs that will be associated with the new Cloud9
+  /// development environment.
   Future<CreateEnvironmentEC2Result> createEnvironmentEC2({
     required String instanceType,
     required String name,
@@ -106,6 +162,8 @@ class Cloud9 {
     String? clientRequestToken,
     ConnectionType? connectionType,
     String? description,
+    bool? dryRun,
+    String? imageId,
     String? ownerArn,
     String? subnetId,
     List<Tag>? tags,
@@ -139,10 +197,16 @@ class Cloud9 {
       200,
     );
     _s.validateStringLength(
+      'imageId',
+      imageId,
+      0,
+      512,
+    );
+    _s.validateStringLength(
       'subnetId',
       subnetId,
-      5,
-      30,
+      15,
+      24,
     );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -163,6 +227,8 @@ class Cloud9 {
           'clientRequestToken': clientRequestToken,
         if (connectionType != null) 'connectionType': connectionType.toValue(),
         if (description != null) 'description': description,
+        if (dryRun != null) 'dryRun': dryRun,
+        if (imageId != null) 'imageId': imageId,
         if (ownerArn != null) 'ownerArn': ownerArn,
         if (subnetId != null) 'subnetId': subnetId,
         if (tags != null) 'tags': tags,
@@ -172,7 +238,7 @@ class Cloud9 {
     return CreateEnvironmentEC2Result.fromJson(jsonResponse.body);
   }
 
-  /// Adds an environment member to an AWS Cloud9 development environment.
+  /// Adds an environment member to an Cloud9 development environment.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -230,8 +296,8 @@ class Cloud9 {
     return CreateEnvironmentMembershipResult.fromJson(jsonResponse.body);
   }
 
-  /// Deletes an AWS Cloud9 development environment. If an Amazon EC2 instance
-  /// is connected to the environment, also terminates the instance.
+  /// Deletes an Cloud9 development environment. If an Amazon EC2 instance is
+  /// connected to the environment, also terminates the instance.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -263,7 +329,7 @@ class Cloud9 {
     );
   }
 
-  /// Deletes an environment member from an AWS Cloud9 development environment.
+  /// Deletes an environment member from an Cloud9 development environment.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -303,7 +369,7 @@ class Cloud9 {
     );
   }
 
-  /// Gets information about environment members for an AWS Cloud9 development
+  /// Gets information about environment members for an Cloud9 development
   /// environment.
   ///
   /// May throw [BadRequestException].
@@ -387,7 +453,7 @@ class Cloud9 {
     return DescribeEnvironmentMembershipsResult.fromJson(jsonResponse.body);
   }
 
-  /// Gets status information for an AWS Cloud9 development environment.
+  /// Gets status information for an Cloud9 development environment.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -422,7 +488,7 @@ class Cloud9 {
     return DescribeEnvironmentStatusResult.fromJson(jsonResponse.body);
   }
 
-  /// Gets information about AWS Cloud9 development environments.
+  /// Gets information about Cloud9 development environments.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -456,7 +522,7 @@ class Cloud9 {
     return DescribeEnvironmentsResult.fromJson(jsonResponse.body);
   }
 
-  /// Gets a list of AWS Cloud9 development environment identifiers.
+  /// Gets a list of Cloud9 development environment identifiers.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -505,16 +571,15 @@ class Cloud9 {
     return ListEnvironmentsResult.fromJson(jsonResponse.body);
   }
 
-  /// Gets a list of the tags associated with an AWS Cloud9 development
-  /// environment.
+  /// Gets a list of the tags associated with an Cloud9 development environment.
   ///
   /// May throw [NotFoundException].
   /// May throw [InternalServerErrorException].
   /// May throw [BadRequestException].
   ///
   /// Parameter [resourceARN] :
-  /// The Amazon Resource Name (ARN) of the AWS Cloud9 development environment
-  /// to get the tags for.
+  /// The Amazon Resource Name (ARN) of the Cloud9 development environment to
+  /// get the tags for.
   Future<ListTagsForResourceResponse> listTagsForResource({
     required String resourceARN,
   }) async {
@@ -537,10 +602,10 @@ class Cloud9 {
     return ListTagsForResourceResponse.fromJson(jsonResponse.body);
   }
 
-  /// Adds tags to an AWS Cloud9 development environment.
+  /// Adds tags to an Cloud9 development environment.
   /// <important>
-  /// Tags that you add to an AWS Cloud9 environment by using this method will
-  /// NOT be automatically propagated to underlying resources.
+  /// Tags that you add to an Cloud9 environment by using this method will NOT
+  /// be automatically propagated to underlying resources.
   /// </important>
   ///
   /// May throw [NotFoundException].
@@ -549,11 +614,11 @@ class Cloud9 {
   /// May throw [ConcurrentAccessException].
   ///
   /// Parameter [resourceARN] :
-  /// The Amazon Resource Name (ARN) of the AWS Cloud9 development environment
-  /// to add tags to.
+  /// The Amazon Resource Name (ARN) of the Cloud9 development environment to
+  /// add tags to.
   ///
   /// Parameter [tags] :
-  /// The list of tags to add to the given AWS Cloud9 development environment.
+  /// The list of tags to add to the given Cloud9 development environment.
   Future<void> tagResource({
     required String resourceARN,
     required List<Tag> tags,
@@ -577,7 +642,7 @@ class Cloud9 {
     );
   }
 
-  /// Removes tags from an AWS Cloud9 development environment.
+  /// Removes tags from an Cloud9 development environment.
   ///
   /// May throw [NotFoundException].
   /// May throw [InternalServerErrorException].
@@ -585,11 +650,11 @@ class Cloud9 {
   /// May throw [ConcurrentAccessException].
   ///
   /// Parameter [resourceARN] :
-  /// The Amazon Resource Name (ARN) of the AWS Cloud9 development environment
-  /// to remove tags from.
+  /// The Amazon Resource Name (ARN) of the Cloud9 development environment to
+  /// remove tags from.
   ///
   /// Parameter [tagKeys] :
-  /// The tag names of the tags to remove from the given AWS Cloud9 development
+  /// The tag names of the tags to remove from the given Cloud9 development
   /// environment.
   Future<void> untagResource({
     required String resourceARN,
@@ -614,7 +679,7 @@ class Cloud9 {
     );
   }
 
-  /// Changes the settings of an existing AWS Cloud9 development environment.
+  /// Changes the settings of an existing Cloud9 development environment.
   ///
   /// May throw [BadRequestException].
   /// May throw [ConflictException].
@@ -630,11 +695,31 @@ class Cloud9 {
   /// Parameter [description] :
   /// Any new or replacement description for the environment.
   ///
+  /// Parameter [managedCredentialsAction] :
+  /// Allows the environment owner to turn on or turn off the Amazon Web
+  /// Services managed temporary credentials for an Cloud9 environment by using
+  /// one of the following values:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>ENABLE</code>
+  /// </li>
+  /// <li>
+  /// <code>DISABLE</code>
+  /// </li>
+  /// </ul> <note>
+  /// Only the environment owner can change the status of managed temporary
+  /// credentials. An <code>AccessDeniedException</code> is thrown if an attempt
+  /// to turn on or turn off managed temporary credentials is made by an account
+  /// that's not the environment owner.
+  /// </note>
+  ///
   /// Parameter [name] :
   /// A replacement name for the environment.
   Future<void> updateEnvironment({
     required String environmentId,
     String? description,
+    ManagedCredentialsAction? managedCredentialsAction,
     String? name,
   }) async {
     ArgumentError.checkNotNull(environmentId, 'environmentId');
@@ -663,12 +748,14 @@ class Cloud9 {
       payload: {
         'environmentId': environmentId,
         if (description != null) 'description': description,
+        if (managedCredentialsAction != null)
+          'managedCredentialsAction': managedCredentialsAction.toValue(),
         if (name != null) 'name': name,
       },
     );
   }
 
-  /// Changes the settings of an existing environment member for an AWS Cloud9
+  /// Changes the settings of an existing environment member for an Cloud9
   /// development environment.
   ///
   /// May throw [BadRequestException].
@@ -773,18 +860,16 @@ class CreateEnvironmentEC2Result {
 
 class CreateEnvironmentMembershipResult {
   /// Information about the environment member that was added.
-  final EnvironmentMember? membership;
+  final EnvironmentMember membership;
 
   CreateEnvironmentMembershipResult({
-    this.membership,
+    required this.membership,
   });
   factory CreateEnvironmentMembershipResult.fromJson(
       Map<String, dynamic> json) {
     return CreateEnvironmentMembershipResult(
-      membership: json['membership'] != null
-          ? EnvironmentMember.fromJson(
-              json['membership'] as Map<String, dynamic>)
-          : null,
+      membership: EnvironmentMember.fromJson(
+          json['membership'] as Map<String, dynamic>),
     );
   }
 }
@@ -831,7 +916,7 @@ class DescribeEnvironmentMembershipsResult {
 
 class DescribeEnvironmentStatusResult {
   /// Any informational message about the status of the environment.
-  final String? message;
+  final String message;
 
   /// The status of the environment. Available values include:
   ///
@@ -858,16 +943,16 @@ class DescribeEnvironmentStatusResult {
   /// <code>stopping</code>: The environment is stopping.
   /// </li>
   /// </ul>
-  final EnvironmentStatus? status;
+  final EnvironmentStatus status;
 
   DescribeEnvironmentStatusResult({
-    this.message,
-    this.status,
+    required this.message,
+    required this.status,
   });
   factory DescribeEnvironmentStatusResult.fromJson(Map<String, dynamic> json) {
     return DescribeEnvironmentStatusResult(
-      message: json['message'] as String?,
-      status: (json['status'] as String?)?.toEnvironmentStatus(),
+      message: json['message'] as String,
+      status: (json['status'] as String).toEnvironmentStatus(),
     );
   }
 }
@@ -889,28 +974,13 @@ class DescribeEnvironmentsResult {
   }
 }
 
-/// Information about an AWS Cloud9 development environment.
+/// Information about an Cloud9 development environment.
 class Environment {
   /// The Amazon Resource Name (ARN) of the environment.
-  final String? arn;
-
-  /// The connection type used for connecting to an Amazon EC2 environment.
-  final ConnectionType? connectionType;
-
-  /// The description for the environment.
-  final String? description;
-
-  /// The ID of the environment.
-  final String? id;
-
-  /// The state of the environment in its creation or deletion lifecycle.
-  final EnvironmentLifecycle? lifecycle;
-
-  /// The name of the environment.
-  final String? name;
+  final String arn;
 
   /// The Amazon Resource Name (ARN) of the environment owner.
-  final String? ownerArn;
+  final String ownerArn;
 
   /// The type of environment. Valid values include the following:
   ///
@@ -923,21 +993,77 @@ class Environment {
   /// <code>ssh</code>: Your own server connects to the environment.
   /// </li>
   /// </ul>
-  final EnvironmentType? type;
+  final EnvironmentType type;
+
+  /// The connection type used for connecting to an Amazon EC2 environment.
+  /// <code>CONNECT_SSH</code> is selected by default.
+  final ConnectionType? connectionType;
+
+  /// The description for the environment.
+  final String? description;
+
+  /// The ID of the environment.
+  final String? id;
+
+  /// The state of the environment in its creation or deletion lifecycle.
+  final EnvironmentLifecycle? lifecycle;
+
+  /// Describes the status of Amazon Web Services managed temporary credentials
+  /// for the Cloud9 environment. Available values are:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>ENABLED_ON_CREATE</code>
+  /// </li>
+  /// <li>
+  /// <code>ENABLED_BY_OWNER</code>
+  /// </li>
+  /// <li>
+  /// <code>DISABLED_BY_DEFAULT</code>
+  /// </li>
+  /// <li>
+  /// <code>DISABLED_BY_OWNER</code>
+  /// </li>
+  /// <li>
+  /// <code>DISABLED_BY_COLLABORATOR</code>
+  /// </li>
+  /// <li>
+  /// <code>PENDING_REMOVAL_BY_COLLABORATOR</code>
+  /// </li>
+  /// <li>
+  /// <code>PENDING_REMOVAL_BY_OWNER</code>
+  /// </li>
+  /// <li>
+  /// <code>FAILED_REMOVAL_BY_COLLABORATOR</code>
+  /// </li>
+  /// <li>
+  /// <code>ENABLED_BY_OWNER</code>
+  /// </li>
+  /// <li>
+  /// <code>DISABLED_BY_DEFAULT</code>
+  /// </li>
+  /// </ul>
+  final ManagedCredentialsStatus? managedCredentialsStatus;
+
+  /// The name of the environment.
+  final String? name;
 
   Environment({
-    this.arn,
+    required this.arn,
+    required this.ownerArn,
+    required this.type,
     this.connectionType,
     this.description,
     this.id,
     this.lifecycle,
+    this.managedCredentialsStatus,
     this.name,
-    this.ownerArn,
-    this.type,
   });
   factory Environment.fromJson(Map<String, dynamic> json) {
     return Environment(
-      arn: json['arn'] as String?,
+      arn: json['arn'] as String,
+      ownerArn: json['ownerArn'] as String,
+      type: (json['type'] as String).toEnvironmentType(),
       connectionType: (json['connectionType'] as String?)?.toConnectionType(),
       description: json['description'] as String?,
       id: json['id'] as String?,
@@ -945,18 +1071,18 @@ class Environment {
           ? EnvironmentLifecycle.fromJson(
               json['lifecycle'] as Map<String, dynamic>)
           : null,
+      managedCredentialsStatus: (json['managedCredentialsStatus'] as String?)
+          ?.toManagedCredentialsStatus(),
       name: json['name'] as String?,
-      ownerArn: json['ownerArn'] as String?,
-      type: (json['type'] as String?)?.toEnvironmentType(),
     );
   }
 }
 
-/// Information about the current creation or deletion lifecycle state of an AWS
+/// Information about the current creation or deletion lifecycle state of an
 /// Cloud9 development environment.
 class EnvironmentLifecycle {
   /// If the environment failed to delete, the Amazon Resource Name (ARN) of the
-  /// related AWS resource.
+  /// related Amazon Web Services resource.
   final String? failureResource;
 
   /// Any informational message about the lifecycle state of the environment.
@@ -1040,15 +1166,11 @@ extension on String {
   }
 }
 
-/// Information about an environment member for an AWS Cloud9 development
+/// Information about an environment member for an Cloud9 development
 /// environment.
 class EnvironmentMember {
   /// The ID of the environment for the environment member.
-  final String? environmentId;
-
-  /// The time, expressed in epoch time format, when the environment member last
-  /// opened the environment.
-  final DateTime? lastAccess;
+  final String environmentId;
 
   /// The type of environment member permissions associated with this environment
   /// member. Available values include:
@@ -1064,29 +1186,33 @@ class EnvironmentMember {
   /// <code>read-write</code>: Has read-write access to the environment.
   /// </li>
   /// </ul>
-  final Permissions? permissions;
+  final Permissions permissions;
 
   /// The Amazon Resource Name (ARN) of the environment member.
-  final String? userArn;
+  final String userArn;
 
-  /// The user ID in AWS Identity and Access Management (AWS IAM) of the
-  /// environment member.
-  final String? userId;
+  /// The user ID in Identity and Access Management (IAM) of the environment
+  /// member.
+  final String userId;
+
+  /// The time, expressed in epoch time format, when the environment member last
+  /// opened the environment.
+  final DateTime? lastAccess;
 
   EnvironmentMember({
-    this.environmentId,
+    required this.environmentId,
+    required this.permissions,
+    required this.userArn,
+    required this.userId,
     this.lastAccess,
-    this.permissions,
-    this.userArn,
-    this.userId,
   });
   factory EnvironmentMember.fromJson(Map<String, dynamic> json) {
     return EnvironmentMember(
-      environmentId: json['environmentId'] as String?,
+      environmentId: json['environmentId'] as String,
+      permissions: (json['permissions'] as String).toPermissions(),
+      userArn: json['userArn'] as String,
+      userId: json['userId'] as String,
       lastAccess: timeStampFromJson(json['lastAccess']),
-      permissions: (json['permissions'] as String?)?.toPermissions(),
-      userArn: json['userArn'] as String?,
-      userId: json['userId'] as String?,
     );
   }
 }
@@ -1198,7 +1324,7 @@ class ListEnvironmentsResult {
 }
 
 class ListTagsForResourceResponse {
-  /// The list of tags associated with the AWS Cloud9 development environment.
+  /// The list of tags associated with the Cloud9 development environment.
   final List<Tag>? tags;
 
   ListTagsForResourceResponse({
@@ -1211,6 +1337,107 @@ class ListTagsForResourceResponse {
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
+  }
+}
+
+enum ManagedCredentialsAction {
+  enable,
+  disable,
+}
+
+extension on ManagedCredentialsAction {
+  String toValue() {
+    switch (this) {
+      case ManagedCredentialsAction.enable:
+        return 'ENABLE';
+      case ManagedCredentialsAction.disable:
+        return 'DISABLE';
+    }
+  }
+}
+
+extension on String {
+  ManagedCredentialsAction toManagedCredentialsAction() {
+    switch (this) {
+      case 'ENABLE':
+        return ManagedCredentialsAction.enable;
+      case 'DISABLE':
+        return ManagedCredentialsAction.disable;
+    }
+    throw Exception('$this is not known in enum ManagedCredentialsAction');
+  }
+}
+
+enum ManagedCredentialsStatus {
+  enabledOnCreate,
+  enabledByOwner,
+  disabledByDefault,
+  disabledByOwner,
+  disabledByCollaborator,
+  pendingRemovalByCollaborator,
+  pendingStartRemovalByCollaborator,
+  pendingRemovalByOwner,
+  pendingStartRemovalByOwner,
+  failedRemovalByCollaborator,
+  failedRemovalByOwner,
+}
+
+extension on ManagedCredentialsStatus {
+  String toValue() {
+    switch (this) {
+      case ManagedCredentialsStatus.enabledOnCreate:
+        return 'ENABLED_ON_CREATE';
+      case ManagedCredentialsStatus.enabledByOwner:
+        return 'ENABLED_BY_OWNER';
+      case ManagedCredentialsStatus.disabledByDefault:
+        return 'DISABLED_BY_DEFAULT';
+      case ManagedCredentialsStatus.disabledByOwner:
+        return 'DISABLED_BY_OWNER';
+      case ManagedCredentialsStatus.disabledByCollaborator:
+        return 'DISABLED_BY_COLLABORATOR';
+      case ManagedCredentialsStatus.pendingRemovalByCollaborator:
+        return 'PENDING_REMOVAL_BY_COLLABORATOR';
+      case ManagedCredentialsStatus.pendingStartRemovalByCollaborator:
+        return 'PENDING_START_REMOVAL_BY_COLLABORATOR';
+      case ManagedCredentialsStatus.pendingRemovalByOwner:
+        return 'PENDING_REMOVAL_BY_OWNER';
+      case ManagedCredentialsStatus.pendingStartRemovalByOwner:
+        return 'PENDING_START_REMOVAL_BY_OWNER';
+      case ManagedCredentialsStatus.failedRemovalByCollaborator:
+        return 'FAILED_REMOVAL_BY_COLLABORATOR';
+      case ManagedCredentialsStatus.failedRemovalByOwner:
+        return 'FAILED_REMOVAL_BY_OWNER';
+    }
+  }
+}
+
+extension on String {
+  ManagedCredentialsStatus toManagedCredentialsStatus() {
+    switch (this) {
+      case 'ENABLED_ON_CREATE':
+        return ManagedCredentialsStatus.enabledOnCreate;
+      case 'ENABLED_BY_OWNER':
+        return ManagedCredentialsStatus.enabledByOwner;
+      case 'DISABLED_BY_DEFAULT':
+        return ManagedCredentialsStatus.disabledByDefault;
+      case 'DISABLED_BY_OWNER':
+        return ManagedCredentialsStatus.disabledByOwner;
+      case 'DISABLED_BY_COLLABORATOR':
+        return ManagedCredentialsStatus.disabledByCollaborator;
+      case 'PENDING_REMOVAL_BY_COLLABORATOR':
+        return ManagedCredentialsStatus.pendingRemovalByCollaborator;
+      case 'PENDING_START_REMOVAL_BY_COLLABORATOR':
+        return ManagedCredentialsStatus.pendingStartRemovalByCollaborator;
+      case 'PENDING_REMOVAL_BY_OWNER':
+        return ManagedCredentialsStatus.pendingRemovalByOwner;
+      case 'PENDING_START_REMOVAL_BY_OWNER':
+        return ManagedCredentialsStatus.pendingStartRemovalByOwner;
+      case 'FAILED_REMOVAL_BY_COLLABORATOR':
+        return ManagedCredentialsStatus.failedRemovalByCollaborator;
+      case 'FAILED_REMOVAL_BY_OWNER':
+        return ManagedCredentialsStatus.failedRemovalByOwner;
+    }
+    throw Exception('$this is not known in enum ManagedCredentialsStatus');
   }
 }
 
@@ -1275,12 +1502,12 @@ extension on String {
   }
 }
 
-/// Metadata that is associated with AWS resources. In particular, a name-value
-/// pair that can be associated with an AWS Cloud9 development environment.
-/// There are two types of tags: <i>user tags</i> and <i>system tags</i>. A user
-/// tag is created by the user. A system tag is automatically created by AWS
-/// services. A system tag is prefixed with "aws:" and cannot be modified by the
-/// user.
+/// Metadata that is associated with Amazon Web Services resources. In
+/// particular, a name-value pair that can be associated with an Cloud9
+/// development environment. There are two types of tags: <i>user tags</i> and
+/// <i>system tags</i>. A user tag is created by the user. A system tag is
+/// automatically created by Amazon Web Services services. A system tag is
+/// prefixed with <code>"aws:"</code> and cannot be modified by the user.
 class Tag {
   /// The <b>name</b> part of a tag.
   final String key;

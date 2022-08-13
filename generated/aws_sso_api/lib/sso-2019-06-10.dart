@@ -18,25 +18,30 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// AWS Single Sign-On Portal is a web service that makes it easy for you to
-/// assign user access to AWS SSO resources such as the user portal. Users can
-/// get AWS account applications and roles assigned to them and get federated
-/// into the application.
-///
-/// For general information about AWS SSO, see <a
-/// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html">What
-/// is AWS Single Sign-On?</a> in the <i>AWS SSO User Guide</i>.
-///
-/// This API reference guide describes the AWS SSO Portal operations that you
-/// can call programatically and includes detailed information on data types and
-/// errors.
+/// Amazon Web Services Single Sign On Portal is a web service that makes it
+/// easy for you to assign user access to Amazon Web Services SSO resources such
+/// as the AWS access portal. Users can get Amazon Web Services account
+/// applications and roles assigned to them and get federated into the
+/// application.
 /// <note>
-/// AWS provides SDKs that consist of libraries and sample code for various
-/// programming languages and platforms, such as Java, Ruby, .Net, iOS, or
-/// Android. The SDKs provide a convenient way to create programmatic access to
-/// AWS SSO and other AWS services. For more information about the AWS SDKs,
-/// including how to download and install them, see <a
-/// href="http://aws.amazon.com/tools/">Tools for Amazon Web Services</a>.
+/// Although Amazon Web Services Single Sign-On was renamed, the
+/// <code>sso</code> and <code>identitystore</code> API namespaces will continue
+/// to retain their original name for backward compatibility purposes. For more
+/// information, see <a
+/// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html#renamed">Amazon
+/// Web Services SSO rename</a>.
+/// </note>
+/// This API reference guide describes the Amazon Web Services SSO Portal
+/// operations that you can call programatically and includes detailed
+/// information on data types and errors.
+/// <note>
+/// Amazon Web Services provides SDKs that consist of libraries and sample code
+/// for various programming languages and platforms, such as Java, Ruby, .Net,
+/// iOS, or Android. The SDKs provide a convenient way to create programmatic
+/// access to Amazon Web Services SSO and other Amazon Web Services services.
+/// For more information about the Amazon Web Services SDKs, including how to
+/// download and install them, see <a href="http://aws.amazon.com/tools/">Tools
+/// for Amazon Web Services</a>.
 /// </note>
 class SSO {
   final _s.RestJsonProtocol _protocol;
@@ -79,10 +84,11 @@ class SSO {
   /// The token issued by the <code>CreateToken</code> API call. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html">CreateToken</a>
-  /// in the <i>AWS SSO OIDC API Reference Guide</i>.
+  /// in the <i>Amazon Web Services SSO OIDC API Reference Guide</i>.
   ///
   /// Parameter [accountId] :
-  /// The identifier for the AWS account that is assigned to the user.
+  /// The identifier for the Amazon Web Services account that is assigned to the
+  /// user.
   ///
   /// Parameter [roleName] :
   /// The friendly name of the role that is assigned to the user.
@@ -113,7 +119,8 @@ class SSO {
     return GetRoleCredentialsResponse.fromJson(response);
   }
 
-  /// Lists all roles that are assigned to the user for a given AWS account.
+  /// Lists all roles that are assigned to the user for a given Amazon Web
+  /// Services account.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [UnauthorizedException].
@@ -124,10 +131,11 @@ class SSO {
   /// The token issued by the <code>CreateToken</code> API call. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html">CreateToken</a>
-  /// in the <i>AWS SSO OIDC API Reference Guide</i>.
+  /// in the <i>Amazon Web Services SSO OIDC API Reference Guide</i>.
   ///
   /// Parameter [accountId] :
-  /// The identifier for the AWS account that is assigned to the user.
+  /// The identifier for the Amazon Web Services account that is assigned to the
+  /// user.
   ///
   /// Parameter [maxResults] :
   /// The number of items that clients can request per page.
@@ -169,11 +177,12 @@ class SSO {
     return ListAccountRolesResponse.fromJson(response);
   }
 
-  /// Lists all AWS accounts assigned to the user. These AWS accounts are
-  /// assigned by the administrator of the account. For more information, see <a
+  /// Lists all Amazon Web Services accounts assigned to the user. These Amazon
+  /// Web Services accounts are assigned by the administrator of the account.
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/useraccess.html#assignusers">Assign
-  /// User Access</a> in the <i>AWS SSO User Guide</i>. This operation returns a
-  /// paginated response.
+  /// User Access</a> in the <i>Amazon Web Services SSO User Guide</i>. This
+  /// operation returns a paginated response.
   ///
   /// May throw [InvalidRequestException].
   /// May throw [UnauthorizedException].
@@ -184,7 +193,7 @@ class SSO {
   /// The token issued by the <code>CreateToken</code> API call. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html">CreateToken</a>
-  /// in the <i>AWS SSO OIDC API Reference Guide</i>.
+  /// in the <i>Amazon Web Services SSO OIDC API Reference Guide</i>.
   ///
   /// Parameter [maxResults] :
   /// This is the number of items clients can request per page.
@@ -223,8 +232,23 @@ class SSO {
     return ListAccountsResponse.fromJson(response);
   }
 
-  /// Removes the client- and server-side session that is associated with the
-  /// user.
+  /// Removes the locally stored SSO tokens from the client-side cache and sends
+  /// an API call to the Amazon Web Services SSO service to invalidate the
+  /// corresponding server-side Amazon Web Services SSO sign in session.
+  /// <note>
+  /// If a user uses Amazon Web Services SSO to access the AWS CLI, the user’s
+  /// Amazon Web Services SSO sign in session is used to obtain an IAM session,
+  /// as specified in the corresponding Amazon Web Services SSO permission set.
+  /// More specifically, Amazon Web Services SSO assumes an IAM role in the
+  /// target account on behalf of the user, and the corresponding temporary
+  /// Amazon Web Services credentials are returned to the client.
+  ///
+  /// After user logout, any existing IAM role sessions that were created by
+  /// using Amazon Web Services SSO permission sets continue based on the
+  /// duration configured in the permission set. For more information, see <a
+  /// href="https://docs.aws.amazon.com/singlesignon/latest/userguide/authconcept.html">User
+  /// authentications</a> in the <i>Amazon Web Services SSO User Guide</i>.
+  /// </note>
   ///
   /// May throw [InvalidRequestException].
   /// May throw [UnauthorizedException].
@@ -234,7 +258,7 @@ class SSO {
   /// The token issued by the <code>CreateToken</code> API call. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html">CreateToken</a>
-  /// in the <i>AWS SSO OIDC API Reference Guide</i>.
+  /// in the <i>Amazon Web Services SSO OIDC API Reference Guide</i>.
   Future<void> logout({
     required String accessToken,
   }) async {
@@ -253,15 +277,18 @@ class SSO {
   }
 }
 
-/// Provides information about your AWS account.
+/// Provides information about your Amazon Web Services account.
 class AccountInfo {
-  /// The identifier of the AWS account that is assigned to the user.
+  /// The identifier of the Amazon Web Services account that is assigned to the
+  /// user.
   final String? accountId;
 
-  /// The display name of the AWS account that is assigned to the user.
+  /// The display name of the Amazon Web Services account that is assigned to the
+  /// user.
   final String? accountName;
 
-  /// The email address of the AWS account that is assigned to the user.
+  /// The email address of the Amazon Web Services account that is assigned to the
+  /// user.
   final String? emailAddress;
 
   AccountInfo({
@@ -347,8 +374,8 @@ class RoleCredentials {
   /// The identifier used for the temporary security credentials. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html">Using
-  /// Temporary Security Credentials to Request Access to AWS Resources</a> in the
-  /// <i>AWS IAM User Guide</i>.
+  /// Temporary Security Credentials to Request Access to Amazon Web Services
+  /// Resources</a> in the <i>Amazon Web Services IAM User Guide</i>.
   final String? accessKeyId;
 
   /// The date on which temporary security credentials expire.
@@ -356,14 +383,14 @@ class RoleCredentials {
 
   /// The key that is used to sign the request. For more information, see <a
   /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html">Using
-  /// Temporary Security Credentials to Request Access to AWS Resources</a> in the
-  /// <i>AWS IAM User Guide</i>.
+  /// Temporary Security Credentials to Request Access to Amazon Web Services
+  /// Resources</a> in the <i>Amazon Web Services IAM User Guide</i>.
   final String? secretAccessKey;
 
   /// The token used for temporary credentials. For more information, see <a
   /// href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html">Using
-  /// Temporary Security Credentials to Request Access to AWS Resources</a> in the
-  /// <i>AWS IAM User Guide</i>.
+  /// Temporary Security Credentials to Request Access to Amazon Web Services
+  /// Resources</a> in the <i>Amazon Web Services IAM User Guide</i>.
   final String? sessionToken;
 
   RoleCredentials({
@@ -384,7 +411,7 @@ class RoleCredentials {
 
 /// Provides information about the role that is assigned to the user.
 class RoleInfo {
-  /// The identifier of the AWS account assigned to the user.
+  /// The identifier of the Amazon Web Services account assigned to the user.
   final String? accountId;
 
   /// The friendly name of the role that is assigned to the user.

@@ -19,25 +19,27 @@ import 'package:shared_aws_api/shared.dart'
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Amazon Lightsail is the easiest way to get started with Amazon Web Services
-/// (AWS) for developers who need to build websites or web applications. It
-/// includes everything you need to launch your project quickly - instances
-/// (virtual private servers), container services, managed databases, SSD-based
-/// block storage, static IP addresses, load balancers, content delivery network
-/// (CDN) distributions, DNS management of registered domains, and resource
-/// snapshots (backups) - for a low, predictable monthly price.
+/// (Amazon Web Services) for developers who need to build websites or web
+/// applications. It includes everything you need to launch your project quickly
+/// - instances (virtual private servers), container services, storage buckets,
+/// managed databases, SSD-based block storage, static IP addresses, load
+/// balancers, content delivery network (CDN) distributions, DNS management of
+/// registered domains, and resource snapshots (backups) - for a low,
+/// predictable monthly price.
 ///
 /// You can manage your Lightsail resources using the Lightsail console,
 /// Lightsail API, AWS Command Line Interface (AWS CLI), or SDKs. For more
 /// information about Lightsail concepts and tasks, see the <a
-/// href="http://lightsail.aws.amazon.com/ls/docs/how-to/article/lightsail-how-to-set-up-access-keys-to-use-sdk-api-cli">Lightsail
-/// Dev Guide</a>.
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-how-to-set-up-access-keys-to-use-sdk-api-cli">Amazon
+/// Lightsail Developer Guide</a>.
 ///
 /// This API Reference provides detailed information about the actions, data
 /// types, parameters, and errors of the Lightsail service. For more information
-/// about the supported AWS Regions, endpoints, and service quotas of the
-/// Lightsail service, see <a
+/// about the supported Amazon Web Services Regions, endpoints, and service
+/// quotas of the Lightsail service, see <a
 /// href="https://docs.aws.amazon.com/general/latest/gr/lightsail.html">Amazon
-/// Lightsail Endpoints and Quotas</a> in the <i>AWS General Reference</i>.
+/// Lightsail Endpoints and Quotas</a> in the <i>Amazon Web Services General
+/// Reference</i>.
 class Lightsail {
   final _s.JsonProtocol _protocol;
   Lightsail({
@@ -109,11 +111,11 @@ class Lightsail {
   /// Use the <code>CreateCertificate</code> action to create a certificate that
   /// you can attach to your distribution.
   /// <important>
-  /// Only certificates created in the <code>us-east-1</code> AWS Region can be
-  /// attached to Lightsail distributions. Lightsail distributions are global
-  /// resources that can reference an origin in any AWS Region, and distribute
-  /// its content globally. However, all distributions are located in the
-  /// <code>us-east-1</code> Region.
+  /// Only certificates created in the <code>us-east-1</code> Amazon Web
+  /// Services Region can be attached to Lightsail distributions. Lightsail
+  /// distributions are global resources that can reference an origin in any
+  /// Amazon Web Services Region, and distribute its content globally. However,
+  /// all distributions are located in the <code>us-east-1</code> Region.
   /// </important>
   ///
   /// May throw [ServiceException].
@@ -176,8 +178,8 @@ class Lightsail {
   /// The <code>attach disk</code> operation supports tag-based access control
   /// via resource tags applied to the resource identified by <code>disk
   /// name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -233,8 +235,8 @@ class Lightsail {
   /// tag-based access control via resource tags applied to the resource
   /// identified by <code>load balancer name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
+  /// Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -296,8 +298,8 @@ class Lightsail {
   /// tag-based access control via resource tags applied to the resource
   /// identified by <code>load balancer name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -384,8 +386,8 @@ class Lightsail {
   /// The <code>CloseInstancePublicPorts</code> action supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>instanceName</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -428,8 +430,8 @@ class Lightsail {
   /// Copies a manual snapshot of an instance or disk as another manual
   /// snapshot, or copies an automatic snapshot of an instance or disk as a
   /// manual snapshot. This operation can also be used to copy a manual or
-  /// automatic snapshot of an instance or a disk from one AWS Region to another
-  /// in Amazon Lightsail.
+  /// automatic snapshot of an instance or a disk from one Amazon Web Services
+  /// Region to another in Amazon Lightsail.
   ///
   /// When copying a <i>manual snapshot</i>, be sure to define the <code>source
   /// region</code>, <code>source snapshot name</code>, and <code>target
@@ -450,7 +452,8 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [sourceRegion] :
-  /// The AWS Region where the source manual or automatic snapshot is located.
+  /// The Amazon Web Services Region where the source manual or automatic
+  /// snapshot is located.
   ///
   /// Parameter [targetSnapshotName] :
   /// The name of the new manual snapshot to be created as a copy.
@@ -475,8 +478,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when copying an automatic snapshot as a manual
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-keeping-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-keeping-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -490,8 +493,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when copying an automatic snapshot as a manual
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-keeping-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-keeping-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -523,8 +526,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when copying an automatic snapshot as a manual
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-keeping-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-keeping-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   Future<CopySnapshotResult> copySnapshot({
@@ -563,18 +566,164 @@ class Lightsail {
     return CopySnapshotResult.fromJson(jsonResponse.body);
   }
 
-  /// Creates an SSL/TLS certificate for a Amazon Lightsail content delivery
-  /// network (CDN) distribution.
+  /// Creates an Amazon Lightsail bucket.
   ///
-  /// After the certificate is created, use the
-  /// <code>AttachCertificateToDistribution</code> action to attach the
-  /// certificate to your distribution.
+  /// A bucket is a cloud storage resource available in the Lightsail object
+  /// storage service. Use buckets to store objects such as data and its
+  /// descriptive metadata. For more information about buckets, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/buckets-in-amazon-lightsail">Buckets
+  /// in Amazon Lightsail</a> in the <i>Amazon Lightsail Developer Guide</i>.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name for the bucket.
+  ///
+  /// For more information about bucket names, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/bucket-naming-rules-in-amazon-lightsail">Bucket
+  /// naming rules in Amazon Lightsail</a> in the <i>Amazon Lightsail Developer
+  /// Guide</i>.
+  ///
+  /// Parameter [bundleId] :
+  /// The ID of the bundle to use for the bucket.
+  ///
+  /// A bucket bundle specifies the monthly cost, storage space, and data
+  /// transfer quota for a bucket.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketBundles.html">GetBucketBundles</a>
+  /// action to get a list of bundle IDs that you can specify.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_UpdateBucketBundle.html">UpdateBucketBundle</a>
+  /// action to change the bundle after the bucket is created.
+  ///
+  /// Parameter [enableObjectVersioning] :
+  /// A Boolean value that indicates whether to enable versioning of objects in
+  /// the bucket.
+  ///
+  /// For more information about versioning, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-managing-bucket-object-versioning">Enabling
+  /// and suspending object versioning in a bucket in Amazon Lightsail</a> in
+  /// the <i>Amazon Lightsail Developer Guide</i>.
+  ///
+  /// Parameter [tags] :
+  /// The tag keys and optional values to add to the bucket during creation.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_TagResource.html">TagResource</a>
+  /// action to tag the bucket after it's created.
+  Future<CreateBucketResult> createBucket({
+    required String bucketName,
+    required String bundleId,
+    bool? enableObjectVersioning,
+    List<Tag>? tags,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(bundleId, 'bundleId');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.CreateBucket'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+        'bundleId': bundleId,
+        if (enableObjectVersioning != null)
+          'enableObjectVersioning': enableObjectVersioning,
+        if (tags != null) 'tags': tags,
+      },
+    );
+
+    return CreateBucketResult.fromJson(jsonResponse.body);
+  }
+
+  /// Creates a new access key for the specified Amazon Lightsail bucket. Access
+  /// keys consist of an access key ID and corresponding secret access key.
+  ///
+  /// Access keys grant full programmatic access to the specified bucket and its
+  /// objects. You can have a maximum of two access keys per bucket. Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketAccessKeys.html">GetBucketAccessKeys</a>
+  /// action to get a list of current access keys for a specific bucket. For
+  /// more information about access keys, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-creating-bucket-access-keys">Creating
+  /// access keys for a bucket in Amazon Lightsail</a> in the <i>Amazon
+  /// Lightsail Developer Guide</i>.
   /// <important>
-  /// Only certificates created in the <code>us-east-1</code> AWS Region can be
-  /// attached to Lightsail distributions. Lightsail distributions are global
-  /// resources that can reference an origin in any AWS Region, and distribute
-  /// its content globally. However, all distributions are located in the
-  /// <code>us-east-1</code> Region.
+  /// The <code>secretAccessKey</code> value is returned only in response to the
+  /// <code>CreateBucketAccessKey</code> action. You can get a secret access key
+  /// only when you first create an access key; you cannot get the secret access
+  /// key later. If you lose the secret access key, you must create a new access
+  /// key.
+  /// </important>
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [NotFoundException].
+  /// May throw [InvalidInputException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket that the new access key will belong to, and grant
+  /// access to.
+  Future<CreateBucketAccessKeyResult> createBucketAccessKey({
+    required String bucketName,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.CreateBucketAccessKey'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+      },
+    );
+
+    return CreateBucketAccessKeyResult.fromJson(jsonResponse.body);
+  }
+
+  /// Creates an SSL/TLS certificate for an Amazon Lightsail content delivery
+  /// network (CDN) distribution and a container service.
+  ///
+  /// After the certificate is valid, use the
+  /// <code>AttachCertificateToDistribution</code> action to use the certificate
+  /// and its domains with your distribution. Or use the
+  /// <code>UpdateContainerService</code> action to use the certificate and its
+  /// domains with your container service.
+  /// <important>
+  /// Only certificates created in the <code>us-east-1</code> Amazon Web
+  /// Services Region can be attached to Lightsail distributions. Lightsail
+  /// distributions are global resources that can reference an origin in any
+  /// Amazon Web Services Region, and distribute its content globally. However,
+  /// all distributions are located in the <code>us-east-1</code> Region.
   /// </important>
   ///
   /// May throw [ServiceException].
@@ -686,9 +835,10 @@ class Lightsail {
   ///
   /// A contact method is used to send you notifications about your Amazon
   /// Lightsail resources. You can add one email address and one mobile phone
-  /// number contact method in each AWS Region. However, SMS text messaging is
-  /// not supported in some AWS Regions, and SMS text messages cannot be sent to
-  /// some countries/regions. For more information, see <a
+  /// number contact method in each Amazon Web Services Region. However, SMS
+  /// text messaging is not supported in some Amazon Web Services Regions, and
+  /// SMS text messages cannot be sent to some countries/regions. For more
+  /// information, see <a
   /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-notifications">Notifications
   /// in Amazon Lightsail</a>.
   ///
@@ -715,8 +865,8 @@ class Lightsail {
   /// The protocol of the contact method, such as <code>Email</code> or
   /// <code>SMS</code> (text messaging).
   ///
-  /// The <code>SMS</code> protocol is supported only in the following AWS
-  /// Regions.
+  /// The <code>SMS</code> protocol is supported only in the following Amazon
+  /// Web Services Regions.
   ///
   /// <ul>
   /// <li>
@@ -739,7 +889,8 @@ class Lightsail {
   /// </li>
   /// </ul>
   /// For a list of countries/regions where SMS text messages can be sent, and
-  /// the latest AWS Regions where SMS text messaging is supported, see <a
+  /// the latest Amazon Web Services Regions where SMS text messaging is
+  /// supported, see <a
   /// href="https://docs.aws.amazon.com/sns/latest/dg/sns-supported-regions-countries.html">Supported
   /// Regions and Countries</a> in the <i>Amazon SNS Developer Guide</i>.
   ///
@@ -782,7 +933,7 @@ class Lightsail {
   ///
   /// A Lightsail container service is a compute resource to which you can
   /// deploy containers. For more information, see <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-containers">Container
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-services">Container
   /// services in Amazon Lightsail</a> in the <i>Lightsail Dev Guide</i>.
   ///
   /// May throw [ServiceException].
@@ -830,7 +981,8 @@ class Lightsail {
   ///
   /// <ul>
   /// <li>
-  /// Must be unique within each AWS Region in your Lightsail account.
+  /// Must be unique within each Amazon Web Services Region in your Lightsail
+  /// account.
   /// </li>
   /// <li>
   /// Must contain 1 to 63 characters.
@@ -854,6 +1006,16 @@ class Lightsail {
   /// deployment and its settings, such as the HTTP or HTTPS port to use, and
   /// the health check configuration.
   ///
+  /// Parameter [privateRegistryAccess] :
+  /// An object to describe the configuration for the container service to
+  /// access private container image repositories, such as Amazon Elastic
+  /// Container Registry (Amazon ECR) private repositories.
+  ///
+  /// For more information, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+  /// access to an Amazon ECR private repository for an Amazon Lightsail
+  /// container service</a> in the <i>Amazon Lightsail Developer Guide</i>.
+  ///
   /// Parameter [publicDomainNames] :
   /// The public domain names to use with the container service, such as
   /// <code>example.com</code> and <code>www.example.com</code>.
@@ -875,16 +1037,21 @@ class Lightsail {
   /// in the example later on this page.
   ///
   /// Parameter [tags] :
-  /// The tag keys and optional values for the container service.
+  /// The tag keys and optional values to add to the container service during
+  /// create.
+  ///
+  /// Use the <code>TagResource</code> action to tag a resource after it's
+  /// created.
   ///
   /// For more information about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   Future<CreateContainerServiceResult> createContainerService({
     required ContainerServicePowerName power,
     required int scale,
     required String serviceName,
     ContainerServiceDeploymentRequest? deployment,
+    PrivateRegistryAccessRequest? privateRegistryAccess,
     Map<String, List<String>>? publicDomainNames,
     List<Tag>? tags,
   }) async {
@@ -920,6 +1087,8 @@ class Lightsail {
         'scale': scale,
         'serviceName': serviceName,
         if (deployment != null) 'deployment': deployment,
+        if (privateRegistryAccess != null)
+          'privateRegistryAccess': privateRegistryAccess,
         if (publicDomainNames != null) 'publicDomainNames': publicDomainNames,
         if (tags != null) 'tags': tags,
       },
@@ -938,11 +1107,11 @@ class Lightsail {
   /// the health check configuration.
   ///
   /// You can deploy containers to your container service using container images
-  /// from a public registry like Docker Hub, or from your local machine. For
-  /// more information, see <a
+  /// from a public registry such as Amazon ECR Public, or from your local
+  /// machine. For more information, see <a
   /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-creating-container-images">Creating
   /// container images for your Amazon Lightsail container services</a> in the
-  /// <i>Lightsail Dev Guide</i>.
+  /// <i>Amazon Lightsail Developer Guide</i>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1003,9 +1172,9 @@ class Lightsail {
   /// create a new set of log in credentials.
   /// <note>
   /// You can only push container images to the container service registry of
-  /// your Lightsail account. You cannot pull container images perform any other
-  /// container image management actions on the container service registry of
-  /// your Lightsail account.
+  /// your Lightsail account. You cannot pull container images or perform any
+  /// other container image management actions on the container service
+  /// registry.
   /// </note>
   /// After you push your container images to the container image registry of
   /// your Lightsail account, use the <code>RegisterContainerImage</code> action
@@ -1014,9 +1183,9 @@ class Lightsail {
   /// This action is not required if you install and use the Lightsail Control
   /// (lightsailctl) plugin to push container images to your Lightsail container
   /// service. For more information, see <a
-  /// href="amazon-lightsail-pushing-container-images">Pushing and managing
-  /// container images on your Amazon Lightsail container services</a> in the
-  /// <i>Lightsail Dev Guide</i>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-pushing-container-images">Pushing
+  /// and managing container images on your Amazon Lightsail container
+  /// services</a> in the <i>Amazon Lightsail Developer Guide</i>.
   /// </note>
   ///
   /// May throw [ServiceException].
@@ -1047,8 +1216,8 @@ class Lightsail {
   ///
   /// The <code>create disk</code> operation supports tag-based access control
   /// via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1120,8 +1289,8 @@ class Lightsail {
   /// access control via request tags and resource tags applied to the resource
   /// identified by <code>disk snapshot name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1182,8 +1351,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when creating a new disk from an automatic
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -1202,8 +1371,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when creating a new disk from an automatic
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -1229,8 +1398,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when creating a new disk from an automatic
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   Future<CreateDiskFromSnapshotResult> createDiskFromSnapshot({
@@ -1301,8 +1470,8 @@ class Lightsail {
   ///
   /// The <code>create disk snapshot</code> operation supports tag-based access
   /// control via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1399,7 +1568,7 @@ class Lightsail {
   ///
   /// Parameter [origin] :
   /// An object that describes the origin resource for the distribution, such as
-  /// a Lightsail instance or load balancer.
+  /// a Lightsail instance, bucket, or load balancer.
   ///
   /// The distribution pulls, caches, and serves content from the origin.
   ///
@@ -1409,6 +1578,14 @@ class Lightsail {
   /// Parameter [cacheBehaviors] :
   /// An array of objects that describe the per-path cache behavior for the
   /// distribution.
+  ///
+  /// Parameter [ipAddressType] :
+  /// The IP address type for the distribution.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  ///
+  /// The default value is <code>dualstack</code>.
   ///
   /// Parameter [tags] :
   /// The tag keys and optional values to add to the distribution during create.
@@ -1422,6 +1599,7 @@ class Lightsail {
     required InputOrigin origin,
     CacheSettings? cacheBehaviorSettings,
     List<CacheBehaviorPerPath>? cacheBehaviors,
+    IpAddressType? ipAddressType,
     List<Tag>? tags,
   }) async {
     ArgumentError.checkNotNull(bundleId, 'bundleId');
@@ -1446,6 +1624,7 @@ class Lightsail {
         if (cacheBehaviorSettings != null)
           'cacheBehaviorSettings': cacheBehaviorSettings,
         if (cacheBehaviors != null) 'cacheBehaviors': cacheBehaviors,
+        if (ipAddressType != null) 'ipAddressType': ipAddressType.toValue(),
         if (tags != null) 'tags': tags,
       },
     );
@@ -1457,8 +1636,8 @@ class Lightsail {
   ///
   /// The <code>create domain</code> operation supports tag-based access control
   /// via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1474,7 +1653,7 @@ class Lightsail {
   /// You cannot register a new domain name using Lightsail. You must register a
   /// domain name using Amazon Route 53 or another domain name registrar. If you
   /// have already registered your domain, you can enter its name in this
-  /// parameter to manage the DNS records for that domain.
+  /// parameter to manage the DNS records for that domain using Lightsail.
   /// </note>
   ///
   /// Parameter [tags] :
@@ -1514,8 +1693,8 @@ class Lightsail {
   /// The <code>create domain entry</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>domain name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1563,8 +1742,8 @@ class Lightsail {
   ///
   /// The <code>create instance snapshot</code> operation supports tag-based
   /// access control via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1616,8 +1795,8 @@ class Lightsail {
   ///
   /// The <code>create instances</code> operation supports tag-based access
   /// control via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
+  /// Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1669,6 +1848,14 @@ class Lightsail {
   /// It is now deprecated.
   /// </note>
   ///
+  /// Parameter [ipAddressType] :
+  /// The IP address type for the instance.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  ///
+  /// The default value is <code>dualstack</code>.
+  ///
   /// Parameter [keyPairName] :
   /// The name of your key pair.
   ///
@@ -1687,8 +1874,8 @@ class Lightsail {
   /// your instance varies. Amazon Linux and CentOS use <code>yum</code>, Debian
   /// and Ubuntu use <code>apt-get</code>, and FreeBSD uses <code>pkg</code>.
   /// For a complete list, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/getting-started/article/compare-options-choose-lightsail-instance-image">Dev
-  /// Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </note>
   Future<CreateInstancesResult> createInstances({
     required String availabilityZone,
@@ -1697,6 +1884,7 @@ class Lightsail {
     required List<String> instanceNames,
     List<AddOnRequest>? addOns,
     String? customImageName,
+    IpAddressType? ipAddressType,
     String? keyPairName,
     List<Tag>? tags,
     String? userData,
@@ -1722,6 +1910,7 @@ class Lightsail {
         'instanceNames': instanceNames,
         if (addOns != null) 'addOns': addOns,
         if (customImageName != null) 'customImageName': customImageName,
+        if (ipAddressType != null) 'ipAddressType': ipAddressType.toValue(),
         if (keyPairName != null) 'keyPairName': keyPairName,
         if (tags != null) 'tags': tags,
         if (userData != null) 'userData': userData,
@@ -1738,8 +1927,8 @@ class Lightsail {
   /// tag-based access control via request tags and resource tags applied to the
   /// resource identified by <code>instance snapshot name</code>. For more
   /// information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1787,6 +1976,14 @@ class Lightsail {
   /// </li>
   /// </ul>
   ///
+  /// Parameter [ipAddressType] :
+  /// The IP address type for the instance.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  ///
+  /// The default value is <code>dualstack</code>.
+  ///
   /// Parameter [keyPairName] :
   /// The name for your key pair.
   ///
@@ -1810,8 +2007,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when creating a new instance from an automatic
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -1830,8 +2027,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when creating a new instance from an automatic
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -1857,8 +2054,8 @@ class Lightsail {
   /// <li>
   /// Define this parameter only when creating a new instance from an automatic
   /// snapshot. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </li>
   /// </ul>
   ///
@@ -1870,8 +2067,8 @@ class Lightsail {
   /// your instance varies. Amazon Linux and CentOS use <code>yum</code>, Debian
   /// and Ubuntu use <code>apt-get</code>, and FreeBSD uses <code>pkg</code>.
   /// For a complete list, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/getting-started/article/compare-options-choose-lightsail-instance-image">Dev
-  /// Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/compare-options-choose-lightsail-instance-image">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </note>
   Future<CreateInstancesFromSnapshotResult> createInstancesFromSnapshot({
     required String availabilityZone,
@@ -1880,6 +2077,7 @@ class Lightsail {
     List<AddOnRequest>? addOns,
     Map<String, List<DiskMap>>? attachedDiskMapping,
     String? instanceSnapshotName,
+    IpAddressType? ipAddressType,
     String? keyPairName,
     String? restoreDate,
     String? sourceInstanceName,
@@ -1909,6 +2107,7 @@ class Lightsail {
           'attachedDiskMapping': attachedDiskMapping,
         if (instanceSnapshotName != null)
           'instanceSnapshotName': instanceSnapshotName,
+        if (ipAddressType != null) 'ipAddressType': ipAddressType.toValue(),
         if (keyPairName != null) 'keyPairName': keyPairName,
         if (restoreDate != null) 'restoreDate': restoreDate,
         if (sourceInstanceName != null)
@@ -1923,12 +2122,18 @@ class Lightsail {
     return CreateInstancesFromSnapshotResult.fromJson(jsonResponse.body);
   }
 
-  /// Creates an SSH key pair.
-  ///
+  /// Creates a custom SSH key pair that you can use with an Amazon Lightsail
+  /// instance.
+  /// <note>
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_DownloadDefaultKeyPair.html">DownloadDefaultKeyPair</a>
+  /// action to create a Lightsail default key pair in an Amazon Web Services
+  /// Region where a default key pair does not currently exist.
+  /// </note>
   /// The <code>create key pair</code> operation supports tag-based access
   /// control via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -1972,7 +2177,7 @@ class Lightsail {
 
   /// Creates a Lightsail load balancer. To learn more about deciding whether to
   /// load balance your application, see <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/how-to/article/configure-lightsail-instances-for-load-balancing">Configure
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/configure-lightsail-instances-for-load-balancing">Configure
   /// your Lightsail instances for load balancing</a>. You can create up to 5
   /// load balancers per AWS Region in your account.
   ///
@@ -1982,8 +2187,8 @@ class Lightsail {
   ///
   /// The <code>create load balancer</code> operation supports tag-based access
   /// control via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2026,11 +2231,31 @@ class Lightsail {
   /// your application if your home page loads slowly or has a lot of media or
   /// scripting on it.
   ///
+  /// Parameter [ipAddressType] :
+  /// The IP address type for the load balancer.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  ///
+  /// The default value is <code>dualstack</code>.
+  ///
   /// Parameter [tags] :
   /// The tag keys and optional values to add to the resource during create.
   ///
   /// Use the <code>TagResource</code> action to tag a resource after it's
   /// created.
+  ///
+  /// Parameter [tlsPolicyName] :
+  /// The name of the TLS policy to apply to the load balancer.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetLoadBalancerTlsPolicies.html">GetLoadBalancerTlsPolicies</a>
+  /// action to get a list of TLS policy names that you can specify.
+  ///
+  /// For more information about load balancer TLS policies, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configure-load-balancer-tls-security-policy">Configuring
+  /// TLS security policies on your Amazon Lightsail load balancers</a> in the
+  /// <i>Amazon Lightsail Developer Guide</i>.
   Future<CreateLoadBalancerResult> createLoadBalancer({
     required int instancePort,
     required String loadBalancerName,
@@ -2038,7 +2263,9 @@ class Lightsail {
     String? certificateDomainName,
     String? certificateName,
     String? healthCheckPath,
+    IpAddressType? ipAddressType,
     List<Tag>? tags,
+    String? tlsPolicyName,
   }) async {
     ArgumentError.checkNotNull(instancePort, 'instancePort');
     _s.validateNumRange(
@@ -2068,14 +2295,16 @@ class Lightsail {
           'certificateDomainName': certificateDomainName,
         if (certificateName != null) 'certificateName': certificateName,
         if (healthCheckPath != null) 'healthCheckPath': healthCheckPath,
+        if (ipAddressType != null) 'ipAddressType': ipAddressType.toValue(),
         if (tags != null) 'tags': tags,
+        if (tlsPolicyName != null) 'tlsPolicyName': tlsPolicyName,
       },
     );
 
     return CreateLoadBalancerResult.fromJson(jsonResponse.body);
   }
 
-  /// Creates a Lightsail load balancer TLS certificate.
+  /// Creates an SSL/TLS certificate for an Amazon Lightsail load balancer.
   ///
   /// TLS is just an updated, more secure version of Secure Socket Layer (SSL).
   ///
@@ -2083,8 +2312,8 @@ class Lightsail {
   /// tag-based access control via resource tags applied to the resource
   /// identified by <code>load balancer name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2159,8 +2388,8 @@ class Lightsail {
   ///
   /// The <code>create relational database</code> operation supports tag-based
   /// access control via request tags. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2171,43 +2400,127 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [masterDatabaseName] :
-  /// The name of the master database created when the Lightsail database
-  /// resource is created.
+  /// The meaning of this parameter differs according to the database engine you
+  /// use.
+  ///
+  /// <b>MySQL</b>
+  ///
+  /// The name of the database to create when the Lightsail database resource is
+  /// created. If this parameter isn't specified, no database is created in the
+  /// database resource.
   ///
   /// Constraints:
   ///
   /// <ul>
   /// <li>
-  /// Must contain from 1 to 64 alphanumeric characters.
+  /// Must contain 1 to 64 letters or numbers.
   /// </li>
   /// <li>
-  /// Cannot be a word reserved by the specified database engine
+  /// Must begin with a letter. Subsequent characters can be letters,
+  /// underscores, or digits (0- 9).
+  /// </li>
+  /// <li>
+  /// Can't be a word reserved by the specified database engine.
+  ///
+  /// For more information about reserved words in MySQL, see the Keywords and
+  /// Reserved Words articles for <a
+  /// href="https://dev.mysql.com/doc/refman/5.6/en/keywords.html">MySQL
+  /// 5.6</a>, <a
+  /// href="https://dev.mysql.com/doc/refman/5.7/en/keywords.html">MySQL
+  /// 5.7</a>, and <a
+  /// href="https://dev.mysql.com/doc/refman/8.0/en/keywords.html">MySQL
+  /// 8.0</a>.
+  /// </li>
+  /// </ul>
+  /// <b>PostgreSQL</b>
+  ///
+  /// The name of the database to create when the Lightsail database resource is
+  /// created. If this parameter isn't specified, a database named
+  /// <code>postgres</code> is created in the database resource.
+  ///
+  /// Constraints:
+  ///
+  /// <ul>
+  /// <li>
+  /// Must contain 1 to 63 letters or numbers.
+  /// </li>
+  /// <li>
+  /// Must begin with a letter. Subsequent characters can be letters,
+  /// underscores, or digits (0- 9).
+  /// </li>
+  /// <li>
+  /// Can't be a word reserved by the specified database engine.
+  ///
+  /// For more information about reserved words in PostgreSQL, see the SQL Key
+  /// Words articles for <a
+  /// href="https://www.postgresql.org/docs/9.6/sql-keywords-appendix.html">PostgreSQL
+  /// 9.6</a>, <a
+  /// href="https://www.postgresql.org/docs/10/sql-keywords-appendix.html">PostgreSQL
+  /// 10</a>, <a
+  /// href="https://www.postgresql.org/docs/11/sql-keywords-appendix.html">PostgreSQL
+  /// 11</a>, and <a
+  /// href="https://www.postgresql.org/docs/12/sql-keywords-appendix.html">PostgreSQL
+  /// 12</a>.
   /// </li>
   /// </ul>
   ///
   /// Parameter [masterUsername] :
-  /// The master user name for your new database.
+  /// The name for the master user.
+  ///
+  /// <b>MySQL</b>
   ///
   /// Constraints:
   ///
   /// <ul>
   /// <li>
-  /// Master user name is required.
+  /// Required for MySQL.
   /// </li>
   /// <li>
-  /// Must contain from 1 to 16 alphanumeric characters.
+  /// Must be 1 to 16 letters or numbers. Can contain underscores.
   /// </li>
   /// <li>
-  /// The first character must be a letter.
+  /// First character must be a letter.
   /// </li>
   /// <li>
-  /// Cannot be a reserved word for the database engine you choose.
+  /// Can't be a reserved word for the chosen database engine.
   ///
   /// For more information about reserved words in MySQL 5.6 or 5.7, see the
   /// Keywords and Reserved Words articles for <a
-  /// href="https://dev.mysql.com/doc/refman/5.6/en/keywords.html">MySQL 5.6</a>
-  /// or <a href="https://dev.mysql.com/doc/refman/5.7/en/keywords.html">MySQL
-  /// 5.7</a> respectively.
+  /// href="https://dev.mysql.com/doc/refman/5.6/en/keywords.html">MySQL
+  /// 5.6</a>, <a
+  /// href="https://dev.mysql.com/doc/refman/5.7/en/keywords.html">MySQL
+  /// 5.7</a>, or <a
+  /// href="https://dev.mysql.com/doc/refman/8.0/en/keywords.html">MySQL
+  /// 8.0</a>.
+  /// </li>
+  /// </ul>
+  /// <b>PostgreSQL</b>
+  ///
+  /// Constraints:
+  ///
+  /// <ul>
+  /// <li>
+  /// Required for PostgreSQL.
+  /// </li>
+  /// <li>
+  /// Must be 1 to 63 letters or numbers. Can contain underscores.
+  /// </li>
+  /// <li>
+  /// First character must be a letter.
+  /// </li>
+  /// <li>
+  /// Can't be a reserved word for the chosen database engine.
+  ///
+  /// For more information about reserved words in MySQL 5.6 or 5.7, see the
+  /// Keywords and Reserved Words articles for <a
+  /// href="https://www.postgresql.org/docs/9.6/sql-keywords-appendix.html">PostgreSQL
+  /// 9.6</a>, <a
+  /// href="https://www.postgresql.org/docs/10/sql-keywords-appendix.html">PostgreSQL
+  /// 10</a>, <a
+  /// href="https://www.postgresql.org/docs/11/sql-keywords-appendix.html">PostgreSQL
+  /// 11</a>, and <a
+  /// href="https://www.postgresql.org/docs/12/sql-keywords-appendix.html">PostgreSQL
+  /// 12</a>.
   /// </li>
   /// </ul>
   ///
@@ -2226,7 +2539,7 @@ class Lightsail {
   /// relational database bundles</code> operation.
   ///
   /// Parameter [relationalDatabaseName] :
-  /// The name to use for your new database.
+  /// The name to use for your new Lightsail database resource.
   ///
   /// Constraints:
   ///
@@ -2248,10 +2561,16 @@ class Lightsail {
   /// database Availability Zones</code> parameter to your request.
   ///
   /// Parameter [masterUserPassword] :
-  /// The password for the master user of your new database. The password can
-  /// include any printable ASCII character except "/", """, or "@".
+  /// The password for the master user. The password can include any printable
+  /// ASCII character except "/", """, or "@". It cannot contain spaces.
   ///
-  /// Constraints: Must contain 8 to 41 characters.
+  /// <b>MySQL</b>
+  ///
+  /// Constraints: Must contain from 8 to 41 characters.
+  ///
+  /// <b>PostgreSQL</b>
+  ///
+  /// Constraints: Must contain from 8 to 128 characters.
   ///
   /// Parameter [preferredBackupWindow] :
   /// The daily time range during which automated backups are created for your
@@ -2386,8 +2705,8 @@ class Lightsail {
   /// supports tag-based access control via request tags and resource tags
   /// applied to the resource identified by relationalDatabaseSnapshotName. For
   /// more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2398,7 +2717,7 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [relationalDatabaseName] :
-  /// The name to use for your new database.
+  /// The name to use for your new Lightsail database resource.
   ///
   /// Constraints:
   ///
@@ -2534,8 +2853,8 @@ class Lightsail {
   /// The <code>create relational database snapshot</code> operation supports
   /// tag-based access control via request tags. For more information, see the
   /// <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2639,8 +2958,8 @@ class Lightsail {
 
   /// Deletes an automatic snapshot of an instance or disk. For more
   /// information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2680,6 +2999,139 @@ class Lightsail {
     );
 
     return DeleteAutoSnapshotResult.fromJson(jsonResponse.body);
+  }
+
+  /// Deletes a Amazon Lightsail bucket.
+  /// <note>
+  /// When you delete your bucket, the bucket name is released and can be reused
+  /// for a new bucket in your account or another Amazon Web Services account.
+  /// </note>
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket to delete.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBuckets.html">GetBuckets</a>
+  /// action to get a list of bucket names that you can specify.
+  ///
+  /// Parameter [forceDelete] :
+  /// A Boolean value that indicates whether to force delete the bucket.
+  ///
+  /// You must force delete the bucket if it has one of the following
+  /// conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The bucket is the origin of a distribution.
+  /// </li>
+  /// <li>
+  /// The bucket has instances that were granted access to it using the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_SetResourceAccessForBucket.html">SetResourceAccessForBucket</a>
+  /// action.
+  /// </li>
+  /// <li>
+  /// The bucket has objects.
+  /// </li>
+  /// <li>
+  /// The bucket has access keys.
+  /// </li>
+  /// </ul> <important>
+  /// Force deleting a bucket might impact other resources that rely on the
+  /// bucket, such as instances, distributions, or software that use the issued
+  /// access keys.
+  /// </important>
+  Future<DeleteBucketResult> deleteBucket({
+    required String bucketName,
+    bool? forceDelete,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.DeleteBucket'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+        if (forceDelete != null) 'forceDelete': forceDelete,
+      },
+    );
+
+    return DeleteBucketResult.fromJson(jsonResponse.body);
+  }
+
+  /// Deletes an access key for the specified Amazon Lightsail bucket.
+  ///
+  /// We recommend that you delete an access key if the secret access key is
+  /// compromised.
+  ///
+  /// For more information about access keys, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-creating-bucket-access-keys">Creating
+  /// access keys for a bucket in Amazon Lightsail</a> in the <i>Amazon
+  /// Lightsail Developer Guide</i>.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [accessKeyId] :
+  /// The ID of the access key to delete.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketAccessKeys.html">GetBucketAccessKeys</a>
+  /// action to get a list of access key IDs that you can specify.
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket that the access key belongs to.
+  Future<DeleteBucketAccessKeyResult> deleteBucketAccessKey({
+    required String accessKeyId,
+    required String bucketName,
+  }) async {
+    ArgumentError.checkNotNull(accessKeyId, 'accessKeyId');
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.DeleteBucketAccessKey'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'accessKeyId': accessKeyId,
+        'bucketName': bucketName,
+      },
+    );
+
+    return DeleteBucketAccessKeyResult.fromJson(jsonResponse.body);
   }
 
   /// Deletes an SSL/TLS certificate for your Amazon Lightsail content delivery
@@ -2726,9 +3178,10 @@ class Lightsail {
   ///
   /// A contact method is used to send you notifications about your Amazon
   /// Lightsail resources. You can add one email address and one mobile phone
-  /// number contact method in each AWS Region. However, SMS text messaging is
-  /// not supported in some AWS Regions, and SMS text messages cannot be sent to
-  /// some countries/regions. For more information, see <a
+  /// number contact method in each Amazon Web Services Region. However, SMS
+  /// text messaging is not supported in some Amazon Web Services Regions, and
+  /// SMS text messages cannot be sent to some countries/regions. For more
+  /// information, see <a
   /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-notifications">Notifications
   /// in Amazon Lightsail</a>.
   ///
@@ -2871,8 +3324,8 @@ class Lightsail {
   /// The <code>delete disk</code> operation supports tag-based access control
   /// via resource tags applied to the resource identified by <code>disk
   /// name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -2925,8 +3378,8 @@ class Lightsail {
   /// The <code>delete disk snapshot</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by <code>disk
   /// snapshot name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3001,8 +3454,8 @@ class Lightsail {
   /// The <code>delete domain</code> operation supports tag-based access control
   /// via resource tags applied to the resource identified by <code>domain
   /// name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3041,8 +3494,8 @@ class Lightsail {
   /// The <code>delete domain entry</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>domain name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3088,8 +3541,8 @@ class Lightsail {
   /// The <code>delete instance</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>instance name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3135,8 +3588,8 @@ class Lightsail {
   /// The <code>delete instance snapshot</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// <code>instance snapshot name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3170,13 +3623,24 @@ class Lightsail {
     return DeleteInstanceSnapshotResult.fromJson(jsonResponse.body);
   }
 
-  /// Deletes a specific SSH key pair.
+  /// Deletes the specified key pair by removing the public key from Amazon
+  /// Lightsail.
+  ///
+  /// You can delete key pairs that were created using the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_ImportKeyPair.html">ImportKeyPair</a>
+  /// and <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateKeyPair.html">CreateKeyPair</a>
+  /// actions, as well as the Lightsail default key pair. A new default key pair
+  /// will not be created unless you launch an instance without specifying a
+  /// custom key pair, or you call the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_DownloadDefaultKeyPair.html">DownloadDefaultKeyPair</a>
+  /// API.
   ///
   /// The <code>delete key pair</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by <code>key
   /// pair name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3188,8 +3652,16 @@ class Lightsail {
   ///
   /// Parameter [keyPairName] :
   /// The name of the key pair to delete.
+  ///
+  /// Parameter [expectedFingerprint] :
+  /// The RSA fingerprint of the Lightsail default key pair to delete.
+  /// <note>
+  /// The <code>expectedFingerprint</code> parameter is required only when
+  /// specifying to delete a Lightsail default key pair.
+  /// </note>
   Future<DeleteKeyPairResult> deleteKeyPair({
     required String keyPairName,
+    String? expectedFingerprint,
   }) async {
     ArgumentError.checkNotNull(keyPairName, 'keyPairName');
     final headers = <String, String>{
@@ -3204,6 +3676,8 @@ class Lightsail {
       headers: headers,
       payload: {
         'keyPairName': keyPairName,
+        if (expectedFingerprint != null)
+          'expectedFingerprint': expectedFingerprint,
       },
     );
 
@@ -3218,7 +3692,7 @@ class Lightsail {
   /// Perform this operation only if you were expecting the host key or
   /// certificate mismatch or if you are familiar with the new host key or
   /// certificate on the instance. For more information, see <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-troubleshooting-browser-based-ssh-rdp-client-connection">Troubleshooting
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-troubleshooting-browser-based-ssh-rdp-client-connection">Troubleshooting
   /// connection issues when using the Amazon Lightsail browser-based SSH or RDP
   /// client</a>.
   /// </important>
@@ -3264,8 +3738,8 @@ class Lightsail {
   /// The <code>delete load balancer</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by <code>load
   /// balancer name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3305,8 +3779,8 @@ class Lightsail {
   /// tag-based access control via resource tags applied to the resource
   /// identified by <code>load balancer name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3362,8 +3836,8 @@ class Lightsail {
   /// The <code>delete relational database</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3440,8 +3914,8 @@ class Lightsail {
   /// The <code>delete relational database snapshot</code> operation supports
   /// tag-based access control via resource tags applied to the resource
   /// identified by relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3525,8 +3999,8 @@ class Lightsail {
   /// The <code>detach disk</code> operation supports tag-based access control
   /// via resource tags applied to the resource identified by <code>disk
   /// name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3570,8 +4044,8 @@ class Lightsail {
   /// tag-based access control via resource tags applied to the resource
   /// identified by <code>load balancer name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3650,8 +4124,8 @@ class Lightsail {
 
   /// Disables an add-on for an Amazon Lightsail resource. For more information,
   /// see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3690,7 +4164,10 @@ class Lightsail {
     return DisableAddOnResult.fromJson(jsonResponse.body);
   }
 
-  /// Downloads the default SSH key pair from the user's account.
+  /// Downloads the regional Amazon Lightsail default key pair.
+  ///
+  /// This action also creates a Lightsail default key pair if a default key
+  /// pair does not currently exist in the Amazon Web Services Region.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3717,8 +4194,8 @@ class Lightsail {
 
   /// Enables or modifies an add-on for an Amazon Lightsail resource. For more
   /// information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3771,8 +4248,8 @@ class Lightsail {
   /// The <code>export snapshot</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>source snapshot name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   /// <note>
   /// Use the <code>get instance snapshots</code> or <code>get disk
   /// snapshots</code> operations to get a list of snapshots that you can export
@@ -3912,8 +4389,8 @@ class Lightsail {
 
   /// Returns the available automatic snapshots for an instance or disk. For
   /// more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configuring-automatic-snapshots">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -3969,8 +4446,8 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [includeInactive] :
-  /// A Boolean value indicating whether to include inactive results in your
-  /// request.
+  /// A Boolean value that indicates whether to include inactive (unavailable)
+  /// blueprints in the response of your request.
   ///
   /// Parameter [pageToken] :
   /// The token to advance to the next page of results from your request.
@@ -4001,8 +4478,321 @@ class Lightsail {
     return GetBlueprintsResult.fromJson(jsonResponse.body);
   }
 
-  /// Returns the list of bundles that are available for purchase. A bundle
-  /// describes the specs for your virtual private server (or <i>instance</i>).
+  /// Returns the existing access key IDs for the specified Amazon Lightsail
+  /// bucket.
+  /// <important>
+  /// This action does not return the secret access key value of an access key.
+  /// You can get a secret access key only when you create it from the response
+  /// of the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateBucketAccessKey.html">CreateBucketAccessKey</a>
+  /// action. If you lose the secret access key, you must create a new access
+  /// key.
+  /// </important>
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket for which to return access keys.
+  Future<GetBucketAccessKeysResult> getBucketAccessKeys({
+    required String bucketName,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.GetBucketAccessKeys'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+      },
+    );
+
+    return GetBucketAccessKeysResult.fromJson(jsonResponse.body);
+  }
+
+  /// Returns the bundles that you can apply to a Amazon Lightsail bucket.
+  ///
+  /// The bucket bundle specifies the monthly cost, storage quota, and data
+  /// transfer quota for a bucket.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_UpdateBucketBundle.html">UpdateBucketBundle</a>
+  /// action to update the bundle for a bucket.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [includeInactive] :
+  /// A Boolean value that indicates whether to include inactive (unavailable)
+  /// bundles in the response of your request.
+  Future<GetBucketBundlesResult> getBucketBundles({
+    bool? includeInactive,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.GetBucketBundles'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (includeInactive != null) 'includeInactive': includeInactive,
+      },
+    );
+
+    return GetBucketBundlesResult.fromJson(jsonResponse.body);
+  }
+
+  /// Returns the data points of a specific metric for an Amazon Lightsail
+  /// bucket.
+  ///
+  /// Metrics report the utilization of a bucket. View and collect metric data
+  /// regularly to monitor the number of objects stored in a bucket (including
+  /// object versions) and the storage space used by those objects.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket for which to get metric data.
+  ///
+  /// Parameter [endTime] :
+  /// The timestamp indicating the latest data to be returned.
+  ///
+  /// Parameter [metricName] :
+  /// The metric for which you want to return information.
+  ///
+  /// Valid bucket metric names are listed below, along with the most useful
+  /// statistics to include in your request, and the published unit value.
+  /// <note>
+  /// These bucket metrics are reported once per day.
+  /// </note>
+  /// <ul>
+  /// <li>
+  /// <b> <code>BucketSizeBytes</code> </b> - The amount of data in bytes stored
+  /// in a bucket. This value is calculated by summing the size of all objects
+  /// in the bucket (including object versions), including the size of all parts
+  /// for all incomplete multipart uploads to the bucket.
+  ///
+  /// Statistics: The most useful statistic is <code>Maximum</code>.
+  ///
+  /// Unit: The published unit is <code>Bytes</code>.
+  /// </li>
+  /// <li>
+  /// <b> <code>NumberOfObjects</code> </b> - The total number of objects stored
+  /// in a bucket. This value is calculated by counting all objects in the
+  /// bucket (including object versions) and the total number of parts for all
+  /// incomplete multipart uploads to the bucket.
+  ///
+  /// Statistics: The most useful statistic is <code>Average</code>.
+  ///
+  /// Unit: The published unit is <code>Count</code>.
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [period] :
+  /// The granularity, in seconds, of the returned data points.
+  /// <note>
+  /// Bucket storage metrics are reported once per day. Therefore, you should
+  /// specify a period of 86400 seconds, which is the number of seconds in a
+  /// day.
+  /// </note>
+  ///
+  /// Parameter [startTime] :
+  /// The timestamp indicating the earliest data to be returned.
+  ///
+  /// Parameter [statistics] :
+  /// The statistic for the metric.
+  ///
+  /// The following statistics are available:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Minimum</code> - The lowest value observed during the specified
+  /// period. Use this value to determine low volumes of activity for your
+  /// application.
+  /// </li>
+  /// <li>
+  /// <code>Maximum</code> - The highest value observed during the specified
+  /// period. Use this value to determine high volumes of activity for your
+  /// application.
+  /// </li>
+  /// <li>
+  /// <code>Sum</code> - The sum of all values submitted for the matching
+  /// metric. You can use this statistic to determine the total volume of a
+  /// metric.
+  /// </li>
+  /// <li>
+  /// <code>Average</code> - The value of <code>Sum</code> /
+  /// <code>SampleCount</code> during the specified period. By comparing this
+  /// statistic with the <code>Minimum</code> and <code>Maximum</code> values,
+  /// you can determine the full scope of a metric and how close the average use
+  /// is to the <code>Minimum</code> and <code>Maximum</code> values. This
+  /// comparison helps you to know when to increase or decrease your resources.
+  /// </li>
+  /// <li>
+  /// <code>SampleCount</code> - The count, or number, of data points used for
+  /// the statistical calculation.
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [unit] :
+  /// The unit for the metric data request.
+  ///
+  /// Valid units depend on the metric data being requested. For the valid units
+  /// with each available metric, see the <code>metricName</code> parameter.
+  Future<GetBucketMetricDataResult> getBucketMetricData({
+    required String bucketName,
+    required DateTime endTime,
+    required BucketMetricName metricName,
+    required int period,
+    required DateTime startTime,
+    required List<MetricStatistic> statistics,
+    required MetricUnit unit,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(endTime, 'endTime');
+    ArgumentError.checkNotNull(metricName, 'metricName');
+    ArgumentError.checkNotNull(period, 'period');
+    _s.validateNumRange(
+      'period',
+      period,
+      60,
+      86400,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(startTime, 'startTime');
+    ArgumentError.checkNotNull(statistics, 'statistics');
+    ArgumentError.checkNotNull(unit, 'unit');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.GetBucketMetricData'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+        'endTime': unixTimestampToJson(endTime),
+        'metricName': metricName.toValue(),
+        'period': period,
+        'startTime': unixTimestampToJson(startTime),
+        'statistics': statistics.map((e) => e.toValue()).toList(),
+        'unit': unit.toValue(),
+      },
+    );
+
+    return GetBucketMetricDataResult.fromJson(jsonResponse.body);
+  }
+
+  /// Returns information about one or more Amazon Lightsail buckets. The
+  /// information returned includes the synchronization status of the Amazon
+  /// Simple Storage Service (Amazon S3) account-level block public access
+  /// feature for your Lightsail buckets.
+  ///
+  /// For more information about buckets, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/buckets-in-amazon-lightsail">Buckets
+  /// in Amazon Lightsail</a> in the <i>Amazon Lightsail Developer Guide</i>.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket for which to return information.
+  ///
+  /// When omitted, the response includes all of your buckets in the Amazon Web
+  /// Services Region where the request is made.
+  ///
+  /// Parameter [includeConnectedResources] :
+  /// A Boolean value that indicates whether to include Lightsail instances that
+  /// were given access to the bucket using the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_SetResourceAccessForBucket.html">SetResourceAccessForBucket</a>
+  /// action.
+  ///
+  /// Parameter [pageToken] :
+  /// The token to advance to the next page of results from your request.
+  ///
+  /// To get a page token, perform an initial <code>GetBuckets</code> request.
+  /// If your results are paginated, the response will return a next page token
+  /// that you can specify as the page token in a subsequent request.
+  Future<GetBucketsResult> getBuckets({
+    String? bucketName,
+    bool? includeConnectedResources,
+    String? pageToken,
+  }) async {
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.GetBuckets'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (bucketName != null) 'bucketName': bucketName,
+        if (includeConnectedResources != null)
+          'includeConnectedResources': includeConnectedResources,
+        if (pageToken != null) 'pageToken': pageToken,
+      },
+    );
+
+    return GetBucketsResult.fromJson(jsonResponse.body);
+  }
+
+  /// Returns the bundles that you can apply to an Amazon Lightsail instance
+  /// when you create it.
+  ///
+  /// A bundle describes the specifications of an instance, such as the monthly
+  /// cost, amount of memory, the number of vCPUs, amount of storage space, and
+  /// monthly network data transfer quota.
+  /// <note>
+  /// Bundles are referred to as <i>instance plans</i> in the Lightsail console.
+  /// </note>
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -4013,8 +4803,8 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [includeInactive] :
-  /// A Boolean value that indicates whether to include inactive bundle results
-  /// in your request.
+  /// A Boolean value that indicates whether to include inactive (unavailable)
+  /// bundles in the response of your request.
   ///
   /// Parameter [pageToken] :
   /// The token to advance to the next page of results from your request.
@@ -4063,8 +4853,8 @@ class Lightsail {
   /// Parameter [certificateName] :
   /// The name for the certificate for which to return information.
   ///
-  /// When omitted, the response includes all of your certificates in the AWS
-  /// Region where the request is made.
+  /// When omitted, the response includes all of your certificates in the Amazon
+  /// Web Services Region where the request is made.
   ///
   /// Parameter [certificateStatuses] :
   /// The status of the certificates for which to return information.
@@ -4072,8 +4862,9 @@ class Lightsail {
   /// For example, specify <code>ISSUED</code> to return only certificates with
   /// an <code>ISSUED</code> status.
   ///
-  /// When omitted, the response includes all of your certificates in the AWS
-  /// Region where the request is made, regardless of their current status.
+  /// When omitted, the response includes all of your certificates in the Amazon
+  /// Web Services Region where the request is made, regardless of their current
+  /// status.
   ///
   /// Parameter [includeCertificateDetails] :
   /// Indicates whether to include detailed information about the certificates
@@ -4157,9 +4948,10 @@ class Lightsail {
   ///
   /// A contact method is used to send you notifications about your Amazon
   /// Lightsail resources. You can add one email address and one mobile phone
-  /// number contact method in each AWS Region. However, SMS text messaging is
-  /// not supported in some AWS Regions, and SMS text messages cannot be sent to
-  /// some countries/regions. For more information, see <a
+  /// number contact method in each Amazon Web Services Region. However, SMS
+  /// text messaging is not supported in some Amazon Web Services Regions, and
+  /// SMS text messages cannot be sent to some countries/regions. For more
+  /// information, see <a
   /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-notifications">Notifications
   /// in Amazon Lightsail</a>.
   ///
@@ -4644,7 +5436,7 @@ class Lightsail {
   /// The name of the container service for which to return information.
   ///
   /// When omitted, the response includes all of your container services in the
-  /// AWS Region where the request is made.
+  /// Amazon Web Services Region where the request is made.
   Future<ContainerServicesListResult> getContainerServices({
     String? serviceName,
   }) async {
@@ -4816,11 +5608,11 @@ class Lightsail {
     return GetDisksResult.fromJson(jsonResponse.body);
   }
 
-  /// Returns the list bundles that can be applied to you Amazon Lightsail
-  /// content delivery network (CDN) distributions.
+  /// Returns the bundles that can be applied to your Amazon Lightsail content
+  /// delivery network (CDN) distributions.
   ///
   /// A distribution bundle specifies the monthly network transfer quota and
-  /// monthly cost of your dsitribution.
+  /// monthly cost of your distribution.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -5116,11 +5908,8 @@ class Lightsail {
   /// Parameter [distributionName] :
   /// The name of the distribution for which to return information.
   ///
-  /// Use the <code>GetDistributions</code> action to get a list of distribution
-  /// names that you can specify.
-  ///
-  /// When omitted, the response includes all of your distributions in the AWS
-  /// Region where the request is made.
+  /// When omitted, the response includes all of your distributions in the
+  /// Amazon Web Services Region where the request is made.
   ///
   /// Parameter [pageToken] :
   /// The token to advance to the next page of results from your request.
@@ -5222,12 +6011,13 @@ class Lightsail {
     return GetDomainsResult.fromJson(jsonResponse.body);
   }
 
-  /// Returns the export snapshot record created as a result of the <code>export
-  /// snapshot</code> operation.
+  /// Returns all export snapshot records created as a result of the
+  /// <code>export snapshot</code> operation.
   ///
   /// An export snapshot record can be used to create a new Amazon EC2 instance
-  /// and its related resources with the <code>create cloud formation
-  /// stack</code> operation.
+  /// and its related resources with the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateCloudFormationStack.html">CreateCloudFormationStack</a>
+  /// action.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -5306,8 +6096,8 @@ class Lightsail {
   /// The <code>get instance access details</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// <code>instance name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -5799,6 +6589,10 @@ class Lightsail {
   /// May throw [AccountSetupInProgressException].
   /// May throw [UnauthenticatedException].
   ///
+  /// Parameter [includeDefaultKeyPair] :
+  /// A Boolean value that indicates whether to include the default key pair in
+  /// the response of your request.
+  ///
   /// Parameter [pageToken] :
   /// The token to advance to the next page of results from your request.
   ///
@@ -5806,6 +6600,7 @@ class Lightsail {
   /// If your results are paginated, the response will return a next page token
   /// that you can specify as the page token in a subsequent request.
   Future<GetKeyPairsResult> getKeyPairs({
+    bool? includeDefaultKeyPair,
     String? pageToken,
   }) async {
     final headers = <String, String>{
@@ -5819,6 +6614,8 @@ class Lightsail {
       // TODO queryParams
       headers: headers,
       payload: {
+        if (includeDefaultKeyPair != null)
+          'includeDefaultKeyPair': includeDefaultKeyPair,
         if (pageToken != null) 'pageToken': pageToken,
       },
     );
@@ -6151,6 +6948,48 @@ class Lightsail {
     return GetLoadBalancerTlsCertificatesResult.fromJson(jsonResponse.body);
   }
 
+  /// Returns a list of TLS security policies that you can apply to Lightsail
+  /// load balancers.
+  ///
+  /// For more information about load balancer TLS security policies, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configure-load-balancer-tls-security-policy">Configuring
+  /// TLS security policies on your Amazon Lightsail load balancers</a> in the
+  /// <i>Amazon Lightsail Developer Guide</i>.
+  ///
+  /// May throw [ServiceException].
+  /// May throw [AccessDeniedException].
+  /// May throw [AccountSetupInProgressException].
+  /// May throw [UnauthenticatedException].
+  /// May throw [InvalidInputException].
+  ///
+  /// Parameter [pageToken] :
+  /// The token to advance to the next page of results from your request.
+  ///
+  /// To get a page token, perform an initial
+  /// <code>GetLoadBalancerTlsPolicies</code> request. If your results are
+  /// paginated, the response will return a next page token that you can specify
+  /// as the page token in a subsequent request.
+  Future<GetLoadBalancerTlsPoliciesResult> getLoadBalancerTlsPolicies({
+    String? pageToken,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.GetLoadBalancerTlsPolicies'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (pageToken != null) 'pageToken': pageToken,
+      },
+    );
+
+    return GetLoadBalancerTlsPoliciesResult.fromJson(jsonResponse.body);
+  }
+
   /// Returns information about all load balancers in an account.
   ///
   /// May throw [ServiceException].
@@ -6450,6 +7289,10 @@ class Lightsail {
   /// May throw [AccountSetupInProgressException].
   /// May throw [UnauthenticatedException].
   ///
+  /// Parameter [includeInactive] :
+  /// A Boolean value that indicates whether to include inactive (unavailable)
+  /// bundles in the response of your request.
+  ///
   /// Parameter [pageToken] :
   /// The token to advance to the next page of results from your request.
   ///
@@ -6458,6 +7301,7 @@ class Lightsail {
   /// paginated, the response will return a next page token that you can specify
   /// as the page token in a subsequent request.
   Future<GetRelationalDatabaseBundlesResult> getRelationalDatabaseBundles({
+    bool? includeInactive,
     String? pageToken,
   }) async {
     final headers = <String, String>{
@@ -6471,6 +7315,7 @@ class Lightsail {
       // TODO queryParams
       headers: headers,
       payload: {
+        if (includeInactive != null) 'includeInactive': includeInactive,
         if (pageToken != null) 'pageToken': pageToken,
       },
     );
@@ -7109,7 +7954,7 @@ class Lightsail {
     return GetRelationalDatabasesResult.fromJson(jsonResponse.body);
   }
 
-  /// Returns information about a specific static IP.
+  /// Returns information about an Amazon Lightsail static IP.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7252,8 +8097,8 @@ class Lightsail {
   /// The <code>OpenInstancePublicPorts</code> action supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>instanceName</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7293,7 +8138,7 @@ class Lightsail {
     return OpenInstancePublicPortsResult.fromJson(jsonResponse.body);
   }
 
-  /// Tries to peer the Lightsail VPC with the user's default VPC.
+  /// Peers the Lightsail VPC with the user's default VPC.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7421,12 +8266,12 @@ class Lightsail {
   /// are enabled for the alarm, and when the alarm is triggered.
   ///
   /// A notification is not sent if a contact protocol is not specified, if the
-  /// specified contact protocol is not configured in the AWS Region, or if
-  /// notifications are not enabled for the alarm using the
+  /// specified contact protocol is not configured in the Amazon Web Services
+  /// Region, or if notifications are not enabled for the alarm using the
   /// <code>notificationEnabled</code> paramater.
   ///
   /// Use the <code>CreateContactMethod</code> action to configure a contact
-  /// protocol in an AWS Region.
+  /// protocol in an Amazon Web Services Region.
   ///
   /// Parameter [datapointsToAlarm] :
   /// The number of data points that must be not within the specified threshold
@@ -7565,8 +8410,8 @@ class Lightsail {
   /// The <code>PutInstancePublicPorts</code> action supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>instanceName</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7612,8 +8457,8 @@ class Lightsail {
   /// The <code>reboot instance</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>instance name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7652,8 +8497,8 @@ class Lightsail {
   /// The <code>reboot relational database</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7693,9 +8538,9 @@ class Lightsail {
   /// This action is not required if you install and use the Lightsail Control
   /// (lightsailctl) plugin to push container images to your Lightsail container
   /// service. For more information, see <a
-  /// href="amazon-lightsail-pushing-container-images">Pushing and managing
-  /// container images on your Amazon Lightsail container services</a> in the
-  /// <i>Lightsail Dev Guide</i>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-pushing-container-images">Pushing
+  /// and managing container images on your Amazon Lightsail container
+  /// services</a> in the <i>Amazon Lightsail Developer Guide</i>.
   /// </note>
   ///
   /// May throw [ServiceException].
@@ -7858,9 +8703,10 @@ class Lightsail {
   ///
   /// A contact method is used to send you notifications about your Amazon
   /// Lightsail resources. You can add one email address and one mobile phone
-  /// number contact method in each AWS Region. However, SMS text messaging is
-  /// not supported in some AWS Regions, and SMS text messages cannot be sent to
-  /// some countries/regions. For more information, see <a
+  /// number contact method in each Amazon Web Services Region. However, SMS
+  /// text messaging is not supported in some Amazon Web Services Regions, and
+  /// SMS text messages cannot be sent to some countries/regions. For more
+  /// information, see <a
   /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-notifications">Notifications
   /// in Amazon Lightsail</a>.
   ///
@@ -7904,6 +8750,138 @@ class Lightsail {
     return SendContactMethodVerificationResult.fromJson(jsonResponse.body);
   }
 
+  /// Sets the IP address type for an Amazon Lightsail resource.
+  ///
+  /// Use this action to enable dual-stack for a resource, which enables IPv4
+  /// and IPv6 for the specified resource. Alternately, you can use this action
+  /// to disable dual-stack, and enable IPv4 only.
+  ///
+  /// May throw [ServiceException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [OperationFailureException].
+  /// May throw [AccessDeniedException].
+  /// May throw [AccountSetupInProgressException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [ipAddressType] :
+  /// The IP address type to set for the specified resource.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  ///
+  /// Parameter [resourceName] :
+  /// The name of the resource for which to set the IP address type.
+  ///
+  /// Parameter [resourceType] :
+  /// The resource type.
+  ///
+  /// The possible values are <code>Distribution</code>, <code>Instance</code>,
+  /// and <code>LoadBalancer</code>.
+  /// <note>
+  /// Distribution-related APIs are available only in the N. Virginia
+  /// (<code>us-east-1</code>) Amazon Web Services Region. Set your Amazon Web
+  /// Services Region configuration to <code>us-east-1</code> to create, view,
+  /// or edit distributions.
+  /// </note>
+  Future<SetIpAddressTypeResult> setIpAddressType({
+    required IpAddressType ipAddressType,
+    required String resourceName,
+    required ResourceType resourceType,
+  }) async {
+    ArgumentError.checkNotNull(ipAddressType, 'ipAddressType');
+    ArgumentError.checkNotNull(resourceName, 'resourceName');
+    ArgumentError.checkNotNull(resourceType, 'resourceType');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.SetIpAddressType'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ipAddressType': ipAddressType.toValue(),
+        'resourceName': resourceName,
+        'resourceType': resourceType.toValue(),
+      },
+    );
+
+    return SetIpAddressTypeResult.fromJson(jsonResponse.body);
+  }
+
+  /// Sets the Amazon Lightsail resources that can access the specified
+  /// Lightsail bucket.
+  ///
+  /// Lightsail buckets currently support setting access for Lightsail instances
+  /// in the same Amazon Web Services Region.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [access] :
+  /// The access setting.
+  ///
+  /// The following access settings are available:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>allow</code> - Allows access to the bucket and its objects.
+  /// </li>
+  /// <li>
+  /// <code>deny</code> - Denies access to the bucket and its objects. Use this
+  /// setting to remove access for a resource previously set to
+  /// <code>allow</code>.
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket for which to set access to another Lightsail
+  /// resource.
+  ///
+  /// Parameter [resourceName] :
+  /// The name of the Lightsail instance for which to set bucket access. The
+  /// instance must be in a running or stopped state.
+  Future<SetResourceAccessForBucketResult> setResourceAccessForBucket({
+    required ResourceBucketAccess access,
+    required String bucketName,
+    required String resourceName,
+  }) async {
+    ArgumentError.checkNotNull(access, 'access');
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(resourceName, 'resourceName');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.SetResourceAccessForBucket'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'access': access.toValue(),
+        'bucketName': bucketName,
+        'resourceName': resourceName,
+      },
+    );
+
+    return SetResourceAccessForBucketResult.fromJson(jsonResponse.body);
+  }
+
   /// Starts a specific Amazon Lightsail instance from a stopped state. To
   /// restart an instance, use the <code>reboot instance</code> operation.
   /// <note>
@@ -7911,14 +8889,14 @@ class Lightsail {
   /// address to the instance. To use the same IP address after stopping and
   /// starting an instance, create a static IP address and attach it to the
   /// instance. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/lightsail-create-static-ip">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-create-static-ip">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </note>
   /// The <code>start instance</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>instance name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -7959,8 +8937,8 @@ class Lightsail {
   /// The <code>start relational database</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8001,14 +8979,14 @@ class Lightsail {
   /// address to the instance. To use the same IP address after stopping and
   /// starting an instance, create a static IP address and attach it to the
   /// instance. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/lightsail-create-static-ip">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/lightsail-create-static-ip">Amazon
+  /// Lightsail Developer Guide</a>.
   /// </note>
   /// The <code>stop instance</code> operation supports tag-based access control
   /// via resource tags applied to the resource identified by <code>instance
   /// name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8058,8 +9036,8 @@ class Lightsail {
   /// The <code>stop relational database</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8105,14 +9083,14 @@ class Lightsail {
   /// resource can have a maximum of 50 tags. Each tag consists of a key and an
   /// optional value. Tag keys must be unique per resource. For more information
   /// about tags, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// The <code>tag resource</code> operation supports tag-based access control
   /// via request tags and resource tags applied to the resource identified by
   /// <code>resource name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8223,7 +9201,7 @@ class Lightsail {
     return TestAlarmResult.fromJson(jsonResponse.body);
   }
 
-  /// Attempts to unpeer the Lightsail VPC from the user's default VPC.
+  /// Unpeers the Lightsail VPC from the user's default VPC.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8254,8 +9232,8 @@ class Lightsail {
   /// The <code>untag resource</code> operation supports tag-based access
   /// control via request tags and resource tags applied to the resource
   /// identified by <code>resource name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8301,6 +9279,156 @@ class Lightsail {
     return UntagResourceResult.fromJson(jsonResponse.body);
   }
 
+  /// Updates an existing Amazon Lightsail bucket.
+  ///
+  /// Use this action to update the configuration of an existing bucket, such as
+  /// versioning, public accessibility, and the Amazon Web Services accounts
+  /// that can access the bucket.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket to update.
+  ///
+  /// Parameter [accessLogConfig] :
+  /// An object that describes the access log configuration for the bucket.
+  ///
+  /// Parameter [accessRules] :
+  /// An object that sets the public accessibility of objects in the specified
+  /// bucket.
+  ///
+  /// Parameter [readonlyAccessAccounts] :
+  /// An array of strings to specify the Amazon Web Services account IDs that
+  /// can access the bucket.
+  ///
+  /// You can give a maximum of 10 Amazon Web Services accounts access to a
+  /// bucket.
+  ///
+  /// Parameter [versioning] :
+  /// Specifies whether to enable or suspend versioning of objects in the
+  /// bucket.
+  ///
+  /// The following options can be specified:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Enabled</code> - Enables versioning of objects in the specified
+  /// bucket.
+  /// </li>
+  /// <li>
+  /// <code>Suspended</code> - Suspends versioning of objects in the specified
+  /// bucket. Existing object versions are retained.
+  /// </li>
+  /// </ul>
+  Future<UpdateBucketResult> updateBucket({
+    required String bucketName,
+    BucketAccessLogConfig? accessLogConfig,
+    AccessRules? accessRules,
+    List<String>? readonlyAccessAccounts,
+    String? versioning,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.UpdateBucket'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+        if (accessLogConfig != null) 'accessLogConfig': accessLogConfig,
+        if (accessRules != null) 'accessRules': accessRules,
+        if (readonlyAccessAccounts != null)
+          'readonlyAccessAccounts': readonlyAccessAccounts,
+        if (versioning != null) 'versioning': versioning,
+      },
+    );
+
+    return UpdateBucketResult.fromJson(jsonResponse.body);
+  }
+
+  /// Updates the bundle, or storage plan, of an existing Amazon Lightsail
+  /// bucket.
+  ///
+  /// A bucket bundle specifies the monthly cost, storage space, and data
+  /// transfer quota for a bucket. You can update a bucket's bundle only one
+  /// time within a monthly AWS billing cycle. To determine if you can update a
+  /// bucket's bundle, use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBuckets.html">GetBuckets</a>
+  /// action. The <code>ableToUpdateBundle</code> parameter in the response will
+  /// indicate whether you can currently update a bucket's bundle.
+  ///
+  /// Update a bucket's bundle if it's consistently going over its storage space
+  /// or data transfer quota, or if a bucket's usage is consistently in the
+  /// lower range of its storage space or data transfer quota. Due to the
+  /// unpredictable usage fluctuations that a bucket might experience, we
+  /// strongly recommend that you update a bucket's bundle only as a long-term
+  /// strategy, instead of as a short-term, monthly cost-cutting measure. Choose
+  /// a bucket bundle that will provide the bucket with ample storage space and
+  /// data transfer for a long time to come.
+  ///
+  /// May throw [AccessDeniedException].
+  /// May throw [InvalidInputException].
+  /// May throw [NotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [UnauthenticatedException].
+  ///
+  /// Parameter [bucketName] :
+  /// The name of the bucket for which to update the bundle.
+  ///
+  /// Parameter [bundleId] :
+  /// The ID of the new bundle to apply to the bucket.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetBucketBundles.html">GetBucketBundles</a>
+  /// action to get a list of bundle IDs that you can specify.
+  Future<UpdateBucketBundleResult> updateBucketBundle({
+    required String bucketName,
+    required String bundleId,
+  }) async {
+    ArgumentError.checkNotNull(bucketName, 'bucketName');
+    _s.validateStringLength(
+      'bucketName',
+      bucketName,
+      3,
+      54,
+      isRequired: true,
+    );
+    ArgumentError.checkNotNull(bundleId, 'bundleId');
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'Lightsail_20161128.UpdateBucketBundle'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'bucketName': bucketName,
+        'bundleId': bundleId,
+      },
+    );
+
+    return UpdateBucketBundleResult.fromJson(jsonResponse.body);
+  }
+
   /// Updates the configuration of your Amazon Lightsail container service, such
   /// as its power, scale, and public domain names.
   ///
@@ -8328,6 +9456,16 @@ class Lightsail {
   ///
   /// Use the <code>GetContainerServicePowers</code> action to view the
   /// specifications of each power option.
+  ///
+  /// Parameter [privateRegistryAccess] :
+  /// An object to describe the configuration for the container service to
+  /// access private container image repositories, such as Amazon Elastic
+  /// Container Registry (Amazon ECR) private repositories.
+  ///
+  /// For more information, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+  /// access to an Amazon ECR private repository for an Amazon Lightsail
+  /// container service</a> in the <i>Amazon Lightsail Developer Guide</i>.
   ///
   /// Parameter [publicDomainNames] :
   /// The public domain names to use with the container service, such as
@@ -8361,6 +9499,7 @@ class Lightsail {
     required String serviceName,
     bool? isDisabled,
     ContainerServicePowerName? power,
+    PrivateRegistryAccessRequest? privateRegistryAccess,
     Map<String, List<String>>? publicDomainNames,
     int? scale,
   }) async {
@@ -8392,6 +9531,8 @@ class Lightsail {
         'serviceName': serviceName,
         if (isDisabled != null) 'isDisabled': isDisabled,
         if (power != null) 'power': power.toValue(),
+        if (privateRegistryAccess != null)
+          'privateRegistryAccess': privateRegistryAccess,
         if (publicDomainNames != null) 'publicDomainNames': publicDomainNames,
         if (scale != null) 'scale': scale,
       },
@@ -8403,7 +9544,7 @@ class Lightsail {
   /// Updates an existing Amazon Lightsail content delivery network (CDN)
   /// distribution.
   ///
-  /// Use this action to update the configuration of your existing distribution
+  /// Use this action to update the configuration of your existing distribution.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8438,7 +9579,7 @@ class Lightsail {
   ///
   /// Parameter [origin] :
   /// An object that describes the origin resource for the distribution, such as
-  /// a Lightsail instance or load balancer.
+  /// a Lightsail instance, bucket, or load balancer.
   ///
   /// The distribution pulls, caches, and serves content from the origin.
   Future<UpdateDistributionResult> updateDistribution({
@@ -8479,7 +9620,7 @@ class Lightsail {
   /// distribution.
   ///
   /// A distribution bundle specifies the monthly network transfer quota and
-  /// monthly cost of your dsitribution.
+  /// monthly cost of your distribution.
   ///
   /// Update your distribution's bundle if your distribution is going over its
   /// monthly network transfer quota and is incurring an overage fee.
@@ -8536,8 +9677,8 @@ class Lightsail {
   /// The <code>update domain entry</code> operation supports tag-based access
   /// control via resource tags applied to the resource identified by
   /// <code>domain name</code>. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8584,8 +9725,8 @@ class Lightsail {
   /// tag-based access control via resource tags applied to the resource
   /// identified by <code>load balancer name</code>. For more information, see
   /// the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8596,10 +9737,52 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [attributeName] :
-  /// The name of the attribute you want to update. Valid values are below.
+  /// The name of the attribute you want to update.
   ///
   /// Parameter [attributeValue] :
   /// The value that you want to specify for the attribute name.
+  ///
+  /// The following values are supported depending on what you specify for the
+  /// <code>attributeName</code> request parameter:
+  ///
+  /// <ul>
+  /// <li>
+  /// If you specify <code>HealthCheckPath</code> for the
+  /// <code>attributeName</code> request parameter, then the
+  /// <code>attributeValue</code> request parameter must be the path to ping on
+  /// the target (for example, <code>/weather/us/wa/seattle</code>).
+  /// </li>
+  /// <li>
+  /// If you specify <code>SessionStickinessEnabled</code> for the
+  /// <code>attributeName</code> request parameter, then the
+  /// <code>attributeValue</code> request parameter must be <code>true</code> to
+  /// activate session stickiness or <code>false</code> to deactivate session
+  /// stickiness.
+  /// </li>
+  /// <li>
+  /// If you specify <code>SessionStickiness_LB_CookieDurationSeconds</code> for
+  /// the <code>attributeName</code> request parameter, then the
+  /// <code>attributeValue</code> request parameter must be an interger that
+  /// represents the cookie duration in seconds.
+  /// </li>
+  /// <li>
+  /// If you specify <code>HttpsRedirectionEnabled</code> for the
+  /// <code>attributeName</code> request parameter, then the
+  /// <code>attributeValue</code> request parameter must be <code>true</code> to
+  /// activate HTTP to HTTPS redirection or <code>false</code> to deactivate
+  /// HTTP to HTTPS redirection.
+  /// </li>
+  /// <li>
+  /// If you specify <code>TlsPolicyName</code> for the
+  /// <code>attributeName</code> request parameter, then the
+  /// <code>attributeValue</code> request parameter must be the name of the TLS
+  /// policy.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_GetLoadBalancerTlsPolicies.html">GetLoadBalancerTlsPolicies</a>
+  /// action to get a list of TLS policy names that you can specify.
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [loadBalancerName] :
   /// The name of the load balancer that you want to modify (e.g.,
@@ -8649,8 +9832,8 @@ class Lightsail {
   /// The <code>update relational database</code> operation supports tag-based
   /// access control via resource tags applied to the resource identified by
   /// relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8661,7 +9844,7 @@ class Lightsail {
   /// May throw [UnauthenticatedException].
   ///
   /// Parameter [relationalDatabaseName] :
-  /// The name of your database to update.
+  /// The name of your Lightsail database resource to update.
   ///
   /// Parameter [applyImmediately] :
   /// When <code>true</code>, applies changes immediately. When
@@ -8692,10 +9875,16 @@ class Lightsail {
   /// result in an outage.
   ///
   /// Parameter [masterUserPassword] :
-  /// The password for the master user of your database. The password can
-  /// include any printable ASCII character except "/", """, or "@".
+  /// The password for the master user. The password can include any printable
+  /// ASCII character except "/", """, or "@".
   ///
-  /// Constraints: Must contain 8 to 41 characters.
+  /// My<b>SQL</b>
+  ///
+  /// Constraints: Must contain from 8 to 41 characters.
+  ///
+  /// <b>PostgreSQL</b>
+  ///
+  /// Constraints: Must contain from 8 to 128 characters.
   ///
   /// Parameter [preferredBackupWindow] :
   /// The daily time range during which automated backups are created for your
@@ -8823,8 +10012,8 @@ class Lightsail {
   /// The <code>update relational database parameters</code> operation supports
   /// tag-based access control via resource tags applied to the resource
   /// identified by relationalDatabaseName. For more information, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-controlling-access-using-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-controlling-access-using-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidInputException].
@@ -8892,6 +10081,358 @@ extension on String {
         return AccessDirection.outbound;
     }
     throw Exception('$this is not known in enum AccessDirection');
+  }
+}
+
+/// Describes an access key for an Amazon Lightsail bucket.
+///
+/// Access keys grant full programmatic access to the specified bucket and its
+/// objects. You can have a maximum of two access keys per bucket. Use the <a
+/// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateBucketAccessKey.html">CreateBucketAccessKey</a>
+/// action to create an access key for a specific bucket. For more information
+/// about access keys, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-creating-bucket-access-keys">Creating
+/// access keys for a bucket in Amazon Lightsail</a> in the <i>Amazon Lightsail
+/// Developer Guide</i>.
+/// <important>
+/// The <code>secretAccessKey</code> value is returned only in response to the
+/// <code>CreateBucketAccessKey</code> action. You can get a secret access key
+/// only when you first create an access key; you cannot get the secret access
+/// key later. If you lose the secret access key, you must create a new access
+/// key.
+/// </important>
+class AccessKey {
+  /// The ID of the access key.
+  final String? accessKeyId;
+
+  /// The timestamp when the access key was created.
+  final DateTime? createdAt;
+
+  /// An object that describes the last time the access key was used.
+  /// <note>
+  /// This object does not include data in the response of a <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateBucketAccessKey.html">CreateBucketAccessKey</a>
+  /// action. If the access key has not been used, the <code>region</code> and
+  /// <code>serviceName</code> values are <code>N/A</code>, and the
+  /// <code>lastUsedDate</code> value is null.
+  /// </note>
+  final AccessKeyLastUsed? lastUsed;
+
+  /// The secret access key used to sign requests.
+  ///
+  /// You should store the secret access key in a safe location. We recommend that
+  /// you delete the access key if the secret access key is compromised.
+  final String? secretAccessKey;
+
+  /// The status of the access key.
+  ///
+  /// A status of <code>Active</code> means that the key is valid, while
+  /// <code>Inactive</code> means it is not.
+  final StatusType? status;
+
+  AccessKey({
+    this.accessKeyId,
+    this.createdAt,
+    this.lastUsed,
+    this.secretAccessKey,
+    this.status,
+  });
+  factory AccessKey.fromJson(Map<String, dynamic> json) {
+    return AccessKey(
+      accessKeyId: json['accessKeyId'] as String?,
+      createdAt: timeStampFromJson(json['createdAt']),
+      lastUsed: json['lastUsed'] != null
+          ? AccessKeyLastUsed.fromJson(json['lastUsed'] as Map<String, dynamic>)
+          : null,
+      secretAccessKey: json['secretAccessKey'] as String?,
+      status: (json['status'] as String?)?.toStatusType(),
+    );
+  }
+}
+
+/// Describes the last time an access key was used.
+/// <note>
+/// This object does not include data in the response of a <a
+/// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_CreateBucketAccessKey.html">CreateBucketAccessKey</a>
+/// action.
+/// </note>
+class AccessKeyLastUsed {
+  /// The date and time when the access key was most recently used.
+  ///
+  /// This value is null if the access key has not been used.
+  final DateTime? lastUsedDate;
+
+  /// The AWS Region where this access key was most recently used.
+  ///
+  /// This value is <code>N/A</code> if the access key has not been used.
+  final String? region;
+
+  /// The name of the AWS service with which this access key was most recently
+  /// used.
+  ///
+  /// This value is <code>N/A</code> if the access key has not been used.
+  final String? serviceName;
+
+  AccessKeyLastUsed({
+    this.lastUsedDate,
+    this.region,
+    this.serviceName,
+  });
+  factory AccessKeyLastUsed.fromJson(Map<String, dynamic> json) {
+    return AccessKeyLastUsed(
+      lastUsedDate: timeStampFromJson(json['lastUsedDate']),
+      region: json['region'] as String?,
+      serviceName: json['serviceName'] as String?,
+    );
+  }
+}
+
+/// Describes the anonymous access permissions for an Amazon Lightsail bucket
+/// and its objects.
+///
+/// For more information about bucket access permissions, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-understanding-bucket-permissions">Understanding
+/// bucket permissions in Amazon Lightsail</a> in the
+///
+/// <i>Amazon Lightsail Developer Guide</i>.
+class AccessRules {
+  /// A Boolean value that indicates whether the access control list (ACL)
+  /// permissions that are applied to individual objects override the
+  /// <code>getObject</code> option that is currently specified.
+  ///
+  /// When this is true, you can use the <a
+  /// href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObjectAcl.html">PutObjectAcl</a>
+  /// Amazon S3 API action to set individual objects to public (read-only) using
+  /// the <code>public-read</code> ACL, or to private using the
+  /// <code>private</code> ACL.
+  final bool? allowPublicOverrides;
+
+  /// Specifies the anonymous access to all objects in a bucket.
+  ///
+  /// The following options can be specified:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>public</code> - Sets all objects in the bucket to public (read-only),
+  /// making them readable by anyone in the world.
+  ///
+  /// If the <code>getObject</code> value is set to <code>public</code>, then all
+  /// objects in the bucket default to public regardless of the
+  /// <code>allowPublicOverrides</code> value.
+  /// </li>
+  /// <li>
+  /// <code>private</code> - Sets all objects in the bucket to private, making
+  /// them readable only by you or anyone you give access to.
+  ///
+  /// If the <code>getObject</code> value is set to <code>private</code>, and the
+  /// <code>allowPublicOverrides</code> value is set to <code>true</code>, then
+  /// all objects in the bucket default to private unless they are configured with
+  /// a <code>public-read</code> ACL. Individual objects with a
+  /// <code>public-read</code> ACL are readable by anyone in the world.
+  /// </li>
+  /// </ul>
+  final AccessType? getObject;
+
+  AccessRules({
+    this.allowPublicOverrides,
+    this.getObject,
+  });
+  factory AccessRules.fromJson(Map<String, dynamic> json) {
+    return AccessRules(
+      allowPublicOverrides: json['allowPublicOverrides'] as bool?,
+      getObject: (json['getObject'] as String?)?.toAccessType(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final allowPublicOverrides = this.allowPublicOverrides;
+    final getObject = this.getObject;
+    return {
+      if (allowPublicOverrides != null)
+        'allowPublicOverrides': allowPublicOverrides,
+      if (getObject != null) 'getObject': getObject.toValue(),
+    };
+  }
+}
+
+enum AccessType {
+  public,
+  private,
+}
+
+extension on AccessType {
+  String toValue() {
+    switch (this) {
+      case AccessType.public:
+        return 'public';
+      case AccessType.private:
+        return 'private';
+    }
+  }
+}
+
+extension on String {
+  AccessType toAccessType() {
+    switch (this) {
+      case 'public':
+        return AccessType.public;
+      case 'private':
+        return AccessType.private;
+    }
+    throw Exception('$this is not known in enum AccessType');
+  }
+}
+
+/// Describes the synchronization status of the Amazon Simple Storage Service
+/// (Amazon S3) account-level block public access (BPA) feature for your
+/// Lightsail buckets.
+///
+/// The account-level BPA feature of Amazon S3 provides centralized controls to
+/// limit public access to all Amazon S3 buckets in an account. BPA can make all
+/// Amazon S3 buckets in an Amazon Web Services account private regardless of
+/// the individual bucket and object permissions that are configured. Lightsail
+/// buckets take into account the Amazon S3 account-level BPA configuration when
+/// allowing or denying public access. To do this, Lightsail periodically
+/// fetches the account-level BPA configuration from Amazon S3. When the
+/// account-level BPA status is <code>InSync</code>, the Amazon S3 account-level
+/// BPA configuration is synchronized and it applies to your Lightsail buckets.
+/// For more information about Amazon Simple Storage Service account-level BPA
+/// and how it affects Lightsail buckets, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-block-public-access-for-buckets">Block
+/// public access for buckets in Amazon Lightsail</a> in the <i>Amazon Lightsail
+/// Developer Guide</i>.
+class AccountLevelBpaSync {
+  /// A Boolean value that indicates whether account-level block public access is
+  /// affecting your Lightsail buckets.
+  final bool? bpaImpactsLightsail;
+
+  /// The timestamp of when the account-level BPA configuration was last
+  /// synchronized. This value is null when the account-level BPA configuration
+  /// has not been synchronized.
+  final DateTime? lastSyncedAt;
+
+  /// A message that provides a reason for a <code>Failed</code> or
+  /// <code>Defaulted</code> synchronization status.
+  ///
+  /// The following messages are possible:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>SYNC_ON_HOLD</code> - The synchronization has not yet happened. This
+  /// status message occurs immediately after you create your first Lightsail
+  /// bucket. This status message should change after the first synchronization
+  /// happens, approximately 1 hour after the first bucket is created.
+  /// </li>
+  /// <li>
+  /// <code>DEFAULTED_FOR_SLR_MISSING</code> - The synchronization failed because
+  /// the required service-linked role is missing from your Amazon Web Services
+  /// account. The account-level BPA configuration for your Lightsail buckets is
+  /// defaulted to <i>active</i> until the synchronization can occur. This means
+  /// that all your buckets are private and not publicly accessible. For more
+  /// information about how to create the required service-linked role to allow
+  /// synchronization, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-using-service-linked-roles">Using
+  /// Service-Linked Roles for Amazon Lightsail</a> in the <i>Amazon Lightsail
+  /// Developer Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>DEFAULTED_FOR_SLR_MISSING_ON_HOLD</code> - The synchronization failed
+  /// because the required service-linked role is missing from your Amazon Web
+  /// Services account. Account-level BPA is not yet configured for your Lightsail
+  /// buckets. Therefore, only the bucket access permissions and individual object
+  /// access permissions apply to your Lightsail buckets. For more information
+  /// about how to create the required service-linked role to allow
+  /// synchronization, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-using-service-linked-roles">Using
+  /// Service-Linked Roles for Amazon Lightsail</a> in the <i>Amazon Lightsail
+  /// Developer Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>Unknown</code> - The reason that synchronization failed is unknown.
+  /// Contact Amazon Web Services Support for more information.
+  /// </li>
+  /// </ul>
+  final BPAStatusMessage? message;
+
+  /// The status of the account-level BPA synchronization.
+  ///
+  /// The following statuses are possible:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>InSync</code> - Account-level BPA is synchronized. The Amazon S3
+  /// account-level BPA configuration applies to your Lightsail buckets.
+  /// </li>
+  /// <li>
+  /// <code>NeverSynced</code> - Synchronization has not yet happened. The Amazon
+  /// S3 account-level BPA configuration does not apply to your Lightsail buckets.
+  /// </li>
+  /// <li>
+  /// <code>Failed</code> - Synchronization failed. The Amazon S3 account-level
+  /// BPA configuration does not apply to your Lightsail buckets.
+  /// </li>
+  /// <li>
+  /// <code>Defaulted</code> - Synchronization failed and account-level BPA for
+  /// your Lightsail buckets is defaulted to <i>active</i>.
+  /// </li>
+  /// </ul> <note>
+  /// You might need to complete further actions if the status is
+  /// <code>Failed</code> or <code>Defaulted</code>. The <code>message</code>
+  /// parameter provides more information for those statuses.
+  /// </note>
+  final AccountLevelBpaSyncStatus? status;
+
+  AccountLevelBpaSync({
+    this.bpaImpactsLightsail,
+    this.lastSyncedAt,
+    this.message,
+    this.status,
+  });
+  factory AccountLevelBpaSync.fromJson(Map<String, dynamic> json) {
+    return AccountLevelBpaSync(
+      bpaImpactsLightsail: json['bpaImpactsLightsail'] as bool?,
+      lastSyncedAt: timeStampFromJson(json['lastSyncedAt']),
+      message: (json['message'] as String?)?.toBPAStatusMessage(),
+      status: (json['status'] as String?)?.toAccountLevelBpaSyncStatus(),
+    );
+  }
+}
+
+enum AccountLevelBpaSyncStatus {
+  inSync,
+  failed,
+  neverSynced,
+  defaulted,
+}
+
+extension on AccountLevelBpaSyncStatus {
+  String toValue() {
+    switch (this) {
+      case AccountLevelBpaSyncStatus.inSync:
+        return 'InSync';
+      case AccountLevelBpaSyncStatus.failed:
+        return 'Failed';
+      case AccountLevelBpaSyncStatus.neverSynced:
+        return 'NeverSynced';
+      case AccountLevelBpaSyncStatus.defaulted:
+        return 'Defaulted';
+    }
+  }
+}
+
+extension on String {
+  AccountLevelBpaSyncStatus toAccountLevelBpaSyncStatus() {
+    switch (this) {
+      case 'InSync':
+        return AccountLevelBpaSyncStatus.inSync;
+      case 'Failed':
+        return AccountLevelBpaSyncStatus.failed;
+      case 'NeverSynced':
+        return AccountLevelBpaSyncStatus.neverSynced;
+      case 'Defaulted':
+        return AccountLevelBpaSyncStatus.defaulted;
+    }
+    throw Exception('$this is not known in enum AccountLevelBpaSyncStatus');
   }
 }
 
@@ -8992,8 +10533,8 @@ extension on String {
 
 /// Describes an alarm.
 ///
-/// An alarm is a way to monitor your Amazon Lightsail resource metrics. For
-/// more information, see <a
+/// An alarm is a way to monitor your Lightsail resource metrics. For more
+/// information, see <a
 /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-alarms">Alarms
 /// in Amazon Lightsail</a>.
 class Alarm {
@@ -9527,6 +11068,44 @@ class AvailabilityZone {
   }
 }
 
+enum BPAStatusMessage {
+  defaultedForSlrMissing,
+  syncOnHold,
+  defaultedForSlrMissingOnHold,
+  unknown,
+}
+
+extension on BPAStatusMessage {
+  String toValue() {
+    switch (this) {
+      case BPAStatusMessage.defaultedForSlrMissing:
+        return 'DEFAULTED_FOR_SLR_MISSING';
+      case BPAStatusMessage.syncOnHold:
+        return 'SYNC_ON_HOLD';
+      case BPAStatusMessage.defaultedForSlrMissingOnHold:
+        return 'DEFAULTED_FOR_SLR_MISSING_ON_HOLD';
+      case BPAStatusMessage.unknown:
+        return 'Unknown';
+    }
+  }
+}
+
+extension on String {
+  BPAStatusMessage toBPAStatusMessage() {
+    switch (this) {
+      case 'DEFAULTED_FOR_SLR_MISSING':
+        return BPAStatusMessage.defaultedForSlrMissing;
+      case 'SYNC_ON_HOLD':
+        return BPAStatusMessage.syncOnHold;
+      case 'DEFAULTED_FOR_SLR_MISSING_ON_HOLD':
+        return BPAStatusMessage.defaultedForSlrMissingOnHold;
+      case 'Unknown':
+        return BPAStatusMessage.unknown;
+    }
+    throw Exception('$this is not known in enum BPAStatusMessage');
+  }
+}
+
 enum BehaviorEnum {
   dontCache,
   cache,
@@ -9663,6 +11242,321 @@ extension on String {
   }
 }
 
+/// Describes an Amazon Lightsail bucket.
+class Bucket {
+  /// Indicates whether the bundle that is currently applied to a bucket can be
+  /// changed to another bundle.
+  ///
+  /// You can update a bucket's bundle only one time within a monthly Amazon Web
+  /// Services billing cycle.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_UpdateBucketBundle.html">UpdateBucketBundle</a>
+  /// action to change a bucket's bundle.
+  final bool? ableToUpdateBundle;
+
+  /// An object that describes the access log configuration for the bucket.
+  final BucketAccessLogConfig? accessLogConfig;
+
+  /// An object that describes the access rules of the bucket.
+  final AccessRules? accessRules;
+
+  /// The Amazon Resource Name (ARN) of the bucket.
+  final String? arn;
+
+  /// The ID of the bundle currently applied to the bucket.
+  ///
+  /// A bucket bundle specifies the monthly cost, storage space, and data transfer
+  /// quota for a bucket.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_UpdateBucketBundle.html">UpdateBucketBundle</a>
+  /// action to change the bundle of a bucket.
+  final String? bundleId;
+
+  /// The timestamp when the distribution was created.
+  final DateTime? createdAt;
+
+  /// An object that describes the location of the bucket, such as the Amazon Web
+  /// Services Region and Availability Zone.
+  final ResourceLocation? location;
+
+  /// The name of the bucket.
+  final String? name;
+
+  /// Indicates whether object versioning is enabled for the bucket.
+  ///
+  /// The following options can be configured:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Enabled</code> - Object versioning is enabled.
+  /// </li>
+  /// <li>
+  /// <code>Suspended</code> - Object versioning was previously enabled but is
+  /// currently suspended. Existing object versions are retained.
+  /// </li>
+  /// <li>
+  /// <code>NeverEnabled</code> - Object versioning has never been enabled.
+  /// </li>
+  /// </ul>
+  final String? objectVersioning;
+
+  /// An array of strings that specify the Amazon Web Services account IDs that
+  /// have read-only access to the bucket.
+  final List<String>? readonlyAccessAccounts;
+
+  /// The Lightsail resource type of the bucket (for example,
+  /// <code>Bucket</code>).
+  final String? resourceType;
+
+  /// An array of objects that describe Lightsail instances that have access to
+  /// the bucket.
+  ///
+  /// Use the <a
+  /// href="https://docs.aws.amazon.com/lightsail/2016-11-28/api-reference/API_SetResourceAccessForBucket.html">SetResourceAccessForBucket</a>
+  /// action to update the instances that have access to a bucket.
+  final List<ResourceReceivingAccess>? resourcesReceivingAccess;
+
+  /// An object that describes the state of the bucket.
+  final BucketState? state;
+
+  /// The support code for a bucket. Include this code in your email to support
+  /// when you have questions about a Lightsail bucket. This code enables our
+  /// support team to look up your Lightsail information more easily.
+  final String? supportCode;
+
+  /// The tag keys and optional values for the bucket. For more information, see
+  /// <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Tags
+  /// in Amazon Lightsail</a> in the <i>Amazon Lightsail Developer Guide</i>.
+  final List<Tag>? tags;
+
+  /// The URL of the bucket.
+  final String? url;
+
+  Bucket({
+    this.ableToUpdateBundle,
+    this.accessLogConfig,
+    this.accessRules,
+    this.arn,
+    this.bundleId,
+    this.createdAt,
+    this.location,
+    this.name,
+    this.objectVersioning,
+    this.readonlyAccessAccounts,
+    this.resourceType,
+    this.resourcesReceivingAccess,
+    this.state,
+    this.supportCode,
+    this.tags,
+    this.url,
+  });
+  factory Bucket.fromJson(Map<String, dynamic> json) {
+    return Bucket(
+      ableToUpdateBundle: json['ableToUpdateBundle'] as bool?,
+      accessLogConfig: json['accessLogConfig'] != null
+          ? BucketAccessLogConfig.fromJson(
+              json['accessLogConfig'] as Map<String, dynamic>)
+          : null,
+      accessRules: json['accessRules'] != null
+          ? AccessRules.fromJson(json['accessRules'] as Map<String, dynamic>)
+          : null,
+      arn: json['arn'] as String?,
+      bundleId: json['bundleId'] as String?,
+      createdAt: timeStampFromJson(json['createdAt']),
+      location: json['location'] != null
+          ? ResourceLocation.fromJson(json['location'] as Map<String, dynamic>)
+          : null,
+      name: json['name'] as String?,
+      objectVersioning: json['objectVersioning'] as String?,
+      readonlyAccessAccounts: (json['readonlyAccessAccounts'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      resourceType: json['resourceType'] as String?,
+      resourcesReceivingAccess: (json['resourcesReceivingAccess'] as List?)
+          ?.whereNotNull()
+          .map((e) =>
+              ResourceReceivingAccess.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      state: json['state'] != null
+          ? BucketState.fromJson(json['state'] as Map<String, dynamic>)
+          : null,
+      supportCode: json['supportCode'] as String?,
+      tags: (json['tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      url: json['url'] as String?,
+    );
+  }
+}
+
+/// Describes the access log configuration for a bucket in the Amazon Lightsail
+/// object storage service.
+///
+/// For more information about bucket access logs, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-bucket-access-logs">Logging
+/// bucket requests using access logging in Amazon Lightsail</a> in the
+/// <i>Amazon Lightsail Developer Guide</i>.
+class BucketAccessLogConfig {
+  /// A Boolean value that indicates whether bucket access logging is enabled for
+  /// the bucket.
+  final bool enabled;
+
+  /// The name of the bucket where the access logs are saved. The destination can
+  /// be a Lightsail bucket in the same account, and in the same Amazon Web
+  /// Services Region as the source bucket.
+  /// <note>
+  /// This parameter is required when enabling the access log for a bucket, and
+  /// should be omitted when disabling the access log.
+  /// </note>
+  final String? destination;
+
+  /// The optional object prefix for the bucket access log.
+  ///
+  /// The prefix is an optional addition to the object key that organizes your
+  /// access log files in the destination bucket. For example, if you specify a
+  /// <code>logs/</code> prefix, then each log object will begin with the
+  /// <code>logs/</code> prefix in its key (for example,
+  /// <code>logs/2021-11-01-21-32-16-E568B2907131C0C0</code>).
+  /// <note>
+  /// This parameter can be optionally specified when enabling the access log for
+  /// a bucket, and should be omitted when disabling the access log.
+  /// </note>
+  final String? prefix;
+
+  BucketAccessLogConfig({
+    required this.enabled,
+    this.destination,
+    this.prefix,
+  });
+  factory BucketAccessLogConfig.fromJson(Map<String, dynamic> json) {
+    return BucketAccessLogConfig(
+      enabled: json['enabled'] as bool,
+      destination: json['destination'] as String?,
+      prefix: json['prefix'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final enabled = this.enabled;
+    final destination = this.destination;
+    final prefix = this.prefix;
+    return {
+      'enabled': enabled,
+      if (destination != null) 'destination': destination,
+      if (prefix != null) 'prefix': prefix,
+    };
+  }
+}
+
+/// Describes the specifications of a bundle that can be applied to an Amazon
+/// Lightsail bucket.
+///
+/// A bucket bundle specifies the monthly cost, storage space, and data transfer
+/// quota for a bucket.
+class BucketBundle {
+  /// The ID of the bundle.
+  final String? bundleId;
+
+  /// Indicates whether the bundle is active. Use for a new or existing bucket.
+  final bool? isActive;
+
+  /// The name of the bundle.
+  final String? name;
+
+  /// The monthly price of the bundle, in US dollars.
+  final double? price;
+
+  /// The storage size of the bundle, in GB.
+  final int? storagePerMonthInGb;
+
+  /// The monthly network transfer quota of the bundle.
+  final int? transferPerMonthInGb;
+
+  BucketBundle({
+    this.bundleId,
+    this.isActive,
+    this.name,
+    this.price,
+    this.storagePerMonthInGb,
+    this.transferPerMonthInGb,
+  });
+  factory BucketBundle.fromJson(Map<String, dynamic> json) {
+    return BucketBundle(
+      bundleId: json['bundleId'] as String?,
+      isActive: json['isActive'] as bool?,
+      name: json['name'] as String?,
+      price: json['price'] as double?,
+      storagePerMonthInGb: json['storagePerMonthInGb'] as int?,
+      transferPerMonthInGb: json['transferPerMonthInGb'] as int?,
+    );
+  }
+}
+
+enum BucketMetricName {
+  bucketSizeBytes,
+  numberOfObjects,
+}
+
+extension on BucketMetricName {
+  String toValue() {
+    switch (this) {
+      case BucketMetricName.bucketSizeBytes:
+        return 'BucketSizeBytes';
+      case BucketMetricName.numberOfObjects:
+        return 'NumberOfObjects';
+    }
+  }
+}
+
+extension on String {
+  BucketMetricName toBucketMetricName() {
+    switch (this) {
+      case 'BucketSizeBytes':
+        return BucketMetricName.bucketSizeBytes;
+      case 'NumberOfObjects':
+        return BucketMetricName.numberOfObjects;
+    }
+    throw Exception('$this is not known in enum BucketMetricName');
+  }
+}
+
+/// Describes the state of an Amazon Lightsail bucket.
+class BucketState {
+  /// The state code of the bucket.
+  ///
+  /// The following codes are possible:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>OK</code> - The bucket is in a running state.
+  /// </li>
+  /// <li>
+  /// <code>Unknown</code> - Creation of the bucket might have timed-out. You
+  /// might want to delete the bucket and create a new one.
+  /// </li>
+  /// </ul>
+  final String? code;
+
+  /// A message that describes the state of the bucket.
+  final String? message;
+
+  BucketState({
+    this.code,
+    this.message,
+  });
+  factory BucketState.fromJson(Map<String, dynamic> json) {
+    return BucketState(
+      code: json['code'] as String?,
+      message: json['message'] as String?,
+    );
+  }
+}
+
 /// Describes a bundle, which is a set of specs describing your virtual private
 /// server (or <i>instance</i>).
 class Bundle {
@@ -9794,8 +11688,6 @@ class CacheBehavior {
 /// <code>cacheBehavior</code> is <code>dont-cache</code>, then a per-path cache
 /// behavior can be used to specify a directory, file, or file type that your
 /// distribution will not cache.
-///
-/// if the cacheBehavior's behavior is set to 'cache', then
 class CacheBehaviorPerPath {
   /// The cache behavior for the specified path.
   ///
@@ -10098,8 +11990,8 @@ class Certificate {
   /// the problem, search for your domain name on the <a
   /// href="https://www.virustotal.com/gui/home/url">VirusTotal</a> website. If
   /// your domain is reported as suspicious, see <a
-  /// href="https://www.google.com/webmasters/hacked/?hl=en">Google Help for
-  /// Hacked Websites</a> to learn what you can do.
+  /// href="https://developers.google.com/web/fundamentals/security/hacked">Google
+  /// Help for Hacked Websites</a> to learn what you can do.
   ///
   /// If you believe that the result is a false positive, notify the organization
   /// that is reporting the domain. VirusTotal is an aggregate of several
@@ -10156,8 +12048,8 @@ class Certificate {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   Certificate({
@@ -10292,8 +12184,8 @@ class CertificateSummary {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   CertificateSummary({
@@ -10339,7 +12231,7 @@ class CloseInstancePublicPortsResult {
 }
 
 /// Describes a CloudFormation stack record created as a result of the
-/// <code>create cloud formation stack</code> operation.
+/// <code>create cloud formation stack</code> action.
 ///
 /// A CloudFormation stack record provides information about the AWS
 /// CloudFormation stack used to create a new Amazon Elastic Compute Cloud
@@ -10356,8 +12248,8 @@ class CloudFormationStackRecord {
   /// stack.
   final DestinationInfo? destinationInfo;
 
-  /// A list of objects describing the Availability Zone and AWS Region of the
-  /// CloudFormation stack record.
+  /// A list of objects describing the Availability Zone and Amazon Web Services
+  /// Region of the CloudFormation stack record.
   final ResourceLocation? location;
 
   /// The name of the CloudFormation stack record. It starts with
@@ -10512,6 +12404,9 @@ class ContactMethod {
 
   /// The timestamp when the contact method was created.
   final DateTime? createdAt;
+
+  /// An object that describes the location of the contact method, such as the
+  /// Amazon Web Services Region and Availability Zone.
   final ResourceLocation? location;
 
   /// The name of the contact method.
@@ -10673,9 +12568,18 @@ class Container {
   ///
   /// Container images sourced from your Lightsail container service, that are
   /// registered and stored on your service, start with a colon (<code>:</code>).
-  /// For example, <code>:container-service-1.mystaticwebsite.1</code>. Container
-  /// images sourced from a public registry like Docker Hub don't start with a
-  /// colon. For example, <code>nginx:latest</code> or <code>nginx</code>.
+  /// For example, if your container service name is
+  /// <code>container-service-1</code>, the container image label is
+  /// <code>mystaticsite</code>, and you want to use the third (<code>3</code>)
+  /// version of the registered container image, then you should specify
+  /// <code>:container-service-1.mystaticsite.3</code>. To use the latest version
+  /// of a container image, specify <code>latest</code> instead of a version
+  /// number (for example, <code>:container-service-1.mystaticsite.latest</code>).
+  /// Lightsail will automatically use the highest numbered version of the
+  /// registered container image.
+  ///
+  /// Container images sourced from a public registry like Docker Hub don't start
+  /// with a colon. For example, <code>nginx:latest</code> or <code>nginx</code>.
   final String? image;
 
   /// The open firewall ports of the container.
@@ -10760,7 +12664,7 @@ class ContainerService {
   final bool? isDisabled;
 
   /// An object that describes the location of the container service, such as the
-  /// AWS Region and Availability Zone.
+  /// Amazon Web Services Region and Availability Zone.
   final ResourceLocation? location;
 
   /// An object that describes the next deployment of the container service.
@@ -10781,9 +12685,9 @@ class ContainerService {
   /// The principal ARN of the container service.
   ///
   /// The principal ARN can be used to create a trust relationship between your
-  /// standard AWS account and your Lightsail container service. This allows you
-  /// to give your service permission to access resources in your standard AWS
-  /// account.
+  /// standard Amazon Web Services account and your Lightsail container service.
+  /// This allows you to give your service permission to access resources in your
+  /// standard Amazon Web Services account.
   final String? principalArn;
 
   /// The private domain name of the container service.
@@ -10791,6 +12695,16 @@ class ContainerService {
   /// The private domain name is accessible only by other resources within the
   /// default virtual private cloud (VPC) of your Lightsail account.
   final String? privateDomainName;
+
+  /// An object that describes the configuration for the container service to
+  /// access private container image repositories, such as Amazon Elastic
+  /// Container Registry (Amazon ECR) private repositories.
+  ///
+  /// For more information, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+  /// access to an Amazon ECR private repository for an Amazon Lightsail container
+  /// service</a> in the <i>Amazon Lightsail Developer Guide</i>.
+  final PrivateRegistryAccess? privateRegistryAccess;
 
   /// The public domain name of the container service, such as
   /// <code>example.com</code> and <code>www.example.com</code>.
@@ -10823,38 +12737,50 @@ class ContainerService {
 
   /// The current state of the container service.
   ///
-  /// The state can be:
+  /// The following container service states are possible:
   ///
   /// <ul>
   /// <li>
-  /// <code>Pending</code> - The container service is being created.
+  /// <code>PENDING</code> - The container service is being created.
   /// </li>
   /// <li>
-  /// <code>Ready</code> - The container service is created but does not have a
-  /// container deployment.
+  /// <code>READY</code> - The container service is running but it does not have
+  /// an active container deployment.
   /// </li>
   /// <li>
-  /// <code>Disabled</code> - The container service is disabled.
-  /// </li>
-  /// <li>
-  /// <code>Updating</code> - The container service capacity or other setting is
-  /// being updated.
-  /// </li>
-  /// <li>
-  /// <code>Deploying</code> - The container service is launching a container
+  /// <code>DEPLOYING</code> - The container service is launching a container
   /// deployment.
   /// </li>
   /// <li>
-  /// <code>Running</code> - The container service is created and it has a
+  /// <code>RUNNING</code> - The container service is running and it has an active
   /// container deployment.
+  /// </li>
+  /// <li>
+  /// <code>UPDATING</code> - The container service capacity or its custom domains
+  /// are being updated.
+  /// </li>
+  /// <li>
+  /// <code>DELETING</code> - The container service is being deleted.
+  /// </li>
+  /// <li>
+  /// <code>DISABLED</code> - The container service is disabled, and its active
+  /// deployment and containers, if any, are shut down.
   /// </li>
   /// </ul>
   final ContainerServiceState? state;
 
+  /// An object that describes the current state of the container service.
+  /// <note>
+  /// The state detail is populated only when a container service is in a
+  /// <code>PENDING</code>, <code>DEPLOYING</code>, or <code>UPDATING</code>
+  /// state.
+  /// </note>
+  final ContainerServiceStateDetail? stateDetail;
+
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   /// The publicly accessible URL of the container service.
@@ -10875,10 +12801,12 @@ class ContainerService {
     this.powerId,
     this.principalArn,
     this.privateDomainName,
+    this.privateRegistryAccess,
     this.publicDomainNames,
     this.resourceType,
     this.scale,
     this.state,
+    this.stateDetail,
     this.tags,
     this.url,
   });
@@ -10903,12 +12831,20 @@ class ContainerService {
       powerId: json['powerId'] as String?,
       principalArn: json['principalArn'] as String?,
       privateDomainName: json['privateDomainName'] as String?,
+      privateRegistryAccess: json['privateRegistryAccess'] != null
+          ? PrivateRegistryAccess.fromJson(
+              json['privateRegistryAccess'] as Map<String, dynamic>)
+          : null,
       publicDomainNames: (json['publicDomainNames'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(
               k, (e as List).whereNotNull().map((e) => e as String).toList())),
       resourceType: (json['resourceType'] as String?)?.toResourceType(),
       scale: json['scale'] as int?,
       state: (json['state'] as String?)?.toContainerServiceState(),
+      stateDetail: json['stateDetail'] != null
+          ? ContainerServiceStateDetail.fromJson(
+              json['stateDetail'] as Map<String, dynamic>)
+          : null,
       tags: (json['tags'] as List?)
           ?.whereNotNull()
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
@@ -11050,6 +12986,67 @@ extension on String {
   }
 }
 
+/// Describes the activation status of the role that you can use to grant an
+/// Amazon Lightsail container service access to Amazon Elastic Container
+/// Registry (Amazon ECR) private repositories.
+///
+/// When activated, Lightsail creates an Identity and Access Management (IAM)
+/// role for the specified Lightsail container service. You can use the ARN of
+/// the role to create a trust relationship between your Lightsail container
+/// service and an Amazon ECR private repository in your Amazon Web Services
+/// account. This allows your container service to pull images from Amazon ECR
+/// private repositories. For more information, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+/// access to an Amazon ECR private repository for an Amazon Lightsail container
+/// service</a> in the <i>Amazon Lightsail Developer Guide</i>.
+class ContainerServiceECRImagePullerRole {
+  /// A Boolean value that indicates whether the role is activated.
+  final bool? isActive;
+
+  /// The Amazon Resource Name (ARN) of the role, if it is activated.
+  final String? principalArn;
+
+  ContainerServiceECRImagePullerRole({
+    this.isActive,
+    this.principalArn,
+  });
+  factory ContainerServiceECRImagePullerRole.fromJson(
+      Map<String, dynamic> json) {
+    return ContainerServiceECRImagePullerRole(
+      isActive: json['isActive'] as bool?,
+      principalArn: json['principalArn'] as String?,
+    );
+  }
+}
+
+/// Describes a request to activate or deactivate the role that you can use to
+/// grant an Amazon Lightsail container service access to Amazon Elastic
+/// Container Registry (Amazon ECR) private repositories.
+///
+/// When activated, Lightsail creates an Identity and Access Management (IAM)
+/// role for the specified Lightsail container service. You can use the ARN of
+/// the role to create a trust relationship between your Lightsail container
+/// service and an Amazon ECR private repository in your Amazon Web Services
+/// account. This allows your container service to pull images from Amazon ECR
+/// private repositories. For more information, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+/// access to an Amazon ECR private repository for an Amazon Lightsail container
+/// service</a> in the <i>Amazon Lightsail Developer Guide</i>.
+class ContainerServiceECRImagePullerRoleRequest {
+  /// A Boolean value that indicates whether to activate the role.
+  final bool? isActive;
+
+  ContainerServiceECRImagePullerRoleRequest({
+    this.isActive,
+  });
+  Map<String, dynamic> toJson() {
+    final isActive = this.isActive;
+    return {
+      if (isActive != null) 'isActive': isActive,
+    };
+  }
+}
+
 /// Describes the public endpoint configuration of a deployment of an Amazon
 /// Lightsail container service.
 class ContainerServiceEndpoint {
@@ -11084,26 +13081,34 @@ class ContainerServiceEndpoint {
 /// service.
 class ContainerServiceHealthCheckConfig {
   /// The number of consecutive health checks successes required before moving the
-  /// container to the <code>Healthy</code> state.
+  /// container to the <code>Healthy</code> state. The default value is
+  /// <code>2</code>.
   final int? healthyThreshold;
 
   /// The approximate interval, in seconds, between health checks of an individual
-  /// container. You may specify between 5 and 300 seconds.
+  /// container. You can specify between 5 and 300 seconds. The default value is
+  /// <code>5</code>.
   final int? intervalSeconds;
 
-  /// The path on the container on which to perform the health check.
+  /// The path on the container on which to perform the health check. The default
+  /// value is <code>/</code>.
   final String? path;
 
   /// The HTTP codes to use when checking for a successful response from a
-  /// container. You can specify values between 200 and 499.
+  /// container. You can specify values between <code>200</code> and
+  /// <code>499</code>. You can specify multiple values (for example,
+  /// <code>200,202</code>) or a range of values (for example,
+  /// <code>200-299</code>).
   final String? successCodes;
 
   /// The amount of time, in seconds, during which no response means a failed
-  /// health check. You may specify between 2 and 60 seconds.
+  /// health check. You can specify between 2 and 60 seconds. The default value is
+  /// <code>2</code>.
   final int? timeoutSeconds;
 
   /// The number of consecutive health check failures required before moving the
-  /// container to the <code>Unhealthy</code> state.
+  /// container to the <code>Unhealthy</code> state. The default value is
+  /// <code>2</code>.
   final int? unhealthyThreshold;
 
   ContainerServiceHealthCheckConfig({
@@ -11370,6 +13375,7 @@ enum ContainerServiceState {
   updating,
   deleting,
   disabled,
+  deploying,
 }
 
 extension on ContainerServiceState {
@@ -11387,6 +13393,8 @@ extension on ContainerServiceState {
         return 'DELETING';
       case ContainerServiceState.disabled:
         return 'DISABLED';
+      case ContainerServiceState.deploying:
+        return 'DEPLOYING';
     }
   }
 }
@@ -11406,8 +13414,152 @@ extension on String {
         return ContainerServiceState.deleting;
       case 'DISABLED':
         return ContainerServiceState.disabled;
+      case 'DEPLOYING':
+        return ContainerServiceState.deploying;
     }
     throw Exception('$this is not known in enum ContainerServiceState');
+  }
+}
+
+/// Describes the current state of a container service.
+class ContainerServiceStateDetail {
+  /// The state code of the container service.
+  ///
+  /// The following state codes are possible:
+  ///
+  /// <ul>
+  /// <li>
+  /// The following state codes are possible if your container service is in a
+  /// <code>DEPLOYING</code> or <code>UPDATING</code> state:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>CREATING_SYSTEM_RESOURCES</code> - The system resources for your
+  /// container service are being created.
+  /// </li>
+  /// <li>
+  /// <code>CREATING_NETWORK_INFRASTRUCTURE</code> - The network infrastructure
+  /// for your container service are being created.
+  /// </li>
+  /// <li>
+  /// <code>PROVISIONING_CERTIFICATE</code> - The SSL/TLS certificate for your
+  /// container service is being created.
+  /// </li>
+  /// <li>
+  /// <code>PROVISIONING_SERVICE</code> - Your container service is being
+  /// provisioned.
+  /// </li>
+  /// <li>
+  /// <code>CREATING_DEPLOYMENT</code> - Your deployment is being created on your
+  /// container service.
+  /// </li>
+  /// <li>
+  /// <code>EVALUATING_HEALTH_CHECK</code> - The health of your deployment is
+  /// being evaluated.
+  /// </li>
+  /// <li>
+  /// <code>ACTIVATING_DEPLOYMENT</code> - Your deployment is being activated.
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// The following state codes are possible if your container service is in a
+  /// <code>PENDING</code> state:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>CERTIFICATE_LIMIT_EXCEEDED</code> - The SSL/TLS certificate required
+  /// for your container service exceeds the maximum number of certificates
+  /// allowed for your account.
+  /// </li>
+  /// <li>
+  /// <code>UNKNOWN_ERROR</code> - An error was experienced when your container
+  /// service was being created.
+  /// </li>
+  /// </ul> </li>
+  /// </ul>
+  final ContainerServiceStateDetailCode? code;
+
+  /// A message that provides more information for the state code.
+  /// <note>
+  /// The state detail is populated only when a container service is in a
+  /// <code>PENDING</code>, <code>DEPLOYING</code>, or <code>UPDATING</code>
+  /// state.
+  /// </note>
+  final String? message;
+
+  ContainerServiceStateDetail({
+    this.code,
+    this.message,
+  });
+  factory ContainerServiceStateDetail.fromJson(Map<String, dynamic> json) {
+    return ContainerServiceStateDetail(
+      code: (json['code'] as String?)?.toContainerServiceStateDetailCode(),
+      message: json['message'] as String?,
+    );
+  }
+}
+
+enum ContainerServiceStateDetailCode {
+  creatingSystemResources,
+  creatingNetworkInfrastructure,
+  provisioningCertificate,
+  provisioningService,
+  creatingDeployment,
+  evaluatingHealthCheck,
+  activatingDeployment,
+  certificateLimitExceeded,
+  unknownError,
+}
+
+extension on ContainerServiceStateDetailCode {
+  String toValue() {
+    switch (this) {
+      case ContainerServiceStateDetailCode.creatingSystemResources:
+        return 'CREATING_SYSTEM_RESOURCES';
+      case ContainerServiceStateDetailCode.creatingNetworkInfrastructure:
+        return 'CREATING_NETWORK_INFRASTRUCTURE';
+      case ContainerServiceStateDetailCode.provisioningCertificate:
+        return 'PROVISIONING_CERTIFICATE';
+      case ContainerServiceStateDetailCode.provisioningService:
+        return 'PROVISIONING_SERVICE';
+      case ContainerServiceStateDetailCode.creatingDeployment:
+        return 'CREATING_DEPLOYMENT';
+      case ContainerServiceStateDetailCode.evaluatingHealthCheck:
+        return 'EVALUATING_HEALTH_CHECK';
+      case ContainerServiceStateDetailCode.activatingDeployment:
+        return 'ACTIVATING_DEPLOYMENT';
+      case ContainerServiceStateDetailCode.certificateLimitExceeded:
+        return 'CERTIFICATE_LIMIT_EXCEEDED';
+      case ContainerServiceStateDetailCode.unknownError:
+        return 'UNKNOWN_ERROR';
+    }
+  }
+}
+
+extension on String {
+  ContainerServiceStateDetailCode toContainerServiceStateDetailCode() {
+    switch (this) {
+      case 'CREATING_SYSTEM_RESOURCES':
+        return ContainerServiceStateDetailCode.creatingSystemResources;
+      case 'CREATING_NETWORK_INFRASTRUCTURE':
+        return ContainerServiceStateDetailCode.creatingNetworkInfrastructure;
+      case 'PROVISIONING_CERTIFICATE':
+        return ContainerServiceStateDetailCode.provisioningCertificate;
+      case 'PROVISIONING_SERVICE':
+        return ContainerServiceStateDetailCode.provisioningService;
+      case 'CREATING_DEPLOYMENT':
+        return ContainerServiceStateDetailCode.creatingDeployment;
+      case 'EVALUATING_HEALTH_CHECK':
+        return ContainerServiceStateDetailCode.evaluatingHealthCheck;
+      case 'ACTIVATING_DEPLOYMENT':
+        return ContainerServiceStateDetailCode.activatingDeployment;
+      case 'CERTIFICATE_LIMIT_EXCEEDED':
+        return ContainerServiceStateDetailCode.certificateLimitExceeded;
+      case 'UNKNOWN_ERROR':
+        return ContainerServiceStateDetailCode.unknownError;
+    }
+    throw Exception(
+        '$this is not known in enum ContainerServiceStateDetailCode');
   }
 }
 
@@ -11478,6 +13630,58 @@ class CopySnapshotResult {
   });
   factory CopySnapshotResult.fromJson(Map<String, dynamic> json) {
     return CopySnapshotResult(
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class CreateBucketAccessKeyResult {
+  /// An object that describes the access key that is created.
+  final AccessKey? accessKey;
+
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  CreateBucketAccessKeyResult({
+    this.accessKey,
+    this.operations,
+  });
+  factory CreateBucketAccessKeyResult.fromJson(Map<String, dynamic> json) {
+    return CreateBucketAccessKeyResult(
+      accessKey: json['accessKey'] != null
+          ? AccessKey.fromJson(json['accessKey'] as Map<String, dynamic>)
+          : null,
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class CreateBucketResult {
+  /// An object that describes the bucket that is created.
+  final Bucket? bucket;
+
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  CreateBucketResult({
+    this.bucket,
+    this.operations,
+  });
+  factory CreateBucketResult.fromJson(Map<String, dynamic> json) {
+    return CreateBucketResult(
+      bucket: json['bucket'] != null
+          ? Bucket.fromJson(json['bucket'] as Map<String, dynamic>)
+          : null,
       operations: (json['operations'] as List?)
           ?.whereNotNull()
           .map((e) => Operation.fromJson(e as Map<String, dynamic>))
@@ -11954,6 +14158,44 @@ class DeleteAutoSnapshotResult {
   }
 }
 
+class DeleteBucketAccessKeyResult {
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  DeleteBucketAccessKeyResult({
+    this.operations,
+  });
+  factory DeleteBucketAccessKeyResult.fromJson(Map<String, dynamic> json) {
+    return DeleteBucketAccessKeyResult(
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class DeleteBucketResult {
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  DeleteBucketResult({
+    this.operations,
+  });
+  factory DeleteBucketResult.fromJson(Map<String, dynamic> json) {
+    return DeleteBucketResult(
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 class DeleteCertificateResult {
   /// An array of objects that describe the result of the action, such as the
   /// status of the request, the timestamp of the request, and the resources
@@ -12367,7 +14609,7 @@ class DisableAddOnResult {
   }
 }
 
-/// Describes a system disk or a block storage disk.
+/// Describes a block storage disk.
 class Disk {
   /// An array of objects representing the add-ons enabled on the disk.
   final List<AddOn>? addOns;
@@ -12432,8 +14674,8 @@ class Disk {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   Disk({
@@ -12573,7 +14815,7 @@ class DiskSnapshot {
   /// The name of the disk snapshot (e.g., <code>my-disk-snapshot</code>).
   final String? name;
 
-  /// The progress of the disk snapshot operation.
+  /// The progress of the snapshot.
   final String? progress;
 
   /// The Lightsail resource type (e.g., <code>DiskSnapshot</code>).
@@ -12592,8 +14834,8 @@ class DiskSnapshot {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   DiskSnapshot({
@@ -12740,8 +14982,8 @@ class DistributionBundle {
   /// The ID of the bundle.
   final String? bundleId;
 
-  /// Indicates whether the bundle is active, and can be specified for a new
-  /// distribution.
+  /// Indicates whether the bundle is active, and can be specified for a new or
+  /// existing distribution.
   final bool? isActive;
 
   /// The name of the distribution bundle.
@@ -12819,7 +15061,7 @@ extension on String {
   }
 }
 
-/// Describes a domain where you are storing recordsets in Lightsail.
+/// Describes a domain where you are storing recordsets.
 class Domain {
   /// The Amazon Resource Name (ARN) of the domain recordset (e.g.,
   /// <code>arn:aws:lightsail:global:123456789101:Domain/824cede0-abc7-4f84-8dbc-12345EXAMPLE</code>).
@@ -12848,8 +15090,8 @@ class Domain {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   Domain({
@@ -12905,23 +15147,32 @@ class DomainEntry {
   /// </note>
   final Map<String, String>? options;
 
-  /// The target AWS name server (e.g., <code>ns-111.awsdns-22.com.</code>).
+  /// The target IP address (e.g., <code>192.0.2.0</code>), or AWS name server
+  /// (e.g., <code>ns-111.awsdns-22.com.</code>).
   ///
   /// For Lightsail load balancers, the value looks like
   /// <code>ab1234c56789c6b86aba6fb203d443bc-123456789.us-east-2.elb.amazonaws.com</code>.
+  /// For Lightsail distributions, the value looks like
+  /// <code>exampled1182ne.cloudfront.net</code>. For Lightsail container
+  /// services, the value looks like
+  /// <code>container-service-1.example23scljs.us-west-2.cs.amazonlightsail.com</code>.
   /// Be sure to also set <code>isAlias</code> to <code>true</code> when setting
-  /// up an A record for a load balancer.
+  /// up an A record for a Lightsail load balancer, distribution, or container
+  /// service.
   final String? target;
 
-  /// The type of domain entry, such as address (A), canonical name (CNAME), mail
-  /// exchanger (MX), name server (NS), start of authority (SOA), service locator
-  /// (SRV), or text (TXT).
+  /// The type of domain entry, such as address for IPv4 (A), address for IPv6
+  /// (AAAA), canonical name (CNAME), mail exchanger (MX), name server (NS), start
+  /// of authority (SOA), service locator (SRV), or text (TXT).
   ///
   /// The following domain entry types can be used:
   ///
   /// <ul>
   /// <li>
   /// <code>A</code>
+  /// </li>
+  /// <li>
+  /// <code>AAAA</code>
   /// </li>
   /// <li>
   /// <code>CNAME</code>
@@ -13009,6 +15260,9 @@ class DomainValidationRecord {
 }
 
 class DownloadDefaultKeyPairResult {
+  /// The timestamp when the default key pair was created.
+  final DateTime? createdAt;
+
   /// A base64-encoded RSA private key.
   final String? privateKeyBase64;
 
@@ -13016,11 +15270,13 @@ class DownloadDefaultKeyPairResult {
   final String? publicKeyBase64;
 
   DownloadDefaultKeyPairResult({
+    this.createdAt,
     this.privateKeyBase64,
     this.publicKeyBase64,
   });
   factory DownloadDefaultKeyPairResult.fromJson(Map<String, dynamic> json) {
     return DownloadDefaultKeyPairResult(
+      createdAt: timeStampFromJson(json['createdAt']),
       privateKeyBase64: json['privateKeyBase64'] as String?,
       publicKeyBase64: json['publicKeyBase64'] as String?,
     );
@@ -13380,6 +15636,104 @@ class GetBlueprintsResult {
       blueprints: (json['blueprints'] as List?)
           ?.whereNotNull()
           .map((e) => Blueprint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextPageToken: json['nextPageToken'] as String?,
+    );
+  }
+}
+
+class GetBucketAccessKeysResult {
+  /// An object that describes the access keys for the specified bucket.
+  final List<AccessKey>? accessKeys;
+
+  GetBucketAccessKeysResult({
+    this.accessKeys,
+  });
+  factory GetBucketAccessKeysResult.fromJson(Map<String, dynamic> json) {
+    return GetBucketAccessKeysResult(
+      accessKeys: (json['accessKeys'] as List?)
+          ?.whereNotNull()
+          .map((e) => AccessKey.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class GetBucketBundlesResult {
+  /// An object that describes bucket bundles.
+  final List<BucketBundle>? bundles;
+
+  GetBucketBundlesResult({
+    this.bundles,
+  });
+  factory GetBucketBundlesResult.fromJson(Map<String, dynamic> json) {
+    return GetBucketBundlesResult(
+      bundles: (json['bundles'] as List?)
+          ?.whereNotNull()
+          .map((e) => BucketBundle.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class GetBucketMetricDataResult {
+  /// An array of objects that describe the metric data returned.
+  final List<MetricDatapoint>? metricData;
+
+  /// The name of the metric returned.
+  final BucketMetricName? metricName;
+
+  GetBucketMetricDataResult({
+    this.metricData,
+    this.metricName,
+  });
+  factory GetBucketMetricDataResult.fromJson(Map<String, dynamic> json) {
+    return GetBucketMetricDataResult(
+      metricData: (json['metricData'] as List?)
+          ?.whereNotNull()
+          .map((e) => MetricDatapoint.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      metricName: (json['metricName'] as String?)?.toBucketMetricName(),
+    );
+  }
+}
+
+class GetBucketsResult {
+  /// An object that describes the synchronization status of the Amazon S3
+  /// account-level block public access feature for your Lightsail buckets.
+  ///
+  /// For more information about this feature and how it affects Lightsail
+  /// buckets, see <a
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-block-public-access-for-buckets">Block
+  /// public access for buckets in Amazon Lightsail</a>.
+  final AccountLevelBpaSync? accountLevelBpaSync;
+
+  /// An array of objects that describe buckets.
+  final List<Bucket>? buckets;
+
+  /// The token to advance to the next page of results from your request.
+  ///
+  /// A next page token is not returned if there are no more results to display.
+  ///
+  /// To get the next page of results, perform another <code>GetBuckets</code>
+  /// request and specify the next page token using the <code>pageToken</code>
+  /// parameter.
+  final String? nextPageToken;
+
+  GetBucketsResult({
+    this.accountLevelBpaSync,
+    this.buckets,
+    this.nextPageToken,
+  });
+  factory GetBucketsResult.fromJson(Map<String, dynamic> json) {
+    return GetBucketsResult(
+      accountLevelBpaSync: json['accountLevelBpaSync'] != null
+          ? AccountLevelBpaSync.fromJson(
+              json['accountLevelBpaSync'] as Map<String, dynamic>)
+          : null,
+      buckets: (json['buckets'] as List?)
+          ?.whereNotNull()
+          .map((e) => Bucket.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextPageToken: json['nextPageToken'] as String?,
     );
@@ -14120,6 +16474,35 @@ class GetLoadBalancerTlsCertificatesResult {
           ?.whereNotNull()
           .map((e) =>
               LoadBalancerTlsCertificate.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class GetLoadBalancerTlsPoliciesResult {
+  /// The token to advance to the next page of results from your request.
+  ///
+  /// A next page token is not returned if there are no more results to display.
+  ///
+  /// To get the next page of results, perform another
+  /// <code>GetLoadBalancerTlsPolicies</code> request and specify the next page
+  /// token using the <code>pageToken</code> parameter.
+  final String? nextPageToken;
+
+  /// An array of objects that describe the TLS security policies that are
+  /// available.
+  final List<LoadBalancerTlsPolicy>? tlsPolicies;
+
+  GetLoadBalancerTlsPoliciesResult({
+    this.nextPageToken,
+    this.tlsPolicies,
+  });
+  factory GetLoadBalancerTlsPoliciesResult.fromJson(Map<String, dynamic> json) {
+    return GetLoadBalancerTlsPoliciesResult(
+      nextPageToken: json['nextPageToken'] as String?,
+      tlsPolicies: (json['tlsPolicies'] as List?)
+          ?.whereNotNull()
+          .map((e) => LoadBalancerTlsPolicy.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -14871,9 +17254,9 @@ class ImportKeyPairResult {
 /// Describes the origin resource of an Amazon Lightsail content delivery
 /// network (CDN) distribution.
 ///
-/// An origin can be a Lightsail instance or load balancer. A distribution pulls
-/// content from an origin, caches it, and serves it to viewers via a worldwide
-/// network of edge servers.
+/// An origin can be a Lightsail instance, bucket, or load balancer. A
+/// distribution pulls content from an origin, caches it, and serves it to
+/// viewers via a worldwide network of edge servers.
 class InputOrigin {
   /// The name of the origin resource.
   final String? name;
@@ -14927,8 +17310,14 @@ class Instance {
   /// The size of the vCPU and the amount of RAM for the instance.
   final InstanceHardware? hardware;
 
-  /// The IPv6 address of the instance.
-  final String? ipv6Address;
+  /// The IP address type of the instance.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  final IpAddressType? ipAddressType;
+
+  /// The IPv6 addresses of the instance.
+  final List<String>? ipv6Addresses;
 
   /// A Boolean value indicating whether this instance has a static IP assigned to
   /// it.
@@ -14968,8 +17357,8 @@ class Instance {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   /// The user name for connecting to the instance (e.g., <code>ec2-user</code>).
@@ -14983,7 +17372,8 @@ class Instance {
     this.bundleId,
     this.createdAt,
     this.hardware,
-    this.ipv6Address,
+    this.ipAddressType,
+    this.ipv6Addresses,
     this.isStaticIp,
     this.location,
     this.name,
@@ -15011,7 +17401,11 @@ class Instance {
       hardware: json['hardware'] != null
           ? InstanceHardware.fromJson(json['hardware'] as Map<String, dynamic>)
           : null,
-      ipv6Address: json['ipv6Address'] as String?,
+      ipAddressType: (json['ipAddressType'] as String?)?.toIpAddressType(),
+      ipv6Addresses: (json['ipv6Addresses'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       isStaticIp: json['isStaticIp'] as bool?,
       location: json['location'] != null
           ? ResourceLocation.fromJson(json['location'] as Map<String, dynamic>)
@@ -15169,17 +17563,27 @@ class InstanceEntry {
   /// <ul>
   /// <li>
   /// <code>DEFAULT</code> - Use the default firewall settings from the Lightsail
-  /// instance blueprint.
+  /// instance blueprint. If this is specified, then IPv4 and IPv6 will be
+  /// configured for the new instance that is created in Amazon EC2.
   /// </li>
   /// <li>
   /// <code>INSTANCE</code> - Use the configured firewall settings from the source
-  /// Lightsail instance.
+  /// Lightsail instance. If this is specified, the new instance that is created
+  /// in Amazon EC2 will be configured to match the configuration of the source
+  /// Lightsail instance. For example, if the source instance is configured for
+  /// dual-stack (IPv4 and IPv6), then IPv4 and IPv6 will be configured for the
+  /// new instance that is created in Amazon EC2. If the source instance is
+  /// configured for IPv4 only, then only IPv4 will be configured for the new
+  /// instance that is created in Amazon EC2.
   /// </li>
   /// <li>
-  /// <code>NONE</code> - Use the default Amazon EC2 security group.
+  /// <code>NONE</code> - Use the default Amazon EC2 security group. If this is
+  /// specified, then only IPv4 will be configured for the new instance that is
+  /// created in Amazon EC2.
   /// </li>
   /// <li>
-  /// <code>CLOSED</code> - All ports closed.
+  /// <code>CLOSED</code> - All ports closed. If this is specified, then only IPv4
+  /// will be configured for the new instance that is created in Amazon EC2.
   /// </li>
   /// </ul> <note>
   /// If you configured <code>lightsail-connect</code> as a
@@ -15614,10 +18018,12 @@ class InstancePortInfo {
   /// console to connect to your instance.
   final List<String>? cidrListAliases;
 
-  /// The IP address, or range of IP addresses in CIDR notation, that are allowed
-  /// to connect to an instance through the ports, and the protocol. Lightsail
-  /// supports IPv4 addresses.
-  ///
+  /// The IPv4 address, or range of IPv4 addresses (in CIDR notation) that are
+  /// allowed to connect to an instance through the ports, and the protocol.
+  /// <note>
+  /// The <code>ipv6Cidrs</code> parameter lists the IPv6 addresses that are
+  /// allowed to connect to an instance.
+  /// </note>
   /// For more information about CIDR block notation, see <a
   /// href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Classless
   /// Inter-Domain Routing</a> on <i>Wikipedia</i>.
@@ -15635,15 +18041,36 @@ class InstancePortInfo {
   /// TCP and UDP - <code>0</code> to <code>65535</code>
   /// </li>
   /// <li>
-  /// ICMP - The ICMP type. For example, specify <code>8</code> as the
-  /// <code>fromPort</code> (ICMP type), and <code>-1</code> as the
+  /// ICMP - The ICMP type for IPv4 addresses. For example, specify <code>8</code>
+  /// as the <code>fromPort</code> (ICMP type), and <code>-1</code> as the
   /// <code>toPort</code> (ICMP code), to enable ICMP Ping. For more information,
   /// see <a
   /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages">Control
   /// Messages</a> on <i>Wikipedia</i>.
   /// </li>
+  /// <li>
+  /// ICMPv6 - The ICMP type for IPv6 addresses. For example, specify
+  /// <code>128</code> as the <code>fromPort</code> (ICMPv6 type), and
+  /// <code>0</code> as <code>toPort</code> (ICMPv6 code). For more information,
+  /// see <a
+  /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6">Internet
+  /// Control Message Protocol for IPv6</a>.
+  /// </li>
   /// </ul>
   final int? fromPort;
+
+  /// The IPv6 address, or range of IPv6 addresses (in CIDR notation) that are
+  /// allowed to connect to an instance through the ports, and the protocol. Only
+  /// devices with an IPv6 address can connect to an instance through IPv6;
+  /// otherwise, IPv4 should be used.
+  /// <note>
+  /// The <code>cidrs</code> parameter lists the IPv4 addresses that are allowed
+  /// to connect to an instance.
+  /// </note>
+  /// For more information about CIDR block notation, see <a
+  /// href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Classless
+  /// Inter-Domain Routing</a> on <i>Wikipedia</i>.
+  final List<String>? ipv6Cidrs;
 
   /// The IP protocol name.
   ///
@@ -15692,12 +18119,20 @@ class InstancePortInfo {
   /// TCP and UDP - <code>0</code> to <code>65535</code>
   /// </li>
   /// <li>
-  /// ICMP - The ICMP code. For example, specify <code>8</code> as the
-  /// <code>fromPort</code> (ICMP type), and <code>-1</code> as the
+  /// ICMP - The ICMP code for IPv4 addresses. For example, specify <code>8</code>
+  /// as the <code>fromPort</code> (ICMP type), and <code>-1</code> as the
   /// <code>toPort</code> (ICMP code), to enable ICMP Ping. For more information,
   /// see <a
   /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages">Control
   /// Messages</a> on <i>Wikipedia</i>.
+  /// </li>
+  /// <li>
+  /// ICMPv6 - The ICMP code for IPv6 addresses. For example, specify
+  /// <code>128</code> as the <code>fromPort</code> (ICMPv6 type), and
+  /// <code>0</code> as <code>toPort</code> (ICMPv6 code). For more information,
+  /// see <a
+  /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6">Internet
+  /// Control Message Protocol for IPv6</a>.
   /// </li>
   /// </ul>
   final int? toPort;
@@ -15710,6 +18145,7 @@ class InstancePortInfo {
     this.cidrs,
     this.commonName,
     this.fromPort,
+    this.ipv6Cidrs,
     this.protocol,
     this.toPort,
   });
@@ -15729,6 +18165,10 @@ class InstancePortInfo {
           .toList(),
       commonName: json['commonName'] as String?,
       fromPort: json['fromPort'] as int?,
+      ipv6Cidrs: (json['ipv6Cidrs'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       protocol: (json['protocol'] as String?)?.toNetworkProtocol(),
       toPort: json['toPort'] as int?,
     );
@@ -15745,10 +18185,12 @@ class InstancePortState {
   /// console to connect to your instance.
   final List<String>? cidrListAliases;
 
-  /// The IP address, or range of IP addresses in CIDR notation, that are allowed
-  /// to connect to an instance through the ports, and the protocol. Lightsail
-  /// supports IPv4 addresses.
-  ///
+  /// The IPv4 address, or range of IPv4 addresses (in CIDR notation) that are
+  /// allowed to connect to an instance through the ports, and the protocol.
+  /// <note>
+  /// The <code>ipv6Cidrs</code> parameter lists the IPv6 addresses that are
+  /// allowed to connect to an instance.
+  /// </note>
   /// For more information about CIDR block notation, see <a
   /// href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Classless
   /// Inter-Domain Routing</a> on <i>Wikipedia</i>.
@@ -15763,15 +18205,36 @@ class InstancePortState {
   /// TCP and UDP - <code>0</code> to <code>65535</code>
   /// </li>
   /// <li>
-  /// ICMP - The ICMP type. For example, specify <code>8</code> as the
-  /// <code>fromPort</code> (ICMP type), and <code>-1</code> as the
+  /// ICMP - The ICMP type for IPv4 addresses. For example, specify <code>8</code>
+  /// as the <code>fromPort</code> (ICMP type), and <code>-1</code> as the
   /// <code>toPort</code> (ICMP code), to enable ICMP Ping. For more information,
   /// see <a
   /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages">Control
   /// Messages</a> on <i>Wikipedia</i>.
   /// </li>
+  /// <li>
+  /// ICMPv6 - The ICMP type for IPv6 addresses. For example, specify
+  /// <code>128</code> as the <code>fromPort</code> (ICMPv6 type), and
+  /// <code>0</code> as <code>toPort</code> (ICMPv6 code). For more information,
+  /// see <a
+  /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6">Internet
+  /// Control Message Protocol for IPv6</a>.
+  /// </li>
   /// </ul>
   final int? fromPort;
+
+  /// The IPv6 address, or range of IPv6 addresses (in CIDR notation) that are
+  /// allowed to connect to an instance through the ports, and the protocol. Only
+  /// devices with an IPv6 address can connect to an instance through IPv6;
+  /// otherwise, IPv4 should be used.
+  /// <note>
+  /// The <code>cidrs</code> parameter lists the IPv4 addresses that are allowed
+  /// to connect to an instance.
+  /// </note>
+  /// For more information about CIDR block notation, see <a
+  /// href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Classless
+  /// Inter-Domain Routing</a> on <i>Wikipedia</i>.
+  final List<String>? ipv6Cidrs;
 
   /// The IP protocol name.
   ///
@@ -15827,12 +18290,20 @@ class InstancePortState {
   /// TCP and UDP - <code>0</code> to <code>65535</code>
   /// </li>
   /// <li>
-  /// ICMP - The ICMP code. For example, specify <code>8</code> as the
-  /// <code>fromPort</code> (ICMP type), and <code>-1</code> as the
+  /// ICMP - The ICMP code for IPv4 addresses. For example, specify <code>8</code>
+  /// as the <code>fromPort</code> (ICMP type), and <code>-1</code> as the
   /// <code>toPort</code> (ICMP code), to enable ICMP Ping. For more information,
   /// see <a
   /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages">Control
   /// Messages</a> on <i>Wikipedia</i>.
+  /// </li>
+  /// <li>
+  /// ICMPv6 - The ICMP code for IPv6 addresses. For example, specify
+  /// <code>128</code> as the <code>fromPort</code> (ICMPv6 type), and
+  /// <code>0</code> as <code>toPort</code> (ICMPv6 code). For more information,
+  /// see <a
+  /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6">Internet
+  /// Control Message Protocol for IPv6</a>.
   /// </li>
   /// </ul>
   final int? toPort;
@@ -15841,6 +18312,7 @@ class InstancePortState {
     this.cidrListAliases,
     this.cidrs,
     this.fromPort,
+    this.ipv6Cidrs,
     this.protocol,
     this.state,
     this.toPort,
@@ -15856,6 +18328,10 @@ class InstancePortState {
           .map((e) => e as String)
           .toList(),
       fromPort: json['fromPort'] as int?,
+      ipv6Cidrs: (json['ipv6Cidrs'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
       protocol: (json['protocol'] as String?)?.toNetworkProtocol(),
       state: (json['state'] as String?)?.toPortState(),
       toPort: json['toPort'] as int?,
@@ -15905,6 +18381,10 @@ class InstanceSnapshot {
   final String? name;
 
   /// The progress of the snapshot.
+  /// <note>
+  /// This is populated only for disk snapshots, and is <code>null</code> for
+  /// instance snapshots.
+  /// </note>
   final String? progress;
 
   /// The type of resource (usually <code>InstanceSnapshot</code>).
@@ -15923,8 +18403,8 @@ class InstanceSnapshot {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   InstanceSnapshot({
@@ -16060,6 +18540,34 @@ class InstanceState {
   }
 }
 
+enum IpAddressType {
+  dualstack,
+  ipv4,
+}
+
+extension on IpAddressType {
+  String toValue() {
+    switch (this) {
+      case IpAddressType.dualstack:
+        return 'dualstack';
+      case IpAddressType.ipv4:
+        return 'ipv4';
+    }
+  }
+}
+
+extension on String {
+  IpAddressType toIpAddressType() {
+    switch (this) {
+      case 'dualstack':
+        return IpAddressType.dualstack;
+      case 'ipv4':
+        return IpAddressType.ipv4;
+    }
+    throw Exception('$this is not known in enum IpAddressType');
+  }
+}
+
 class IsVpcPeeredResult {
   /// Returns <code>true</code> if the Lightsail VPC is peered; otherwise,
   /// <code>false</code>.
@@ -16075,7 +18583,7 @@ class IsVpcPeeredResult {
   }
 }
 
-/// Describes the SSH key pair.
+/// Describes an SSH key pair.
 class KeyPair {
   /// The Amazon Resource Name (ARN) of the key pair (e.g.,
   /// <code>arn:aws:lightsail:us-east-2:123456789101:KeyPair/05859e3d-331d-48ba-9034-12345EXAMPLE</code>).
@@ -16104,8 +18612,8 @@ class KeyPair {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   KeyPair({
@@ -16175,15 +18683,21 @@ class LightsailDistribution {
   /// The domain name of the distribution.
   final String? domainName;
 
+  /// The IP address type of the distribution.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  final IpAddressType? ipAddressType;
+
   /// Indicates whether the distribution is enabled.
   final bool? isEnabled;
 
-  /// An object that describes the location of the distribution, such as the AWS
-  /// Region and Availability Zone.
+  /// An object that describes the location of the distribution, such as the
+  /// Amazon Web Services Region and Availability Zone.
   /// <note>
   /// Lightsail distributions are global resources that can reference an origin in
-  /// any AWS Region, and distribute its content globally. However, all
-  /// distributions are located in the <code>us-east-1</code> Region.
+  /// any Amazon Web Services Region, and distribute its content globally.
+  /// However, all distributions are located in the <code>us-east-1</code> Region.
   /// </note>
   final ResourceLocation? location;
 
@@ -16191,7 +18705,7 @@ class LightsailDistribution {
   final String? name;
 
   /// An object that describes the origin resource of the distribution, such as a
-  /// Lightsail instance or load balancer.
+  /// Lightsail instance, bucket, or load balancer.
   ///
   /// The distribution pulls, caches, and serves content from the origin.
   final Origin? origin;
@@ -16212,8 +18726,8 @@ class LightsailDistribution {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   LightsailDistribution({
@@ -16227,6 +18741,7 @@ class LightsailDistribution {
     this.createdAt,
     this.defaultCacheBehavior,
     this.domainName,
+    this.ipAddressType,
     this.isEnabled,
     this.location,
     this.name,
@@ -16261,6 +18776,7 @@ class LightsailDistribution {
               json['defaultCacheBehavior'] as Map<String, dynamic>)
           : null,
       domainName: json['domainName'] as String?,
+      ipAddressType: (json['ipAddressType'] as String?)?.toIpAddressType(),
       isEnabled: json['isEnabled'] as bool?,
       location: json['location'] != null
           ? ResourceLocation.fromJson(json['location'] as Map<String, dynamic>)
@@ -16281,7 +18797,7 @@ class LightsailDistribution {
   }
 }
 
-/// Describes the Lightsail load balancer.
+/// Describes a load balancer.
 class LoadBalancer {
   /// The Amazon Resource Name (ARN) of the load balancer.
   final String? arn;
@@ -16301,6 +18817,10 @@ class LoadBalancer {
   /// page.
   final String? healthCheckPath;
 
+  /// A Boolean value that indicates whether HTTPS redirection is enabled for the
+  /// load balancer.
+  final bool? httpsRedirectionEnabled;
+
   /// An array of InstanceHealthSummary objects describing the health of the load
   /// balancer.
   final List<InstanceHealthSummary>? instanceHealthSummary;
@@ -16308,6 +18828,12 @@ class LoadBalancer {
   /// The port where the load balancer will direct traffic to your Lightsail
   /// instances. For HTTP traffic, it's port 80. For HTTPS traffic, it's port 443.
   final int? instancePort;
+
+  /// The IP address type of the load balancer.
+  ///
+  /// The possible values are <code>ipv4</code> for IPv4 only, and
+  /// <code>dualstack</code> for IPv4 and IPv6.
+  final IpAddressType? ipAddressType;
 
   /// The AWS Region where your load balancer was created (e.g.,
   /// <code>us-east-2a</code>). Lightsail automatically creates your load balancer
@@ -16341,8 +18867,8 @@ class LoadBalancer {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   /// An array of LoadBalancerTlsCertificateSummary objects that provide
@@ -16350,14 +18876,19 @@ class LoadBalancer {
   /// <code>true</code>, the certificate is attached to the load balancer.
   final List<LoadBalancerTlsCertificateSummary>? tlsCertificateSummaries;
 
+  /// The name of the TLS security policy for the load balancer.
+  final String? tlsPolicyName;
+
   LoadBalancer({
     this.arn,
     this.configurationOptions,
     this.createdAt,
     this.dnsName,
     this.healthCheckPath,
+    this.httpsRedirectionEnabled,
     this.instanceHealthSummary,
     this.instancePort,
+    this.ipAddressType,
     this.location,
     this.name,
     this.protocol,
@@ -16367,6 +18898,7 @@ class LoadBalancer {
     this.supportCode,
     this.tags,
     this.tlsCertificateSummaries,
+    this.tlsPolicyName,
   });
   factory LoadBalancer.fromJson(Map<String, dynamic> json) {
     return LoadBalancer(
@@ -16377,11 +18909,13 @@ class LoadBalancer {
       createdAt: timeStampFromJson(json['createdAt']),
       dnsName: json['dnsName'] as String?,
       healthCheckPath: json['healthCheckPath'] as String?,
+      httpsRedirectionEnabled: json['httpsRedirectionEnabled'] as bool?,
       instanceHealthSummary: (json['instanceHealthSummary'] as List?)
           ?.whereNotNull()
           .map((e) => InstanceHealthSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       instancePort: json['instancePort'] as int?,
+      ipAddressType: (json['ipAddressType'] as String?)?.toIpAddressType(),
       location: json['location'] != null
           ? ResourceLocation.fromJson(json['location'] as Map<String, dynamic>)
           : null,
@@ -16403,6 +18937,7 @@ class LoadBalancer {
           .map((e) => LoadBalancerTlsCertificateSummary.fromJson(
               e as Map<String, dynamic>))
           .toList(),
+      tlsPolicyName: json['tlsPolicyName'] as String?,
     );
   }
 }
@@ -16411,6 +18946,8 @@ enum LoadBalancerAttributeName {
   healthCheckPath,
   sessionStickinessEnabled,
   sessionStickinessLbCookieDurationSeconds,
+  httpsRedirectionEnabled,
+  tlsPolicyName,
 }
 
 extension on LoadBalancerAttributeName {
@@ -16422,6 +18959,10 @@ extension on LoadBalancerAttributeName {
         return 'SessionStickinessEnabled';
       case LoadBalancerAttributeName.sessionStickinessLbCookieDurationSeconds:
         return 'SessionStickiness_LB_CookieDurationSeconds';
+      case LoadBalancerAttributeName.httpsRedirectionEnabled:
+        return 'HttpsRedirectionEnabled';
+      case LoadBalancerAttributeName.tlsPolicyName:
+        return 'TlsPolicyName';
     }
   }
 }
@@ -16436,6 +18977,10 @@ extension on String {
       case 'SessionStickiness_LB_CookieDurationSeconds':
         return LoadBalancerAttributeName
             .sessionStickinessLbCookieDurationSeconds;
+      case 'HttpsRedirectionEnabled':
+        return LoadBalancerAttributeName.httpsRedirectionEnabled;
+      case 'TlsPolicyName':
+        return LoadBalancerAttributeName.tlsPolicyName;
     }
     throw Exception('$this is not known in enum LoadBalancerAttributeName');
   }
@@ -16635,8 +19180,8 @@ class LoadBalancerTlsCertificate {
   /// the problem, search for your domain name on the <a
   /// href="https://www.virustotal.com/gui/home/url">VirusTotal</a> website. If
   /// your domain is reported as suspicious, see <a
-  /// href="https://www.google.com/webmasters/hacked/?hl=en">Google Help for
-  /// Hacked Websites</a> to learn what you can do.
+  /// href="https://developers.google.com/web/fundamentals/security/hacked">Google
+  /// Help for Hacked Websites</a> to learn what you can do.
   ///
   /// If you believe that the result is a false positive, notify the organization
   /// that is reporting the domain. VirusTotal is an aggregate of several
@@ -16772,8 +19317,8 @@ class LoadBalancerTlsCertificate {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   LoadBalancerTlsCertificate({
@@ -17273,6 +19818,56 @@ class LoadBalancerTlsCertificateSummary {
     return LoadBalancerTlsCertificateSummary(
       isAttached: json['isAttached'] as bool?,
       name: json['name'] as String?,
+    );
+  }
+}
+
+/// Describes the TLS security policies that are available for Lightsail load
+/// balancers.
+///
+/// For more information about load balancer TLS security policies, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-configure-load-balancer-tls-security-policy">Configuring
+/// TLS security policies on your Amazon Lightsail load balancers</a> in the
+/// <i>Amazon Lightsail Developer Guide</i>.
+class LoadBalancerTlsPolicy {
+  /// The ciphers used by the TLS security policy.
+  ///
+  /// The ciphers are listed in order of preference.
+  final List<String>? ciphers;
+
+  /// The description of the TLS security policy.
+  final String? description;
+
+  /// A Boolean value that indicates whether the TLS security policy is the
+  /// default.
+  final bool? isDefault;
+
+  /// The name of the TLS security policy.
+  final String? name;
+
+  /// The protocols used in a given TLS security policy.
+  final List<String>? protocols;
+
+  LoadBalancerTlsPolicy({
+    this.ciphers,
+    this.description,
+    this.isDefault,
+    this.name,
+    this.protocols,
+  });
+  factory LoadBalancerTlsPolicy.fromJson(Map<String, dynamic> json) {
+    return LoadBalancerTlsPolicy(
+      ciphers: (json['ciphers'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      description: json['description'] as String?,
+      isDefault: json['isDefault'] as bool?,
+      name: json['name'] as String?,
+      protocols: (json['protocols'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
     );
   }
 }
@@ -17804,7 +20399,7 @@ class Operation {
   /// A Boolean value indicating whether the operation is terminal.
   final bool? isTerminal;
 
-  /// The AWS Region and Availability Zone.
+  /// The Amazon Web Services Region and Availability Zone.
   final ResourceLocation? location;
 
   /// Details about the operation (e.g., <code>Debian-1GB-Ohio-1</code>).
@@ -17966,6 +20561,7 @@ enum OperationType {
   attachCertificateToDistribution,
   detachCertificateFromDistribution,
   updateDistributionBundle,
+  setIpAddressType,
   createCertificate,
   deleteCertificate,
   createContainerService,
@@ -17975,6 +20571,13 @@ enum OperationType {
   createContainerServiceRegistryLogin,
   registerContainerImage,
   deleteContainerImage,
+  createBucket,
+  deleteBucket,
+  createBucketAccessKey,
+  deleteBucketAccessKey,
+  updateBucketBundle,
+  updateBucket,
+  setResourceAccessForBucket,
 }
 
 extension on OperationType {
@@ -18104,6 +20707,8 @@ extension on OperationType {
         return 'DetachCertificateFromDistribution';
       case OperationType.updateDistributionBundle:
         return 'UpdateDistributionBundle';
+      case OperationType.setIpAddressType:
+        return 'SetIpAddressType';
       case OperationType.createCertificate:
         return 'CreateCertificate';
       case OperationType.deleteCertificate:
@@ -18122,6 +20727,20 @@ extension on OperationType {
         return 'RegisterContainerImage';
       case OperationType.deleteContainerImage:
         return 'DeleteContainerImage';
+      case OperationType.createBucket:
+        return 'CreateBucket';
+      case OperationType.deleteBucket:
+        return 'DeleteBucket';
+      case OperationType.createBucketAccessKey:
+        return 'CreateBucketAccessKey';
+      case OperationType.deleteBucketAccessKey:
+        return 'DeleteBucketAccessKey';
+      case OperationType.updateBucketBundle:
+        return 'UpdateBucketBundle';
+      case OperationType.updateBucket:
+        return 'UpdateBucket';
+      case OperationType.setResourceAccessForBucket:
+        return 'SetResourceAccessForBucket';
     }
   }
 }
@@ -18253,6 +20872,8 @@ extension on String {
         return OperationType.detachCertificateFromDistribution;
       case 'UpdateDistributionBundle':
         return OperationType.updateDistributionBundle;
+      case 'SetIpAddressType':
+        return OperationType.setIpAddressType;
       case 'CreateCertificate':
         return OperationType.createCertificate;
       case 'DeleteCertificate':
@@ -18271,6 +20892,20 @@ extension on String {
         return OperationType.registerContainerImage;
       case 'DeleteContainerImage':
         return OperationType.deleteContainerImage;
+      case 'CreateBucket':
+        return OperationType.createBucket;
+      case 'DeleteBucket':
+        return OperationType.deleteBucket;
+      case 'CreateBucketAccessKey':
+        return OperationType.createBucketAccessKey;
+      case 'DeleteBucketAccessKey':
+        return OperationType.deleteBucketAccessKey;
+      case 'UpdateBucketBundle':
+        return OperationType.updateBucketBundle;
+      case 'UpdateBucket':
+        return OperationType.updateBucket;
+      case 'SetResourceAccessForBucket':
+        return OperationType.setResourceAccessForBucket;
     }
     throw Exception('$this is not known in enum OperationType');
   }
@@ -18279,9 +20914,9 @@ extension on String {
 /// Describes the origin resource of an Amazon Lightsail content delivery
 /// network (CDN) distribution.
 ///
-/// An origin can be a Lightsail instance or load balancer. A distribution pulls
-/// content from an origin, caches it, and serves it to viewers via a worldwide
-/// network of edge servers.
+/// An origin can be a Lightsail instance, bucket, or load balancer. A
+/// distribution pulls content from an origin, caches it, and serves it to
+/// viewers via a worldwide network of edge servers.
 class Origin {
   /// The name of the origin resource.
   final String? name;
@@ -18490,10 +21125,12 @@ class PortInfo {
   /// console to connect to your instance.
   final List<String>? cidrListAliases;
 
-  /// The IP address, or range of IP addresses in CIDR notation, that are allowed
-  /// to connect to an instance through the ports, and the protocol. Lightsail
-  /// supports IPv4 addresses.
-  ///
+  /// The IPv4 address, or range of IPv4 addresses (in CIDR notation) that are
+  /// allowed to connect to an instance through the ports, and the protocol.
+  /// <note>
+  /// The <code>ipv6Cidrs</code> parameter lists the IPv6 addresses that are
+  /// allowed to connect to an instance.
+  /// </note>
   /// Examples:
   ///
   /// <ul>
@@ -18520,15 +21157,36 @@ class PortInfo {
   /// TCP and UDP - <code>0</code> to <code>65535</code>
   /// </li>
   /// <li>
-  /// ICMP - The ICMP type. For example, specify <code>8</code> as the
-  /// <code>fromPort</code> (ICMP type), and <code>-1</code> as the
+  /// ICMP - The ICMP type for IPv4 addresses. For example, specify <code>8</code>
+  /// as the <code>fromPort</code> (ICMP type), and <code>-1</code> as the
   /// <code>toPort</code> (ICMP code), to enable ICMP Ping. For more information,
   /// see <a
   /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages">Control
   /// Messages</a> on <i>Wikipedia</i>.
   /// </li>
+  /// <li>
+  /// ICMPv6 - The ICMP type for IPv6 addresses. For example, specify
+  /// <code>128</code> as the <code>fromPort</code> (ICMPv6 type), and
+  /// <code>0</code> as <code>toPort</code> (ICMPv6 code). For more information,
+  /// see <a
+  /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6">Internet
+  /// Control Message Protocol for IPv6</a>.
+  /// </li>
   /// </ul>
   final int? fromPort;
+
+  /// The IPv6 address, or range of IPv6 addresses (in CIDR notation) that are
+  /// allowed to connect to an instance through the ports, and the protocol. Only
+  /// devices with an IPv6 address can connect to an instance through IPv6;
+  /// otherwise, IPv4 should be used.
+  /// <note>
+  /// The <code>cidrs</code> parameter lists the IPv4 addresses that are allowed
+  /// to connect to an instance.
+  /// </note>
+  /// For more information about CIDR block notation, see <a
+  /// href="https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing#CIDR_notation">Classless
+  /// Inter-Domain Routing</a> on <i>Wikipedia</i>.
+  final List<String>? ipv6Cidrs;
 
   /// The IP protocol name.
   ///
@@ -18577,12 +21235,20 @@ class PortInfo {
   /// TCP and UDP - <code>0</code> to <code>65535</code>
   /// </li>
   /// <li>
-  /// ICMP - The ICMP code. For example, specify <code>8</code> as the
-  /// <code>fromPort</code> (ICMP type), and <code>-1</code> as the
+  /// ICMP - The ICMP code for IPv4 addresses. For example, specify <code>8</code>
+  /// as the <code>fromPort</code> (ICMP type), and <code>-1</code> as the
   /// <code>toPort</code> (ICMP code), to enable ICMP Ping. For more information,
   /// see <a
   /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol#Control_messages">Control
   /// Messages</a> on <i>Wikipedia</i>.
+  /// </li>
+  /// <li>
+  /// ICMPv6 - The ICMP code for IPv6 addresses. For example, specify
+  /// <code>128</code> as the <code>fromPort</code> (ICMPv6 type), and
+  /// <code>0</code> as <code>toPort</code> (ICMPv6 code). For more information,
+  /// see <a
+  /// href="https://en.wikipedia.org/wiki/Internet_Control_Message_Protocol_for_IPv6">Internet
+  /// Control Message Protocol for IPv6</a>.
   /// </li>
   /// </ul>
   final int? toPort;
@@ -18591,6 +21257,7 @@ class PortInfo {
     this.cidrListAliases,
     this.cidrs,
     this.fromPort,
+    this.ipv6Cidrs,
     this.protocol,
     this.toPort,
   });
@@ -18598,12 +21265,14 @@ class PortInfo {
     final cidrListAliases = this.cidrListAliases;
     final cidrs = this.cidrs;
     final fromPort = this.fromPort;
+    final ipv6Cidrs = this.ipv6Cidrs;
     final protocol = this.protocol;
     final toPort = this.toPort;
     return {
       if (cidrListAliases != null) 'cidrListAliases': cidrListAliases,
       if (cidrs != null) 'cidrs': cidrs,
       if (fromPort != null) 'fromPort': fromPort,
+      if (ipv6Cidrs != null) 'ipv6Cidrs': ipv6Cidrs,
       if (protocol != null) 'protocol': protocol.toValue(),
       if (toPort != null) 'toPort': toPort,
     };
@@ -18673,6 +21342,59 @@ extension on String {
         return PortState.closed;
     }
     throw Exception('$this is not known in enum PortState');
+  }
+}
+
+/// Describes the configuration for an Amazon Lightsail container service to
+/// access private container image repositories, such as Amazon Elastic
+/// Container Registry (Amazon ECR) private repositories.
+///
+/// For more information, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+/// access to an Amazon ECR private repository for an Amazon Lightsail container
+/// service</a> in the <i>Amazon Lightsail Developer Guide</i>.
+class PrivateRegistryAccess {
+  /// An object that describes the activation status of the role that you can use
+  /// to grant a Lightsail container service access to Amazon ECR private
+  /// repositories. If the role is activated, the Amazon Resource Name (ARN) of
+  /// the role is also listed.
+  final ContainerServiceECRImagePullerRole? ecrImagePullerRole;
+
+  PrivateRegistryAccess({
+    this.ecrImagePullerRole,
+  });
+  factory PrivateRegistryAccess.fromJson(Map<String, dynamic> json) {
+    return PrivateRegistryAccess(
+      ecrImagePullerRole: json['ecrImagePullerRole'] != null
+          ? ContainerServiceECRImagePullerRole.fromJson(
+              json['ecrImagePullerRole'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+/// Describes a request to configure an Amazon Lightsail container service to
+/// access private container image repositories, such as Amazon Elastic
+/// Container Registry (Amazon ECR) private repositories.
+///
+/// For more information, see <a
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-container-service-ecr-private-repo-access">Configuring
+/// access to an Amazon ECR private repository for an Amazon Lightsail container
+/// service</a> in the <i>Amazon Lightsail Developer Guide</i>.
+class PrivateRegistryAccessRequest {
+  /// An object to describe a request to activate or deactivate the role that you
+  /// can use to grant an Amazon Lightsail container service access to Amazon
+  /// Elastic Container Registry (Amazon ECR) private repositories.
+  final ContainerServiceECRImagePullerRoleRequest? ecrImagePullerRole;
+
+  PrivateRegistryAccessRequest({
+    this.ecrImagePullerRole,
+  });
+  Map<String, dynamic> toJson() {
+    final ecrImagePullerRole = this.ecrImagePullerRole;
+    return {
+      if (ecrImagePullerRole != null) 'ecrImagePullerRole': ecrImagePullerRole,
+    };
   }
 }
 
@@ -18894,6 +21616,7 @@ enum RegionName {
   apSoutheast_2,
   apNortheast_1,
   apNortheast_2,
+  euNorth_1,
 }
 
 extension on RegionName {
@@ -18927,6 +21650,8 @@ extension on RegionName {
         return 'ap-northeast-1';
       case RegionName.apNortheast_2:
         return 'ap-northeast-2';
+      case RegionName.euNorth_1:
+        return 'eu-north-1';
     }
   }
 }
@@ -18962,12 +21687,16 @@ extension on String {
         return RegionName.apNortheast_1;
       case 'ap-northeast-2':
         return RegionName.apNortheast_2;
+      case 'eu-north-1':
+        return RegionName.euNorth_1;
     }
     throw Exception('$this is not known in enum RegionName');
   }
 }
 
 class RegisterContainerImageResult {
+  /// An object that describes a container image that is registered to a Lightsail
+  /// container service
   final ContainerImage? containerImage;
 
   RegisterContainerImageResult({
@@ -19078,8 +21807,8 @@ class RelationalDatabase {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   RelationalDatabase({
@@ -19573,8 +22302,8 @@ class RelationalDatabaseSnapshot {
 
   /// The tag keys and optional values for the resource. For more information
   /// about tags in Lightsail, see the <a
-  /// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-  /// Dev Guide</a>.
+  /// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+  /// Lightsail Developer Guide</a>.
   final List<Tag>? tags;
 
   RelationalDatabaseSnapshot({
@@ -19772,6 +22501,34 @@ class ResetDistributionCacheResult {
   }
 }
 
+enum ResourceBucketAccess {
+  allow,
+  deny,
+}
+
+extension on ResourceBucketAccess {
+  String toValue() {
+    switch (this) {
+      case ResourceBucketAccess.allow:
+        return 'allow';
+      case ResourceBucketAccess.deny:
+        return 'deny';
+    }
+  }
+}
+
+extension on String {
+  ResourceBucketAccess toResourceBucketAccess() {
+    switch (this) {
+      case 'allow':
+        return ResourceBucketAccess.allow;
+      case 'deny':
+        return ResourceBucketAccess.deny;
+    }
+    throw Exception('$this is not known in enum ResourceBucketAccess');
+  }
+}
+
 /// Describes the resource location.
 class ResourceLocation {
   /// The Availability Zone. Follows the format <code>us-east-2a</code>
@@ -19789,6 +22546,27 @@ class ResourceLocation {
     return ResourceLocation(
       availabilityZone: json['availabilityZone'] as String?,
       regionName: (json['regionName'] as String?)?.toRegionName(),
+    );
+  }
+}
+
+/// Describes an Amazon Lightsail instance that has access to a Lightsail
+/// bucket.
+class ResourceReceivingAccess {
+  /// The name of the Lightsail instance.
+  final String? name;
+
+  /// The Lightsail resource type (for example, <code>Instance</code>).
+  final String? resourceType;
+
+  ResourceReceivingAccess({
+    this.name,
+    this.resourceType,
+  });
+  factory ResourceReceivingAccess.fromJson(Map<String, dynamic> json) {
+    return ResourceReceivingAccess(
+      name: json['name'] as String?,
+      resourceType: json['resourceType'] as String?,
     );
   }
 }
@@ -19839,6 +22617,7 @@ enum ResourceType {
   contactMethod,
   distribution,
   certificate,
+  bucket,
 }
 
 extension on ResourceType {
@@ -19882,6 +22661,8 @@ extension on ResourceType {
         return 'Distribution';
       case ResourceType.certificate:
         return 'Certificate';
+      case ResourceType.bucket:
+        return 'Bucket';
     }
   }
 }
@@ -19927,6 +22708,8 @@ extension on String {
         return ResourceType.distribution;
       case 'Certificate':
         return ResourceType.certificate;
+      case 'Bucket':
+        return ResourceType.bucket;
     }
     throw Exception('$this is not known in enum ResourceType');
   }
@@ -19944,6 +22727,44 @@ class SendContactMethodVerificationResult {
   factory SendContactMethodVerificationResult.fromJson(
       Map<String, dynamic> json) {
     return SendContactMethodVerificationResult(
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class SetIpAddressTypeResult {
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  SetIpAddressTypeResult({
+    this.operations,
+  });
+  factory SetIpAddressTypeResult.fromJson(Map<String, dynamic> json) {
+    return SetIpAddressTypeResult(
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class SetResourceAccessForBucketResult {
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  SetResourceAccessForBucketResult({
+    this.operations,
+  });
+  factory SetResourceAccessForBucketResult.fromJson(Map<String, dynamic> json) {
+    return SetResourceAccessForBucketResult(
       operations: (json['operations'] as List?)
           ?.whereNotNull()
           .map((e) => Operation.fromJson(e as Map<String, dynamic>))
@@ -19990,7 +22811,7 @@ class StartRelationalDatabaseResult {
   }
 }
 
-/// Describes the static IP.
+/// Describes a static IP.
 class StaticIp {
   /// The Amazon Resource Name (ARN) of the static IP (e.g.,
   /// <code>arn:aws:lightsail:us-east-2:123456789101:StaticIp/9cbb4a9e-f8e3-4dfe-b57e-12345EXAMPLE</code>).
@@ -20052,6 +22873,34 @@ class StaticIp {
   }
 }
 
+enum StatusType {
+  active,
+  inactive,
+}
+
+extension on StatusType {
+  String toValue() {
+    switch (this) {
+      case StatusType.active:
+        return 'Active';
+      case StatusType.inactive:
+        return 'Inactive';
+    }
+  }
+}
+
+extension on String {
+  StatusType toStatusType() {
+    switch (this) {
+      case 'Active':
+        return StatusType.active;
+      case 'Inactive':
+        return StatusType.inactive;
+    }
+    throw Exception('$this is not known in enum StatusType');
+  }
+}
+
 class StopInstanceResult {
   /// An array of objects that describe the result of the action, such as the
   /// status of the request, the timestamp of the request, and the resources
@@ -20094,8 +22943,8 @@ class StopRelationalDatabaseResult {
 /// resource.
 ///
 /// For more information about tags in Lightsail, see the <a
-/// href="https://lightsail.aws.amazon.com/ls/docs/en/articles/amazon-lightsail-tags">Lightsail
-/// Dev Guide</a>.
+/// href="https://lightsail.aws.amazon.com/ls/docs/en_us/articles/amazon-lightsail-tags">Amazon
+/// Lightsail Developer Guide</a>.
 class Tag {
   /// The key of the tag.
   ///
@@ -20243,6 +23092,51 @@ class UntagResourceResult {
   }
 }
 
+class UpdateBucketBundleResult {
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  UpdateBucketBundleResult({
+    this.operations,
+  });
+  factory UpdateBucketBundleResult.fromJson(Map<String, dynamic> json) {
+    return UpdateBucketBundleResult(
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
+class UpdateBucketResult {
+  /// An object that describes the bucket that is updated.
+  final Bucket? bucket;
+
+  /// An array of objects that describe the result of the action, such as the
+  /// status of the request, the timestamp of the request, and the resources
+  /// affected by the request.
+  final List<Operation>? operations;
+
+  UpdateBucketResult({
+    this.bucket,
+    this.operations,
+  });
+  factory UpdateBucketResult.fromJson(Map<String, dynamic> json) {
+    return UpdateBucketResult(
+      bucket: json['bucket'] != null
+          ? Bucket.fromJson(json['bucket'] as Map<String, dynamic>)
+          : null,
+      operations: (json['operations'] as List?)
+          ?.whereNotNull()
+          .map((e) => Operation.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}
+
 class UpdateContainerServiceResult {
   /// An object that describes a container service.
   final ContainerService? containerService;
@@ -20261,6 +23155,9 @@ class UpdateContainerServiceResult {
 }
 
 class UpdateDistributionBundleResult {
+  /// An object that describes the result of the action, such as the status of the
+  /// request, the timestamp of the request, and the resources affected by the
+  /// request.
   final Operation? operation;
 
   UpdateDistributionBundleResult({

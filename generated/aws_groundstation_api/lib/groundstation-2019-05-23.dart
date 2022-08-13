@@ -1147,6 +1147,7 @@ enum ConfigCapabilityType {
   dataflowEndpoint,
   tracking,
   uplinkEcho,
+  s3Recording,
 }
 
 extension on ConfigCapabilityType {
@@ -1164,6 +1165,8 @@ extension on ConfigCapabilityType {
         return 'tracking';
       case ConfigCapabilityType.uplinkEcho:
         return 'uplink-echo';
+      case ConfigCapabilityType.s3Recording:
+        return 's3-recording';
     }
   }
 }
@@ -1183,6 +1186,8 @@ extension on String {
         return ConfigCapabilityType.tracking;
       case 'uplink-echo':
         return ConfigCapabilityType.uplinkEcho;
+      case 's3-recording':
+        return ConfigCapabilityType.s3Recording;
     }
     throw Exception('$this is not known in enum ConfigCapabilityType');
   }
@@ -1194,9 +1199,13 @@ class ConfigDetails {
   final AntennaDemodDecodeDetails? antennaDemodDecodeDetails;
   final EndpointDetails? endpointDetails;
 
+  /// Details for an S3 recording <code>Config</code> in a contact.
+  final S3RecordingDetails? s3RecordingDetails;
+
   ConfigDetails({
     this.antennaDemodDecodeDetails,
     this.endpointDetails,
+    this.s3RecordingDetails,
   });
   factory ConfigDetails.fromJson(Map<String, dynamic> json) {
     return ConfigDetails(
@@ -1207,6 +1216,10 @@ class ConfigDetails {
       endpointDetails: json['endpointDetails'] != null
           ? EndpointDetails.fromJson(
               json['endpointDetails'] as Map<String, dynamic>)
+          : null,
+      s3RecordingDetails: json['s3RecordingDetails'] != null
+          ? S3RecordingDetails.fromJson(
+              json['s3RecordingDetails'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -1287,6 +1300,9 @@ class ConfigTypeData {
   /// Information about the dataflow endpoint <code>Config</code>.
   final DataflowEndpointConfig? dataflowEndpointConfig;
 
+  /// Information about an S3 recording <code>Config</code>.
+  final S3RecordingConfig? s3RecordingConfig;
+
   /// Object that determines whether tracking should be used during a contact
   /// executed with this <code>Config</code> in the mission profile.
   final TrackingConfig? trackingConfig;
@@ -1303,6 +1319,7 @@ class ConfigTypeData {
     this.antennaDownlinkDemodDecodeConfig,
     this.antennaUplinkConfig,
     this.dataflowEndpointConfig,
+    this.s3RecordingConfig,
     this.trackingConfig,
     this.uplinkEchoConfig,
   });
@@ -1326,6 +1343,10 @@ class ConfigTypeData {
           ? DataflowEndpointConfig.fromJson(
               json['dataflowEndpointConfig'] as Map<String, dynamic>)
           : null,
+      s3RecordingConfig: json['s3RecordingConfig'] != null
+          ? S3RecordingConfig.fromJson(
+              json['s3RecordingConfig'] as Map<String, dynamic>)
+          : null,
       trackingConfig: json['trackingConfig'] != null
           ? TrackingConfig.fromJson(
               json['trackingConfig'] as Map<String, dynamic>)
@@ -1343,6 +1364,7 @@ class ConfigTypeData {
         this.antennaDownlinkDemodDecodeConfig;
     final antennaUplinkConfig = this.antennaUplinkConfig;
     final dataflowEndpointConfig = this.dataflowEndpointConfig;
+    final s3RecordingConfig = this.s3RecordingConfig;
     final trackingConfig = this.trackingConfig;
     final uplinkEchoConfig = this.uplinkEchoConfig;
     return {
@@ -1354,6 +1376,7 @@ class ConfigTypeData {
         'antennaUplinkConfig': antennaUplinkConfig,
       if (dataflowEndpointConfig != null)
         'dataflowEndpointConfig': dataflowEndpointConfig,
+      if (s3RecordingConfig != null) 's3RecordingConfig': s3RecordingConfig,
       if (trackingConfig != null) 'trackingConfig': trackingConfig,
       if (uplinkEchoConfig != null) 'uplinkEchoConfig': uplinkEchoConfig,
     };
@@ -2617,6 +2640,62 @@ extension on String {
         return Polarization.rightHand;
     }
     throw Exception('$this is not known in enum Polarization');
+  }
+}
+
+/// Information about an S3 recording <code>Config</code>.
+class S3RecordingConfig {
+  /// ARN of the bucket to record to.
+  final String bucketArn;
+
+  /// ARN of the role Ground Station assumes to write data to the bucket.
+  final String roleArn;
+
+  /// S3 Key prefix to prefice data files.
+  final String? prefix;
+
+  S3RecordingConfig({
+    required this.bucketArn,
+    required this.roleArn,
+    this.prefix,
+  });
+  factory S3RecordingConfig.fromJson(Map<String, dynamic> json) {
+    return S3RecordingConfig(
+      bucketArn: json['bucketArn'] as String,
+      roleArn: json['roleArn'] as String,
+      prefix: json['prefix'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final bucketArn = this.bucketArn;
+    final roleArn = this.roleArn;
+    final prefix = this.prefix;
+    return {
+      'bucketArn': bucketArn,
+      'roleArn': roleArn,
+      if (prefix != null) 'prefix': prefix,
+    };
+  }
+}
+
+/// Details about an S3 recording <code>Config</code> used in a contact.
+class S3RecordingDetails {
+  /// ARN of the bucket used.
+  final String? bucketArn;
+
+  /// Template of the S3 key used.
+  final String? keyTemplate;
+
+  S3RecordingDetails({
+    this.bucketArn,
+    this.keyTemplate,
+  });
+  factory S3RecordingDetails.fromJson(Map<String, dynamic> json) {
+    return S3RecordingDetails(
+      bucketArn: json['bucketArn'] as String?,
+      keyTemplate: json['keyTemplate'] as String?,
+    );
   }
 }
 

@@ -61,8 +61,7 @@ class SavingsPlans {
   ///
   /// Parameter [commitment] :
   /// The hourly commitment, in USD. This is a value between 0.001 and 1
-  /// million. You cannot specify more than three digits after the decimal
-  /// point.
+  /// million. You cannot specify more than five digits after the decimal point.
   ///
   /// Parameter [savingsPlanOfferingId] :
   /// The ID of the offering.
@@ -1159,6 +1158,7 @@ enum SavingsPlanProductType {
   ec2,
   fargate,
   lambda,
+  sageMaker,
 }
 
 extension on SavingsPlanProductType {
@@ -1170,6 +1170,8 @@ extension on SavingsPlanProductType {
         return 'Fargate';
       case SavingsPlanProductType.lambda:
         return 'Lambda';
+      case SavingsPlanProductType.sageMaker:
+        return 'SageMaker';
     }
   }
 }
@@ -1183,6 +1185,8 @@ extension on String {
         return SavingsPlanProductType.fargate;
       case 'Lambda':
         return SavingsPlanProductType.lambda;
+      case 'SageMaker':
+        return SavingsPlanProductType.sageMaker;
     }
     throw Exception('$this is not known in enum SavingsPlanProductType');
   }
@@ -1438,7 +1442,9 @@ extension on String {
 enum SavingsPlanRateServiceCode {
   amazonEC2,
   amazonECS,
+  amazonEKS,
   awsLambda,
+  amazonSageMaker,
 }
 
 extension on SavingsPlanRateServiceCode {
@@ -1448,8 +1454,12 @@ extension on SavingsPlanRateServiceCode {
         return 'AmazonEC2';
       case SavingsPlanRateServiceCode.amazonECS:
         return 'AmazonECS';
+      case SavingsPlanRateServiceCode.amazonEKS:
+        return 'AmazonEKS';
       case SavingsPlanRateServiceCode.awsLambda:
         return 'AWSLambda';
+      case SavingsPlanRateServiceCode.amazonSageMaker:
+        return 'AmazonSageMaker';
     }
   }
 }
@@ -1461,8 +1471,12 @@ extension on String {
         return SavingsPlanRateServiceCode.amazonEC2;
       case 'AmazonECS':
         return SavingsPlanRateServiceCode.amazonECS;
+      case 'AmazonEKS':
+        return SavingsPlanRateServiceCode.amazonEKS;
       case 'AWSLambda':
         return SavingsPlanRateServiceCode.awsLambda;
+      case 'AmazonSageMaker':
+        return SavingsPlanRateServiceCode.amazonSageMaker;
     }
     throw Exception('$this is not known in enum SavingsPlanRateServiceCode');
   }
@@ -1552,6 +1566,7 @@ extension on String {
 enum SavingsPlanType {
   compute,
   eC2Instance,
+  sageMaker,
 }
 
 extension on SavingsPlanType {
@@ -1561,6 +1576,8 @@ extension on SavingsPlanType {
         return 'Compute';
       case SavingsPlanType.eC2Instance:
         return 'EC2Instance';
+      case SavingsPlanType.sageMaker:
+        return 'SageMaker';
     }
   }
 }
@@ -1572,6 +1589,8 @@ extension on String {
         return SavingsPlanType.compute;
       case 'EC2Instance':
         return SavingsPlanType.eC2Instance;
+      case 'SageMaker':
+        return SavingsPlanType.sageMaker;
     }
     throw Exception('$this is not known in enum SavingsPlanType');
   }

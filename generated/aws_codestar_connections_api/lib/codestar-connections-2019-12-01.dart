@@ -149,6 +149,7 @@ class CodeStarconnections {
     required String name,
     required String providerEndpoint,
     required ProviderType providerType,
+    List<Tag>? tags,
     VpcConfiguration? vpcConfiguration,
   }) async {
     ArgumentError.checkNotNull(name, 'name');
@@ -183,6 +184,7 @@ class CodeStarconnections {
         'Name': name,
         'ProviderEndpoint': providerEndpoint,
         'ProviderType': providerType.toValue(),
+        if (tags != null) 'Tags': tags,
         if (vpcConfiguration != null) 'VpcConfiguration': vpcConfiguration,
       },
     );
@@ -747,13 +749,19 @@ class CreateConnectionOutput {
 class CreateHostOutput {
   /// The Amazon Resource Name (ARN) of the host to be created.
   final String? hostArn;
+  final List<Tag>? tags;
 
   CreateHostOutput({
     this.hostArn,
+    this.tags,
   });
   factory CreateHostOutput.fromJson(Map<String, dynamic> json) {
     return CreateHostOutput(
       hostArn: json['HostArn'] as String?,
+      tags: (json['Tags'] as List?)
+          ?.whereNotNull()
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

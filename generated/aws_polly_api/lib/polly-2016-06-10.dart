@@ -53,10 +53,10 @@ class Polly {
     _protocol.close();
   }
 
-  /// Deletes the specified pronunciation lexicon stored in an AWS Region. A
-  /// lexicon which has been deleted is not available for speech synthesis, nor
-  /// is it possible to retrieve it using either the <code>GetLexicon</code> or
-  /// <code>ListLexicon</code> APIs.
+  /// Deletes the specified pronunciation lexicon stored in an Amazon Web
+  /// Services Region. A lexicon which has been deleted is not available for
+  /// speech synthesis, nor is it possible to retrieve it using either the
+  /// <code>GetLexicon</code> or <code>ListLexicon</code> APIs.
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html">Managing
@@ -157,7 +157,7 @@ class Polly {
   }
 
   /// Returns the content of the specified pronunciation lexicon stored in an
-  /// AWS Region. For more information, see <a
+  /// Amazon Web Services Region. For more information, see <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html">Managing
   /// Lexicons</a>.
   ///
@@ -203,8 +203,8 @@ class Polly {
     return GetSpeechSynthesisTaskOutput.fromJson(response);
   }
 
-  /// Returns a list of pronunciation lexicons stored in an AWS Region. For more
-  /// information, see <a
+  /// Returns a list of pronunciation lexicons stored in an Amazon Web Services
+  /// Region. For more information, see <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html">Managing
   /// Lexicons</a>.
   ///
@@ -285,11 +285,11 @@ class Polly {
     return ListSpeechSynthesisTasksOutput.fromJson(response);
   }
 
-  /// Stores a pronunciation lexicon in an AWS Region. If a lexicon with the
-  /// same name already exists in the region, it is overwritten by the new
-  /// lexicon. Lexicon operations have eventual consistency, therefore, it might
-  /// take some time before the lexicon is available to the SynthesizeSpeech
-  /// operation.
+  /// Stores a pronunciation lexicon in an Amazon Web Services Region. If a
+  /// lexicon with the same name already exists in the region, it is overwritten
+  /// by the new lexicon. Lexicon operations have eventual consistency,
+  /// therefore, it might take some time before the lexicon is available to the
+  /// SynthesizeSpeech operation.
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/managing-lexicons.html">Managing
@@ -331,10 +331,12 @@ class Polly {
   /// <code>SpeechSynthesisTask</code>. This operation requires all the standard
   /// information needed for speech synthesis, plus the name of an Amazon S3
   /// bucket for the service to store the output of the synthesis task and two
-  /// optional parameters (OutputS3KeyPrefix and SnsTopicArn). Once the
-  /// synthesis task is created, this operation will return a
-  /// SpeechSynthesisTask object, which will include an identifier of this task
-  /// as well as the current status.
+  /// optional parameters (<code>OutputS3KeyPrefix</code> and
+  /// <code>SnsTopicArn</code>). Once the synthesis task is created, this
+  /// operation will return a <code>SpeechSynthesisTask</code> object, which
+  /// will include an identifier of this task as well as the current status. The
+  /// <code>SpeechSynthesisTask</code> object is available for 72 hours after
+  /// starting the asynchronous synthesis task.
   ///
   /// May throw [TextLengthExceededException].
   /// May throw [InvalidS3BucketException].
@@ -375,7 +377,7 @@ class Polly {
   /// either Indian English (en-IN) or Hindi (hi-IN).
   ///
   /// If a bilingual voice is used and no language code is specified, Amazon
-  /// Polly will use the default language of the bilingual voice. The default
+  /// Polly uses the default language of the bilingual voice. The default
   /// language for any voice is the one returned by the <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html">DescribeVoices</a>
   /// operation for the <code>LanguageCode</code> parameter. For example, if no
@@ -520,7 +522,7 @@ class Polly {
   /// either Indian English (en-IN) or Hindi (hi-IN).
   ///
   /// If a bilingual voice is used and no language code is specified, Amazon
-  /// Polly will use the default language of the bilingual voice. The default
+  /// Polly uses the default language of the bilingual voice. The default
   /// language for any voice is the one returned by the <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html">DescribeVoices</a>
   /// operation for the <code>LanguageCode</code> parameter. For example, if no
@@ -754,6 +756,10 @@ enum LanguageCode {
   ruRu,
   svSe,
   trTr,
+  enNz,
+  enZa,
+  caEs,
+  deAt,
 }
 
 extension on LanguageCode {
@@ -817,6 +823,14 @@ extension on LanguageCode {
         return 'sv-SE';
       case LanguageCode.trTr:
         return 'tr-TR';
+      case LanguageCode.enNz:
+        return 'en-NZ';
+      case LanguageCode.enZa:
+        return 'en-ZA';
+      case LanguageCode.caEs:
+        return 'ca-ES';
+      case LanguageCode.deAt:
+        return 'de-AT';
     }
   }
 }
@@ -882,6 +896,14 @@ extension on String {
         return LanguageCode.svSe;
       case 'tr-TR':
         return LanguageCode.trTr;
+      case 'en-NZ':
+        return LanguageCode.enNz;
+      case 'en-ZA':
+        return LanguageCode.enZa;
+      case 'ca-ES':
+        return LanguageCode.caEs;
+      case 'de-AT':
+        return LanguageCode.deAt;
     }
     throw Exception('$this is not known in enum LanguageCode');
   }
@@ -1146,8 +1168,8 @@ class SynthesisTask {
   /// English (en-IN) or Hindi (hi-IN).
   ///
   /// If a bilingual voice is used and no language code is specified, Amazon Polly
-  /// will use the default language of the bilingual voice. The default language
-  /// for any voice is the one returned by the <a
+  /// uses the default language of the bilingual voice. The default language for
+  /// any voice is the one returned by the <a
   /// href="https://docs.aws.amazon.com/polly/latest/dg/API_DescribeVoices.html">DescribeVoices</a>
   /// operation for the <code>LanguageCode</code> parameter. For example, if no
   /// language code is specified, Aditi will use Indian English rather than Hindi.
@@ -1268,7 +1290,7 @@ class SynthesizeSpeechOutput {
   /// </li>
   /// <li>
   /// If you request <code>json</code> as the <code>OutputFormat</code>, the
-  /// <code>ContentType</code> returned is audio/json.
+  /// <code>ContentType</code> returned is application/x-json-stream.
   /// </li>
   /// </ul>
   ///
@@ -1428,6 +1450,7 @@ enum VoiceId {
   enrique,
   ewa,
   filiz,
+  gabrielle,
   geraint,
   giorgio,
   gwyneth,
@@ -1473,6 +1496,15 @@ enum VoiceId {
   vitoria,
   zeina,
   zhiyu,
+  aria,
+  ayanda,
+  arlet,
+  hannah,
+  arthur,
+  daniel,
+  liam,
+  pedro,
+  kajal,
 }
 
 extension on VoiceId {
@@ -1512,6 +1544,8 @@ extension on VoiceId {
         return 'Ewa';
       case VoiceId.filiz:
         return 'Filiz';
+      case VoiceId.gabrielle:
+        return 'Gabrielle';
       case VoiceId.geraint:
         return 'Geraint';
       case VoiceId.giorgio:
@@ -1602,6 +1636,24 @@ extension on VoiceId {
         return 'Zeina';
       case VoiceId.zhiyu:
         return 'Zhiyu';
+      case VoiceId.aria:
+        return 'Aria';
+      case VoiceId.ayanda:
+        return 'Ayanda';
+      case VoiceId.arlet:
+        return 'Arlet';
+      case VoiceId.hannah:
+        return 'Hannah';
+      case VoiceId.arthur:
+        return 'Arthur';
+      case VoiceId.daniel:
+        return 'Daniel';
+      case VoiceId.liam:
+        return 'Liam';
+      case VoiceId.pedro:
+        return 'Pedro';
+      case VoiceId.kajal:
+        return 'Kajal';
     }
   }
 }
@@ -1643,6 +1695,8 @@ extension on String {
         return VoiceId.ewa;
       case 'Filiz':
         return VoiceId.filiz;
+      case 'Gabrielle':
+        return VoiceId.gabrielle;
       case 'Geraint':
         return VoiceId.geraint;
       case 'Giorgio':
@@ -1733,6 +1787,24 @@ extension on String {
         return VoiceId.zeina;
       case 'Zhiyu':
         return VoiceId.zhiyu;
+      case 'Aria':
+        return VoiceId.aria;
+      case 'Ayanda':
+        return VoiceId.ayanda;
+      case 'Arlet':
+        return VoiceId.arlet;
+      case 'Hannah':
+        return VoiceId.hannah;
+      case 'Arthur':
+        return VoiceId.arthur;
+      case 'Daniel':
+        return VoiceId.daniel;
+      case 'Liam':
+        return VoiceId.liam;
+      case 'Pedro':
+        return VoiceId.pedro;
+      case 'Kajal':
+        return VoiceId.kajal;
     }
     throw Exception('$this is not known in enum VoiceId');
   }

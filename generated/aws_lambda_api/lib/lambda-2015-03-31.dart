@@ -18,12 +18,15 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// This is the <i>AWS Lambda API Reference</i>. The AWS Lambda Developer Guide
-/// provides additional information. For the service overview, see <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">What is AWS
-/// Lambda</a>, and for information about how the service works, see <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-introduction.html">AWS
-/// Lambda: How it Works</a> in the <b>AWS Lambda Developer Guide</b>.
+/// Lambda is a compute service that lets you run code without provisioning or
+/// managing servers. Lambda runs your code on a high-availability compute
+/// infrastructure and performs all of the administration of the compute
+/// resources, including server and operating system maintenance, capacity
+/// provisioning and automatic scaling, code monitoring and logging. With
+/// Lambda, you can run code for virtually any type of application or backend
+/// service. For more information about the Lambda service, see <a
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html">What is
+/// Lambda</a> in the <b>Lambda Developer Guide</b>.
 class Lambda {
   final _s.RestJsonProtocol _protocol;
   Lambda({
@@ -53,10 +56,10 @@ class Lambda {
   }
 
   /// Adds permissions to the resource-based policy of a version of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>. Use this action to grant layer usage permission to other
-  /// accounts. You can grant permission to a single account, all AWS accounts,
-  /// or all accounts in an organization.
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>. Use this action to grant layer usage permission to other
+  /// accounts. You can grant permission to a single account, all accounts in an
+  /// organization, or all Amazon Web Services accounts.
   ///
   /// To revoke permission, call <a>RemoveLayerVersionPermission</a> with the
   /// statement ID that you specified when you added it.
@@ -77,7 +80,11 @@ class Lambda {
   /// The name or Amazon Resource Name (ARN) of the layer.
   ///
   /// Parameter [principal] :
-  /// An account ID, or <code>*</code> to grant permission to all AWS accounts.
+  /// An account ID, or <code>*</code> to grant layer usage permission to all
+  /// accounts in an organization, or all Amazon Web Services accounts (if
+  /// <code>organizationId</code> is not specified). For the last case, make
+  /// sure that you really do want all Amazon Web Services accounts to have
+  /// usage permission to this layer.
   ///
   /// Parameter [statementId] :
   /// An identifier that distinguishes the policy from others on the same layer
@@ -104,6 +111,13 @@ class Lambda {
     String? revisionId,
   }) async {
     ArgumentError.checkNotNull(action, 'action');
+    _s.validateStringLength(
+      'action',
+      action,
+      0,
+      22,
+      isRequired: true,
+    );
     ArgumentError.checkNotNull(layerName, 'layerName');
     _s.validateStringLength(
       'layerName',
@@ -122,6 +136,12 @@ class Lambda {
       isRequired: true,
     );
     ArgumentError.checkNotNull(versionNumber, 'versionNumber');
+    _s.validateStringLength(
+      'organizationId',
+      organizationId,
+      0,
+      34,
+    );
     final $query = <String, List<String>>{
       if (revisionId != null) 'RevisionId': [revisionId],
     };
@@ -142,20 +162,24 @@ class Lambda {
     return AddLayerVersionPermissionResponse.fromJson(response);
   }
 
-  /// Grants an AWS service or another account permission to use a function. You
-  /// can apply the policy at the function level, or specify a qualifier to
-  /// restrict access to a single version or alias. If you use a qualifier, the
-  /// invoker must use the full Amazon Resource Name (ARN) of that version or
-  /// alias to invoke the function.
+  /// Grants an Amazon Web Services service, account, or organization permission
+  /// to use a function. You can apply the policy at the function level, or
+  /// specify a qualifier to restrict access to a single version or alias. If
+  /// you use a qualifier, the invoker must use the full Amazon Resource Name
+  /// (ARN) of that version or alias to invoke the function. Note: Lambda does
+  /// not support adding policies to version $LATEST.
   ///
   /// To grant permission to another account, specify the account ID as the
-  /// <code>Principal</code>. For AWS services, the principal is a domain-style
-  /// identifier defined by the service, like <code>s3.amazonaws.com</code> or
-  /// <code>sns.amazonaws.com</code>. For AWS services, you can also specify the
-  /// ARN of the associated resource as the <code>SourceArn</code>. If you grant
-  /// permission to a service principal without specifying the source, other
-  /// accounts could potentially configure resources in their account to invoke
-  /// your Lambda function.
+  /// <code>Principal</code>. To grant permission to an organization defined in
+  /// Organizations, specify the organization ID as the
+  /// <code>PrincipalOrgID</code>. For Amazon Web Services services, the
+  /// principal is a domain-style identifier defined by the service, like
+  /// <code>s3.amazonaws.com</code> or <code>sns.amazonaws.com</code>. For
+  /// Amazon Web Services services, you can also specify the ARN of the
+  /// associated resource as the <code>SourceArn</code>. If you grant permission
+  /// to a service principal without specifying the source, other accounts could
+  /// potentially configure resources in their account to invoke your Lambda
+  /// function.
   ///
   /// This action adds a statement to a resource-based permissions policy for
   /// the function. For more information about function policies, see <a
@@ -196,9 +220,10 @@ class Lambda {
   /// name, it is limited to 64 characters in length.
   ///
   /// Parameter [principal] :
-  /// The AWS service or account that invokes the function. If you specify a
-  /// service, use <code>SourceArn</code> or <code>SourceAccount</code> to limit
-  /// who can invoke the function through that service.
+  /// The Amazon Web Services service or account that invokes the function. If
+  /// you specify a service, use <code>SourceArn</code> or
+  /// <code>SourceAccount</code> to limit who can invoke the function through
+  /// that service.
   ///
   /// Parameter [statementId] :
   /// A statement identifier that differentiates the statement from others in
@@ -207,6 +232,20 @@ class Lambda {
   /// Parameter [eventSourceToken] :
   /// For Alexa Smart Home functions, a token that must be supplied by the
   /// invoker.
+  ///
+  /// Parameter [functionUrlAuthType] :
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to
+  /// bypass IAM authentication to create a public endpoint. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">
+  /// Security and auth model for Lambda function URLs</a>.
+  ///
+  /// Parameter [principalOrgID] :
+  /// The identifier for your organization in Organizations. Use this to grant
+  /// permissions to all the Amazon Web Services accounts under this
+  /// organization.
   ///
   /// Parameter [qualifier] :
   /// Specify a version or alias to add permissions to a published version of
@@ -224,14 +263,20 @@ class Lambda {
   /// deleted by its owner and recreated by another account.
   ///
   /// Parameter [sourceArn] :
-  /// For AWS services, the ARN of the AWS resource that invokes the function.
-  /// For example, an Amazon S3 bucket or Amazon SNS topic.
+  /// For Amazon Web Services services, the ARN of the Amazon Web Services
+  /// resource that invokes the function. For example, an Amazon S3 bucket or
+  /// Amazon SNS topic.
+  ///
+  /// Note that Lambda configures the comparison using the
+  /// <code>StringLike</code> operator.
   Future<AddPermissionResponse> addPermission({
     required String action,
     required String functionName,
     required String principal,
     required String statementId,
     String? eventSourceToken,
+    FunctionUrlAuthType? functionUrlAuthType,
+    String? principalOrgID,
     String? qualifier,
     String? revisionId,
     String? sourceAccount,
@@ -262,10 +307,22 @@ class Lambda {
       256,
     );
     _s.validateStringLength(
+      'principalOrgID',
+      principalOrgID,
+      12,
+      34,
+    );
+    _s.validateStringLength(
       'qualifier',
       qualifier,
       1,
       128,
+    );
+    _s.validateStringLength(
+      'sourceAccount',
+      sourceAccount,
+      0,
+      12,
     );
     final $query = <String, List<String>>{
       if (qualifier != null) 'Qualifier': [qualifier],
@@ -275,6 +332,9 @@ class Lambda {
       'Principal': principal,
       'StatementId': statementId,
       if (eventSourceToken != null) 'EventSourceToken': eventSourceToken,
+      if (functionUrlAuthType != null)
+        'FunctionUrlAuthType': functionUrlAuthType.toValue(),
+      if (principalOrgID != null) 'PrincipalOrgID': principalOrgID,
       if (revisionId != null) 'RevisionId': revisionId,
       if (sourceAccount != null) 'SourceAccount': sourceAccount,
       if (sourceArn != null) 'SourceArn': sourceArn,
@@ -435,37 +495,40 @@ class Lambda {
     return CreateCodeSigningConfigResponse.fromJson(response);
   }
 
-  /// Creates a mapping between an event source and an AWS Lambda function.
-  /// Lambda reads items from the event source and triggers the function.
+  /// Creates a mapping between an event source and an Lambda function. Lambda
+  /// reads items from the event source and triggers the function.
   ///
-  /// For details about each event source type, see the following topics.
+  /// For details about how to configure different event sources, see the
+  /// following topics.
   ///
   /// <ul>
   /// <li>
-  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html">Using
-  /// AWS Lambda with Amazon DynamoDB</a>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-dynamodb-eventsourcemapping">
+  /// Amazon DynamoDB Streams</a>
   /// </li>
   /// <li>
   /// <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html">Using
-  /// AWS Lambda with Amazon Kinesis</a>
-  /// </li>
-  /// <li>
-  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html">Using
-  /// AWS Lambda with Amazon SQS</a>
-  /// </li>
-  /// <li>
-  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html">Using
-  /// AWS Lambda with Amazon MQ</a>
-  /// </li>
-  /// <li>
-  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html">Using
-  /// AWS Lambda with Amazon MSK</a>
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html#services-kinesis-eventsourcemapping">
+  /// Amazon Kinesis</a>
   /// </li>
   /// <li>
   /// <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/kafka-smaa.html">Using
-  /// AWS Lambda with Self-Managed Apache Kafka</a>
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-eventsource">
+  /// Amazon SQS</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html#services-mq-eventsourcemapping">
+  /// Amazon MQ and RabbitMQ</a>
+  /// </li>
+  /// <li>
+  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html">
+  /// Amazon MSK</a>
+  /// </li>
+  /// <li>
+  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/kafka-smaa.html">
+  /// Apache Kafka</a>
   /// </li>
   /// </ul>
   /// The following error handling options are only available for stream sources
@@ -493,6 +556,41 @@ class Lambda {
   /// <li>
   /// <code>ParallelizationFactor</code> - Process multiple batches from each
   /// shard concurrently.
+  /// </li>
+  /// </ul>
+  /// For information about which configuration parameters apply to each event
+  /// source, see the following topics.
+  ///
+  /// <ul>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-ddb-params">
+  /// Amazon DynamoDB Streams</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html#services-kinesis-params">
+  /// Amazon Kinesis</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-params">
+  /// Amazon SQS</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html#services-mq-params">
+  /// Amazon MQ and RabbitMQ</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html#services-msk-parms">
+  /// Amazon MSK</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html#services-kafka-parms">
+  /// Apache Kafka</a>
   /// </li>
   /// </ul>
   ///
@@ -526,14 +624,17 @@ class Lambda {
   /// the function name, it's limited to 64 characters in length.
   ///
   /// Parameter [batchSize] :
-  /// The maximum number of items to retrieve in a single batch.
+  /// The maximum number of records in each batch that Lambda pulls from your
+  /// stream or queue and sends to your function. Lambda passes all of the
+  /// records in the batch to the function in a single call, up to the payload
+  /// limit for synchronous invocation (6 MB).
   ///
   /// <ul>
   /// <li>
   /// <b>Amazon Kinesis</b> - Default 100. Max 10,000.
   /// </li>
   /// <li>
-  /// <b>Amazon DynamoDB Streams</b> - Default 100. Max 1,000.
+  /// <b>Amazon DynamoDB Streams</b> - Default 100. Max 10,000.
   /// </li>
   /// <li>
   /// <b>Amazon Simple Queue Service</b> - Default 10. For standard queues the
@@ -546,19 +647,24 @@ class Lambda {
   /// <li>
   /// <b>Self-Managed Apache Kafka</b> - Default 100. Max 10,000.
   /// </li>
+  /// <li>
+  /// <b>Amazon MQ (ActiveMQ and RabbitMQ)</b> - Default 100. Max 10,000.
+  /// </li>
   /// </ul>
   ///
   /// Parameter [bisectBatchOnFunctionError] :
-  /// (Streams) If the function returns an error, split the batch in two and
-  /// retry.
+  /// (Streams only) If the function returns an error, split the batch in two
+  /// and retry.
   ///
   /// Parameter [destinationConfig] :
-  /// (Streams) An Amazon SQS queue or Amazon SNS topic destination for
+  /// (Streams only) An Amazon SQS queue or Amazon SNS topic destination for
   /// discarded records.
   ///
   /// Parameter [enabled] :
-  /// If true, the event source mapping is active. Set to false to pause polling
-  /// and invocation.
+  /// When true, the event source mapping is active. When false, Lambda pauses
+  /// polling and invocation.
+  ///
+  /// Default: True
   ///
   /// Parameter [eventSourceArn] :
   /// The Amazon Resource Name (ARN) of the event source.
@@ -578,25 +684,40 @@ class Lambda {
   /// </li>
   /// </ul>
   ///
+  /// Parameter [filterCriteria] :
+  /// (Streams and Amazon SQS) An object that defines the filter criteria that
+  /// determine whether Lambda should process an event. For more information,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html">Lambda
+  /// event filtering</a>.
+  ///
   /// Parameter [functionResponseTypes] :
-  /// (Streams) A list of current response type enums applied to the event
-  /// source mapping.
+  /// (Streams and Amazon SQS) A list of current response type enums applied to
+  /// the event source mapping.
   ///
   /// Parameter [maximumBatchingWindowInSeconds] :
-  /// (Streams and SQS standard queues) The maximum amount of time to gather
-  /// records before invoking the function, in seconds.
+  /// (Streams and Amazon SQS standard queues) The maximum amount of time, in
+  /// seconds, that Lambda spends gathering records before invoking the
+  /// function.
+  ///
+  /// Default: 0
+  ///
+  /// Related setting: When you set <code>BatchSize</code> to a value greater
+  /// than 10, you must set <code>MaximumBatchingWindowInSeconds</code> to at
+  /// least 1.
   ///
   /// Parameter [maximumRecordAgeInSeconds] :
-  /// (Streams) Discard records older than the specified age. The default value
-  /// is infinite (-1).
+  /// (Streams only) Discard records older than the specified age. The default
+  /// value is infinite (-1).
   ///
   /// Parameter [maximumRetryAttempts] :
-  /// (Streams) Discard records after the specified number of retries. The
+  /// (Streams only) Discard records after the specified number of retries. The
   /// default value is infinite (-1). When set to infinite (-1), failed records
   /// will be retried until the record expires.
   ///
   /// Parameter [parallelizationFactor] :
-  /// (Streams) The number of batches to process from each shard concurrently.
+  /// (Streams only) The number of batches to process from each shard
+  /// concurrently.
   ///
   /// Parameter [queues] :
   /// (MQ) The name of the Amazon MQ broker destination queue to consume.
@@ -605,7 +726,7 @@ class Lambda {
   /// The Self-Managed Apache Kafka cluster to send records.
   ///
   /// Parameter [sourceAccessConfigurations] :
-  /// An array of the authentication protocol, or the VPC components to secure
+  /// An array of authentication protocols or VPC components required to secure
   /// your event source.
   ///
   /// Parameter [startingPosition] :
@@ -621,8 +742,8 @@ class Lambda {
   /// The name of the Kafka topic.
   ///
   /// Parameter [tumblingWindowInSeconds] :
-  /// (Streams) The duration of a processing window in seconds. The range is
-  /// between 1 second up to 15 minutes.
+  /// (Streams only) The duration in seconds of a processing window. The range
+  /// is between 1 second up to 900 seconds.
   Future<EventSourceMappingConfiguration> createEventSourceMapping({
     required String functionName,
     int? batchSize,
@@ -630,6 +751,7 @@ class Lambda {
     DestinationConfig? destinationConfig,
     bool? enabled,
     String? eventSourceArn,
+    FilterCriteria? filterCriteria,
     List<FunctionResponseType>? functionResponseTypes,
     int? maximumBatchingWindowInSeconds,
     int? maximumRecordAgeInSeconds,
@@ -695,6 +817,7 @@ class Lambda {
       if (destinationConfig != null) 'DestinationConfig': destinationConfig,
       if (enabled != null) 'Enabled': enabled,
       if (eventSourceArn != null) 'EventSourceArn': eventSourceArn,
+      if (filterCriteria != null) 'FilterCriteria': filterCriteria,
       if (functionResponseTypes != null)
         'FunctionResponseTypes':
             functionResponseTypes.map((e) => e.toValue()).toList(),
@@ -735,8 +858,25 @@ class Lambda {
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/intro-permission-model.html#lambda-intro-execution-role">execution
   /// role</a>. The deployment package is a .zip file archive or container image
   /// that contains your function code. The execution role grants the function
-  /// permission to use AWS services, such as Amazon CloudWatch Logs for log
-  /// streaming and AWS X-Ray for request tracing.
+  /// permission to use Amazon Web Services services, such as Amazon CloudWatch
+  /// Logs for log streaming and X-Ray for request tracing.
+  ///
+  /// You set the package type to <code>Image</code> if the deployment package
+  /// is a <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html">container
+  /// image</a>. For a container image, the code property must include the URI
+  /// of a container image in the Amazon ECR registry. You do not need to
+  /// specify the handler and runtime properties.
+  ///
+  /// You set the package type to <code>Zip</code> if the deployment package is
+  /// a <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html#gettingstarted-package-zip">.zip
+  /// file archive</a>. For a .zip file archive, the code property specifies the
+  /// location of the .zip file. You must also specify the handler and runtime
+  /// properties. The code in the deployment package must be compatible with the
+  /// target instruction set architecture of the function (<code>x86-64</code>
+  /// or <code>arm64</code>). If you do not specify the architecture, the
+  /// default value is <code>x86-64</code>.
   ///
   /// When you create a function, Lambda provisions an instance of the function
   /// and its supporting resources. If your function connects to a VPC, this
@@ -771,15 +911,16 @@ class Lambda {
   /// includes set set of signing profiles, which define the trusted publishers
   /// for this function.
   ///
-  /// If another account or an AWS service invokes your function, use
-  /// <a>AddPermission</a> to grant permission by creating a resource-based IAM
-  /// policy. You can grant permissions at the function level, on a version, or
-  /// on an alias.
+  /// If another account or an Amazon Web Services service invokes your
+  /// function, use <a>AddPermission</a> to grant permission by creating a
+  /// resource-based IAM policy. You can grant permissions at the function
+  /// level, on a version, or on an alias.
   ///
   /// To invoke your function directly, use <a>Invoke</a>. To invoke your
-  /// function in response to events in other AWS services, create an event
-  /// source mapping (<a>CreateEventSourceMapping</a>), or configure a function
-  /// trigger in the other service. For more information, see <a
+  /// function in response to events in other Amazon Web Services services,
+  /// create an event source mapping (<a>CreateEventSourceMapping</a>), or
+  /// configure a function trigger in the other service. For more information,
+  /// see <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-invocation.html">Invoking
   /// Functions</a>.
   ///
@@ -818,6 +959,11 @@ class Lambda {
   /// Parameter [role] :
   /// The Amazon Resource Name (ARN) of the function's execution role.
   ///
+  /// Parameter [architectures] :
+  /// The instruction set architecture that the function supports. Enter a
+  /// string array with one of the valid values (arm64 or x86_64). The default
+  /// value is <code>x86_64</code>.
+  ///
   /// Parameter [codeSigningConfigArn] :
   /// To enable code signing for this function, specify the ARN of a
   /// code-signing configuration. A code-signing configuration includes a set of
@@ -837,24 +983,31 @@ class Lambda {
   /// Environment variables that are accessible from function code during
   /// execution.
   ///
+  /// Parameter [ephemeralStorage] :
+  /// The size of the function’s /tmp directory in MB. The default value is 512,
+  /// but can be any whole number between 512 and 10240 MB.
+  ///
   /// Parameter [fileSystemConfigs] :
   /// Connection settings for an Amazon EFS file system.
   ///
   /// Parameter [handler] :
   /// The name of the method within your code that Lambda calls to execute your
-  /// function. The format includes the file name. It can also include
-  /// namespaces and other qualifiers, depending on the runtime. For more
-  /// information, see <a
+  /// function. Handler is required if the deployment package is a .zip file
+  /// archive. The format includes the file name. It can also include namespaces
+  /// and other qualifiers, depending on the runtime. For more information, see
+  /// <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/programming-model-v2.html">Programming
   /// Model</a>.
   ///
   /// Parameter [imageConfig] :
-  /// Configuration values that override the container image Dockerfile.
+  /// Container image <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-images.html#configuration-images-settings">configuration
+  /// values</a> that override the values in the container image Dockerfile.
   ///
   /// Parameter [kMSKeyArn] :
-  /// The ARN of the AWS Key Management Service (AWS KMS) key that's used to
-  /// encrypt your function's environment variables. If it's not provided, AWS
-  /// Lambda uses a default service key.
+  /// The ARN of the Amazon Web Services Key Management Service (KMS) key that's
+  /// used to encrypt your function's environment variables. If it's not
+  /// provided, Lambda uses a default service key.
   ///
   /// Parameter [layers] :
   /// A list of <a
@@ -863,9 +1016,11 @@ class Lambda {
   /// layer by its ARN, including the version.
   ///
   /// Parameter [memorySize] :
-  /// The amount of memory available to the function at runtime. Increasing the
-  /// function's memory also increases its CPU allocation. The default value is
-  /// 128 MB. The value can be any multiple of 1 MB.
+  /// The amount of <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html">memory
+  /// available to the function</a> at runtime. Increasing the function memory
+  /// also increases its CPU allocation. The default value is 128 MB. The value
+  /// can be any multiple of 1 MB.
   ///
   /// Parameter [packageType] :
   /// The type of deployment package. Set to <code>Image</code> for container
@@ -877,6 +1032,7 @@ class Lambda {
   /// Parameter [runtime] :
   /// The identifier of the function's <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">runtime</a>.
+  /// Runtime is required if the deployment package is a .zip file archive.
   ///
   /// Parameter [tags] :
   /// A list of <a
@@ -884,28 +1040,34 @@ class Lambda {
   /// to apply to the function.
   ///
   /// Parameter [timeout] :
-  /// The amount of time that Lambda allows a function to run before stopping
-  /// it. The default is 3 seconds. The maximum allowed value is 900 seconds.
+  /// The amount of time (in seconds) that Lambda allows a function to run
+  /// before stopping it. The default is 3 seconds. The maximum allowed value is
+  /// 900 seconds. For additional information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html">Lambda
+  /// execution environment</a>.
   ///
   /// Parameter [tracingConfig] :
   /// Set <code>Mode</code> to <code>Active</code> to sample and trace a subset
-  /// of incoming requests with AWS X-Ray.
+  /// of incoming requests with <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html">X-Ray</a>.
   ///
   /// Parameter [vpcConfig] :
-  /// For network connectivity to AWS resources in a VPC, specify a list of
-  /// security groups and subnets in the VPC. When you connect a function to a
-  /// VPC, it can only access resources and the internet through that VPC. For
-  /// more information, see <a
+  /// For network connectivity to Amazon Web Services resources in a VPC,
+  /// specify a list of security groups and subnets in the VPC. When you connect
+  /// a function to a VPC, it can only access resources and the internet through
+  /// that VPC. For more information, see <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html">VPC
   /// Settings</a>.
   Future<FunctionConfiguration> createFunction({
     required FunctionCode code,
     required String functionName,
     required String role,
+    List<Architecture>? architectures,
     String? codeSigningConfigArn,
     DeadLetterConfig? deadLetterConfig,
     String? description,
     Environment? environment,
+    EphemeralStorage? ephemeralStorage,
     List<FileSystemConfig>? fileSystemConfigs,
     String? handler,
     ImageConfig? imageConfig,
@@ -964,11 +1126,14 @@ class Lambda {
       'Code': code,
       'FunctionName': functionName,
       'Role': role,
+      if (architectures != null)
+        'Architectures': architectures.map((e) => e.toValue()).toList(),
       if (codeSigningConfigArn != null)
         'CodeSigningConfigArn': codeSigningConfigArn,
       if (deadLetterConfig != null) 'DeadLetterConfig': deadLetterConfig,
       if (description != null) 'Description': description,
       if (environment != null) 'Environment': environment,
+      if (ephemeralStorage != null) 'EphemeralStorage': ephemeralStorage,
       if (fileSystemConfigs != null) 'FileSystemConfigs': fileSystemConfigs,
       if (handler != null) 'Handler': handler,
       if (imageConfig != null) 'ImageConfig': imageConfig,
@@ -990,6 +1155,90 @@ class Lambda {
       exceptionFnMap: _exceptionFns,
     );
     return FunctionConfiguration.fromJson(response);
+  }
+
+  /// Creates a Lambda function URL with the specified configuration parameters.
+  /// A function URL is a dedicated HTTP(S) endpoint that you can use to invoke
+  /// your function.
+  ///
+  /// May throw [ResourceConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ServiceException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [authType] :
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to
+  /// bypass IAM authentication to create a public endpoint. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">
+  /// Security and auth model for Lambda function URLs</a>.
+  ///
+  /// Parameter [functionName] :
+  /// The name of the Lambda function.
+  /// <p class="title"> <b>Name formats</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Function name</b> - <code>my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Function ARN</b> -
+  /// <code>arn:aws:lambda:us-west-2:123456789012:function:my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Partial ARN</b> - <code>123456789012:function:my-function</code>.
+  /// </li>
+  /// </ul>
+  /// The length constraint applies only to the full ARN. If you specify only
+  /// the function name, it is limited to 64 characters in length.
+  ///
+  /// Parameter [cors] :
+  /// The <a
+  /// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+  /// resource sharing (CORS)</a> settings for your function URL.
+  ///
+  /// Parameter [qualifier] :
+  /// The alias name.
+  Future<CreateFunctionUrlConfigResponse> createFunctionUrlConfig({
+    required FunctionUrlAuthType authType,
+    required String functionName,
+    Cors? cors,
+    String? qualifier,
+  }) async {
+    ArgumentError.checkNotNull(authType, 'authType');
+    ArgumentError.checkNotNull(functionName, 'functionName');
+    _s.validateStringLength(
+      'functionName',
+      functionName,
+      1,
+      140,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'qualifier',
+      qualifier,
+      1,
+      128,
+    );
+    final $query = <String, List<String>>{
+      if (qualifier != null) 'Qualifier': [qualifier],
+    };
+    final $payload = <String, dynamic>{
+      'AuthType': authType.toValue(),
+      if (cors != null) 'Cors': cors,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri:
+          '/2021-10-31/functions/${Uri.encodeComponent(functionName)}/url',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    return CreateFunctionUrlConfigResponse.fromJson(response);
   }
 
   /// Deletes a Lambda function <a
@@ -1115,9 +1364,9 @@ class Lambda {
   /// deleted.
   ///
   /// To delete Lambda event source mappings that invoke a function, use
-  /// <a>DeleteEventSourceMapping</a>. For AWS services and resources that
-  /// invoke your function directly, delete the trigger in the service where you
-  /// originally configured it.
+  /// <a>DeleteEventSourceMapping</a>. For Amazon Web Services services and
+  /// resources that invoke your function directly, delete the trigger in the
+  /// service where you originally configured it.
   ///
   /// May throw [ServiceException].
   /// May throw [ResourceNotFoundException].
@@ -1282,6 +1531,7 @@ class Lambda {
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterValueException].
   /// May throw [TooManyRequestsException].
+  /// May throw [ResourceConflictException].
   ///
   /// Parameter [functionName] :
   /// The name of the Lambda function, version, or alias.
@@ -1337,11 +1587,72 @@ class Lambda {
     );
   }
 
+  /// Deletes a Lambda function URL. When you delete a function URL, you can't
+  /// recover it. Creating a new function URL results in a different URL
+  /// address.
+  ///
+  /// May throw [ResourceConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ServiceException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [functionName] :
+  /// The name of the Lambda function.
+  /// <p class="title"> <b>Name formats</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Function name</b> - <code>my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Function ARN</b> -
+  /// <code>arn:aws:lambda:us-west-2:123456789012:function:my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Partial ARN</b> - <code>123456789012:function:my-function</code>.
+  /// </li>
+  /// </ul>
+  /// The length constraint applies only to the full ARN. If you specify only
+  /// the function name, it is limited to 64 characters in length.
+  ///
+  /// Parameter [qualifier] :
+  /// The alias name.
+  Future<void> deleteFunctionUrlConfig({
+    required String functionName,
+    String? qualifier,
+  }) async {
+    ArgumentError.checkNotNull(functionName, 'functionName');
+    _s.validateStringLength(
+      'functionName',
+      functionName,
+      1,
+      140,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'qualifier',
+      qualifier,
+      1,
+      128,
+    );
+    final $query = <String, List<String>>{
+      if (qualifier != null) 'Qualifier': [qualifier],
+    };
+    await _protocol.send(
+      payload: null,
+      method: 'DELETE',
+      requestUri:
+          '/2021-10-31/functions/${Uri.encodeComponent(functionName)}/url',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+  }
+
   /// Deletes a version of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>. Deleted versions can no longer be viewed or added to
-  /// functions. To avoid breaking functions, a copy of the version remains in
-  /// Lambda until no functions refer to it.
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>. Deleted versions can no longer be viewed or added to functions.
+  /// To avoid breaking functions, a copy of the version remains in Lambda until
+  /// no functions refer to it.
   ///
   /// May throw [ServiceException].
   /// May throw [TooManyRequestsException].
@@ -1437,7 +1748,7 @@ class Lambda {
 
   /// Retrieves details about your account's <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/limits.html">limits</a>
-  /// and usage in an AWS Region.
+  /// and usage in an Amazon Web Services Region.
   ///
   /// May throw [TooManyRequestsException].
   /// May throw [ServiceException].
@@ -1856,10 +2167,70 @@ class Lambda {
     return FunctionEventInvokeConfig.fromJson(response);
   }
 
+  /// Returns details about a Lambda function URL.
+  ///
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ServiceException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [functionName] :
+  /// The name of the Lambda function.
+  /// <p class="title"> <b>Name formats</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Function name</b> - <code>my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Function ARN</b> -
+  /// <code>arn:aws:lambda:us-west-2:123456789012:function:my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Partial ARN</b> - <code>123456789012:function:my-function</code>.
+  /// </li>
+  /// </ul>
+  /// The length constraint applies only to the full ARN. If you specify only
+  /// the function name, it is limited to 64 characters in length.
+  ///
+  /// Parameter [qualifier] :
+  /// The alias name.
+  Future<GetFunctionUrlConfigResponse> getFunctionUrlConfig({
+    required String functionName,
+    String? qualifier,
+  }) async {
+    ArgumentError.checkNotNull(functionName, 'functionName');
+    _s.validateStringLength(
+      'functionName',
+      functionName,
+      1,
+      140,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'qualifier',
+      qualifier,
+      1,
+      128,
+    );
+    final $query = <String, List<String>>{
+      if (qualifier != null) 'Qualifier': [qualifier],
+    };
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri:
+          '/2021-10-31/functions/${Uri.encodeComponent(functionName)}/url',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    return GetFunctionUrlConfigResponse.fromJson(response);
+  }
+
   /// Returns information about a version of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>, with a link to download the layer archive that's valid
-  /// for 10 minutes.
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>, with a link to download the layer archive that's valid for 10
+  /// minutes.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidParameterValueException].
@@ -1895,9 +2266,9 @@ class Lambda {
   }
 
   /// Returns information about a version of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>, with a link to download the layer archive that's valid
-  /// for 10 minutes.
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>, with a link to download the layer archive that's valid for 10
+  /// minutes.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidParameterValueException].
@@ -1931,9 +2302,8 @@ class Lambda {
   }
 
   /// Returns the permission policy for a version of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>. For more information, see
-  /// <a>AddLayerVersionPermission</a>.
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>. For more information, see <a>AddLayerVersionPermission</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [ResourceNotFoundException].
@@ -2222,9 +2592,14 @@ class Lambda {
   ///
   /// Parameter [logType] :
   /// Set to <code>Tail</code> to include the execution log in the response.
+  /// Applies to synchronously invoked functions only.
   ///
   /// Parameter [payload] :
   /// The JSON that you want to provide to your Lambda function as input.
+  ///
+  /// You can enter the JSON directly. For example, <code>--payload '{ "key":
+  /// "value" }'</code>. You can also specify a file path. For example,
+  /// <code>--payload file://payload.json</code>.
   ///
   /// Parameter [qualifier] :
   /// Specify a version or alias to invoke a published version of the function.
@@ -2508,7 +2883,9 @@ class Lambda {
   /// A pagination token returned by a previous call.
   ///
   /// Parameter [maxItems] :
-  /// The maximum number of event source mappings to return.
+  /// The maximum number of event source mappings to return. Note that
+  /// ListEventSourceMappings returns a maximum of 100 items in each response,
+  /// even if you set the number higher.
   Future<ListEventSourceMappingsResponse> listEventSourceMappings({
     String? eventSourceArn,
     String? functionName,
@@ -2614,13 +2991,87 @@ class Lambda {
     return ListFunctionEventInvokeConfigsResponse.fromJson(response);
   }
 
+  /// Returns a list of Lambda function URLs for the specified function.
+  ///
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ServiceException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [functionName] :
+  /// The name of the Lambda function.
+  /// <p class="title"> <b>Name formats</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Function name</b> - <code>my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Function ARN</b> -
+  /// <code>arn:aws:lambda:us-west-2:123456789012:function:my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Partial ARN</b> - <code>123456789012:function:my-function</code>.
+  /// </li>
+  /// </ul>
+  /// The length constraint applies only to the full ARN. If you specify only
+  /// the function name, it is limited to 64 characters in length.
+  ///
+  /// Parameter [marker] :
+  /// Specify the pagination token that's returned by a previous request to
+  /// retrieve the next page of results.
+  ///
+  /// Parameter [maxItems] :
+  /// The maximum number of function URLs to return in the response. Note that
+  /// <code>ListFunctionUrlConfigs</code> returns a maximum of 50 items in each
+  /// response, even if you set the number higher.
+  Future<ListFunctionUrlConfigsResponse> listFunctionUrlConfigs({
+    required String functionName,
+    String? marker,
+    int? maxItems,
+  }) async {
+    ArgumentError.checkNotNull(functionName, 'functionName');
+    _s.validateStringLength(
+      'functionName',
+      functionName,
+      1,
+      140,
+      isRequired: true,
+    );
+    _s.validateNumRange(
+      'maxItems',
+      maxItems,
+      1,
+      50,
+    );
+    final $query = <String, List<String>>{
+      if (marker != null) 'Marker': [marker],
+      if (maxItems != null) 'MaxItems': [maxItems.toString()],
+    };
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri:
+          '/2021-10-31/functions/${Uri.encodeComponent(functionName)}/urls',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    return ListFunctionUrlConfigsResponse.fromJson(response);
+  }
+
   /// Returns a list of Lambda functions, with the version-specific
   /// configuration of each. Lambda returns up to 50 functions per call.
   ///
   /// Set <code>FunctionVersion</code> to <code>ALL</code> to include all
   /// published versions of each function in addition to the unpublished
-  /// version. To get more information about a function or version, use
+  /// version.
+  /// <note>
+  /// The <code>ListFunctions</code> action returns a subset of the
+  /// <a>FunctionConfiguration</a> fields. To get the additional fields (State,
+  /// StateReasonCode, StateReason, LastUpdateStatus, LastUpdateStatusReason,
+  /// LastUpdateStatusReasonCode) for a function or version, use
   /// <a>GetFunction</a>.
+  /// </note>
   ///
   /// May throw [ServiceException].
   /// May throw [TooManyRequestsException].
@@ -2635,14 +3086,16 @@ class Lambda {
   /// retrieve the next page of results.
   ///
   /// Parameter [masterRegion] :
-  /// For Lambda@Edge functions, the AWS Region of the master function. For
-  /// example, <code>us-east-1</code> filters the list of functions to only
-  /// include Lambda@Edge functions replicated from a master function in US East
-  /// (N. Virginia). If specified, you must set <code>FunctionVersion</code> to
-  /// <code>ALL</code>.
+  /// For Lambda@Edge functions, the Amazon Web Services Region of the master
+  /// function. For example, <code>us-east-1</code> filters the list of
+  /// functions to only include Lambda@Edge functions replicated from a master
+  /// function in US East (N. Virginia). If specified, you must set
+  /// <code>FunctionVersion</code> to <code>ALL</code>.
   ///
   /// Parameter [maxItems] :
-  /// The maximum number of functions to return.
+  /// The maximum number of functions to return in the response. Note that
+  /// <code>ListFunctions</code> returns a maximum of 50 items in each response,
+  /// even if you set the number higher.
   Future<ListFunctionsResponse> listFunctions({
     FunctionVersion? functionVersion,
     String? marker,
@@ -2725,12 +3178,12 @@ class Lambda {
   }
 
   /// Lists the versions of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>. Versions that have been deleted aren't listed. Specify a
-  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>. Versions that have been deleted aren't listed. Specify a <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">runtime
   /// identifier</a> to list only versions that indicate that they're compatible
-  /// with that runtime.
+  /// with that runtime. Specify a compatible architecture to include only layer
+  /// versions that are compatible with that architecture.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidParameterValueException].
@@ -2739,6 +3192,11 @@ class Lambda {
   ///
   /// Parameter [layerName] :
   /// The name or Amazon Resource Name (ARN) of the layer.
+  ///
+  /// Parameter [compatibleArchitecture] :
+  /// The compatible <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architecture</a>.
   ///
   /// Parameter [compatibleRuntime] :
   /// A runtime identifier. For example, <code>go1.x</code>.
@@ -2750,6 +3208,7 @@ class Lambda {
   /// The maximum number of versions to return.
   Future<ListLayerVersionsResponse> listLayerVersions({
     required String layerName,
+    Architecture? compatibleArchitecture,
     Runtime? compatibleRuntime,
     String? marker,
     int? maxItems,
@@ -2769,6 +3228,8 @@ class Lambda {
       50,
     );
     final $query = <String, List<String>>{
+      if (compatibleArchitecture != null)
+        'CompatibleArchitecture': [compatibleArchitecture.toValue()],
       if (compatibleRuntime != null)
         'CompatibleRuntime': [compatibleRuntime.toValue()],
       if (marker != null) 'Marker': [marker],
@@ -2786,16 +3247,24 @@ class Lambda {
   }
 
   /// Lists <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layers</a> and shows information about the latest version of each.
-  /// Specify a <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-layers.html">Lambda
+  /// layers</a> and shows information about the latest version of each. Specify
+  /// a <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">runtime
   /// identifier</a> to list only layers that indicate that they're compatible
-  /// with that runtime.
+  /// with that runtime. Specify a compatible architecture to include only
+  /// layers that are compatible with that <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architecture</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [InvalidParameterValueException].
   /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [compatibleArchitecture] :
+  /// The compatible <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architecture</a>.
   ///
   /// Parameter [compatibleRuntime] :
   /// A runtime identifier. For example, <code>go1.x</code>.
@@ -2806,6 +3275,7 @@ class Lambda {
   /// Parameter [maxItems] :
   /// The maximum number of layers to return.
   Future<ListLayersResponse> listLayers({
+    Architecture? compatibleArchitecture,
     Runtime? compatibleRuntime,
     String? marker,
     int? maxItems,
@@ -2817,6 +3287,8 @@ class Lambda {
       50,
     );
     final $query = <String, List<String>>{
+      if (compatibleArchitecture != null)
+        'CompatibleArchitecture': [compatibleArchitecture.toValue()],
       if (compatibleRuntime != null)
         'CompatibleRuntime': [compatibleRuntime.toValue()],
       if (marker != null) 'Marker': [marker],
@@ -2909,7 +3381,8 @@ class Lambda {
   /// May throw [TooManyRequestsException].
   ///
   /// Parameter [resource] :
-  /// The function's Amazon Resource Name (ARN).
+  /// The function's Amazon Resource Name (ARN). Note: Lambda does not support
+  /// adding tags to aliases or versions.
   Future<ListTagsResponse> listTags({
     required String resource,
   }) async {
@@ -2957,7 +3430,9 @@ class Lambda {
   /// retrieve the next page of results.
   ///
   /// Parameter [maxItems] :
-  /// The maximum number of versions to return.
+  /// The maximum number of versions to return. Note that
+  /// <code>ListVersionsByFunction</code> returns a maximum of 50 items in each
+  /// response, even if you set the number higher.
   Future<ListVersionsByFunctionResponse> listVersionsByFunction({
     required String functionName,
     String? marker,
@@ -2993,8 +3468,8 @@ class Lambda {
   }
 
   /// Creates an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a> from a ZIP archive. Each time you call
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a> from a ZIP archive. Each time you call
   /// <code>PublishLayerVersion</code> with the same layer name, a new version
   /// is created.
   ///
@@ -3012,6 +3487,11 @@ class Lambda {
   ///
   /// Parameter [layerName] :
   /// The name or Amazon Resource Name (ARN) of the layer.
+  ///
+  /// Parameter [compatibleArchitectures] :
+  /// A list of compatible <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architectures</a>.
   ///
   /// Parameter [compatibleRuntimes] :
   /// A list of compatible <a
@@ -3041,6 +3521,7 @@ class Lambda {
   Future<PublishLayerVersionResponse> publishLayerVersion({
     required LayerVersionContentInput content,
     required String layerName,
+    List<Architecture>? compatibleArchitectures,
     List<Runtime>? compatibleRuntimes,
     String? description,
     String? licenseInfo,
@@ -3068,6 +3549,9 @@ class Lambda {
     );
     final $payload = <String, dynamic>{
       'Content': content,
+      if (compatibleArchitectures != null)
+        'CompatibleArchitectures':
+            compatibleArchitectures.map((e) => e.toValue()).toList(),
       if (compatibleRuntimes != null)
         'CompatibleRuntimes':
             compatibleRuntimes.map((e) => e.toValue()).toList(),
@@ -3090,9 +3574,9 @@ class Lambda {
   /// create a snapshot of your function code and configuration that doesn't
   /// change.
   ///
-  /// AWS Lambda doesn't publish a version if the function's configuration and
-  /// code haven't changed since the last version. Use <a>UpdateFunctionCode</a>
-  /// or <a>UpdateFunctionConfiguration</a> to update the function before
+  /// Lambda doesn't publish a version if the function's configuration and code
+  /// haven't changed since the last version. Use <a>UpdateFunctionCode</a> or
+  /// <a>UpdateFunctionConfiguration</a> to update the function before
   /// publishing a version.
   ///
   /// Clients can invoke versions directly or with an alias. To create an alias,
@@ -3343,6 +3827,7 @@ class Lambda {
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterValueException].
   /// May throw [TooManyRequestsException].
+  /// May throw [ResourceConflictException].
   ///
   /// Parameter [functionName] :
   /// The name of the Lambda function, version, or alias.
@@ -3531,9 +4016,8 @@ class Lambda {
   }
 
   /// Removes a statement from the permissions policy for a version of an <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-  /// Lambda layer</a>. For more information, see
-  /// <a>AddLayerVersionPermission</a>.
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+  /// layer</a>. For more information, see <a>AddLayerVersionPermission</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [ResourceNotFoundException].
@@ -3590,8 +4074,9 @@ class Lambda {
     );
   }
 
-  /// Revokes function-use permission from an AWS service or another account.
-  /// You can get the ID of the statement from the output of <a>GetPolicy</a>.
+  /// Revokes function-use permission from an Amazon Web Services service or
+  /// another account. You can get the ID of the statement from the output of
+  /// <a>GetPolicy</a>.
   ///
   /// May throw [ServiceException].
   /// May throw [ResourceNotFoundException].
@@ -3892,10 +4377,42 @@ class Lambda {
     return UpdateCodeSigningConfigResponse.fromJson(response);
   }
 
-  /// Updates an event source mapping. You can change the function that AWS
-  /// Lambda invokes, or pause invocation and resume later from the same
-  /// location.
+  /// Updates an event source mapping. You can change the function that Lambda
+  /// invokes, or pause invocation and resume later from the same location.
   ///
+  /// For details about how to configure different event sources, see the
+  /// following topics.
+  ///
+  /// <ul>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-dynamodb-eventsourcemapping">
+  /// Amazon DynamoDB Streams</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html#services-kinesis-eventsourcemapping">
+  /// Amazon Kinesis</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#events-sqs-eventsource">
+  /// Amazon SQS</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html#services-mq-eventsourcemapping">
+  /// Amazon MQ and RabbitMQ</a>
+  /// </li>
+  /// <li>
+  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html">
+  /// Amazon MSK</a>
+  /// </li>
+  /// <li>
+  /// <a href="https://docs.aws.amazon.com/lambda/latest/dg/kafka-smaa.html">
+  /// Apache Kafka</a>
+  /// </li>
+  /// </ul>
   /// The following error handling options are only available for stream sources
   /// (DynamoDB and Kinesis):
   ///
@@ -3923,6 +4440,41 @@ class Lambda {
   /// shard concurrently.
   /// </li>
   /// </ul>
+  /// For information about which configuration parameters apply to each event
+  /// source, see the following topics.
+  ///
+  /// <ul>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-ddb.html#services-ddb-params">
+  /// Amazon DynamoDB Streams</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html#services-kinesis-params">
+  /// Amazon Kinesis</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html#services-sqs-params">
+  /// Amazon SQS</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-mq.html#services-mq-params">
+  /// Amazon MQ and RabbitMQ</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-msk.html#services-msk-parms">
+  /// Amazon MSK</a>
+  /// </li>
+  /// <li>
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/with-kafka.html#services-kafka-parms">
+  /// Apache Kafka</a>
+  /// </li>
+  /// </ul>
   ///
   /// May throw [ServiceException].
   /// May throw [ResourceNotFoundException].
@@ -3935,14 +4487,17 @@ class Lambda {
   /// The identifier of the event source mapping.
   ///
   /// Parameter [batchSize] :
-  /// The maximum number of items to retrieve in a single batch.
+  /// The maximum number of records in each batch that Lambda pulls from your
+  /// stream or queue and sends to your function. Lambda passes all of the
+  /// records in the batch to the function in a single call, up to the payload
+  /// limit for synchronous invocation (6 MB).
   ///
   /// <ul>
   /// <li>
   /// <b>Amazon Kinesis</b> - Default 100. Max 10,000.
   /// </li>
   /// <li>
-  /// <b>Amazon DynamoDB Streams</b> - Default 100. Max 1,000.
+  /// <b>Amazon DynamoDB Streams</b> - Default 100. Max 10,000.
   /// </li>
   /// <li>
   /// <b>Amazon Simple Queue Service</b> - Default 10. For standard queues the
@@ -3955,19 +4510,31 @@ class Lambda {
   /// <li>
   /// <b>Self-Managed Apache Kafka</b> - Default 100. Max 10,000.
   /// </li>
+  /// <li>
+  /// <b>Amazon MQ (ActiveMQ and RabbitMQ)</b> - Default 100. Max 10,000.
+  /// </li>
   /// </ul>
   ///
   /// Parameter [bisectBatchOnFunctionError] :
-  /// (Streams) If the function returns an error, split the batch in two and
-  /// retry.
+  /// (Streams only) If the function returns an error, split the batch in two
+  /// and retry.
   ///
   /// Parameter [destinationConfig] :
-  /// (Streams) An Amazon SQS queue or Amazon SNS topic destination for
+  /// (Streams only) An Amazon SQS queue or Amazon SNS topic destination for
   /// discarded records.
   ///
   /// Parameter [enabled] :
-  /// If true, the event source mapping is active. Set to false to pause polling
-  /// and invocation.
+  /// When true, the event source mapping is active. When false, Lambda pauses
+  /// polling and invocation.
+  ///
+  /// Default: True
+  ///
+  /// Parameter [filterCriteria] :
+  /// (Streams and Amazon SQS) An object that defines the filter criteria that
+  /// determine whether Lambda should process an event. For more information,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html">Lambda
+  /// event filtering</a>.
   ///
   /// Parameter [functionName] :
   /// The name of the Lambda function.
@@ -3993,38 +4560,47 @@ class Lambda {
   /// the function name, it's limited to 64 characters in length.
   ///
   /// Parameter [functionResponseTypes] :
-  /// (Streams) A list of current response type enums applied to the event
-  /// source mapping.
+  /// (Streams and Amazon SQS) A list of current response type enums applied to
+  /// the event source mapping.
   ///
   /// Parameter [maximumBatchingWindowInSeconds] :
-  /// (Streams and SQS standard queues) The maximum amount of time to gather
-  /// records before invoking the function, in seconds.
+  /// (Streams and Amazon SQS standard queues) The maximum amount of time, in
+  /// seconds, that Lambda spends gathering records before invoking the
+  /// function.
+  ///
+  /// Default: 0
+  ///
+  /// Related setting: When you set <code>BatchSize</code> to a value greater
+  /// than 10, you must set <code>MaximumBatchingWindowInSeconds</code> to at
+  /// least 1.
   ///
   /// Parameter [maximumRecordAgeInSeconds] :
-  /// (Streams) Discard records older than the specified age. The default value
-  /// is infinite (-1).
+  /// (Streams only) Discard records older than the specified age. The default
+  /// value is infinite (-1).
   ///
   /// Parameter [maximumRetryAttempts] :
-  /// (Streams) Discard records after the specified number of retries. The
+  /// (Streams only) Discard records after the specified number of retries. The
   /// default value is infinite (-1). When set to infinite (-1), failed records
   /// will be retried until the record expires.
   ///
   /// Parameter [parallelizationFactor] :
-  /// (Streams) The number of batches to process from each shard concurrently.
+  /// (Streams only) The number of batches to process from each shard
+  /// concurrently.
   ///
   /// Parameter [sourceAccessConfigurations] :
-  /// An array of the authentication protocol, or the VPC components to secure
+  /// An array of authentication protocols or VPC components required to secure
   /// your event source.
   ///
   /// Parameter [tumblingWindowInSeconds] :
-  /// (Streams) The duration of a processing window in seconds. The range is
-  /// between 1 second up to 15 minutes.
+  /// (Streams only) The duration in seconds of a processing window. The range
+  /// is between 1 second up to 900 seconds.
   Future<EventSourceMappingConfiguration> updateEventSourceMapping({
     required String uuid,
     int? batchSize,
     bool? bisectBatchOnFunctionError,
     DestinationConfig? destinationConfig,
     bool? enabled,
+    FilterCriteria? filterCriteria,
     String? functionName,
     List<FunctionResponseType>? functionResponseTypes,
     int? maximumBatchingWindowInSeconds,
@@ -4083,6 +4659,7 @@ class Lambda {
         'BisectBatchOnFunctionError': bisectBatchOnFunctionError,
       if (destinationConfig != null) 'DestinationConfig': destinationConfig,
       if (enabled != null) 'Enabled': enabled,
+      if (filterCriteria != null) 'FilterCriteria': filterCriteria,
       if (functionName != null) 'FunctionName': functionName,
       if (functionResponseTypes != null)
         'FunctionResponseTypes':
@@ -4115,6 +4692,22 @@ class Lambda {
   /// information, see <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-trustedcode.html">Configuring
   /// code signing</a>.
+  ///
+  /// If the function's package type is <code>Image</code>, you must specify the
+  /// code package in <code>ImageUri</code> as the URI of a <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html">container
+  /// image</a> in the Amazon ECR registry.
+  ///
+  /// If the function's package type is <code>Zip</code>, you must specify the
+  /// deployment package as a <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html#gettingstarted-package-zip">.zip
+  /// file archive</a>. Enter the Amazon S3 bucket and key of the code .zip file
+  /// location. You can also provide the function code inline using the
+  /// <code>ZipFile</code> field.
+  ///
+  /// The code in the deployment package must be compatible with the target
+  /// instruction set architecture of the function (<code>x86-64</code> or
+  /// <code>arm64</code>).
   ///
   /// The function's code is locked when you publish a version. You can't modify
   /// the code of a published version, only the unpublished version.
@@ -4154,12 +4747,18 @@ class Lambda {
   /// The length constraint applies only to the full ARN. If you specify only
   /// the function name, it is limited to 64 characters in length.
   ///
+  /// Parameter [architectures] :
+  /// The instruction set architecture that the function supports. Enter a
+  /// string array with one of the valid values (arm64 or x86_64). The default
+  /// value is <code>x86_64</code>.
+  ///
   /// Parameter [dryRun] :
   /// Set to true to validate the request parameters and access permissions
   /// without modifying the function code.
   ///
   /// Parameter [imageUri] :
-  /// URI of a container image in the Amazon ECR registry.
+  /// URI of a container image in the Amazon ECR registry. Do not use for a
+  /// function defined with a .zip file archive.
   ///
   /// Parameter [publish] :
   /// Set to true to publish a new version of the function after updating the
@@ -4172,21 +4771,26 @@ class Lambda {
   /// since you last read it.
   ///
   /// Parameter [s3Bucket] :
-  /// An Amazon S3 bucket in the same AWS Region as your function. The bucket
-  /// can be in a different AWS account.
+  /// An Amazon S3 bucket in the same Amazon Web Services Region as your
+  /// function. The bucket can be in a different Amazon Web Services account.
+  /// Use only with a function defined with a .zip file archive deployment
+  /// package.
   ///
   /// Parameter [s3Key] :
-  /// The Amazon S3 key of the deployment package.
+  /// The Amazon S3 key of the deployment package. Use only with a function
+  /// defined with a .zip file archive deployment package.
   ///
   /// Parameter [s3ObjectVersion] :
   /// For versioned objects, the version of the deployment package object to
   /// use.
   ///
   /// Parameter [zipFile] :
-  /// The base64-encoded contents of the deployment package. AWS SDK and AWS CLI
-  /// clients handle the encoding for you.
+  /// The base64-encoded contents of the deployment package. Amazon Web Services
+  /// SDK and Amazon Web Services CLI clients handle the encoding for you. Use
+  /// only with a function defined with a .zip file archive deployment package.
   Future<FunctionConfiguration> updateFunctionCode({
     required String functionName,
+    List<Architecture>? architectures,
     bool? dryRun,
     String? imageUri,
     bool? publish,
@@ -4223,6 +4827,8 @@ class Lambda {
       1024,
     );
     final $payload = <String, dynamic>{
+      if (architectures != null)
+        'Architectures': architectures.map((e) => e.toValue()).toList(),
       if (dryRun != null) 'DryRun': dryRun,
       if (imageUri != null) 'ImageUri': imageUri,
       if (publish != null) 'Publish': publish,
@@ -4261,7 +4867,7 @@ class Lambda {
   /// version, only the unpublished version.
   ///
   /// To configure function concurrency, use <a>PutFunctionConcurrency</a>. To
-  /// grant invoke permissions to an account or AWS service, use
+  /// grant invoke permissions to an account or Amazon Web Services service, use
   /// <a>AddPermission</a>.
   ///
   /// May throw [ServiceException].
@@ -4307,24 +4913,32 @@ class Lambda {
   /// Environment variables that are accessible from function code during
   /// execution.
   ///
+  /// Parameter [ephemeralStorage] :
+  /// The size of the function’s /tmp directory in MB. The default value is 512,
+  /// but can be any whole number between 512 and 10240 MB.
+  ///
   /// Parameter [fileSystemConfigs] :
   /// Connection settings for an Amazon EFS file system.
   ///
   /// Parameter [handler] :
   /// The name of the method within your code that Lambda calls to execute your
-  /// function. The format includes the file name. It can also include
-  /// namespaces and other qualifiers, depending on the runtime. For more
-  /// information, see <a
+  /// function. Handler is required if the deployment package is a .zip file
+  /// archive. The format includes the file name. It can also include namespaces
+  /// and other qualifiers, depending on the runtime. For more information, see
+  /// <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/programming-model-v2.html">Programming
   /// Model</a>.
   ///
   /// Parameter [imageConfig] :
-  /// Configuration values that override the container image Dockerfile.
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/images-parms.html">Container
+  /// image configuration values</a> that override the values in the container
+  /// image Docker file.
   ///
   /// Parameter [kMSKeyArn] :
-  /// The ARN of the AWS Key Management Service (AWS KMS) key that's used to
-  /// encrypt your function's environment variables. If it's not provided, AWS
-  /// Lambda uses a default service key.
+  /// The ARN of the Amazon Web Services Key Management Service (KMS) key that's
+  /// used to encrypt your function's environment variables. If it's not
+  /// provided, Lambda uses a default service key.
   ///
   /// Parameter [layers] :
   /// A list of <a
@@ -4333,9 +4947,11 @@ class Lambda {
   /// layer by its ARN, including the version.
   ///
   /// Parameter [memorySize] :
-  /// The amount of memory available to the function at runtime. Increasing the
-  /// function's memory also increases its CPU allocation. The default value is
-  /// 128 MB. The value can be any multiple of 1 MB.
+  /// The amount of <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html">memory
+  /// available to the function</a> at runtime. Increasing the function memory
+  /// also increases its CPU allocation. The default value is 128 MB. The value
+  /// can be any multiple of 1 MB.
   ///
   /// Parameter [revisionId] :
   /// Only update the function if the revision ID matches the ID that's
@@ -4348,20 +4964,25 @@ class Lambda {
   /// Parameter [runtime] :
   /// The identifier of the function's <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html">runtime</a>.
+  /// Runtime is required if the deployment package is a .zip file archive.
   ///
   /// Parameter [timeout] :
-  /// The amount of time that Lambda allows a function to run before stopping
-  /// it. The default is 3 seconds. The maximum allowed value is 900 seconds.
+  /// The amount of time (in seconds) that Lambda allows a function to run
+  /// before stopping it. The default is 3 seconds. The maximum allowed value is
+  /// 900 seconds. For additional information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html">Lambda
+  /// execution environment</a>.
   ///
   /// Parameter [tracingConfig] :
   /// Set <code>Mode</code> to <code>Active</code> to sample and trace a subset
-  /// of incoming requests with AWS X-Ray.
+  /// of incoming requests with <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html">X-Ray</a>.
   ///
   /// Parameter [vpcConfig] :
-  /// For network connectivity to AWS resources in a VPC, specify a list of
-  /// security groups and subnets in the VPC. When you connect a function to a
-  /// VPC, it can only access resources and the internet through that VPC. For
-  /// more information, see <a
+  /// For network connectivity to Amazon Web Services resources in a VPC,
+  /// specify a list of security groups and subnets in the VPC. When you connect
+  /// a function to a VPC, it can only access resources and the internet through
+  /// that VPC. For more information, see <a
   /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html">VPC
   /// Settings</a>.
   Future<FunctionConfiguration> updateFunctionConfiguration({
@@ -4369,6 +4990,7 @@ class Lambda {
     DeadLetterConfig? deadLetterConfig,
     String? description,
     Environment? environment,
+    EphemeralStorage? ephemeralStorage,
     List<FileSystemConfig>? fileSystemConfigs,
     String? handler,
     ImageConfig? imageConfig,
@@ -4418,6 +5040,7 @@ class Lambda {
       if (deadLetterConfig != null) 'DeadLetterConfig': deadLetterConfig,
       if (description != null) 'Description': description,
       if (environment != null) 'Environment': environment,
+      if (ephemeralStorage != null) 'EphemeralStorage': ephemeralStorage,
       if (fileSystemConfigs != null) 'FileSystemConfigs': fileSystemConfigs,
       if (handler != null) 'Handler': handler,
       if (imageConfig != null) 'ImageConfig': imageConfig,
@@ -4451,6 +5074,7 @@ class Lambda {
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidParameterValueException].
   /// May throw [TooManyRequestsException].
+  /// May throw [ResourceConflictException].
   ///
   /// Parameter [functionName] :
   /// The name of the Lambda function, version, or alias.
@@ -4555,6 +5179,87 @@ class Lambda {
     );
     return FunctionEventInvokeConfig.fromJson(response);
   }
+
+  /// Updates the configuration for a Lambda function URL.
+  ///
+  /// May throw [ResourceConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [InvalidParameterValueException].
+  /// May throw [ServiceException].
+  /// May throw [TooManyRequestsException].
+  ///
+  /// Parameter [functionName] :
+  /// The name of the Lambda function.
+  /// <p class="title"> <b>Name formats</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>Function name</b> - <code>my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Function ARN</b> -
+  /// <code>arn:aws:lambda:us-west-2:123456789012:function:my-function</code>.
+  /// </li>
+  /// <li>
+  /// <b>Partial ARN</b> - <code>123456789012:function:my-function</code>.
+  /// </li>
+  /// </ul>
+  /// The length constraint applies only to the full ARN. If you specify only
+  /// the function name, it is limited to 64 characters in length.
+  ///
+  /// Parameter [authType] :
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to
+  /// bypass IAM authentication to create a public endpoint. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html">
+  /// Security and auth model for Lambda function URLs</a>.
+  ///
+  /// Parameter [cors] :
+  /// The <a
+  /// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+  /// resource sharing (CORS)</a> settings for your function URL.
+  ///
+  /// Parameter [qualifier] :
+  /// The alias name.
+  Future<UpdateFunctionUrlConfigResponse> updateFunctionUrlConfig({
+    required String functionName,
+    FunctionUrlAuthType? authType,
+    Cors? cors,
+    String? qualifier,
+  }) async {
+    ArgumentError.checkNotNull(functionName, 'functionName');
+    _s.validateStringLength(
+      'functionName',
+      functionName,
+      1,
+      140,
+      isRequired: true,
+    );
+    _s.validateStringLength(
+      'qualifier',
+      qualifier,
+      1,
+      128,
+    );
+    final $query = <String, List<String>>{
+      if (qualifier != null) 'Qualifier': [qualifier],
+    };
+    final $payload = <String, dynamic>{
+      if (authType != null) 'AuthType': authType.toValue(),
+      if (cors != null) 'Cors': cors,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'PUT',
+      requestUri:
+          '/2021-10-31/functions/${Uri.encodeComponent(functionName)}/url',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    return UpdateFunctionUrlConfigResponse.fromJson(response);
+  }
 }
 
 /// Limits that are related to concurrency and storage. All file and storage
@@ -4564,7 +5269,7 @@ class AccountLimit {
   /// extracted.
   final int? codeSizeUnzipped;
 
-  /// The maximum size of a deployment package when it's uploaded directly to AWS
+  /// The maximum size of a deployment package when it's uploaded directly to
   /// Lambda. Use Amazon S3 for larger files.
   final int? codeSizeZipped;
 
@@ -4752,7 +5457,37 @@ class AllowedPublishers {
   }
 }
 
-/// Details about a Code signing configuration.
+enum Architecture {
+  x86_64,
+  arm64,
+}
+
+extension on Architecture {
+  String toValue() {
+    switch (this) {
+      case Architecture.x86_64:
+        return 'x86_64';
+      case Architecture.arm64:
+        return 'arm64';
+    }
+  }
+}
+
+extension on String {
+  Architecture toArchitecture() {
+    switch (this) {
+      case 'x86_64':
+        return Architecture.x86_64;
+      case 'arm64':
+        return Architecture.arm64;
+    }
+    throw Exception('$this is not known in enum Architecture');
+  }
+}
+
+/// Details about a <a
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html">Code
+/// signing configuration</a>.
 class CodeSigningConfig {
   /// List of allowed publishers.
   final AllowedPublishers allowedPublishers;
@@ -4796,8 +5531,9 @@ class CodeSigningConfig {
   }
 }
 
-/// Code signing configuration policies specifies the validation failure action
-/// for signature mismatch or expiry.
+/// Code signing configuration <a
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-codesigning.html#config-codesigning-policies">policies</a>
+/// specify the validation failure action for signature mismatch or expiry.
 class CodeSigningPolicies {
   /// Code signing configuration policy for deployment validation failure. If you
   /// set the policy to <code>Enforce</code>, Lambda blocks the deployment request
@@ -4860,7 +5596,7 @@ extension on String {
 class Concurrency {
   /// The number of concurrent executions that are reserved for this function. For
   /// more information, see <a
-  /// href="https://docs.aws.amazon.com/lambda/latest/dg/concurrent-executions.html">Managing
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html">Managing
   /// Concurrency</a>.
   final int? reservedConcurrentExecutions;
 
@@ -4875,6 +5611,94 @@ class Concurrency {
   }
 }
 
+/// The <a
+/// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+/// resource sharing (CORS)</a> settings for your Lambda function URL. Use CORS
+/// to grant access to your function URL from any origin. You can also use CORS
+/// to control access for specific HTTP headers and methods in requests to your
+/// function URL.
+class Cors {
+  /// Whether to allow cookies or other credentials in requests to your function
+  /// URL. The default is <code>false</code>.
+  final bool? allowCredentials;
+
+  /// The HTTP headers that origins can include in requests to your function URL.
+  /// For example: <code>Date</code>, <code>Keep-Alive</code>,
+  /// <code>X-Custom-Header</code>.
+  final List<String>? allowHeaders;
+
+  /// The HTTP methods that are allowed when calling your function URL. For
+  /// example: <code>GET</code>, <code>POST</code>, <code>DELETE</code>, or the
+  /// wildcard character (<code>*</code>).
+  final List<String>? allowMethods;
+
+  /// The origins that can access your function URL. You can list any number of
+  /// specific origins, separated by a comma. For example:
+  /// <code>https://www.example.com</code>, <code>http://localhost:60905</code>.
+  ///
+  /// Alternatively, you can grant access to all origins using the wildcard
+  /// character (<code>*</code>).
+  final List<String>? allowOrigins;
+
+  /// The HTTP headers in your function response that you want to expose to
+  /// origins that call your function URL. For example: <code>Date</code>,
+  /// <code>Keep-Alive</code>, <code>X-Custom-Header</code>.
+  final List<String>? exposeHeaders;
+
+  /// The maximum amount of time, in seconds, that web browsers can cache results
+  /// of a preflight request. By default, this is set to <code>0</code>, which
+  /// means that the browser doesn't cache results.
+  final int? maxAge;
+
+  Cors({
+    this.allowCredentials,
+    this.allowHeaders,
+    this.allowMethods,
+    this.allowOrigins,
+    this.exposeHeaders,
+    this.maxAge,
+  });
+  factory Cors.fromJson(Map<String, dynamic> json) {
+    return Cors(
+      allowCredentials: json['AllowCredentials'] as bool?,
+      allowHeaders: (json['AllowHeaders'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      allowMethods: (json['AllowMethods'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      allowOrigins: (json['AllowOrigins'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      exposeHeaders: (json['ExposeHeaders'] as List?)
+          ?.whereNotNull()
+          .map((e) => e as String)
+          .toList(),
+      maxAge: json['MaxAge'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final allowCredentials = this.allowCredentials;
+    final allowHeaders = this.allowHeaders;
+    final allowMethods = this.allowMethods;
+    final allowOrigins = this.allowOrigins;
+    final exposeHeaders = this.exposeHeaders;
+    final maxAge = this.maxAge;
+    return {
+      if (allowCredentials != null) 'AllowCredentials': allowCredentials,
+      if (allowHeaders != null) 'AllowHeaders': allowHeaders,
+      if (allowMethods != null) 'AllowMethods': allowMethods,
+      if (allowOrigins != null) 'AllowOrigins': allowOrigins,
+      if (exposeHeaders != null) 'ExposeHeaders': exposeHeaders,
+      if (maxAge != null) 'MaxAge': maxAge,
+    };
+  }
+}
+
 class CreateCodeSigningConfigResponse {
   /// The code signing configuration.
   final CodeSigningConfig codeSigningConfig;
@@ -4886,6 +5710,51 @@ class CreateCodeSigningConfigResponse {
     return CreateCodeSigningConfigResponse(
       codeSigningConfig: CodeSigningConfig.fromJson(
           json['CodeSigningConfig'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class CreateFunctionUrlConfigResponse {
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to bypass
+  /// IAM authentication to create a public endpoint. For more information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html"> Security
+  /// and auth model for Lambda function URLs</a>.
+  final FunctionUrlAuthType authType;
+
+  /// When the function URL was created, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String creationTime;
+
+  /// The Amazon Resource Name (ARN) of your function.
+  final String functionArn;
+
+  /// The HTTP URL endpoint for your function.
+  final String functionUrl;
+
+  /// The <a
+  /// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+  /// resource sharing (CORS)</a> settings for your function URL.
+  final Cors? cors;
+
+  CreateFunctionUrlConfigResponse({
+    required this.authType,
+    required this.creationTime,
+    required this.functionArn,
+    required this.functionUrl,
+    this.cors,
+  });
+  factory CreateFunctionUrlConfigResponse.fromJson(Map<String, dynamic> json) {
+    return CreateFunctionUrlConfigResponse(
+      authType: (json['AuthType'] as String).toFunctionUrlAuthType(),
+      creationTime: json['CreationTime'] as String,
+      functionArn: json['FunctionArn'] as String,
+      functionUrl: json['FunctionUrl'] as String,
+      cors: json['Cors'] != null
+          ? Cors.fromJson(json['Cors'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -4978,9 +5847,14 @@ extension on String {
   }
 }
 
-/// A function's environment variable settings.
+/// A function's environment variable settings. You can use environment
+/// variables to adjust your function's behavior without updating code. An
+/// environment variable is a pair of strings that are stored in a function's
+/// version-specific configuration.
 class Environment {
-  /// Environment variable key-value pairs.
+  /// Environment variable key-value pairs. For more information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">Using
+  /// Lambda environment variables</a>.
   final Map<String, String>? variables;
 
   Environment({
@@ -5039,68 +5913,113 @@ class EnvironmentResponse {
   }
 }
 
-/// A mapping between an AWS resource and an AWS Lambda function. See
-/// <a>CreateEventSourceMapping</a> for details.
+/// The size of the function’s /tmp directory in MB. The default value is 512,
+/// but can be any whole number between 512 and 10240 MB.
+class EphemeralStorage {
+  /// The size of the function’s /tmp directory.
+  final int size;
+
+  EphemeralStorage({
+    required this.size,
+  });
+  factory EphemeralStorage.fromJson(Map<String, dynamic> json) {
+    return EphemeralStorage(
+      size: json['Size'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final size = this.size;
+    return {
+      'Size': size,
+    };
+  }
+}
+
+/// A mapping between an Amazon Web Services resource and a Lambda function. For
+/// details, see <a>CreateEventSourceMapping</a>.
 class EventSourceMappingConfiguration {
-  /// The maximum number of items to retrieve in a single batch.
+  /// The maximum number of records in each batch that Lambda pulls from your
+  /// stream or queue and sends to your function. Lambda passes all of the records
+  /// in the batch to the function in a single call, up to the payload limit for
+  /// synchronous invocation (6 MB).
+  ///
+  /// Default value: Varies by service. For Amazon SQS, the default is 10. For all
+  /// other services, the default is 100.
+  ///
+  /// Related setting: When you set <code>BatchSize</code> to a value greater than
+  /// 10, you must set <code>MaximumBatchingWindowInSeconds</code> to at least 1.
   final int? batchSize;
 
-  /// (Streams) If the function returns an error, split the batch in two and
+  /// (Streams only) If the function returns an error, split the batch in two and
   /// retry. The default value is false.
   final bool? bisectBatchOnFunctionError;
 
-  /// (Streams) An Amazon SQS queue or Amazon SNS topic destination for discarded
-  /// records.
+  /// (Streams only) An Amazon SQS queue or Amazon SNS topic destination for
+  /// discarded records.
   final DestinationConfig? destinationConfig;
 
   /// The Amazon Resource Name (ARN) of the event source.
   final String? eventSourceArn;
 
+  /// (Streams and Amazon SQS) An object that defines the filter criteria that
+  /// determine whether Lambda should process an event. For more information, see
+  /// <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html">Lambda
+  /// event filtering</a>.
+  final FilterCriteria? filterCriteria;
+
   /// The ARN of the Lambda function.
   final String? functionArn;
 
-  /// (Streams) A list of current response type enums applied to the event source
-  /// mapping.
+  /// (Streams and Amazon SQS) A list of current response type enums applied to
+  /// the event source mapping.
   final List<FunctionResponseType>? functionResponseTypes;
 
-  /// The date that the event source mapping was last updated, or its state
+  /// The date that the event source mapping was last updated or that its state
   /// changed.
   final DateTime? lastModified;
 
-  /// The result of the last AWS Lambda invocation of your Lambda function.
+  /// The result of the last Lambda invocation of your function.
   final String? lastProcessingResult;
 
-  /// (Streams and SQS standard queues) The maximum amount of time to gather
-  /// records before invoking the function, in seconds. The default value is zero.
+  /// (Streams and Amazon SQS standard queues) The maximum amount of time, in
+  /// seconds, that Lambda spends gathering records before invoking the function.
+  ///
+  /// Default: 0
+  ///
+  /// Related setting: When you set <code>BatchSize</code> to a value greater than
+  /// 10, you must set <code>MaximumBatchingWindowInSeconds</code> to at least 1.
   final int? maximumBatchingWindowInSeconds;
 
-  /// (Streams) Discard records older than the specified age. The default value is
-  /// infinite (-1). When set to infinite (-1), failed records are retried until
-  /// the record expires.
+  /// (Streams only) Discard records older than the specified age. The default
+  /// value is -1, which sets the maximum age to infinite. When the value is set
+  /// to infinite, Lambda never discards old records.
   final int? maximumRecordAgeInSeconds;
 
-  /// (Streams) Discard records after the specified number of retries. The default
-  /// value is infinite (-1). When set to infinite (-1), failed records are
-  /// retried until the record expires.
+  /// (Streams only) Discard records after the specified number of retries. The
+  /// default value is -1, which sets the maximum number of retries to infinite.
+  /// When MaximumRetryAttempts is infinite, Lambda retries failed records until
+  /// the record expires in the event source.
   final int? maximumRetryAttempts;
 
-  /// (Streams) The number of batches to process from each shard concurrently. The
-  /// default value is 1.
+  /// (Streams only) The number of batches to process concurrently from each
+  /// shard. The default value is 1.
   final int? parallelizationFactor;
 
-  /// (MQ) The name of the Amazon MQ broker destination queue to consume.
+  /// (Amazon MQ) The name of the Amazon MQ broker destination queue to consume.
   final List<String>? queues;
 
-  /// The Self-Managed Apache Kafka cluster for your event source.
+  /// The self-managed Apache Kafka cluster for your event source.
   final SelfManagedEventSource? selfManagedEventSource;
 
-  /// An array of the authentication protocol, or the VPC components to secure
-  /// your event source.
+  /// An array of the authentication protocol, VPC components, or virtual host to
+  /// secure and define your event source.
   final List<SourceAccessConfiguration>? sourceAccessConfigurations;
 
   /// The position in a stream from which to start reading. Required for Amazon
-  /// Kinesis, Amazon DynamoDB, and Amazon MSK Streams sources.
-  /// <code>AT_TIMESTAMP</code> is only supported for Amazon Kinesis streams.
+  /// Kinesis, Amazon DynamoDB, and Amazon MSK stream sources.
+  /// <code>AT_TIMESTAMP</code> is supported only for Amazon Kinesis streams.
   final EventSourcePosition? startingPosition;
 
   /// With <code>StartingPosition</code> set to <code>AT_TIMESTAMP</code>, the
@@ -5113,15 +6032,15 @@ class EventSourceMappingConfiguration {
   /// <code>Deleting</code>.
   final String? state;
 
-  /// Indicates whether the last change to the event source mapping was made by a
-  /// user, or by the Lambda service.
+  /// Indicates whether a user or Lambda made the last change to the event source
+  /// mapping.
   final String? stateTransitionReason;
 
   /// The name of the Kafka topic.
   final List<String>? topics;
 
-  /// (Streams) The duration of a processing window in seconds. The range is
-  /// between 1 second up to 15 minutes.
+  /// (Streams only) The duration in seconds of a processing window. The range is
+  /// 1–900 seconds.
   final int? tumblingWindowInSeconds;
 
   /// The identifier of the event source mapping.
@@ -5132,6 +6051,7 @@ class EventSourceMappingConfiguration {
     this.bisectBatchOnFunctionError,
     this.destinationConfig,
     this.eventSourceArn,
+    this.filterCriteria,
     this.functionArn,
     this.functionResponseTypes,
     this.lastModified,
@@ -5160,6 +6080,10 @@ class EventSourceMappingConfiguration {
               json['DestinationConfig'] as Map<String, dynamic>)
           : null,
       eventSourceArn: json['EventSourceArn'] as String?,
+      filterCriteria: json['FilterCriteria'] != null
+          ? FilterCriteria.fromJson(
+              json['FilterCriteria'] as Map<String, dynamic>)
+          : null,
       functionArn: json['FunctionArn'] as String?,
       functionResponseTypes: (json['FunctionResponseTypes'] as List?)
           ?.whereNotNull()
@@ -5234,8 +6158,9 @@ extension on String {
   }
 }
 
-/// Details about the connection between a Lambda function and an Amazon EFS
-/// file system.
+/// Details about the connection between a Lambda function and an <a
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html">Amazon
+/// EFS file system</a>.
 class FileSystemConfig {
   /// The Amazon Resource Name (ARN) of the Amazon EFS access point that provides
   /// access to the file system.
@@ -5266,15 +6191,68 @@ class FileSystemConfig {
   }
 }
 
+/// A structure within a <code>FilterCriteria</code> object that defines an
+/// event filtering pattern.
+class Filter {
+  /// A filter pattern. For more information on the syntax of a filter pattern,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventfiltering.html#filtering-syntax">
+  /// Filter rule syntax</a>.
+  final String? pattern;
+
+  Filter({
+    this.pattern,
+  });
+  factory Filter.fromJson(Map<String, dynamic> json) {
+    return Filter(
+      pattern: json['Pattern'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final pattern = this.pattern;
+    return {
+      if (pattern != null) 'Pattern': pattern,
+    };
+  }
+}
+
+/// An object that contains the filters for an event source.
+class FilterCriteria {
+  /// A list of filters.
+  final List<Filter>? filters;
+
+  FilterCriteria({
+    this.filters,
+  });
+  factory FilterCriteria.fromJson(Map<String, dynamic> json) {
+    return FilterCriteria(
+      filters: (json['Filters'] as List?)
+          ?.whereNotNull()
+          .map((e) => Filter.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final filters = this.filters;
+    return {
+      if (filters != null) 'Filters': filters,
+    };
+  }
+}
+
 /// The code for the Lambda function. You can specify either an object in Amazon
 /// S3, upload a .zip file archive deployment package directly, or specify the
 /// URI of a container image.
 class FunctionCode {
-  /// URI of a container image in the Amazon ECR registry.
+  /// URI of a <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html">container
+  /// image</a> in the Amazon ECR registry.
   final String? imageUri;
 
-  /// An Amazon S3 bucket in the same AWS Region as your function. The bucket can
-  /// be in a different AWS account.
+  /// An Amazon S3 bucket in the same Amazon Web Services Region as your function.
+  /// The bucket can be in a different Amazon Web Services account.
   final String? s3Bucket;
 
   /// The Amazon S3 key of the deployment package.
@@ -5283,8 +6261,8 @@ class FunctionCode {
   /// For versioned objects, the version of the deployment package object to use.
   final String? s3ObjectVersion;
 
-  /// The base64-encoded contents of the deployment package. AWS SDK and AWS CLI
-  /// clients handle the encoding for you.
+  /// The base64-encoded contents of the deployment package. Amazon Web Services
+  /// SDK and Amazon Web Services CLI clients handle the encoding for you.
   final Uint8List? zipFile;
 
   FunctionCode({
@@ -5342,6 +6320,11 @@ class FunctionCodeLocation {
 
 /// Details about a function's configuration.
 class FunctionConfiguration {
+  /// The instruction set architecture that the function supports. Architecture is
+  /// a string array with one of the valid values. The default architecture value
+  /// is <code>x86_64</code>.
+  final List<Architecture>? architectures;
+
   /// The SHA256 hash of the function's deployment package.
   final String? codeSha256;
 
@@ -5354,10 +6337,18 @@ class FunctionConfiguration {
   /// The function's description.
   final String? description;
 
-  /// The function's environment variables.
+  /// The function's <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html">environment
+  /// variables</a>.
   final EnvironmentResponse? environment;
 
-  /// Connection settings for an Amazon EFS file system.
+  /// The size of the function’s /tmp directory in MB. The default value is 512,
+  /// but can be any whole number between 512 and 10240 MB.
+  final EphemeralStorage? ephemeralStorage;
+
+  /// Connection settings for an <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html">Amazon
+  /// EFS file system</a>.
   final List<FileSystemConfig>? fileSystemConfigs;
 
   /// The function's Amazon Resource Name (ARN).
@@ -5373,7 +6364,7 @@ class FunctionConfiguration {
   final ImageConfigResponse? imageConfigResponse;
 
   /// The KMS key that's used to encrypt the function's environment variables.
-  /// This key is only returned if you've configured a customer managed CMK.
+  /// This key is only returned if you've configured a customer managed key.
   final String? kMSKeyArn;
 
   /// The date and time that the function was last updated, in <a
@@ -5396,7 +6387,7 @@ class FunctionConfiguration {
   /// layers</a>.
   final List<Layer>? layers;
 
-  /// For Lambda@Edge functions, the ARN of the master function.
+  /// For Lambda@Edge functions, the ARN of the main function.
   final String? masterArn;
 
   /// The amount of memory available to the function at runtime.
@@ -5436,7 +6427,7 @@ class FunctionConfiguration {
   /// stopping it.
   final int? timeout;
 
-  /// The function's AWS X-Ray tracing configuration.
+  /// The function's X-Ray tracing configuration.
   final TracingConfigResponse? tracingConfig;
 
   /// The version of the Lambda function.
@@ -5446,11 +6437,13 @@ class FunctionConfiguration {
   final VpcConfigResponse? vpcConfig;
 
   FunctionConfiguration({
+    this.architectures,
     this.codeSha256,
     this.codeSize,
     this.deadLetterConfig,
     this.description,
     this.environment,
+    this.ephemeralStorage,
     this.fileSystemConfigs,
     this.functionArn,
     this.functionName,
@@ -5480,6 +6473,10 @@ class FunctionConfiguration {
   });
   factory FunctionConfiguration.fromJson(Map<String, dynamic> json) {
     return FunctionConfiguration(
+      architectures: (json['Architectures'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as String).toArchitecture())
+          .toList(),
       codeSha256: json['CodeSha256'] as String?,
       codeSize: json['CodeSize'] as int?,
       deadLetterConfig: json['DeadLetterConfig'] != null
@@ -5490,6 +6487,10 @@ class FunctionConfiguration {
       environment: json['Environment'] != null
           ? EnvironmentResponse.fromJson(
               json['Environment'] as Map<String, dynamic>)
+          : null,
+      ephemeralStorage: json['EphemeralStorage'] != null
+          ? EphemeralStorage.fromJson(
+              json['EphemeralStorage'] as Map<String, dynamic>)
           : null,
       fileSystemConfigs: (json['FileSystemConfigs'] as List?)
           ?.whereNotNull()
@@ -5614,6 +6615,87 @@ extension on String {
         return FunctionResponseType.reportBatchItemFailures;
     }
     throw Exception('$this is not known in enum FunctionResponseType');
+  }
+}
+
+enum FunctionUrlAuthType {
+  none,
+  awsIam,
+}
+
+extension on FunctionUrlAuthType {
+  String toValue() {
+    switch (this) {
+      case FunctionUrlAuthType.none:
+        return 'NONE';
+      case FunctionUrlAuthType.awsIam:
+        return 'AWS_IAM';
+    }
+  }
+}
+
+extension on String {
+  FunctionUrlAuthType toFunctionUrlAuthType() {
+    switch (this) {
+      case 'NONE':
+        return FunctionUrlAuthType.none;
+      case 'AWS_IAM':
+        return FunctionUrlAuthType.awsIam;
+    }
+    throw Exception('$this is not known in enum FunctionUrlAuthType');
+  }
+}
+
+/// Details about a Lambda function URL.
+class FunctionUrlConfig {
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to bypass
+  /// IAM authentication to create a public endpoint. For more information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html"> Security
+  /// and auth model for Lambda function URLs</a>.
+  final FunctionUrlAuthType authType;
+
+  /// When the function URL was created, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String creationTime;
+
+  /// The Amazon Resource Name (ARN) of your function.
+  final String functionArn;
+
+  /// The HTTP URL endpoint for your function.
+  final String functionUrl;
+
+  /// When the function URL configuration was last updated, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String lastModifiedTime;
+
+  /// The <a
+  /// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+  /// resource sharing (CORS)</a> settings for your function URL.
+  final Cors? cors;
+
+  FunctionUrlConfig({
+    required this.authType,
+    required this.creationTime,
+    required this.functionArn,
+    required this.functionUrl,
+    required this.lastModifiedTime,
+    this.cors,
+  });
+  factory FunctionUrlConfig.fromJson(Map<String, dynamic> json) {
+    return FunctionUrlConfig(
+      authType: (json['AuthType'] as String).toFunctionUrlAuthType(),
+      creationTime: json['CreationTime'] as String,
+      functionArn: json['FunctionArn'] as String,
+      functionUrl: json['FunctionUrl'] as String,
+      lastModifiedTime: json['LastModifiedTime'] as String,
+      cors: json['Cors'] != null
+          ? Cors.fromJson(json['Cors'] as Map<String, dynamic>)
+          : null,
+    );
   }
 }
 
@@ -5769,6 +6851,58 @@ class GetFunctionResponse {
   }
 }
 
+class GetFunctionUrlConfigResponse {
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to bypass
+  /// IAM authentication to create a public endpoint. For more information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html"> Security
+  /// and auth model for Lambda function URLs</a>.
+  final FunctionUrlAuthType authType;
+
+  /// When the function URL was created, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String creationTime;
+
+  /// The Amazon Resource Name (ARN) of your function.
+  final String functionArn;
+
+  /// The HTTP URL endpoint for your function.
+  final String functionUrl;
+
+  /// When the function URL configuration was last updated, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String lastModifiedTime;
+
+  /// The <a
+  /// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+  /// resource sharing (CORS)</a> settings for your function URL.
+  final Cors? cors;
+
+  GetFunctionUrlConfigResponse({
+    required this.authType,
+    required this.creationTime,
+    required this.functionArn,
+    required this.functionUrl,
+    required this.lastModifiedTime,
+    this.cors,
+  });
+  factory GetFunctionUrlConfigResponse.fromJson(Map<String, dynamic> json) {
+    return GetFunctionUrlConfigResponse(
+      authType: (json['AuthType'] as String).toFunctionUrlAuthType(),
+      creationTime: json['CreationTime'] as String,
+      functionArn: json['FunctionArn'] as String,
+      functionUrl: json['FunctionUrl'] as String,
+      lastModifiedTime: json['LastModifiedTime'] as String,
+      cors: json['Cors'] != null
+          ? Cors.fromJson(json['Cors'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
 class GetLayerVersionPolicyResponse {
   /// The policy document.
   final String? policy;
@@ -5789,6 +6923,11 @@ class GetLayerVersionPolicyResponse {
 }
 
 class GetLayerVersionResponse {
+  /// A list of compatible <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architectures</a>.
+  final List<Architecture>? compatibleArchitectures;
+
   /// The layer's compatible runtimes.
   final List<Runtime>? compatibleRuntimes;
 
@@ -5816,6 +6955,7 @@ class GetLayerVersionResponse {
   final int? version;
 
   GetLayerVersionResponse({
+    this.compatibleArchitectures,
     this.compatibleRuntimes,
     this.content,
     this.createdDate,
@@ -5827,6 +6967,10 @@ class GetLayerVersionResponse {
   });
   factory GetLayerVersionResponse.fromJson(Map<String, dynamic> json) {
     return GetLayerVersionResponse(
+      compatibleArchitectures: (json['CompatibleArchitectures'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as String).toArchitecture())
+          .toList(),
       compatibleRuntimes: (json['CompatibleRuntimes'] as List?)
           ?.whereNotNull()
           .map((e) => (e as String).toRuntime())
@@ -5912,7 +7056,7 @@ class GetProvisionedConcurrencyConfigResponse {
 
 /// Configuration values that override the container image Dockerfile settings.
 /// See <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/images-parms.html">Container
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms">Container
 /// settings</a>.
 class ImageConfig {
   /// Specifies parameters that you want to pass in with ENTRYPOINT.
@@ -6180,8 +7324,8 @@ extension on String {
 }
 
 /// An <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-/// Lambda layer</a>.
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+/// layer</a>.
 class Layer {
   /// The Amazon Resource Name (ARN) of the function layer.
   final String? arn;
@@ -6212,9 +7356,9 @@ class Layer {
 }
 
 /// A ZIP archive that contains the contents of an <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-/// Lambda layer</a>. You can specify either an Amazon S3 location, or upload a
-/// layer archive directly.
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+/// layer</a>. You can specify either an Amazon S3 location, or upload a layer
+/// archive directly.
 class LayerVersionContentInput {
   /// The Amazon S3 bucket of the layer archive.
   final String? s3Bucket;
@@ -6225,8 +7369,8 @@ class LayerVersionContentInput {
   /// For versioned objects, the version of the layer archive object to use.
   final String? s3ObjectVersion;
 
-  /// The base64-encoded contents of the layer archive. AWS SDK and AWS CLI
-  /// clients handle the encoding for you.
+  /// The base64-encoded contents of the layer archive. Amazon Web Services SDK
+  /// and Amazon Web Services CLI clients handle the encoding for you.
   final Uint8List? zipFile;
 
   LayerVersionContentInput({
@@ -6250,8 +7394,8 @@ class LayerVersionContentInput {
 }
 
 /// Details about a version of an <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-/// Lambda layer</a>.
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+/// layer</a>.
 class LayerVersionContentOutput {
   /// The SHA-256 hash of the layer archive.
   final String? codeSha256;
@@ -6287,9 +7431,14 @@ class LayerVersionContentOutput {
 }
 
 /// Details about a version of an <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-/// Lambda layer</a>.
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+/// layer</a>.
 class LayerVersionsListItem {
+  /// A list of compatible <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architectures</a>.
+  final List<Architecture>? compatibleArchitectures;
+
   /// The layer's compatible runtimes.
   final List<Runtime>? compatibleRuntimes;
 
@@ -6310,6 +7459,7 @@ class LayerVersionsListItem {
   final int? version;
 
   LayerVersionsListItem({
+    this.compatibleArchitectures,
     this.compatibleRuntimes,
     this.createdDate,
     this.description,
@@ -6319,6 +7469,10 @@ class LayerVersionsListItem {
   });
   factory LayerVersionsListItem.fromJson(Map<String, dynamic> json) {
     return LayerVersionsListItem(
+      compatibleArchitectures: (json['CompatibleArchitectures'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as String).toArchitecture())
+          .toList(),
       compatibleRuntimes: (json['CompatibleRuntimes'] as List?)
           ?.whereNotNull()
           .map((e) => (e as String).toRuntime())
@@ -6333,8 +7487,8 @@ class LayerVersionsListItem {
 }
 
 /// Details about an <a
-/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">AWS
-/// Lambda layer</a>.
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html">Lambda
+/// layer</a>.
 class LayersListItem {
   /// The newest version of the layer.
   final LayerVersionsListItem? latestMatchingVersion;
@@ -6448,6 +7602,28 @@ class ListFunctionEventInvokeConfigsResponse {
           ?.whereNotNull()
           .map((e) =>
               FunctionEventInvokeConfig.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextMarker: json['NextMarker'] as String?,
+    );
+  }
+}
+
+class ListFunctionUrlConfigsResponse {
+  /// A list of function URL configurations.
+  final List<FunctionUrlConfig> functionUrlConfigs;
+
+  /// The pagination token that's included if more results are available.
+  final String? nextMarker;
+
+  ListFunctionUrlConfigsResponse({
+    required this.functionUrlConfigs,
+    this.nextMarker,
+  });
+  factory ListFunctionUrlConfigsResponse.fromJson(Map<String, dynamic> json) {
+    return ListFunctionUrlConfigsResponse(
+      functionUrlConfigs: (json['FunctionUrlConfigs'] as List)
+          .whereNotNull()
+          .map((e) => FunctionUrlConfig.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextMarker: json['NextMarker'] as String?,
     );
@@ -6795,6 +7971,11 @@ extension on String {
 }
 
 class PublishLayerVersionResponse {
+  /// A list of compatible <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/foundation-arch.html">instruction
+  /// set architectures</a>.
+  final List<Architecture>? compatibleArchitectures;
+
   /// The layer's compatible runtimes.
   final List<Runtime>? compatibleRuntimes;
 
@@ -6822,6 +8003,7 @@ class PublishLayerVersionResponse {
   final int? version;
 
   PublishLayerVersionResponse({
+    this.compatibleArchitectures,
     this.compatibleRuntimes,
     this.content,
     this.createdDate,
@@ -6833,6 +8015,10 @@ class PublishLayerVersionResponse {
   });
   factory PublishLayerVersionResponse.fromJson(Map<String, dynamic> json) {
     return PublishLayerVersionResponse(
+      compatibleArchitectures: (json['CompatibleArchitectures'] as List?)
+          ?.whereNotNull()
+          .map((e) => (e as String).toArchitecture())
+          .toList(),
       compatibleRuntimes: (json['CompatibleRuntimes'] as List?)
           ?.whereNotNull()
           .map((e) => (e as String).toRuntime())
@@ -6940,6 +8126,8 @@ enum Runtime {
   nodejs8_10,
   nodejs10X,
   nodejs12X,
+  nodejs14X,
+  nodejs16X,
   java8,
   java8Al2,
   java11,
@@ -6947,10 +8135,12 @@ enum Runtime {
   python3_6,
   python3_7,
   python3_8,
+  python3_9,
   dotnetcore1_0,
   dotnetcore2_0,
   dotnetcore2_1,
   dotnetcore3_1,
+  dotnet6,
   nodejs4_3Edge,
   go1X,
   ruby2_5,
@@ -6974,6 +8164,10 @@ extension on Runtime {
         return 'nodejs10.x';
       case Runtime.nodejs12X:
         return 'nodejs12.x';
+      case Runtime.nodejs14X:
+        return 'nodejs14.x';
+      case Runtime.nodejs16X:
+        return 'nodejs16.x';
       case Runtime.java8:
         return 'java8';
       case Runtime.java8Al2:
@@ -6988,6 +8182,8 @@ extension on Runtime {
         return 'python3.7';
       case Runtime.python3_8:
         return 'python3.8';
+      case Runtime.python3_9:
+        return 'python3.9';
       case Runtime.dotnetcore1_0:
         return 'dotnetcore1.0';
       case Runtime.dotnetcore2_0:
@@ -6996,6 +8192,8 @@ extension on Runtime {
         return 'dotnetcore2.1';
       case Runtime.dotnetcore3_1:
         return 'dotnetcore3.1';
+      case Runtime.dotnet6:
+        return 'dotnet6';
       case Runtime.nodejs4_3Edge:
         return 'nodejs4.3-edge';
       case Runtime.go1X:
@@ -7027,6 +8225,10 @@ extension on String {
         return Runtime.nodejs10X;
       case 'nodejs12.x':
         return Runtime.nodejs12X;
+      case 'nodejs14.x':
+        return Runtime.nodejs14X;
+      case 'nodejs16.x':
+        return Runtime.nodejs16X;
       case 'java8':
         return Runtime.java8;
       case 'java8.al2':
@@ -7041,6 +8243,8 @@ extension on String {
         return Runtime.python3_7;
       case 'python3.8':
         return Runtime.python3_8;
+      case 'python3.9':
+        return Runtime.python3_9;
       case 'dotnetcore1.0':
         return Runtime.dotnetcore1_0;
       case 'dotnetcore2.0':
@@ -7049,6 +8253,8 @@ extension on String {
         return Runtime.dotnetcore2_1;
       case 'dotnetcore3.1':
         return Runtime.dotnetcore3_1;
+      case 'dotnet6':
+        return Runtime.dotnet6;
       case 'nodejs4.3-edge':
         return Runtime.nodejs4_3Edge;
       case 'go1.x':
@@ -7066,7 +8272,7 @@ extension on String {
   }
 }
 
-/// The Self-Managed Apache Kafka cluster for your event source.
+/// The self-managed Apache Kafka cluster for your event source.
 class SelfManagedEventSource {
   /// The list of bootstrap servers for your Kafka brokers in the following
   /// format: <code>"KAFKA_BOOTSTRAP_SERVERS":
@@ -7093,32 +8299,57 @@ class SelfManagedEventSource {
   }
 }
 
-/// You can specify the authentication protocol, or the VPC components to secure
-/// access to your event source.
+/// To secure and define access to your event source, you can specify the
+/// authentication protocol, VPC components, or virtual host.
 class SourceAccessConfiguration {
-  /// The type of authentication protocol or the VPC components for your event
-  /// source. For example: <code>"Type":"SASL_SCRAM_512_AUTH"</code>.
+  /// The type of authentication protocol, VPC components, or virtual host for
+  /// your event source. For example: <code>"Type":"SASL_SCRAM_512_AUTH"</code>.
   ///
   /// <ul>
   /// <li>
-  /// <code>BASIC_AUTH</code> - (MQ) The Secrets Manager secret that stores your
-  /// broker credentials.
+  /// <code>BASIC_AUTH</code> - (Amazon MQ) The Secrets Manager secret that stores
+  /// your broker credentials.
+  /// </li>
+  /// <li>
+  /// <code>BASIC_AUTH</code> - (Self-managed Apache Kafka) The Secrets Manager
+  /// ARN of your secret key used for SASL/PLAIN authentication of your Apache
+  /// Kafka brokers.
   /// </li>
   /// <li>
   /// <code>VPC_SUBNET</code> - The subnets associated with your VPC. Lambda
-  /// connects to these subnets to fetch data from your Kafka cluster.
+  /// connects to these subnets to fetch data from your self-managed Apache Kafka
+  /// cluster.
   /// </li>
   /// <li>
   /// <code>VPC_SECURITY_GROUP</code> - The VPC security group used to manage
-  /// access to your Kafka brokers.
+  /// access to your self-managed Apache Kafka brokers.
   /// </li>
   /// <li>
-  /// <code>SASL_SCRAM_256_AUTH</code> - The ARN of your secret key used for SASL
-  /// SCRAM-256 authentication of your Kafka brokers.
+  /// <code>SASL_SCRAM_256_AUTH</code> - The Secrets Manager ARN of your secret
+  /// key used for SASL SCRAM-256 authentication of your self-managed Apache Kafka
+  /// brokers.
   /// </li>
   /// <li>
-  /// <code>SASL_SCRAM_512_AUTH</code> - The ARN of your secret key used for SASL
-  /// SCRAM-512 authentication of your Kafka brokers.
+  /// <code>SASL_SCRAM_512_AUTH</code> - The Secrets Manager ARN of your secret
+  /// key used for SASL SCRAM-512 authentication of your self-managed Apache Kafka
+  /// brokers.
+  /// </li>
+  /// <li>
+  /// <code>VIRTUAL_HOST</code> - (Amazon MQ) The name of the virtual host in your
+  /// RabbitMQ broker. Lambda uses this RabbitMQ host as the event source. This
+  /// property cannot be specified in an UpdateEventSourceMapping API call.
+  /// </li>
+  /// <li>
+  /// <code>CLIENT_CERTIFICATE_TLS_AUTH</code> - (Amazon MSK, Self-managed Apache
+  /// Kafka) The Secrets Manager ARN of your secret key containing the certificate
+  /// chain (X.509 PEM), private key (PKCS#8 PEM), and private key password
+  /// (optional) used for mutual TLS authentication of your MSK/Apache Kafka
+  /// brokers.
+  /// </li>
+  /// <li>
+  /// <code>SERVER_ROOT_CA_CERTIFICATE</code> - (Self-managed Apache Kafka) The
+  /// Secrets Manager ARN of your secret key containing the root CA certificate
+  /// (X.509 PEM) used for TLS encryption of your Apache Kafka brokers.
   /// </li>
   /// </ul>
   final SourceAccessType? type;
@@ -7155,6 +8386,9 @@ enum SourceAccessType {
   vpcSecurityGroup,
   saslScram_512Auth,
   saslScram_256Auth,
+  virtualHost,
+  clientCertificateTlsAuth,
+  serverRootCaCertificate,
 }
 
 extension on SourceAccessType {
@@ -7170,6 +8404,12 @@ extension on SourceAccessType {
         return 'SASL_SCRAM_512_AUTH';
       case SourceAccessType.saslScram_256Auth:
         return 'SASL_SCRAM_256_AUTH';
+      case SourceAccessType.virtualHost:
+        return 'VIRTUAL_HOST';
+      case SourceAccessType.clientCertificateTlsAuth:
+        return 'CLIENT_CERTIFICATE_TLS_AUTH';
+      case SourceAccessType.serverRootCaCertificate:
+        return 'SERVER_ROOT_CA_CERTIFICATE';
     }
   }
 }
@@ -7187,6 +8427,12 @@ extension on String {
         return SourceAccessType.saslScram_512Auth;
       case 'SASL_SCRAM_256_AUTH':
         return SourceAccessType.saslScram_256Auth;
+      case 'VIRTUAL_HOST':
+        return SourceAccessType.virtualHost;
+      case 'CLIENT_CERTIFICATE_TLS_AUTH':
+        return SourceAccessType.clientCertificateTlsAuth;
+      case 'SERVER_ROOT_CA_CERTIFICATE':
+        return SourceAccessType.serverRootCaCertificate;
     }
     throw Exception('$this is not known in enum SourceAccessType');
   }
@@ -7313,8 +8559,10 @@ extension on String {
   }
 }
 
-/// The function's AWS X-Ray tracing configuration. To sample and record
-/// incoming requests, set <code>Mode</code> to <code>Active</code>.
+/// The function's <a
+/// href="https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html">X-Ray</a>
+/// tracing configuration. To sample and record incoming requests, set
+/// <code>Mode</code> to <code>Active</code>.
 class TracingConfig {
   /// The tracing mode.
   final TracingMode? mode;
@@ -7330,7 +8578,7 @@ class TracingConfig {
   }
 }
 
-/// The function's AWS X-Ray tracing configuration.
+/// The function's X-Ray tracing configuration.
 class TracingConfigResponse {
   /// The tracing mode.
   final TracingMode? mode;
@@ -7384,6 +8632,58 @@ class UpdateCodeSigningConfigResponse {
     return UpdateCodeSigningConfigResponse(
       codeSigningConfig: CodeSigningConfig.fromJson(
           json['CodeSigningConfig'] as Map<String, dynamic>),
+    );
+  }
+}
+
+class UpdateFunctionUrlConfigResponse {
+  /// The type of authentication that your function URL uses. Set to
+  /// <code>AWS_IAM</code> if you want to restrict access to authenticated
+  /// <code>IAM</code> users only. Set to <code>NONE</code> if you want to bypass
+  /// IAM authentication to create a public endpoint. For more information, see <a
+  /// href="https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html"> Security
+  /// and auth model for Lambda function URLs</a>.
+  final FunctionUrlAuthType authType;
+
+  /// When the function URL was created, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String creationTime;
+
+  /// The Amazon Resource Name (ARN) of your function.
+  final String functionArn;
+
+  /// The HTTP URL endpoint for your function.
+  final String functionUrl;
+
+  /// When the function URL configuration was last updated, in <a
+  /// href="https://www.w3.org/TR/NOTE-datetime">ISO-8601 format</a>
+  /// (YYYY-MM-DDThh:mm:ss.sTZD).
+  final String lastModifiedTime;
+
+  /// The <a
+  /// href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">cross-origin
+  /// resource sharing (CORS)</a> settings for your function URL.
+  final Cors? cors;
+
+  UpdateFunctionUrlConfigResponse({
+    required this.authType,
+    required this.creationTime,
+    required this.functionArn,
+    required this.functionUrl,
+    required this.lastModifiedTime,
+    this.cors,
+  });
+  factory UpdateFunctionUrlConfigResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateFunctionUrlConfigResponse(
+      authType: (json['AuthType'] as String).toFunctionUrlAuthType(),
+      creationTime: json['CreationTime'] as String,
+      functionArn: json['FunctionArn'] as String,
+      functionUrl: json['FunctionUrl'] as String,
+      lastModifiedTime: json['LastModifiedTime'] as String,
+      cors: json['Cors'] != null
+          ? Cors.fromJson(json['Cors'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
