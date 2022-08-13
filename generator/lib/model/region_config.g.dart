@@ -24,12 +24,15 @@ RegionConfigData _$RegionConfigDataFromJson(Map<String, dynamic> json) {
     (json['patterns'] as Map<String, dynamic>).map(
       (k, e) => MapEntry(k, RegionConfig.fromJson(e as Map<String, dynamic>)),
     ),
-    RegionConfigData.mapFipsRulesFromJson(
-        json['fipsRules'] as Map<String, dynamic>),
-    RegionConfigData.mapDualstackRulesFromJson(
-        json['dualstackRules'] as Map<String, dynamic>),
-    RegionConfigData.mapDualstackFipsRulesFromJson(
-        json['dualstackFipsRules'] as Map<String, dynamic>),
+    (json['fipsRules'] as Map<String, dynamic>).map(
+      (k, e) => MapEntry(k, e as Object),
+    ),
+    (json['dualstackRules'] as Map<String, dynamic>).map(
+      (k, e) => MapEntry(k, e as Object),
+    ),
+    (json['dualstackFipsRules'] as Map<String, dynamic>).map(
+      (k, e) => MapEntry(k, e as Object),
+    ),
   );
 }
 
