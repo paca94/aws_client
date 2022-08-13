@@ -9,12 +9,8 @@ final rules = <String, RegionConfig>{
   'cn-*/*': RegionConfig(
     endpoint: '{service}.{region}.amazonaws.com.cn',
   ),
-  'us-iso-*/*': RegionConfig(
-    endpoint: '{service}.{region}.c2s.ic.gov',
-  ),
-  'us-isob-*/*': RegionConfig(
-    endpoint: '{service}.{region}.sc2s.sgov.gov',
-  ),
+  'us-iso-*/*': _usIso,
+  'us-isob-*/*': _usIsob,
   '*/budgets': _globalSSL,
   '*/cloudfront': _globalSSL,
   '*/sts': _globalSSL,
@@ -30,6 +26,16 @@ final rules = <String, RegionConfig>{
     signingRegion: 'cn-northwest-1',
   ),
   'us-gov-*/route53': _globalGovCloud,
+  'us-iso-*/route53': RegionConfig(
+    endpoint: '{service}.c2s.ic.gov',
+    globalEndpoint: true,
+    signingRegion: 'us-iso-east-1',
+  ),
+  'us-isob-*/route53': RegionConfig(
+    endpoint: '{service}.sc2s.sgov.gov',
+    globalEndpoint: true,
+    signingRegion: 'us-isob-east-1',
+  ),
   '*/waf': _globalSSL,
   '*/iam': _globalSSL,
   'cn-*/iam': RegionConfig(
@@ -78,4 +84,64 @@ final _globalGovCloud = RegionConfig(
 final _s3signature = RegionConfig(
   endpoint: '{service}.{region}.amazonaws.com',
   signatureVersion: 's3',
+);
+
+final _usIso = RegionConfig(
+  endpoint: '{service}.{region}.c2s.ic.gov',
+);
+
+final _usIsob = RegionConfig(
+  endpoint: '{service}.{region}.sc2s.sgov.gov',
+);
+
+final _fipsStandard = RegionConfig(
+  endpoint: '{service}-fips.{region}.amazonaws.com',
+);
+
+final _fipsDotPrefix = RegionConfig(
+  endpoint: 'fips.{service}.{region}.amazonaws.com',
+);
+
+final _fipsWithoutRegion = RegionConfig(
+  endpoint: '{service}-fips.amazonaws.com',
+);
+
+final _fips_api_ecr = RegionConfig(
+  endpoint: 'ecr-fips.{region}.amazonaws.com',
+);
+
+final _fips_api_sagemaker = RegionConfig(
+  endpoint: 'api-fips.sagemaker.{region}.amazonaws.com',
+);
+
+final _fips_models_lex = RegionConfig(
+  endpoint: 'models-fips.lex.{region}.amazonaws.com',
+);
+
+final _fips_runtime_lex = RegionConfig(
+  endpoint: 'runtime-fips.lex.{region}.amazonaws.com',
+);
+
+final _fipsWithServiceOnly = RegionConfig(
+  endpoint: '{service}.{region}.amazonaws.com',
+);
+
+final _dualstackLegacy = RegionConfig(
+  endpoint: '{service}.dualstack.{region}.amazonaws.com',
+);
+
+final _dualstackLegacyCn = RegionConfig(
+  endpoint: '{service}.dualstack.{region}.amazonaws.com.cn',
+);
+
+final _dualstackFipsLegacy = RegionConfig(
+  endpoint: '{service}-fips.dualstack.{region}.amazonaws.com',
+);
+
+final _dualstackFipsLegacyCn = RegionConfig(
+  endpoint: '{service}-fips.dualstack.{region}.amazonaws.com.cn',
+);
+
+final _dualstackLegacyEc2 = RegionConfig(
+  endpoint: 'api.ec2.{region}.aws',
 );
