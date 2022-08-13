@@ -24,9 +24,13 @@ final rules = <String, RegionConfig>{
   code.writeln('};');
 
   for (var pattern in regionConfigData.patterns.entries) {
+    String patternKey = pattern.key;
+    if (patternKey.contains(".")){
+      patternKey = pattern.key.replaceAll(".", "_");
+    }
     code.writeln('');
     code.writeln(
-        'final _${pattern.key} = ${_regionConfigToCode(pattern.value)};');
+        'final _${patternKey} = ${_regionConfigToCode(pattern.value)};');
   }
 
   return '$code';
