@@ -69,6 +69,8 @@ class Shape {
   @JsonKey(defaultValue: false)
   final bool requiresLength;
   late List<Member> _members;
+  @JsonKey(defaultValue: true)
+  final bool document;
 
   Shape(
     this.type,
@@ -102,6 +104,7 @@ class Shape {
     this.eventstream,
     this.union,
     this.requiresLength,
+    this.document,
   ) {
     membersMap?.entries.forEach((e) {
       e.value.name = e.key;
@@ -231,6 +234,7 @@ class Member {
   final bool eventpayload;
   final List<String>? tags;
   final String? timestampFormat;
+  final String? pattern;
 
   Member(
     this.shape,
@@ -252,6 +256,7 @@ class Member {
     this.eventpayload,
     this.tags,
     this.timestampFormat,
+    this.pattern,
   ) {
     _isRequired = location == 'uri';
   }

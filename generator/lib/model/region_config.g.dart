@@ -9,7 +9,13 @@ part of 'region_config.dart';
 RegionConfigData _$RegionConfigDataFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    allowedKeys: const ['rules', 'patterns'],
+    allowedKeys: const [
+      'rules',
+      'patterns',
+      'fipsRules',
+      'dualstackRules',
+      'dualstackFipsRules'
+    ],
   );
   return RegionConfigData(
     (json['rules'] as Map<String, dynamic>).map(
@@ -18,6 +24,12 @@ RegionConfigData _$RegionConfigDataFromJson(Map<String, dynamic> json) {
     (json['patterns'] as Map<String, dynamic>).map(
       (k, e) => MapEntry(k, RegionConfig.fromJson(e as Map<String, dynamic>)),
     ),
+    RegionConfigData.mapFipsRulesFromJson(
+        json['fipsRules'] as Map<String, dynamic>),
+    RegionConfigData.mapDualstackRulesFromJson(
+        json['dualstackRules'] as Map<String, dynamic>),
+    RegionConfigData.mapDualstackFipsRulesFromJson(
+        json['dualstackFipsRules'] as Map<String, dynamic>),
   );
 }
 
