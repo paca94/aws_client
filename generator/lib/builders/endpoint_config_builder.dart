@@ -42,8 +42,7 @@ import 'endpoint.dart';
       patternKey = dotKeyReplace(patternKey);
     }
     code.writeln('');
-    code.writeln(
-        'final _$patternKey = ${_regionConfigToCode(pattern.value)};');
+    code.writeln('final _$patternKey = ${_regionConfigToCode(pattern.value)};');
   }
 
   return '$code';
