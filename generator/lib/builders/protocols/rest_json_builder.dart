@@ -19,7 +19,7 @@ class RestJsonServiceBuilder extends ServiceBuilder {
       ${isRegionRequired ? 'required String' : 'String?'} region,
       _s.AwsClientCredentials? credentials,
       _s.AwsClientCredentialsProvider? credentialsProvider,
-      _s.Client? client, 
+      _s.Client? client,
       String? endpointUrl,
     })
   : _protocol = _s.RestJsonProtocol(
@@ -77,10 +77,12 @@ class RestJsonServiceBuilder extends ServiceBuilder {
       }
     }
     var isBlobResponse = false;
+    var isStringPayload = false;
     Member? payloadMember;
     if (outputShape?.payload != null) {
       payloadMember = outputShape!.membersMap![outputShape.payload];
       isBlobResponse = payloadMember!.shapeClass!.type == 'blob';
+      isStringPayload = payloadMember.dartType == 'String';
     }
     final isInlineExtraction =
         payloadMember != null || outputShape?.hasHeaderMembers == true;
@@ -100,7 +102,7 @@ class RestJsonServiceBuilder extends ServiceBuilder {
 
     if (operation.hasReturnType) {
       final outputShape = operation.output!.shapeClass;
-      if (!isBlobResponse && isInlineExtraction) {
+      if (!isBlobResponse && !isStringPayload && isInlineExtraction) {
         buf.writeln('final \$json = await _s.jsonFromResponse(response);');
       }
 
@@ -111,6 +113,9 @@ class RestJsonServiceBuilder extends ServiceBuilder {
         if (isBlobResponse) {
           buf.writeln(
               '${payloadMember!.fieldName}: await response.stream.toBytes(),');
+        } else if (isStringPayload) {
+          buf.writeln(
+              '${payloadMember!.fieldName}: await response.stream.bytesToString(),');
         } else if (payloadMember != null) {
           buf.writeln(
               '${payloadMember.fieldName}: ${payloadMember.shapeClass!.className}.fromJson(\$json),');
