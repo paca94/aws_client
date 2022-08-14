@@ -845,9 +845,8 @@ class DataExchange {
       headers: headers,
       exceptionFnMap: _exceptionFns,
     );
-    final $json = await _s.jsonFromResponse(response);
     return SendApiAssetResponse(
-      body: string.fromJson($json),
+      body: await response.stream.bytesToString(),
       responseHeaders: _s.extractHeaderMapValues(response.headers, ''),
     );
   }
